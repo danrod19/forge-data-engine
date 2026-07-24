@@ -1,0 +1,688 @@
+[
+  {
+    "source_id": 166,
+    "traditional": {
+      "id": 166,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How does HSRP provide first hop redundancy?",
+      "alternativas": [
+        "It load-balances Layer 2 traffic along the path by flflooding traffic out all interfaces configured with the same VLAN.",
+        "It uses a shared virtual MAC and a virtual IP address to a group of routers that serve as the default gateway for hosts on a LAN.",
+        "It forwards multiple packets to the same destination over different routed links in the data path.",
+        "It load-balances traffic by assigning the same metric value to more than one route to the same destination in the IP routing table."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "HSRP provides first-hop redundancy by electing an active router that owns a virtual IP and virtual MAC shared by the HSRP group. Hosts use the VIP as default gateway; if the active fails, the standby assumes the VIP/vMAC so traffic continues. It does not flood L2 for load balancing, does not ECMP routed packets by itself, and is not equal-cost multipath in the routing table."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 167,
+    "traditional": {
+      "id": 167,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command must you enter to guarantee that an HSRP router with higher priority becomes the HSRP primary router after it is reloaded?",
+      "alternativas": [
+        "standby 10 preempt",
+        "standby 10 version 1",
+        "standby 10 priority 150",
+        "standby 10 version 2"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Higher HSRP priority alone does not reclaim the active role after reload if preemption is disabled. standby preempt allows a recovering higher-priority router to take over as active. Version and priority commands alone do not force re-election after reload without preempt."
+    },
+    "ticket": {
+      "id": 167,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9167 — R1 (priority 150) foi recarregado. R2 (priority 100) permanece Active e o tráfego não volta para R1. Ambos no grupo HSRP 10 com VIP 10.10.10.1.",
+      "cli_output": "R1# show standby brief\n                     P indicates configured to preempt.\n                     |\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nGi0/0       10   150   Standby 10.10.10.3     local           10.10.10.1\n\nR1# show running-config | include standby\nstandby 10 ip 10.10.10.1\nstandby 10 priority 150\n! (sem standby 10 preempt)\n\nR2# show standby brief\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nGi0/0       10   100   Active  local           10.10.10.2     10.10.10.1",
+      "alternativas": [
+        "Falta standby 10 preempt em R1; sem preempt a prioridade maior não retoma Active após o reload.",
+        "Trocar para standby 10 version 2 resolve sozinho a preempção.",
+        "Priority 150 é inválida; HSRP só aceita priority 100.",
+        "show interfaces confirma que HSRP ignora priority sem version 1."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "HSRP só devolve o papel Active a um router de maior prioridade se preempt estiver habilitado. O output mostra Pri 150 sem flag P e State Standby. Correção: standby 10 preempt. Version não substitui preempt; priority 150 é válida."
+    }
+  },
+  {
+    "source_id": 168,
+    "traditional": {
+      "id": 168,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command should you enter to verify the priority of a router in an HSRP group?",
+      "alternativas": [
+        "show hsrp",
+        "show sessions",
+        "show interfaces",
+        "show standby"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "show standby (or show standby brief) displays HSRP state, priority, preempt, virtual IP/MAC, and active/standby roles. show hsrp is not the classic IOS form. show sessions and show interfaces do not show HSRP priority."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 169,
+    "traditional": {
+      "id": 169,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which of the following dynamic routing protocols are Distance Vector routing protocols?",
+      "alternativas": [
+        "IS-IS",
+        "EIGRP",
+        "OSPF",
+        "RIP"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "EIGRP is an advanced distance-vector protocol (DUAL). OSPF and IS-IS are link-state. RIP is classic distance-vector (also correct in multi-select dumps). This bank stores a single index keyed to EIGRP after cleaning the mangled BGP/RIP option line."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 170,
+    "traditional": {
+      "id": 170,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command should you enter to view the error log in an EIGRP for IPv6 environment?",
+      "alternativas": [
+        "show ipv6 eigrp neighbors",
+        "show ipv6 eigrp topology",
+        "show ipv6 eigrp traffic",
+        "show ipv6 eigrp events"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "show ipv6 eigrp events displays the EIGRP event log used for troubleshooting adjacency and update issues. neighbors/topology/traffic show peer, topology table, and counters—not the event error log."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 171,
+    "traditional": {
+      "id": 171,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command is used to display the collection of OSPF link states?",
+      "alternativas": [
+        "show ip ospf link-state",
+        "show ip ospf lsa database",
+        "show ip ospf neighbors",
+        "show ip ospf database"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "show ip ospf database displays the OSPF LSDB (router, network, summary LSAs, etc.). There is no standard show ip ospf link-state / lsa database as primary. neighbors shows adjacency state only."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 172,
+    "traditional": {
+      "id": 172,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network administrator is troubleshooting the OSPF configuration of routers R1 and R2. The routers cannot establish an adjacency relationshipon their common Ethernet link.The graphic shows the output of the show ip ospf interface e0 command for routers R1 and R2. Based on the information in the graphic, what is the cause of this problem?",
+      "alternativas": [
+        "The OSPF area is not configured properly.",
+        "The priority on R1 should be set higher.",
+        "The cost on R1 should be set higher.",
+        "The hello and dead timers are not configured properly."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "OSPF adjacency requires matching hello/dead timers (among area, network type, auth, stub flags). Mismatched timers keep neighbors from reaching FULL. Priority/cost affect DR election and metrics, not basic adjacency. Process IDs need not match between routers."
+    },
+    "ticket": {
+      "id": 172,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9172 — R1 e R2 não formam adjacência OSPF no link Ethernet comum. show ip ospf neighbor vazio.",
+      "cli_output": "R1# show ip ospf interface gi0/0\nGigabitEthernet0/0 is up, line protocol is up\n  Internet Address 192.168.1.1/24, Area 0\n  Process ID 1, Router ID 1.1.1.1, Network Type BROADCAST, Cost: 1\n  Timer intervals configured, Hello 10, Dead 40, WaitInterval 5, Retransmit 5\n\nR2# show ip ospf interface gi0/0\nGigabitEthernet0/0 is up, line protocol is up\n  Internet Address 192.168.1.2/24, Area 0\n  Process ID 1, Router ID 2.2.2.2, Network Type BROADCAST, Cost: 1\n  Timer intervals configured, Hello 5, Dead 20, WaitInterval 5, Retransmit 5\n\nR1# show ip ospf neighbor\n! (empty)",
+      "alternativas": [
+        "Hello/Dead divergentes (10/40 vs 5/20) impedem adjacência OSPF.",
+        "Process ID diferente entre roteadores é obrigatório e está faltando.",
+        "É preciso elevar priority em R1 para formar vizinho.",
+        "Cost 1 em ambos bloqueia FULL por definição."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Timers Hello/Dead devem coincidir. Aqui 10/40 ≠ 5/20. Process ID pode diferir; priority/cost não explicam neighbor vazio. Alinhar ip ospf hello-interval/dead-interval."
+    }
+  },
+  {
+    "source_id": 173,
+    "traditional": {
+      "id": 173,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "If all OSPF routers in a single area are configured with the same priority value, what value does a router use for the OSPF router ID in the absenceof a loopback interface?",
+      "alternativas": [
+        "the IP address of the first Fast Ethernet interface",
+        "the IP address of the console management interface",
+        "the highest IP address among its active interfaces",
+        "the lowest IP address among its active interfaces"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Without a router-id command or loopback, OSPF chooses the highest IP among up/up interfaces as Router ID. Not console IP, not lowest IP, not priority."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 174,
+    "traditional": {
+      "id": 174,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "R1 has learned route 192.168.12.0/24 via IS-IS, OSPF, RIP, and Internal EIGRP. Under normal operating conditions, which routing protocol isinstafilled in the routing table?",
+      "alternativas": [
+        "IS-IS",
+        "Internal EIGRP",
+        "RIP",
+        "OSPF"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Administrative distance: Internal EIGRP 90, OSPF 110, IS-IS 115, RIP 120. Lowest AD wins for the same prefix, so Internal EIGRP is installed."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 175,
+    "traditional": {
+      "id": 175,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A user configured OSPF in a single area between two routers. A serial interface connecting R1 and R2 is running encapsulation PPP. By default,which OSPF network type is seen on this interface when the user types show ip ospf interface on R1 or R2?",
+      "alternativas": [
+        "nonbroadcast",
+        "point-to-point",
+        "point-to-multipoint",
+        "broadcast"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Serial PPP links default to OSPF network type point-to-point (no DR/BDR). Broadcast is Ethernet default. NBMA types need explicit config."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 176,
+    "traditional": {
+      "id": 176,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which MAC address is recognized as a VRRP virtual address?",
+      "alternativas": [
+        "0000.5E00.010a",
+        "0005.3709.8968",
+        "0000.0C07.AC99",
+        "0007.C070.AB01"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "VRRP virtual MAC format is 0000.5E00.01xx where xx is the group ID in hex. 0000.5E00.010a is group 10. 0000.0C07.ACxx is HSRP v1."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 177,
+    "traditional": {
+      "id": 177,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer configured an OSPF neighbor as a designated router. Which state verifies the designated router is in the proper mode?",
+      "alternativas": [
+        "Init",
+        "2-way",
+        "Exchange",
+        "Full"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "A DR adjacency reaches Full state with neighbors that fully exchange LSAs. Init/2-way are earlier; 2-way may be enough for non-DR pairs on multi-access, but verifying the DR is operating properly for adjacency completion is Full with its neighbors."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 178,
+    "traditional": {
+      "id": 178,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When the active router in a VRRP group fails, which router assumes the role and forwards packets?",
+      "alternativas": [
+        "forwarding",
+        "standby",
+        "backup",
+        "listening"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "In VRRP, the Backup router assumes Master when the current Master fails. HSRP uses Active/Standby terminology; VRRP uses Master/Backup."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 179,
+    "traditional": {
+      "id": 179,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which action does the router take as it forwards a packet through the network?",
+      "alternativas": [
+        "The router encapsulates the original packet and then includes a tag that identifies the source router MAC address and transmits ittransparently to the destination.",
+        "The router encapsulates the source and destination IP addresses with the sending router IP address as the source and the neighbor IPaddress as the destination.",
+        "The router replaces the original source and destination MAC addresses with the sending router MAC address as the source and neighborMAC address as the destination.",
+        "The router replaces the source and destination labels with the sending router interface label as a source and the next hop router label as adestination."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "When routing, the router rewrites L2 headers: source MAC = egress interface MAC, destination MAC = next-hop MAC; L3 addresses stay the same. It does not encapsulate by swapping to neighbor IP as L3 destination for ordinary IP routing, nor use MPLS labels unless MPLS is in use."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 180,
+    "traditional": {
+      "id": 180,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which virtual MAC address is used by VRRP group 1?",
+      "alternativas": [
+        "0504.0367.4921",
+        "0007.c061.bc01",
+        "0050.0c05.ad81",
+        "0000.5E00.0101"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "VRRP group 1 virtual MAC is 0000.5E00.0101 (base 0000.5E00.01 + group 01)."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 181,
+    "traditional": {
+      "id": 181,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the purpose of using First Hop Redundancy Protocol on a specific subnet?",
+      "alternativas": [
+        "forwards multicast hello messages between routers",
+        "sends the default route to the hosts on a network",
+        "ensures a loop-free physical topology",
+        "filters traffic based on destination IP addressing"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "FHRP provides a resilient default gateway for hosts on the subnet (virtual IP). Hosts still point to that VIP; FHRP is not STP, not ACL filtering, though hellos are used between routers for election."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 182,
+    "traditional": {
+      "id": 182,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer is configuring router R1 with an IPv6 static route for prefix 2019:C15C:0CAF:E001::/64. The next hop must be2019:C15C:0CAF:E002::1. The route must be reachable via the R1 Gigabit 0/0 interface. Which command configures the designated route?",
+      "alternativas": [
+        "R1(config-if)#ip route 2019:C15C:0CAF:E001::/64 GigabitEthernet 0/0",
+        "R1(config)#ip route 2019:C15C:0CAF:E001::/64 GigabitEthernet 0/0",
+        "R1(config-if)#ipv6 route 2019:C15C:0CAF:E001::/64 2019:C15C:0CAF:E002::1",
+        "R1(config)#ipv6 route 2019:C15C:0CAF:E001::/64 2019:C15C:0CAF:E002::1"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "IPv6 static routes use ipv6 route in global config: ipv6 route <prefix>/<len> <next-hop>. ip route is IPv4. Interface mode is wrong for standard static route commands."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 183,
+    "traditional": {
+      "id": 183,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "OSPF must be configured between routers R1 and R2. Which OSPF configuration must be applied to router R1 to avoid a DR/BDR election?",
+      "alternativas": [
+        "router ospf 1 network 192.168.1.1 0.0.0.0 area 0 interface e1/1 ip address 192.168.1.1 255.255.255.252 ip ospf cost 0",
+        "router ospf 1 network 192.168.1.1 0.0.0.0 area 0 hello interval 15 interface e1/1 ip address 192.168.1.1 255.255.255.252",
+        "router ospf 1 network 192.168.1.1 0.0.0.0 area 0 interface e1/1 ip address 192.168.1.1 255.255.255.252 ip ospf network broadcast",
+        "router ospf 1 network 192.168.1.1 0.0.0.0 area 0 interface e1/1 ip address 192.168.1.1 255.255.255.252 ip ospf network point-to-point"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "ip ospf network point-to-point avoids DR/BDR election on the link. broadcast forces DR election. Cost/hello tweaks do not remove DR election on broadcast."
+    },
+    "ticket": {
+      "id": 183,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9183 — Link /30 entre R1–R2 elege DR/BDR desnecessariamente. Engenharia quer evitar eleição DR/BDR.",
+      "cli_output": "R1# show ip ospf interface gi0/1\nGigabitEthernet0/1 is up, line protocol is up\n  Internet Address 192.168.1.1/30, Area 0\n  Network Type BROADCAST, Cost: 1\n  Transmit Delay is 1 sec, State DR, Priority 1\n  Designated Router (ID) 1.1.1.1, Interface address 192.168.1.1\n  Backup Designated router (ID) 2.2.2.2, Interface address 192.168.1.2",
+      "alternativas": [
+        "Configurar ip ospf network point-to-point no link para eliminar DR/BDR.",
+        "ip ospf network broadcast é o comando para evitar DR.",
+        "ip ospf cost 0 remove a eleição DR.",
+        "Hello 15 sozinho desativa BDR."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Network type point-to-point não elege DR/BDR — ideal em /30. Broadcast força DR. Cost/hello não removem eleição."
+    }
+  },
+  {
+    "source_id": 184,
+    "traditional": {
+      "id": 184,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which SDN plane forwards user-generated traffic?",
+      "alternativas": [
+        "Management plane",
+        "Control plane",
+        "Policy plane",
+        "Data plane"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "The data (forwarding) plane carries user traffic. Control plane builds tables (OSPF, etc.). Management plane is device admin. Policy plane is an SDN abstraction for intent/policy, not the packet-forwarding plane name here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 185,
+    "traditional": {
+      "id": 185,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A packet from a company's branch office is destined to host 172.31.0.1 at headquarters. The sending router has three possible matches in itsrouting table for the packet: prefixes 172.31.0.0/16, 172.31.0.0/24, and 172.31.0.0/25. How does the router handle the packet?",
+      "alternativas": [
+        "It sends the traffic via prefix 172.31.0.0/24.",
+        "It sends the traffic via prefix 172.31.0.0/16.",
+        "It sends the traffic via prefix 172.31.0.0/25.",
+        "It sends the traffic via the default gateway 0.0.0.0/0."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Longest prefix match: 172.31.0.1 matches /25 more specifically than /24 or /16, so the /25 route is used."
+    },
+    "ticket": {
+      "id": 185,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9185 — Pacote a 172.31.0.1 escolhe rota errada segundo a equipe. Três prefixos instalados.",
+      "cli_output": "R1# show ip route 172.31.0.1\nRouting entry for 172.31.0.0/25\n  Known via \"static\", distance 1, metric 0\n  Routing Descriptor Blocks:\n  * 10.0.0.2\n\nR1# show ip route | include 172.31\nS        172.31.0.0/16 ...\nS        172.31.0.0/24 ...\nS        172.31.0.0/25 ...",
+      "alternativas": [
+        "Longest match usa 172.31.0.0/25 para 172.31.0.1.",
+        "Sempre vence o /16 por ser mais “amplo”.",
+        "Default 0.0.0.0/0 tem prioridade sobre qualquer match.",
+        "O /24 vence o /25 por AD menor implícito."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "IOS aplica longest-prefix match. /25 é mais específico que /24 e /16 para 172.31.0.1. Default só se não houver match."
+    }
+  },
+  {
+    "source_id": 186,
+    "traditional": {
+      "id": 186,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer just instafilled network 10.120.10.0/24. Which configuration must be applied to the R14 router to add the new network to its OSPFrouting table?",
+      "alternativas": [
+        "Router ospf 100 Network 10.120.10.0 0.0.0.255 area 0",
+        "Router ospf 120 Network 10.120.10.0 255.255.255.0 area 0 Ip route 10.120.10.0 255.255.255.0 fa0/1",
+        "Router ospf 100 area 0 Network 10.120.10.0 0.0.0.255",
+        "Router ospf 100 Network 10.120.10.0 255.255.255.0 area 0"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "OSPF network statement uses wildcard mask: network 10.120.10.0 0.0.0.255 area 0 under router ospf. Using subnet mask 255.255.255.0 in network is wrong. area placement before network is invalid syntax."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 187,
+    "traditional": {
+      "id": 187,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the MAC address used with VRRP as a virtual address?",
+      "alternativas": [
+        "00-05-42-38-53-31",
+        "00-00-5E-00-01-0a",
+        "00-00-0C-07-AD-89",
+        "00-07-C0-70-AB-01"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "VRRP virtual MAC 00-00-5E-00-01-0a corresponds to group 10. HSRP uses 00-00-0C-07-ACxx."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 188,
+    "traditional": {
+      "id": 188,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Why would VRRP be implemented when configuring a new subnet in a multivendor environment?",
+      "alternativas": [
+        "when a gateway protocol is required that supports more than two Cisco devices for redundancy",
+        "to interoperate normally with all vendors and provide additional security features for Cisco devices",
+        "to ensure that the spanning-tree forwarding path to the gateway is loop-free",
+        "to enable normal operations to continue after a member failure without requiring a change in a host ARP cache"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "VRRP is an open standard, suitable in multivendor networks for gateway redundancy. Cisco-only extras are not the multivendor reason. STP is separate. ARP-cache transparency is a general FHRP benefit but the multivendor driver is standards interoperability."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 189,
+    "traditional": {
+      "id": 189,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of address is shared by routers in a HSRP implementation and used by hosts on the subnet as their default gateway address?",
+      "alternativas": [
+        "multicast address",
+        "virtual IP address",
+        "loopback IP address",
+        "broadcast address"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Hosts use the HSRP virtual IP as default gateway. Multicast is for hellos; loopback is not the LAN gateway; broadcast is not the VIP."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 190,
+    "traditional": {
+      "id": 190,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "By default, which virtual MAC address does HSRP group 14 use?",
+      "alternativas": [
+        "00:05:5e:19:0c:14",
+        "00:05:0c:07:ac:14",
+        "04:15:26:73:3c:0e",
+        "00:00:0c:07:ac:0e"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "HSRP v1 virtual MAC is 0000.0C07.ACxx with xx = group in hex. Group 14 = 0x0E → 00:00:0c:07:ac:0e."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 191,
+    "traditional": {
+      "id": 191,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A router has two static routes to the same destination network under the same OSPF process. How does the router forward packets to thedestination if the next-hop devices are different?",
+      "alternativas": [
+        "The router chooses the route with the oldest age.",
+        "The router chooses the next hop with the lowest IP address.",
+        "The router chooses the next hop with the lowest MAC address.",
+        "The router load-balances traffic over all routes to the destination."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Equal-cost (or equal-AD equal-metric) static routes to the same prefix with different next hops are CEF load-balanced by default. Age/MAC/lowest IP are not the selection rules."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 192,
+    "traditional": {
+      "id": 192,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What does the implementation of a first-hop redundancy protocol protect against on a network?",
+      "alternativas": [
+        "default gateway failure",
+        "BGP neighbor flflapping",
+        "spanning-tree loops",
+        "root-bridge loss"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "FHRP protects against default gateway failure by providing a standby/backup forwarder for the VIP. It does not fix BGP flapping, STP loops, or root bridge loss."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 193,
+    "traditional": {
+      "id": 193,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which feature or protocol is required for an IP SLA to measure UDP jitter?",
+      "alternativas": [
+        "LLDP",
+        "EEM",
+        "CDP",
+        "NTP"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "UDP jitter IP SLA measurements need synchronized time (NTP) for accurate one-way delay/jitter calculations. LLDP/CDP/EEM are unrelated as the required feature for jitter accuracy."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 194,
+    "traditional": {
+      "id": 194,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which NAT term is defined as a group of addresses available for NAT use?",
+      "alternativas": [
+        "NAT pool",
+        "dynamic NAT",
+        "static NAT",
+        "one-way NAT"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "A NAT pool is a configured range of addresses available for dynamic translation. Dynamic/static/one-way describe methods, not the address group term."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 195,
+    "traditional": {
+      "id": 195,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command can you enter to allow Telnet to be supported in addition to SSH?",
+      "alternativas": [
+        "transport input telnet ssh",
+        "transport input telnet",
+        "no transport input telnet",
+        "privilege level 15"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "transport input telnet ssh on the VTY allows both protocols. telnet alone drops SSH; no transport input telnet removes Telnet; privilege level does not enable protocols."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 196,
+    "traditional": {
+      "id": 196,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the authoritative source for an address lookup?",
+      "alternativas": [
+        "a recursive DNS search",
+        "the operating system cache",
+        "the ISP local cache",
+        "the browser cache"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Authoritative DNS answers come from the authoritative name servers via the resolution process (recursive/iterative lookup path). Caches (OS/browser/ISP) may return non-authoritative answers."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 197,
+    "traditional": {
+      "id": 197,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command is used to verify the DHCP relay agent address that has been set up on your Cisco IOS router?",
+      "alternativas": [
+        "show ip interface brief",
+        "show ip dhcp bindings",
+        "show ip route",
+        "show ip interface"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "show ip interface displays helper-address (DHCP relay) configured on the interface. brief omits helpers; bindings/pool are server-side; route table is unrelated."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 198,
+    "traditional": {
+      "id": 198,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of information resides on a DHCP server?",
+      "alternativas": [
+        "a list of the available IP addresses in a pool",
+        "a list of public IP addresses and their corresponding names",
+        "usernames and passwords for the end users in a domain",
+        "a list of statically assigned MAC addresses"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "DHCP servers maintain address pools of available leases (plus options/bindings). DNS names, domain passwords, and static MAC lists are not the primary DHCP server data described."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 199,
+    "traditional": {
+      "id": 199,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which Cisco IOS command will indicate that interface GigabitEthernet 0/0 is configured via DHCP?",
+      "alternativas": [
+        "show ip interface GigabitEthernet 0/0 dhcp",
+        "show interface GigabitEthernet 0/0",
+        "show ip interface dhcp",
+        "show ip interface GigabitEthernet 0/0"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "show ip interface GigabitEthernet 0/0 shows Interface is up, address assignment method including DHCP when configured. The dhcp-specific show forms listed are invalid/not primary."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 200,
+    "traditional": {
+      "id": 200,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What will happen if you configure the logging trap debug command on a router?",
+      "alternativas": [
+        "It causes the router to send messages with lower severity levels to the syslog server",
+        "It causes the router to send all messages with the severity levels Warning, Error, Critical, and Emergency to the syslog server",
+        "It causes the router to send all messages to the syslog server",
+        "It causes the router to stop sending all messages to the syslog server"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "logging trap debug sets severity to 7, so all lower-severity-number messages (0–7) are sent—effectively all standard syslog levels to the server. It does not stop logging nor limit only to warning+."
+    },
+    "ticket": null
+  }
+]

@@ -1,0 +1,1217 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7104 — O servidor de monitoramento em R1 Gi0/1 deveria receber um GUA IPv6 derivado do prefixo 2001:DB8:5:112::/64 e do MAC da interface (EUI-64). O link-local sobe, mas o endereço global esperado (baseado no MAC) não aparece. A equipe colou um endereço estático incompleto e pede o comando correto para gerar o IID automaticamente a partir do prefixo e do MAC.",
+    "cli_output": "R1# show ipv6 interface gi0/1\nGigabitEthernet0/1 is up, line protocol is up\n  IPv6 is enabled, link-local address is FE80::C801:1AFF:FE23:4501\n  No global unicast address is configured\n  ND reachable time is 30000 milliseconds\n  ND advertised reachable time is 0 milliseconds\n\nR1# show running-config interface gi0/1\ninterface GigabitEthernet0/1\n description MONITOR-SRV\n ipv6 enable\n ! (sem ipv6 address ... eui-64)\n\nR1# show interfaces gi0/1\nGigabitEthernet0/1 is up, line protocol is up\n  Hardware is CSR vNIC, address is c801.1a23.4501 (bia c801.1a23.4501)",
+    "alternativas": [
+      "Configurar ipv6 address 2001:DB8:5:112::/64 eui-64 na Gi0/1 para gerar o IID a partir do MAC com o prefixo especificado.",
+      "Configurar apenas ipv6 address dhcp e esperar que o MAC seja enviado como prefixo pelo servidor.",
+      "Configurar ipv6 address 2001:DB8:5:112::2/64 link-local para forçar o GUA a partir do MAC.",
+      "Manter só ipv6 enable; o GUA EUI-64 é criado automaticamente sem prefixo configurado."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Com apenas ipv6 enable, a interface obtém link-local (FE80::/10) mas não instala GUA. Para um endereço global a partir de um prefixo que você especifica e do MAC da interface, o comando correto é ipv6 address 2001:DB8:5:112::/64 eui-64 — o IOS monta o interface ID no formato EUI-64 a partir do MAC c801.1a23.4501. DHCPv6 não usa o prefixo+MAC da forma pedida. Marcar um /64 como link-local está semanticamente errado (link-local é FE80::/10). Sem anunciar/configurar prefixo, EUI-64 sozinho não materializa GUA."
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7112 — Link ponto a ponto entre R-CORE e R-EDGE deveria usar um /30. Após a mudança, o ping entre os peers falha intermitentemente e a equipe de WAN reporta máscara inconsistente. R-CORE ficou com 209.165.201.1; precisam validar qual combinação de IP utilizável + máscara /30 está correta no peer.",
+    "cli_output": "R-EDGE# show running-config interface gi0/0\ninterface GigabitEthernet0/0\n description to R-CORE\n ip address 209.165.201.2 255.255.255.248\n!\nR-EDGE# show ip interface brief\nInterface              IP-Address      OK? Method Status                Protocol\nGigabitEthernet0/0     209.165.201.2   YES NVRAM  up                    up\n\nR-CORE# show running-config interface gi0/0\ninterface GigabitEthernet0/0\n description to R-EDGE\n ip address 209.165.201.1 255.255.255.252\n!\nR-EDGE# show ip route 209.165.201.1\n% Network not in table\n\nR-EDGE# ping 209.165.201.1\nSending 5, 100-byte ICMP Echos to 209.165.201.1, timeout is 2 seconds:\n.....\nSuccess rate is 0 percent (0/5)",
+    "alternativas": [
+      "Corrigir R-EDGE para ip address 209.165.201.2 255.255.255.252 (/30); a máscara /29 atual coloca o peer fora da mesma sub-rede utilizável.",
+      "Usar 10.2.1.3 255.255.255.252 em R-EDGE; .3/30 é sempre o melhor host em qualquer /30.",
+      "Manter 255.255.255.248 e mudar só o IP para 172.16.1.4, que já é um /30 válido.",
+      "Trocar ambos para 192.168.1.1 255.255.255.248; /29 é o padrão Cisco para links serial ponto a ponto."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "R-CORE está em 209.165.201.1/30 (máscara 255.255.255.252). R-EDGE está em .2 com 255.255.255.248 (/29), então o cálculo de rede/broadcast diverge e o peer deixa de ser tratado como on-link corretamente. A combinação utilizável /30 correta no peer é 209.165.201.2 255.255.255.252. 10.2.1.3/30 é broadcast da rede 10.2.1.0/30. 172.16.1.4 com /29 não atende o requisito /30. /29 não é o padrão obrigatório para P2P — o desenho pedido é /30."
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7120 — Usuários na VLAN 40 relatam picos de CPU no access switch e captura mostra o mesmo unicast desconhecido saindo em dezenas de portas da VLAN 40. O destino 0050.56aa.bb01 não está estável na tabela MAC. A equipe pergunta o comportamento esperado de frame flflooding nesse cenário.",
+    "cli_output": "SW-A1# show mac address-table dynamic vlan 40\n          Mac Address Table\n-------------------------------------------\nVlan    Mac Address       Type        Ports\n----    -----------       --------    -----\n  40    0050.56aa.1001    DYNAMIC     Gi1/0/3\n  40    0050.56aa.1002    DYNAMIC     Gi1/0/4\n! (0050.56aa.bb01 NÃO aparece)\n\nSW-A1# show interfaces gi1/0/10 switchport\nName: Gi1/0/10\nSwitchport: Enabled\nAdministrative Mode: static access\nOperational Mode: static access\nAccess Mode VLAN: 40 (USERS)\n\nSW-A1# show mac address-table address 0050.56aa.bb01\n% Unicast MAC address not found in MAC address table\n\n! SPAN na VLAN 40: frame destinated to 0050.56aa.bb01 visto em Gi1/0/3, Gi1/0/4, Gi1/0/5... (todas access VLAN 40) exceto a porta de origem Gi1/0/10",
+    "alternativas": [
+      "Com MAC de destino desconhecido, o switch faz flflooding: envia o frame a todas as portas da mesma VLAN, exceto a porta de origem.",
+      "O switch envia o frame a todas as portas de todas as VLANs porque unknown unicast ignora VLAN.",
+      "O switch só encaminha para portas que já têm a entrada CAM correspondente ao destino.",
+      "O frame é replicado inclusive de volta pela porta de origem para revalidar o MAC do host."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem entrada CAM para 0050.56aa.bb01, o unicast é unknown: flflooding na VLAN 40 para todas as portas ativas da VLAN, menos a origem (Gi1/0/10). O SPAN confirma réplicas só em portas da VLAN 40. Flflooding não atravessa outras VLANs. Se houvesse match na MAC table, haveria unicast filter para uma única porta. Reenviar pela porta de origem não é o comportamento padrão de flflooding e desperdiçaria o frame no host que já o originou."
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7128 — Hosts na VLAN 60 deveriam obter GUA IPv6 automaticamente derivados do MAC (SLAAC), mas só aparecem link-locals. O roteador de primeiro salto anuncia o prefixo 2001:DB8:60:1::/64. A interface LAN do R1 está com IPv6 habilitado, porém sem autoconfig/SLAAC no lado do cliente de teste (router-on-a-stick lab) e os hosts reportam “no global address”.",
+    "cli_output": "R1# show ipv6 interface gi0/0.60\nGigabitEthernet0/0.60 is up, line protocol is up\n  IPv6 is enabled, link-local address is FE80::1\n  Global unicast address(es):\n    2001:DB8:60:1::1, subnet is 2001:DB8:60:1::/64\n  ND advertised reachable time is 0 milliseconds\n  ND advertised retransmit interval is 0 milliseconds\n  ND router advertisements are sent every 200 seconds\n  Hosts use stateless autoconfig for addresses.\n\nPC1# (simulado) show ipv6 interface brief\nEthernet0/0  [up/up]\n    FE80::A8BB:CCFF:FE00:100\n    ! nenhum GUA\n\n! Host com autoconfig desabilitado / stack IPv6 sem SLAAC\n! RA do R1 visível em captura: prefix 2001:DB8:60:1::/64 A-flag=1",
+    "alternativas": [
+      "Habilitar SLAAC/autoconfig na interface do host para formar o GUA a partir do prefixo do RA e do identificador derivado do MAC.",
+      "Desabilitar o processo EUI-64 no host para forçar o uso exclusivo do link-local como GUA.",
+      "Atribuir manualmente apenas um link-local adicional; isso instala automaticamente o GUA global.",
+      "Remover o prefixo do RA e depender só de DHCPv6 stateful sem flag A, o que ainda gera IID pelo MAC via SLAAC."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O RA de R1 já anuncia 2001:DB8:60:1::/64 com comportamento de SLAAC (A-flag). Sem SLAAC/autoconfig no host, só o link-local localmente gerado aparece. Habilitar SLAAC permite concatenar prefixo do RA + IID (EUI-64/MAC ou privacy) e obter GUA. Desabilitar EUI-64 não cria GUA. Link-local extra não vira global unicast. DHCPv6 stateful é outro modelo; e sem prefixo/A-flag o host não faz SLAAC clássico baseado em MAC+prefixo anunciado."
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7135 — AP-ANDAR4-02 em local mode fica em discovery loop e não registra na WLC. O AP está em access VLAN 99 (mgmt APs). A WLC (10.99.0.5) está em outro prédio. Ping do gateway da VLAN 99 até a WLC funciona. A equipe achava que o AP precisava estar no mesmo switch da WLC ou em cabo direto.",
+    "cli_output": "AP-ANDAR4-02# show capwap client rcb\nAdminState                         : ADMIN_ENABLED\nName                               : AP-ANDAR4-02\nLocation                           : default location\nPrimary controller name            : \nPrimary controller IP              : 0.0.0.0\nSecondary controller IP            : 0.0.0.0\nDiscovery status                   : Discovering\n\nSW-FL4# show running-config interface gi1/0/12\ninterface GigabitEthernet1/0/12\n description AP-ANDAR4-02\n switchport mode access\n switchport access vlan 99\n spanning-tree portfast\n\nSW-L3# show ip route 10.99.0.5\nRouting entry for 10.99.0.0/24\n  Known via \"static\", distance 1, metric 0\n  Routing Descriptor Blocks:\n  * 10.10.0.1\n\n! DHCP scope VLAN 99: option 43 / DNS CISCO-CAPWAP-CONTROLLER ainda NÃO configurados\n! WLC management: 10.99.0.5 — alcançável via L3 a partir da VLAN 99",
+    "alternativas": [
+      "O AP pode estar em qualquer switch com reachability IP à WLC; falta mecanismo de discovery (Option 43/DNS/priming) — CAPWAP não exige mesmo switch nem cabo direto.",
+      "O AP não pode estar no cabeamento copper/wired ou formará loop com a WLC.",
+      "CAPWAP em local mode exige que o AP e a WLC compartilhem o mesmo switch de acesso.",
+      "É obrigatório um cabo copper dedicado AP—WLC; roteamento L3 entre prédios impede CAPWAP."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "CAPWAP é IP-based: o AP em local mode precisa descobrir e alcançar a WLC (UDP 5246/5247), não colocation L2 no mesmo switch. Aqui a rota até 10.99.0.5 existe, mas Primary controller IP está 0.0.0.0 e discovery continua — típico de ausência de DHCP option 43, DNS CISCO-CAPWAP-CONTROLLER ou controller name pré-configurado. Correção: option 43/DNS/prime com 10.99.0.5 e liberar fifirewall CAPWAP. AP wired na VLAN de mgmt é o desenho normal; cabo direto ou mesmo switch não são requisitos."
+  },
+  {
+    "id": 6,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9167 — R1 (priority 150) foi recarregado. R2 (priority 100) permanece Active e o tráfego não volta para R1. Ambos no grupo HSRP 10 com VIP 10.10.10.1.",
+    "cli_output": "R1# show standby brief\n                     P indicates configured to preempt.\n                     |\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nGi0/0       10   150   Standby 10.10.10.3     local           10.10.10.1\n\nR1# show running-config | include standby\nstandby 10 ip 10.10.10.1\nstandby 10 priority 150\n! (sem standby 10 preempt)\n\nR2# show standby brief\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nGi0/0       10   100   Active  local           10.10.10.2     10.10.10.1",
+    "alternativas": [
+      "Falta standby 10 preempt em R1; sem preempt a prioridade maior não retoma Active após o reload.",
+      "Trocar para standby 10 version 2 resolve sozinho a preempção.",
+      "Priority 150 é inválida; HSRP só aceita priority 100.",
+      "show interfaces confirma que HSRP ignora priority sem version 1."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "HSRP só devolve o papel Active a um router de maior prioridade se preempt estiver habilitado. O output mostra Pri 150 sem flag P e State Standby. Correção: standby 10 preempt. Version não substitui preempt; priority 150 é válida."
+  },
+  {
+    "id": 7,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9172 — R1 e R2 não formam adjacência OSPF no link Ethernet comum. show ip ospf neighbor vazio.",
+    "cli_output": "R1# show ip ospf interface gi0/0\nGigabitEthernet0/0 is up, line protocol is up\n  Internet Address 192.168.1.1/24, Area 0\n  Process ID 1, Router ID 1.1.1.1, Network Type BROADCAST, Cost: 1\n  Timer intervals configured, Hello 10, Dead 40, WaitInterval 5, Retransmit 5\n\nR2# show ip ospf interface gi0/0\nGigabitEthernet0/0 is up, line protocol is up\n  Internet Address 192.168.1.2/24, Area 0\n  Process ID 1, Router ID 2.2.2.2, Network Type BROADCAST, Cost: 1\n  Timer intervals configured, Hello 5, Dead 20, WaitInterval 5, Retransmit 5\n\nR1# show ip ospf neighbor\n! (empty)",
+    "alternativas": [
+      "Hello/Dead divergentes (10/40 vs 5/20) impedem adjacência OSPF.",
+      "Process ID diferente entre roteadores é obrigatório e está faltando.",
+      "É preciso elevar priority em R1 para formar vizinho.",
+      "Cost 1 em ambos bloqueia FULL por definição."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Timers Hello/Dead devem coincidir. Aqui 10/40 ≠ 5/20. Process ID pode diferir; priority/cost não explicam neighbor vazio. Alinhar ip ospf hello-interval/dead-interval."
+  },
+  {
+    "id": 8,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9183 — Link /30 entre R1–R2 elege DR/BDR desnecessariamente. Engenharia quer evitar eleição DR/BDR.",
+    "cli_output": "R1# show ip ospf interface gi0/1\nGigabitEthernet0/1 is up, line protocol is up\n  Internet Address 192.168.1.1/30, Area 0\n  Network Type BROADCAST, Cost: 1\n  Transmit Delay is 1 sec, State DR, Priority 1\n  Designated Router (ID) 1.1.1.1, Interface address 192.168.1.1\n  Backup Designated router (ID) 2.2.2.2, Interface address 192.168.1.2",
+    "alternativas": [
+      "Configurar ip ospf network point-to-point no link para eliminar DR/BDR.",
+      "ip ospf network broadcast é o comando para evitar DR.",
+      "ip ospf cost 0 remove a eleição DR.",
+      "Hello 15 sozinho desativa BDR."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Network type point-to-point não elege DR/BDR — ideal em /30. Broadcast força DR. Cost/hello não removem eleição."
+  },
+  {
+    "id": 9,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9185 — Pacote a 172.31.0.1 escolhe rota errada segundo a equipe. Três prefixos instalados.",
+    "cli_output": "R1# show ip route 172.31.0.1\nRouting entry for 172.31.0.0/25\n  Known via \"static\", distance 1, metric 0\n  Routing Descriptor Blocks:\n  * 10.0.0.2\n\nR1# show ip route | include 172.31\nS        172.31.0.0/16 ...\nS        172.31.0.0/24 ...\nS        172.31.0.0/25 ...",
+    "alternativas": [
+      "Longest match usa 172.31.0.0/25 para 172.31.0.1.",
+      "Sempre vence o /16 por ser mais “amplo”.",
+      "Default 0.0.0.0/0 tem prioridade sobre qualquer match.",
+      "O /24 vence o /25 por AD menor implícito."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "IOS aplica longest-prefix match. /25 é mais específico que /24 e /16 para 172.31.0.1. Default só se não houver match."
+  },
+  {
+    "id": 10,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9202 — Interface WAN do roteador de filial precisa obter IP automaticamente do ISP (DHCP client).",
+    "cli_output": "R1# show running-config interface gi0/0\ninterface GigabitEthernet0/0\n description WAN-ISP\n ip address 192.0.2.10 255.255.255.0\n! estático legado\n\nR1# show ip interface brief\nInterface              IP-Address      OK? Method Status\nGigabitEthernet0/0     192.0.2.10      YES NVRAM  up",
+    "alternativas": [
+      "Configurar ip address dhcp na interface para virar cliente DHCP.",
+      "ip helper-address na WAN faz o roteador ser cliente DHCP.",
+      "ip dhcp pool na WAN obtém endereço do ISP.",
+      "ip dhcp client sozinho sem ip address dhcp é o padrão IOS."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Cliente DHCP no IOS: ip address dhcp na interface. helper-address é relay; pool é servidor."
+  },
+  {
+    "id": 11,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9207 — NAT dinâmico deve traduzir 10.10.0.0/24 para o pool 192.168.3.1–3. Traduções não ocorrem.",
+    "cli_output": "R1# show running-config | section nat|access-list 1\nip nat pool mypool 192.168.3.1 192.168.3.3 prefix-length 30\naccess-list 1 permit 10.10.0.0 0.0.0.255\nip nat outside destination list 1 pool mypool\ninterface GigabitEthernet1/1\n ip nat inside\ninterface GigabitEthernet1/2\n ip nat outside\n\nR1# show ip nat translations\n! empty",
+    "alternativas": [
+      "Trocar para ip nat inside source list 1 pool mypool (inside source, não outside destination).",
+      "Manter outside destination; só falta overload.",
+      "Wildcard 0.0.0.254 é obrigatório para /24.",
+      "Remover ip nat inside/outside das interfaces."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Tradução da sub-rede interna usa inside source list + pool. outside destination inverte o modelo e não atende o requisito. ACL /24 usa 0.0.0.255."
+  },
+  {
+    "id": 12,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9208 — Active HSRP R1 falhou. Quem deve encaminhar o VIP agora?",
+    "cli_output": "R2# show standby\nGigabitEthernet0/0 - Group 1\n  State is Active\n    1 state change, last state change 00:00:12\n  Virtual IP address is 10.1.1.1\n  Active router is local\n  Standby router is unknown expired\n  Priority 90 (configured 90)\n  Group name is \"hsrp-Gi0/0-1\" (default)\n\n! R1 unreachable",
+    "alternativas": [
+      "O router Standby assume Active e encaminha pacotes do VIP.",
+      "O papel Listening vira forwarder permanente sem virar Active.",
+      "Backup (termo VRRP) é o nome HSRP do sucessor.",
+      "Forwarding é um estado HSRP estável separado de Active."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "HSRP: Standby → Active no failover. Listening é estado transitório/auxiliar. Backup é VRRP. Não há role estável “forwarding” como sucessor nomeado."
+  },
+  {
+    "id": 13,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9214 — Clientes na VLAN 40 não recebem DHCP; servidor está em outro site. Relay ausente.",
+    "cli_output": "R1# show ip interface gi0/0.40\nGigabitEthernet0/0.40 is up, line protocol is up\n  Internet address is 10.40.0.1/24\n  Helper address is not set\n\nR1# show running-config interface gi0/0.40\ninterface GigabitEthernet0/0.40\n encapsulation dot1Q 40\n ip address 10.40.0.1 255.255.255.0",
+    "alternativas": [
+      "Configurar ip helper-address no roteador mais próximo dos clientes (SVI/subif da VLAN 40).",
+      "helper-address só no roteador colado ao servidor DHCP.",
+      "Precisa em todos os hops do caminho WAN.",
+      "No trunk L2 do switch, não no gateway L3 dos clientes."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Relay fica na interface L3 do subnet do cliente para capturar broadcasts DHCP e unicasts ao servidor. Não é necessário em cada hop."
+  },
+  {
+    "id": 14,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9226 — Engenheiro configurou hostname e tenta gerar chave RSA para SSH; comando falha pedindo domain name.",
+    "cli_output": "R1# show running-config | include hostname|domain\nhostname R1\n! sem ip domain-name\n\nR1(config)# crypto key generate rsa\n% Please define a domain-name first.",
+    "alternativas": [
+      "Configurar ip domain-name antes de crypto key generate rsa.",
+      "password password é pré-requisito da chave RSA.",
+      "ip ssh authentication-retries deve vir antes da chave.",
+      "Gerar a chave antes do hostname e domain."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "RSA key pair no IOS exige hostname + domain-name. authentication-retries e passwords não substituem esse pré-requisito."
+  },
+  {
+    "id": 15,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9230 — PC 10.1.1.1 precisa de NAT estático para 209.165.200.225. Tradução incorreta configurada.",
+    "cli_output": "R1# show running-config | include nat\nip nat outside source static 209.165.200.225 10.1.1.1\ninterface Gi0/0\n ip nat inside\ninterface Gi0/1\n ip nat outside\n\nR1# show ip nat translations\nPro Inside global      Inside local       Outside local      Outside global\n--- ---                ---                10.1.1.1           209.165.200.225",
+    "alternativas": [
+      "Usar ip nat inside source static 10.1.1.1 209.165.200.225.",
+      "Manter outside source static com endereços invertidos.",
+      "inside source static 209.165.200.225 10.1.1.1 está correto.",
+      "NAT estático não exige inside/outside nas interfaces."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Inside-local 10.1.1.1 ↔ inside-global 209.165.200.225 usa inside source static na ordem local→global. outside source inverte o modelo. Interfaces inside/outside são necessárias."
+  },
+  {
+    "id": 16,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9246 — Port-security na porta da impressora; MAC deve ser aprendido e gravado automaticamente.",
+    "cli_output": "SW1# show port-security interface gi1/0/10\nPort Security              : Enabled\nPort Status                : Secure-up\nMaximum MAC Addresses      : 1\nTotal MAC Addresses        : 0\nConfigured MAC Addresses   : 0\nSticky MAC Addresses       : 0\nSecurity Violation Count   : 0\n\nSW1# show running-config interface gi1/0/10\ninterface GigabitEthernet1/0/10\n switchport mode access\n switchport port-security\n! sem sticky",
+    "alternativas": [
+      "Habilitar switchport port-security mac-address sticky para aprender e fixar o MAC na config.",
+      "Só static MAC manual atende “automaticamente”.",
+      "enable dynamic MAC address learning é o comando port-security.",
+      "auto MAC address learning existe como feature separada obrigatória."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sticky port-security aprende o MAC dinâmico e o converte em sticky na running-config. Static é manual. Não há comando genérico “auto MAC” no lugar de sticky."
+  },
+  {
+    "id": 17,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9250 — Auditoria viu senhas em claro no show run. Precisam ofuscar senhas type 7 no arquivo de config.",
+    "cli_output": "R1# show running-config | include password|secret\nenable password Cisco123\nline vty 0 4\n password LabPass\n! service password-encryption não configurado",
+    "alternativas": [
+      "Aplicar service password-encryption para ofuscar senhas em claro na configuração.",
+      "O comando impede admins de configurar senhas novas.",
+      "Ele criptografa túneis VPN IPsec automaticamente.",
+      "Protege o VLAN database do switch via VTP."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "service password-encryption aplica cifra reversível (type 7) a passwords em texto claro no config, dificultando leitura casual. Não é VPN crypto nem VTP protection. enable secret é hashing forte separado para enable."
+  },
+  {
+    "id": 18,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9257 — Segurança pede mitigação de VLAN hopping em trunks com native VLAN 1 default.",
+    "cli_output": "SW1# show interfaces trunk\nPort        Mode         Encapsulation  Status        Native vlan\nGi1/0/24    on           802.1q         trunking      1\n\nSW1# show vlan brief | include 1 | 999\n1    default                          active\n999  BLACKHOLE                        active",
+    "alternativas": [
+      "Alterar native VLAN para VLAN não usada (ex. 999) e alinhar nos dois lados; evitar native 1.",
+      "Só DAI mitiga VLAN hopping double-tag.",
+      "ACL “prevent changing VLANs” é o controle clássico Cisco para hopping.",
+      "Port-security em VLANs de Internet é a mitigação principal de hopping."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Ataques double-tag exploram native VLAN default. Práticas: native VLAN unused, same on both ends, disable unused ports, avoid DTP. DAI/port-security tratam outros vetores."
+  },
+  {
+    "id": 19,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9258 — DHCP snooping habilitado; equipe pergunta onde ficam os bindings IP-MAC-porta.",
+    "cli_output": "SW1# show ip dhcp snooping binding\nMacAddress         IpAddress       Lease(sec) Type           VLAN Interface\n------------------ --------------- ---------- -------------  ---- -------------------\n00:11:22:33:44:55  10.10.10.50     86400      dhcp-snooping  10   GigabitEthernet1/0/5\n\nSW1# show mac address-table dynamic vlan 10\nVlan    Mac Address       Type        Ports\n10      0011.2233.4455    DYNAMIC     Gi1/0/5",
+    "alternativas": [
+      "Bindings de DHCP snooping ficam no binding database (show ip dhcp snooping binding).",
+      "Ficam só na CAM table sem base separada.",
+      "Ficam no frame forwarding database de VTP.",
+      "Não há banco; só no MAC address table sem IP."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "DHCP snooping mantém binding database (MAC, IP, lease, VLAN, port). A MAC table é L2 learning separado, sem lease DHCP."
+  },
+  {
+    "id": 20,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #1801 — Hosts IPv6 mostram interface ID diferente do MAC do NIC; o time de inventário esperava o MAC “cru” e suspeita de erro de SLAAC. Switch L3 com EUI-64 na SVI.",
+    "cli_output": "R1# show ipv6 interface vlan 10\nVlan10 is up, line protocol is up\n  IPv6 is enabled, link-local address is FE80::C800:11FF:FE22:3344\n  Global unicast address(es):\n    2001:DB8:10:1:C800:11FF:FE22:3344, subnet is 2001:DB8:10:1::/64 [EUI]\n\nR1# show interfaces vlan 10\n  Hardware is EtherSVI, address is ca00.1122.3344\n\n! MAC ca00.1122.3344 → IID C800:11FF:FE22:3344 (FFFE + U/L bit flip CA→C8)",
+    "alternativas": [
+      "O IID EUI-64 inverte o bit U/L e insere FFFE; o MAC não aparece “cru” no endereço IPv6 — comportamento esperado.",
+      "FE80 no início do GUA prova que o prefixo global está errado e o SLAAC falhou.",
+      "EUI-64 usa o MAC sem qualquer modificação; o show indica bug de IOS.",
+      "O bit invertido só ocorre com privacy extensions, nunca com EUI-64."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Com EUI-64, o MAC ca00.1122.3344 vira C800:11FF:FE22:3344: FFFE no meio e flip do 7º bit (CA→C8).\nIsso é o comportamento correto, não um erro de inventário.\nFE80 é só o link-local; o GUA usa o prefixo 2001:DB8:10:1::/64 com o mesmo IID.\nPrivacy extensions gerariam IID aleatório, não este padrão EUI."
+  },
+  {
+    "id": 21,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #2301 — Voz wireless ruim no 2.4 GHz (utilização alta). Clientes dual-band não sobem para 5 GHz. WLC com Band Select desabilitado no SSID CORP-VOICE.",
+    "cli_output": "WLC> show wlan 12\nWLAN Identifier.................................. 12\nProfile Name..................................... CORP-VOICE\nNetwork Name (SSID).............................. CORP-VOICE\nStatus........................................... Enabled\n...\nBand Select...................................... Disabled\n\nWLC> show advanced 802.11b summary\nAP Name  Channel  Utilization\nAP-FL2   6        82%\n\nWLC> show advanced 802.11a summary\nAP Name  Channel  Utilization\nAP-FL2   36       18%",
+    "alternativas": [
+      "Band Select está Disabled; habilitar Client Band Select no WLAN para preferir 5 GHz menos congestionado.",
+      "DTIM alto no 5 GHz impede qualquer associação em 802.11a/n/ac.",
+      "Utilization 82% no 2.4 GHz é ideal para voice e não requer ação.",
+      "AAA override é a única feature que move clientes de banda no CCNA."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O show wlan confirma Band Select Disabled enquanto o 2.4 GHz está congestionado e o 5 GHz livre.\nBand Select é a feature de steering para dual-band clients.\nHabilite Band Select no WLAN CORP-VOICE (e valide radio policy inclui 5 GHz)."
+  },
+  {
+    "id": 22,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #2601 — Edge R-EDGE precisa de IP público dinâmico do ISP na Fa0/0. Interface sem IP; Internet down. Time usou ip default-gateway por engano.",
+    "cli_output": "R-EDGE# show run interface fastEthernet 0/0\ninterface FastEthernet0/0\n description WAN-ISP\n ip default-gateway 203.0.113.1\n duplex auto\n speed auto\n\nR-EDGE# show ip interface brief\nInterface                  IP-Address      OK? Method Status                Protocol\nFastEthernet0/0            unassigned      YES unset  up                    up\n\nR-EDGE# show ip route\nGateway of last resort is not set",
+    "alternativas": [
+      "Falta ip address dhcp na Fa0/0; ip default-gateway não atribui IP de interface em roteador.",
+      "ip default-gateway na interface faz o IOS obter DHCP automaticamente.",
+      "Status up/up com unassigned é impossível; o cabo está down.",
+      "Basta ip route 0.0.0.0 0.0.0.0 Fa0/0 sem endereço IP."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Roteadores usam ip address dhcp no interface para cliente DHCP no ISP.\nip default-gateway é comando de host/L2 switch, não preenche IP da Fa0/0.\nCom unassigned, não há WAN IP nem default funcional."
+  },
+  {
+    "id": 23,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #3401 — Utilização 2.4 GHz alta e 5 GHz ociosa no mesmo AP. Clientes dual-band permanecem em 2.4. Band Select off.",
+    "cli_output": "WLC> show wlan 5\nSSID..................................... CORP\nBand Select.............................. Disabled\nRadio Policy............................. All\n\nWLC> show ap auto-rf 802.11b AP-CORE\nLoad Profile............................. Failed\n\nWLC> show ap auto-rf 802.11a AP-CORE\nLoad Profile............................. Passed",
+    "alternativas": [
+      "Habilitar Client Band Select para preferir 5 GHz com 2.4 congestionado.",
+      "Radio Policy All impede 5 GHz; mudar para 802.11b only.",
+      "OEAP Split Tunnel move clientes para 5 GHz automaticamente.",
+      "Load Profile Failed no 2.4 GHz indica que Band Select deve permanecer Disabled."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Band Select Disabled + 2.4 overloaded e 5 GHz healthy = cenário clássico para Client Band Select.\nRadio Policy All já permite ambas as bandas; falta steering."
+  },
+  {
+    "id": 24,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5701 — Servidor IPv6-only deve ser alcançável só na rede interna (vários VLANs/site), sem Internet. Configuraram só link-local; outros andares não alcançam.",
+    "cli_output": "SRV# show ipv6 interface brief\nGigabitEthernet0/0  [up/up]\n    FE80::A1B2:C3FF:FE45:6789\n    ! (sem GUA/ULA)\n\nR1# ping FE80::A1B2:C3FF:FE45:6789\n% Invalid source / not on same link when sourcing from remote VLAN",
+    "alternativas": [
+      "Falta ULA (fd00::/8) site-local; link-local não roteia entre VLANs do campus interno.",
+      "Link-local FE80 roteia entre todos os andares por padrão OSPFv3.",
+      "Global unicast 2001:db8:: é a única forma de manter tráfego só interno.",
+      "IPv4-compatible ::ffff:10.0.0.1 é obrigatória em IPv6-only."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Link-local não atravessa roteadores. Para reachability interna multi-subnet sem Internet, use unique local (fd00::/8) e roteamento IPv6 interno.\nA chave da fonte apontava link-local; isso conflita com “internal network” multi-hop — ULA é a resposta correta."
+  },
+  {
+    "id": 25,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5901 — SVI Vlan2000 precisa de IPv6 interno site-local (não Internet). Configuraram ff00::/ multicast por engano.",
+    "cli_output": "R1# show run interface vlan 2000\ninterface Vlan2000\n ipv6 address ff00:0:aaaa::1234:2343/64\n\nR1# show ipv6 interface vlan 2000\n  IPv6 is enabled\n  Joined group address(es):\n    FF00:0:AAAA::1234:2343\n  ! sem unicast ULA",
+    "alternativas": [
+      "ff00::/8 é multicast; usar ULA fd00::/8 (ex.: fd00::1234:2343/64) para unicast local de site.",
+      "ff00:: é ULA válida e deve ser anunciada na Internet.",
+      "fe80:: na SVI impede qualquer ping na mesma VLAN.",
+      "Multicast ff00 é o formato exigido para “locally-unique unicast”."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Locally-unique site unicast = ULA fd00::/8 (fc00::/7). Multicast prefix está errado no running-config.\nCorrigir para fd00::/64 na Vlan2000."
+  },
+  {
+    "id": 26,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6001 — Usuário alega que o switch “floda tudo”. Captura mostra unicast conhecido saindo só em uma porta. Validar comportamento.",
+    "cli_output": "SW1# show mac address-table address 0050.56ab.cdef\n          Mac Address Table\n-------------------------------------------\nVlan    Mac Address       Type        Ports\n----    -----------       --------    -----\n  10    0050.56ab.cdef    DYNAMIC     Gi1/0/8\n\nSW1# show mac address-table dynamic interface gi1/0/8\n  10    0050.56ab.cdef    DYNAMIC     Gi1/0/8",
+    "alternativas": [
+      "MAC conhecido → frame unicast é enviado só à porta aprendida (Gi1/0/8), não flooded.",
+      "Entrada DYNAMIC força flood em todas as portas da VLAN.",
+      "Unicast conhecido é sempre broadcast ff:ff:ff:ff:ff:ff.",
+      "Type DYNAMIC significa porta err-disabled."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Tabela MAC com porta Gi1/0/8 prova known unicast switching para essa porta.\nFlood é o caso de unknown unicast/broadcast."
+  },
+  {
+    "id": 27,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6601 — AP não liga via PoE. Porta em power inline never; precisa detectar PD e alimentar automaticamente.",
+    "cli_output": "SW1# show run interface gi1/0/12\ninterface GigabitEthernet1/0/12\n description AP-FLOOR2\n switchport access vlan 99\n power inline never\n\nSW1# show power inline gi1/0/12\nInterface Admin  Oper       Power   Device\nGi1/0/12  never  off        0.0     n/a",
+    "alternativas": [
+      "Admin never desliga PoE; configurar power inline auto para detecção e alimentação do AP.",
+      "Oper off com never é o estado desejado para APs Cisco.",
+      "power inline static é obrigatório e auto não detecta PD.",
+      "VLAN 99 impede PoE na porta."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "power inline never disables PoE. auto enables detection and powering of PDs when budget allows.\nChange to power inline auto and verify show power inline."
+  },
+  {
+    "id": 28,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6901 — Porta do usuário em err-disabled após cabo intermitente. Logs de link-flap.",
+    "cli_output": "SW1# show interfaces gi1/0/22 status\nPort      Name       Status         Vlan  Duplex  Speed\nGi1/0/22  USER       err-disabled   10    auto    auto\n\nSW1# show logging | include ERR_DISABLE|flap\n%PM-4-ERR_DISABLE: link-flap error detected on Gi1/0/22, putting Gi1/0/22 in err-disable state\n%LINK-3-UPDOWN: Interface GigabitEthernet1/0/22, changed state to up\n%LINK-3-UPDOWN: Interface GigabitEthernet1/0/22, changed state to down",
+    "alternativas": [
+      "Link flapping disparou err-disable; corrigir cabo/patch e reativar a porta (no shut / recovery).",
+      "err-disabled ocorre porque nada está plugado na porta.",
+      "shutdown administrativo gera o log link-flap.",
+      "Latency alta coloca a porta em err-disabled por padrão."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Log link-flap + err-disabled is the classic physical intermittency case.\nFix cabling, then recover the interface."
+  },
+  {
+    "id": 29,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7001 — Precisam IP 10.10.10.145 com máscara binária …11111000. Configuraram /28 por engano e o host caiu fora da subnet do gateway.",
+    "cli_output": "R1# show run interface gi0/0\ninterface GigabitEthernet0/0\n ip address 10.10.10.145 255.255.255.240\n\nR1# show ip interface gi0/0\n  Internet address is 10.10.10.145/28\n\n! Máscara pedida: 255.255.255.248 (/29)",
+    "alternativas": [
+      "…11111000 = /29 (255.255.255.248); trocar de /28 para /29.",
+      "/28 é idêntico a …11111000.",
+      "/30 é a única máscara válida com .145.",
+      "Binary 11111000 no último octeto é /27."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Count host bits in the last octet: three zeros ⇒ /29.\nRunning-config /28 does not match the specified binary mask."
+  },
+  {
+    "id": 30,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7401 — Porta PoE com power inline police foi para err-disabled após AP high-power. Logs de power deny.",
+    "cli_output": "SW1# show power inline gi1/0/15\nInterface Admin  Oper       Power(Watts)  Device\nGi1/0/15  auto   errdisable 15.4          Ieee PD\n\nSW1# show logging | include POWER|ERR\n%ILPOWER-3-CONTROLLER_PORT_ERR: Controller port error, Interface Gi1/0/15: Power given, but Power Controller does not report Power Good\n%PM-4-ERR_DISABLE: pwr-err on Gi1/0/15",
+    "alternativas": [
+      "Porta excedeu/errou orçamento de potência PoE e foi err-disabled; ajustar max power/police ou PD, depois recuperar a interface.",
+      "errdisable PoE ocorre só se a porta estiver sem cabo.",
+      "Ieee PD no show prova que a porta nunca recebeu power.",
+      "Oper errdisable é o estado normal de APs em produção."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "PoE police/max power violations lead to err-disable on the port.\nFix power budget/PD class, then recover the port."
+  },
+  {
+    "id": 31,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8001 — PC-A 192.168.25.100/25 e PC-B 192.168.25.128/25 no mesmo switch/VLAN não se pingam (ARP incompleto entre si). Gateway comum inexistente.",
+    "cli_output": "PC-A> ipconfig\n  IPv4 Address. . . . . . . . . . . : 192.168.25.100\n  Subnet Mask . . . . . . . . . . . : 255.255.255.128\nPC-B> ipconfig\n  IPv4 Address. . . . . . . . . . . : 192.168.25.128\n  Subnet Mask . . . . . . . . . . . : 255.255.255.128\n\nPC-A> ping 192.168.25.128\n  Destination host unreachable (on-link calculation fails / wrong subnet)",
+    "alternativas": [
+      "Com /25, .100 e .128 estão em subnets diferentes; usar máscara 255.255.255.0 (/24) se devem ser on-link na mesma VLAN.",
+      "/25 coloca .100 e .128 no mesmo bloco 192.168.25.128/25.",
+      "255.255.255.252 faz ambos hosts da mesma /30 automaticamente.",
+      "O problema é só Spanning Tree PortFast."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "/25 splits at .128. Host .100 is in the lower half; .128 is the network address of the upper half / first address issues aside, they are not the same subnet.\nWiden to /24 for local communication on one VLAN without a router."
+  },
+  {
+    "id": 32,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8301 — Throughput ruim ao servidor no core; latência baixa; show interfaces com FCS-Err alto na porta do server.",
+    "cli_output": "CORE# show interfaces gi1/0/48\nGigabitEthernet1/0/48 is up, line protocol is up\n  Full-duplex, 1000Mb/s, media type is 10/100/1000BaseTX\n  15231 input errors, 14802 CRC, 14802 frame, 0 overrun\n  0 output errors, 0 collisions\n\nCORE# show interfaces gi1/0/48 counters errors\nPort        Align-Err    FCS-Err   Xmit-Err    Rcv-Err\nGi1/0/48          120      14802         0      15231",
+    "alternativas": [
+      "FCS/CRC altos indicam falha física (cabo/conector/NIC); substituir cabo e retestar.",
+      "FCS-Err alto com full-duplex prova congestionamento de banda apenas.",
+      "Latência mínima elimina qualquer problema de Layer 1.",
+      "0 collisions com CRC alto indica mismatch de native VLAN."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "FCS-Err/CRC on the server-facing interface is Layer-1 corruption evidence.\nReplace/test cable and NIC path; not a pure utilization issue."
+  },
+  {
+    "id": 33,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9001 — Servidor demora ~30s para ter rede no boot; porta access sem PortFast. STP rapid-pvst.",
+    "cli_output": "SW-SRV# show spanning-tree interface gi1/0/1\nVlan             Role Sts Cost      Prio.Nbr Type\n---------------- ---- --- --------- -------- --------------------------------\nVLAN0050         Desg LRN 4         128.1    P2p\n\nSW-SRV# show run interface gi1/0/1\ninterface GigabitEthernet1/0/1\n switchport access vlan 50\n switchport mode access\n! (sem spanning-tree portfast)\n\nSW-SRV# show spanning-tree summary\nPortfast Default             is disabled",
+    "alternativas": [
+      "Sem PortFast a porta edge passa por learning; habilitar spanning-tree portfast para ir a forwarding mais rápido no boot do servidor.",
+      "Sts LRN indica loop permanente e a porta nunca fará forwarding.",
+      "PortFast Default disabled prova que o switch não roda STP.",
+      "VLAN 50 access impede PortFast em qualquer plataforma."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "PortFast is for edge ports to reduce STP wait before forwarding.\nLearning state on a server access port at boot matches the symptom.\nEnable portfast (and BPDU Guard)."
+  },
+  {
+    "id": 34,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #10270 — Roteador de fábrica precisa: enable secret priv4t3p4ss, console user EXEC p4ssw0rd1, VTY Telnet s3cr3t2. Após config, console não pede senha.",
+    "cli_output": "R1# show running-config | section line|enable\nenable secret 5 $1$....priv\nline con 0\n password p4ssw0rd1\nline vty 0 15\n password s3cr3t2\n! falta \"login\" nas linhas\n\nR1# show line con 0 | include Password\nPassword is set, but login not enabled",
+    "alternativas": [
+      "Adicionar login em line con 0 e line vty 0 15 além de enable secret e passwords.",
+      "Usar enable secret privilege 15 priv4t3p4ss como sintaxe correta.",
+      "Remover passwords das linhas; só enable secret autentica console.",
+      "login local é obrigatório mesmo sem username configurado."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "password sozinho não autentica sem login (ou login local). enable secret privilege 15 é inválido. Com password line, use login."
+  },
+  {
+    "id": 35,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #10275 — Hostname, domain e usuário local ok; SSH falha porque não há chave RSA.",
+    "cli_output": "R1# show ip ssh\nSSH Disabled - version 1.99\n% Please create RSA keys to enable SSH.\n\nR1# show running-config | include hostname|domain|username\nhostname R1\nip domain-name lab.local\nusername admin privilege 15 secret 5 $1$...",
+    "alternativas": [
+      "Executar crypto key generate rsa (modulus adequado) para habilitar SSH.",
+      "crypto key zeroize rsa cria a chave necessária.",
+      "crypto key import é o único método suportado.",
+      "Sem RSA, transport input ssh funciona com Telnet keys."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "SSH no IOS exige par de chaves RSA. generate rsa é o passo; zeroize apaga chaves."
+  },
+  {
+    "id": 36,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #10284 — Segurança reporta risco de VLAN hopping; trunks ainda com DTP desirable e native 1.",
+    "cli_output": "SW1# show interfaces gi1/0/24 switchport\nAdministrative Mode: dynamic desirable\nOperational Mode: trunk\nNegotiation of Trunking: On\nTrunking Native Mode VLAN: 1 (default)",
+    "alternativas": [
+      "Fixar switchport mode trunk, switchport nonegotiate (disable DTP) e native VLAN não default.",
+      "Somente DAI mitiga VLAN hopping.",
+      "Ativar todas as portas na VLAN 1 reduz hopping.",
+      "Extended VLANs sozinhos eliminam double-tag."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Mitigações clássicas: trunks manuais, DTP off, native VLAN unused. DAI é ARP; VLAN 1 default aumenta risco."
+  },
+  {
+    "id": 37,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #10290 — Port-security deve descartar MACs inválidos sem err-disable e sem log SNMP. Porta impressora.",
+    "cli_output": "SW1# show port-security interface gi1/0/8\nPort Security              : Enabled\nViolation Mode             : Shutdown\nMaximum MAC Addresses      : 1\nSecurity Violation Count   : 2\nPort Status                : Secure-shutdown\n\nSW1# show running-config interface gi1/0/8\ninterface GigabitEthernet1/0/8\n switchport port-security\n switchport port-security maximum 1\n switchport port-security violation shutdown",
+    "alternativas": [
+      "Alterar para switchport port-security violation protect.",
+      "violation shutdown é o único modo que não derruba a porta.",
+      "restrict nunca conta violações; é igual a protect.",
+      "shutdown VLAN é o modo que só descarta frames silenciosamente."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "protect descarta frames de MACs desconhecidos sem syslog/SNMP e sem err-disable. restrict loga; shutdown err-disable."
+  },
+  {
+    "id": 38,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #10368 — Precisam acessar a GUI do WLC via HTTP (lab). HTTPS ok; HTTP recusado.",
+    "cli_output": "WLC) > show network summary\nWeb Mode.................................... Disable\nSecure Web Mode............................. Enable\n\nWLC) > ping 10.0.0.50\n!!!!!",
+    "alternativas": [
+      "Habilitar config network webmode enable para HTTP na GUI.",
+      "config network telnet enable libera HTTP.",
+      "config network secureweb enable desliga HTTPS e liga HTTP.",
+      "Gerar certificado webadmin substitui webmode."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Web Mode = HTTP GUI. secureweb = HTTPS. Telnet é CLI. Certificado não substitui o enable de webmode."
+  },
+  {
+    "id": 39,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #10375 — LAG recém-alterado no WLC; port-channel no switch não agrega como esperado.",
+    "cli_output": "WLC) > show lag summary\nLAG Enabled\n\nSW1# show etherchannel summary\nGroup  Port-channel  Protocol    Ports\n1      Po1(SU)         -         Gi1/0/1(P) Gi1/0/2(D)\n\n! mudança de interfaces LAG no WLC ainda não refletida após config",
+    "alternativas": [
+      "Reboot do WLC após alteração de LAG para aplicar membership.",
+      "Só flush de MAC no WLC aplica LAG.",
+      "Re-enable interfaces no switch sem reboot no WLC basta sempre.",
+      "Reassociar APs reconfigura LAG do distribution port."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Mudanças de LAG no AireOS WLC exigem reboot do controller. MAC flush/AP reassoc não aplicam o bundle."
+  },
+  {
+    "id": 40,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #10385 — AP lightweight local mode não sobe CAPWAP; porta do switch está trunk nativo errado.",
+    "cli_output": "SW1# show running-config interface gi1/0/12\ninterface GigabitEthernet1/0/12\n description AP-LOCAL\n switchport mode trunk\n switchport trunk native vlan 1\n switchport trunk allowed vlan 1,10,20\n\nAP# show capwap client rcb\n! Discovery failing / wrong VLAN",
+    "alternativas": [
+      "Em local mode, usar access na VLAN de management do AP (CAPWAP), não trunk multi-VLAN desnecessário.",
+      "EtherChannel é obrigatório para todo AP local mode.",
+      "LAG no AP resolve discovery.",
+      "Trunk é sempre mandatório em local mode centralizado."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Local mode: AP em access na VLAN de gerência; user VLANs vão no túnel CAPWAP. Trunk multi-VLAN é típico de FlexConnect local switching."
+  },
+  {
+    "id": 41,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #10391 — Dois roteadores OSPF ligados por cabo crossover Ethernet elegem DR/BDR; desejam ponto a ponto.",
+    "cli_output": "R1# show ip ospf interface gi0/0\nNetwork Type BROADCAST, Cost: 1\nState DR, Priority 1\nDesignated Router (ID) 1.1.1.1\nBackup Designated router (ID) 2.2.2.2",
+    "alternativas": [
+      "ip ospf network point-to-point no link elimina eleição DR/BDR.",
+      "ip ospf network broadcast remove DR.",
+      "priority 0 em ambos impede adjacência total.",
+      "dead-interval 40 sozinho muda o network type."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "point-to-point é o network type correto para link /30 sem DR. broadcast força DR/BDR."
+  },
+  {
+    "id": 42,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #10395 — Precisam comprimir 2001:0db8:0000:0000:0700:0003:400F:572B na Serial0/0.",
+    "cli_output": "R1(config-if)# ipv6 address 2001:0db8:0000:0000:0700:0003:400F:572B/64\nR1# show ipv6 interface serial0/0 | include address\n  2001:DB8:0:0:700:3:400F:572B, subnet is 2001:DB8:0:0:700:3:400F:572B/64",
+    "alternativas": [
+      "Forma comprimida correta: 2001:db8::700:3:400F:572B.",
+      "2001:db8:0::700:3:4F:572B preserva todos os hex originais.",
+      "Dois :: na mesma linha são válidos se curtos.",
+      "0700 pode virar :7: sem perder nibble."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Remover zeros à esquerda e colapsar a maior sequência de zeros com um único ::. Não alterar dígitos hex (4F ≠ 400F)."
+  },
+  {
+    "id": 43,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #10399 — Default estática de backup para 10.200.0.2 não “flutua”; compete com a primária.",
+    "cli_output": "R1# show running-config | include ip route 0.0.0.0\nip route 0.0.0.0 0.0.0.0 10.100.0.2\nip route 0.0.0.0 0.0.0.0 10.200.0.2 1\n\nR1# show ip route 0.0.0.0\nRouting entry for 0.0.0.0/0\n  Known via \"static\", distance 1, metric 0\n  * 10.100.0.2\n  * 10.200.0.2",
+    "alternativas": [
+      "Usar AD maior no backup, ex. ip route 0.0.0.0 0.0.0.0 10.200.0.2 10.",
+      "AD 1 no backup é o padrão de floating static.",
+      "Sem AD explícito o backup fica com AD 255 e nunca sobe.",
+      "Palavra-chave floating existe na sintaxe IOS."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Floating static = AD maior que a primária. AD 1 iguala e load-share/compete. Não há keyword floating."
+  },
+  {
+    "id": 44,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #10403 — Clientes VLAN 20 sem DHCP; servidor 192.168.10.1 em outra subnet.",
+    "cli_output": "R1# show ip interface gi0/0.20\nInternet address is 10.20.0.1/24\nHelper address is not set\n\nR1# show running-config interface gi0/0.20\ninterface GigabitEthernet0/0.20\n encapsulation dot1Q 20\n ip address 10.20.0.1 255.255.255.0",
+    "alternativas": [
+      "Configurar ip helper-address 192.168.10.1 na interface dos clientes.",
+      "ip route 192.168.10.1 substitui o relay DHCP.",
+      "ip default-gateway no roteador relaya DHCPDISCOVER.",
+      "ip dhcp address não existe; use só no servidor."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "DHCP relay = ip helper-address no gateway da subnet cliente. Rotas/default-gateway não relayam broadcasts DHCP."
+  },
+  {
+    "id": 45,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #10409 — Syslog remoto deve incluir warning e error, sem inundar com notice/informational.",
+    "cli_output": "R1# show logging | include Trap\nTrap logging: level informational, 1200 message lines logged\n\nR1# show running-config | include logging trap\nlogging trap informational",
+    "alternativas": [
+      "logging trap 4 (warnings) inclui severities 0–4 (emergency…warning/error).",
+      "logging trap 5 é mais restrito que 4 e exclui warnings.",
+      "logging trap 2 envia também informational.",
+      "trap 3 exclui errors e só manda critical."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Trap level N envia mensagens com severity ≤ N. Level 4 warning cobre errors (3) e acima. Level 5 notice é mais verboso."
+  },
+  {
+    "id": 46,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #10412 — ACL deve negar HTTP de 192.168.240.0/20 para 10.125.128.32/27 e permitir restante de 10.0.0.0/8.",
+    "cli_output": "R1# show access-lists deny_outbound\nExtended IP access list deny_outbound\n    10 permit ip 192.168.240.0 0.0.15.255 10.0.0.0 0.255.255.255\n    20 deny tcp 192.168.240.0 0.0.15.255 10.125.128.32 0.0.0.31 eq www\n! permit genérico casa primeiro — HTTP nunca é negado\n\nR1# show ip interface gi0/1 | include access\n  Outgoing access list is deny_outbound",
+    "alternativas": [
+      "Colocar deny tcp ... eq 80 antes do permit para 10.0.0.0/8, com wildcards corretos /20 e /27.",
+      "Permit any no topo é best practice para esse requisito.",
+      "Usar máscara 255.255.240.0 no lugar de wildcard em extended ACL IOS clássica.",
+      "Negar eq 443 atende “HTTP” na definição da questão."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "ACLs são top-down: deny HTTP específico deve vir antes do permit amplo para 10/8. Wildcards: /20 → 0.0.15.255, /27 → 0.0.0.31. HTTP = tcp/80."
+  },
+  {
+    "id": 47,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #10415 — Auditoria: senhas line em claro no show run.",
+    "cli_output": "R1# show running-config | include password|secret\nenable secret 5 $1$mERr$...\nline vty 0 4\n password LabClearText\n! service password-encryption ausente",
+    "alternativas": [
+      "Aplicar service password-encryption para ofuscar senhas plaintext na config.",
+      "enable password-encryption é o comando global padrão.",
+      "enable secret criptografa todas as senhas de linha automaticamente.",
+      "password-encrypt é sinônimo válido no IOS."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "service password-encryption aplica type 7 às senhas em claro. enable secret só no enable. Comandos inventados não existem."
+  },
+  {
+    "id": 48,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #11420 — Conta local engineer2 deve usar o hash mais forte disponível no IOS moderno. Senha type 7 foi rejeitada pela auditoria.",
+    "cli_output": "R1# show running-config | include username\nusername engineer2 privilege 1 password 7 08324D400E1C03161E\n\nR1# show aaa users\n! local user present, weak reversible password",
+    "alternativas": [
+      "Recriar com username engineer2 algorithm-type scrypt secret <senha>.",
+      "Manter password 7; é o mais forte no IOS.",
+      "secret 4 com hash MD5 legado é recomendado atualmente.",
+      "secret 5 password <hash> é a sintaxe documentada preferida."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "algorithm-type scrypt secret aplica hashing forte ao segredo local. Type 7 é reversível. Type 4 está deprecado/inseguro. Sintaxe secret 5 password é inválida/errada."
+  },
+  {
+    "id": 49,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #11445 — Trunk 802.1Q entre SW1–SW2 deve permitir só VLANs 1–10; defaults ainda em DTP.",
+    "cli_output": "SW1# show interfaces gi1/0/1 switchport\nAdministrative Mode: dynamic auto\nOperational Mode: static access\nAdministrative Trunking Encapsulation: negotiate\n\nSW1# show running-config interface gi1/0/1\ninterface GigabitEthernet1/0/1\n! sem trunk/dot1q/allowed",
+    "alternativas": [
+      "switchport mode trunk, encapsulation dot1q (se exigido), allowed vlan 1-10.",
+      "ISL + desirable atende “industry-standard”.",
+      "Somente channel-protocol lacp cria trunk 802.1Q.",
+      "dynamic auto sozinho força 802.1Q allowed 1-10."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Padrão da indústria é 802.1Q. mode trunk + encapsulation dot1q + allowed 1-10 cumpre. ISL é proprietário; LACP é EtherChannel."
+  },
+  {
+    "id": 50,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #11459 — Pool DHCP ok, clientes sem gateway. Servidor IOS local.",
+    "cli_output": "R1# show running-config | section dhcp\nip dhcp pool LAN\n network 10.10.10.0 255.255.255.0\n dns-server 8.8.8.8\n! sem default-router\n\nR1# show ip dhcp binding\n! clientes com IP, sem default gateway no lease options",
+    "alternativas": [
+      "Adicionar default-router 10.10.10.1 no pool DHCP.",
+      "ip helper-address no mesmo pool define o gateway.",
+      "dns-server já envia o default gateway.",
+      "default-gateway global no roteador preenche a opção DHCP automaticamente."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Opção de gateway no IOS DHCP pool é default-router. helper-address é relay. dns-server só DNS."
+  },
+  {
+    "id": 51,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #11490 — Diagrama multivendor; só CDP habilitado; switches de terceiros não aparecem.",
+    "cli_output": "R1# show cdp neighbors\nCapability Codes: R - Router, S - Switch\nDevice ID        Local Intrfce     Holdtme    Capability  Platform\nSW-CISCO         Gig 0/1           150              S     WS-C2960\n\nR1# show lldp neighbors\n% LLDP is not enabled",
+    "alternativas": [
+      "Habilitar lldp run para descoberta IEEE multivendor.",
+      "cdp run é suficiente para qualquer fabricante.",
+      "cdp enable global substitui LLDP.",
+      "flow-sampler-map topology mapeia vizinhos L2."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "LLDP (802.1AB) é o padrão multivendor. CDP é Cisco-only. NetFlow sampler não faz neighbor discovery."
+  },
+  {
+    "id": 52,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #11495 — Rota estática de backup não assume quando OSPF cai.",
+    "cli_output": "R1# show running-config | include ip route 10.0.0.0\nip route 10.0.0.0 255.0.0.0 192.0.2.1 1\n\nR1# show ip route 10.0.0.0\n% Network not in table\n! primária OSPF down; estático AD 1 deveria estar mas foi removido/ incorreto no design\n\nR1# show run | include ip route\nip route 10.0.0.0 255.0.0.0 192.0.2.1 110\n! AD 110 igual OSPF — não “flutua” acima",
+    "alternativas": [
+      "Floating static precisa de AD maior que a primária (ex. 210 > 110 OSPF).",
+      "AD menor no backup é o mecanismo de floating.",
+      "default-information originate é obrigatório para floating static.",
+      "AD maior na primária transforma o backup em floating."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Backup estático deve ter AD mais alto que a rota primária para instalar só na falha. AD igual/menor compete ou prefere o estático."
+  },
+  {
+    "id": 53,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #11498 — Senhas line em claro no show run; auditoria pede ofuscação.",
+    "cli_output": "R1# show run | include password\nline vty 0 4\n password ClearTextLab\n! service password-encryption não presente",
+    "alternativas": [
+      "Configurar service password-encryption.",
+      "enable secret ofusca todas as senhas de linha automaticamente.",
+      "enable password é mais forte que secret e resolve o achado.",
+      "username password encrypt é o comando global correto."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "service password-encryption aplica type 7 às senhas plaintext na config. enable secret só no enable password."
+  },
+  {
+    "id": 54,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #11509 — R1 sem gateway of last resort; destinos externos falham.",
+    "cli_output": "R1# show ip route\nGateway of last resort is not set\nC    10.1.1.0/24 is directly connected, GigabitEthernet0/0\n\nR1# show run | include ip route|default\n! vazio",
+    "alternativas": [
+      "Configurar ip route 0.0.0.0 0.0.0.0 192.168.1.1.",
+      "ip route default-route 192.168.1.1 é sintaxe válida.",
+      "ip default-gateway em roteador com ip routing substitui default route.",
+      "ip route 192.168.1.1 0.0.0.0 0.0.0.0 instala default correta."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Default = 0.0.0.0/0 via next-hop. Sintaxes inventadas/invertidas não criam gateway of last resort em roteador."
+  },
+  {
+    "id": 55,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #11529 — Interface WAN deve obter IP do ISP via DHCP.",
+    "cli_output": "R1# show running-config interface gi0/0\ninterface GigabitEthernet0/0\n ip address 203.0.113.10 255.255.255.0\n! estático\n\nR1# show ip interface brief | include Gi0/0\nGi0/0   203.0.113.10   YES NVRAM  up  up",
+    "alternativas": [
+      "ip address dhcp na interface para modo cliente.",
+      "ip helper-address transforma a WAN em cliente DHCP.",
+      "ip dhcp pool na WAN pede endereço ao ISP.",
+      "ip dhcp client sozinho basta sem ip address dhcp."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Cliente DHCP no IOS = ip address dhcp. helper/pool são relay/servidor."
+  },
+  {
+    "id": 56,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #11538 — Pacote a 10.10.1.22 escolhe rota inesperada entre estáticas overlap.",
+    "cli_output": "R1# show ip route 10.10.1.22\nRouting entry for 10.10.1.20/30\n  Known via \"static\", distance 1, metric 0\n  * 10.10.255.1\n\nR1# show run | include ip route 10.10.1\nip route 10.10.1.0 255.255.255.240 10.10.255.1\nip route 10.10.1.20 255.255.255.252 10.10.255.1\nip route 10.10.1.20 255.255.255.254 10.10.255.1\nip route 10.10.1.16 255.255.255.252 10.10.255.1",
+    "alternativas": [
+      "Longest match: 10.10.1.20/30 inclui .22 e vence /28; /31 e .16/30 não cobrem .22.",
+      "Sempre vence a rota listada primeiro no running-config.",
+      "10.10.1.16/30 cobre .22 porque /30 tem 16 hosts.",
+      "10.10.1.20/31 inclui .20–.23."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Longest-prefix match: .22 ∈ .20/30 (.20–.23). /28 menos específico; /31 só .20–.21; .16/30 = .16–.19."
+  },
+  {
+    "id": 57,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #11542 — SW1 dynamic auto, SW2 dynamic desirable; validar se vira trunk.",
+    "cli_output": "SW1# show interfaces gi1/0/1 switchport\nAdministrative Mode: dynamic auto\nOperational Mode: trunk\nNegotiation of Trunking: On\n\nSW2# show interfaces gi1/0/1 switchport\nAdministrative Mode: dynamic desirable\nOperational Mode: trunk",
+    "alternativas": [
+      "Auto + Desirable forma trunk via DTP.",
+      "Resultado é sempre access port.",
+      "Link fica err-disabled.",
+      "Link fica down/down por DTP."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Desirable inicia DTP; auto aceita → trunk operacional, como no show."
+  },
+  {
+    "id": 58,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #11547 — Vizinho OSPF trava; suspeita de MTU.",
+    "cli_output": "R1# show ip ospf interface gi1/0\n  MTU is 1600\n\nR2# show ip ospf interface gi1/0\n  MTU is 1500\n\nR1# show ip ospf neighbor\nNeighbor ID     State\n2.2.2.2         EXSTART/DROTHER",
+    "alternativas": [
+      "MTU mismatch (1600 vs 1500) impede completar adjacência (EXSTART/EXCHANGE).",
+      "passive-interface default é a única causa possível.",
+      "Network command em area errada é provada só pelo MTU output.",
+      "Process ID diferente bloqueia sempre em EXSTART."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "OSPF exige MTU compatível (ou ip ospf mtu-ignore). EXSTART crônico com MTU diferente é clássico. Corrigir MTU ou mtu-ignore."
+  },
+  {
+    "id": 59,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #11556 — PortFast em uplink para outro switch; loops intermitentes.",
+    "cli_output": "SW-A# show spanning-tree interface gi1/0/24 detail\nPort 24 is designated forwarding\nThe port is in the portfast mode\nBPDU: sent 80, received 200\n\nSW-A# show run interface gi1/0/24\ninterface GigabitEthernet1/0/24\n switchport mode trunk\n spanning-tree portfast",
+    "alternativas": [
+      "PortFast em link switch-switch atrasa proteção STP e aumenta risco de loop/broadcast storm.",
+      "PortFast em uplink é best practice Cisco.",
+      "BPDUs recebidos provam que PortFast bloqueia loops sozinho.",
+      "VTP propaga por causa do PortFast."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "PortFast assume edge/host. Em switch-switch, forwarding precoce + BPDUs recebidos = risco de loop. Remover PortFast do uplink."
+  },
+  {
+    "id": 60,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #12574 — NAT dinâmico 10.10.0.0/24 → pool 192.168.3.1–3 não cria traduções.",
+    "cli_output": "R1# show run | section nat|access-list 1\nip nat pool mypool 192.168.3.1 192.168.3.3 prefix-length 30\naccess-list 1 permit 10.10.0.0 0.0.0.255\nip nat outside destination list 1 pool mypool\ninterface GigabitEthernet1/1\n ip nat inside\ninterface GigabitEthernet1/2\n ip nat outside\n\nR1# show ip nat translations\n! empty",
+    "alternativas": [
+      "Usar ip nat inside source list 1 pool mypool em vez de outside destination.",
+      "Manter outside destination; só falta overload.",
+      "Remover ip nat inside/outside das interfaces.",
+      "ACL com 0.0.0.254 é obrigatória para /24."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Tradução da sub-rede interna usa inside source + pool. outside destination inverte o modelo. Interfaces inside/outside e ACL /24 com 0.0.0.255 são necessários."
+  },
+  {
+    "id": 61,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #12579 — Port-security na impressora deve aprender e gravar o MAC automaticamente.",
+    "cli_output": "SW1# show port-security interface gi1/0/10\nPort Security : Enabled\nSticky MAC Addresses : 0\nTotal MAC Addresses : 0\n\nSW1# show run interface gi1/0/10\ninterface GigabitEthernet1/0/10\n switchport port-security\n! sem sticky",
+    "alternativas": [
+      "switchport port-security mac-address sticky.",
+      "Só static MAC atende aprendizado automático.",
+      "enable dynamic MAC address learning é o comando port-security.",
+      "auto MAC address learning substitui sticky."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sticky aprende o MAC e o salva na running-config. Static é manual; não há comando genérico “auto MAC” no lugar de sticky."
+  },
+  {
+    "id": 62,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #12598 — Clientes VLAN 30 sem DHCP; servidor em outro site.",
+    "cli_output": "R1# show ip interface gi0/0.30\nHelper address is not set\nInternet address is 10.30.0.1/24",
+    "alternativas": [
+      "ip helper-address <DHCP-server> na interface dos clientes.",
+      "ip address dhcp na SVI do cliente é relay.",
+      "ip dhcp pool na interface WAN relay broadcasts.",
+      "ip dhcp relay é o comando clássico IOS no lugar de helper-address."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Relay DHCP = ip helper-address no gateway da subnet do cliente. pool/address dhcp são servidor/cliente."
+  },
+  {
+    "id": 63,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #12602 — Violação de port-security; porta Secure-shutdown.",
+    "cli_output": "SW1# show port-security interface gi1/0/5\nViolation Mode             : Shutdown\nPort Status                : Secure-shutdown\nSecurity Violation Count   : 1",
+    "alternativas": [
+      "violation shutdown err-disable a porta ao exceder max MAC — comportamento esperado do modo.",
+      "protect sempre err-disable.",
+      "restrict nunca incrementa contadores.",
+      "violation access é o modo padrão Cisco."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "shutdown mode coloca a porta em err-disabled/secure-shutdown. protect descarta; restrict loga."
+  },
+  {
+    "id": 64,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #12630 — VLAN 10 deve cruzar o trunk untagged (native).",
+    "cli_output": "SW1# show interfaces trunk\nPort        Native vlan\nGi1/0/24    1\nVlans allowed: 1,10,20,30",
+    "alternativas": [
+      "switchport trunk native vlan 10.",
+      "allowed vlan 10 sozinho define native.",
+      "mode access é necessário para untagged multi-VLAN.",
+      "encapsulation dot1q altera native para 10 automaticamente."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Native VLAN carrega frames untagged no 802.1Q. native vlan 10 alinha o desenho; allowed só filtra."
+  },
+  {
+    "id": 65,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #12655 — Switch antigo reinserido corrompeu VLANs (revision alto).",
+    "cli_output": "SW-OLD# show vtp status\nVTP Operating Mode : Server\nConfiguration Revision : 42\n\nSW-CORE# show vtp status\nConfiguration Revision : 12",
+    "alternativas": [
+      "Inserir o switch com revision menor que o domínio (ou transparent/reset revision) antes de server.",
+      "Revision maior é seguro e preferível.",
+      "DTP desirable protege o VLAN database de VTP.",
+      "DTP desirable no uplink apaga o risco de VTP overwrite."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "VTP server com revision maior sobrescreve o domínio. Baixe a revision (mudar domínio/transparent) antes de reintroduzir."
+  },
+  {
+    "id": 66,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #12685 — Syslog deve incluir warning e error, sem notice em massa.",
+    "cli_output": "R1# show run | include logging trap\nlogging trap informational",
+    "alternativas": [
+      "logging trap 4 (warnings) envia severities 0–4.",
+      "logging trap 5 é mais restrito e exclui warnings.",
+      "trap 2 inclui informational por padrão.",
+      "trap 3 envia debug."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Trap level N envia mensagens com severity ≤ N. Level 4 = warning e mais graves (inclui error)."
+  },
+  {
+    "id": 67,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #12727 — R1 ficou DROTHER; precisa ser DR no segmento.",
+    "cli_output": "R1# show ip ospf neighbor\nNeighbor ID     Pri   State\n2.2.2.2           1   FULL/DR\n3.3.3.3           1   FULL/BDR\n\nR1# show ip ospf interface fa0/0 | include Priority|State\n  Priority 1\n  State DROTHER",
+    "alternativas": [
+      "ip ospf priority 200 em R1 Fa0/0 e clear ip ospf process.",
+      "priority 1 em R1 garante DR.",
+      "Subir priority só em R3 elege R1.",
+      "Sem clear process a priority nunca é relida em eleições futuras."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Maior priority vence DR election. Ajuste em R1 + clear process refaz a eleição. Priority 1 default não o força a DR se outros empatam/MAC."
+  },
+  {
+    "id": 68,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #12761 — Hostname ok; crypto key generate rsa pede domain-name.",
+    "cli_output": "R1(config)# crypto key generate rsa\n% Please define a domain-name first.\nR1# show run | include hostname|domain\nhostname R1",
+    "alternativas": [
+      "Configurar ip domain-name antes de gerar a chave RSA.",
+      "password password é pré-requisito da chave.",
+      "Gerar a chave antes do domain-name.",
+      "ip ssh authentication-retries substitui domain-name."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "RSA key pair no IOS exige hostname + domain-name. Depois: crypto key generate rsa."
+  },
+  {
+    "id": 69,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #12770 — Console não pede senha após password configurado.",
+    "cli_output": "R1# show run | section line|enable\nenable secret 5 $1$...\nline con 0\n password p4ssw0rd1\nline vty 0 15\n password s3cr3t2\n! falta login",
+    "alternativas": [
+      "Adicionar login em con e vty com enable secret correto (sem 'privilege 15' na sintaxe secret).",
+      "enable secret privilege 15 é a sintaxe oficial.",
+      "Sem login, password de linha autentica sozinho.",
+      "Remover passwords e usar só enable secret na console user EXEC."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "line password exige login (ou login local). enable secret privilege 15 é inválido."
+  },
+  {
+    "id": 70,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #12777 — Backup estático para rede RIP 192.168.23.0/24 via 192.168.13.3 não flutua.",
+    "cli_output": "R1# show ip protocols | include Administrative\n  Distance: (default is 120)\n\nR1# show run | include ip route 192.168.23\nip route 192.168.23.0 255.255.255.0 192.168.13.3 100",
+    "alternativas": [
+      "Usar AD 121 (maior que RIP 120): ip route 192.168.23.0 255.255.255.0 192.168.13.3 121.",
+      "AD 100 é floating correto sobre RIP.",
+      "Máscara /32 no destino de rede /24 é necessária.",
+      "Sem AD o estático só entra se RIP tiver AD 255."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Floating static > AD do primário. RIP default 120 → use 121+. AD 100 prefere o estático sempre."
+  },
+  {
+    "id": 71,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8091 — Porta Gi1/0/24 entre SW-ACCESS e SW-DIST foi configurada com PortFast “para acelerar o link”. Após um recabo, usuários reportam lentidão extrema e loops intermitentes na VLAN 10. Broadcasts disparam CPU no access.",
+    "cli_output": "SW-ACCESS# show spanning-tree interface gi1/0/24 detail\nPort 24 (GigabitEthernet1/0/24) of VLAN0010 is designated forwarding\n   Port path cost 4, Port priority 128, Port Identifier 128.24.\n   Designated root has priority 32768, address 0011.2233.4455\n   The port is in the portfast edge mode\n   Link type is point-to-point by default\n   BPDU: sent 120, received 340\n\nSW-ACCESS# show running-config interface gi1/0/24\ninterface GigabitEthernet1/0/24\n description UPLINK-TO-DIST\n switchport mode trunk\n spanning-tree portfast\n! (sem bpduguard)\n\nSW-DIST# show spanning-tree vlan 10 | include blocked|BLK|Altn\nGi1/0/1            Altn BLK 4         128.1    P2p",
+    "alternativas": [
+      "PortFast em uplink para outro switch coloca a porta em forwarding cedo demais; STP atrasa a detecção do loop e aumenta risco de broadcast storm.",
+      "PortFast em trunk sempre desliga VTP e por isso a VLAN 10 oscila.",
+      "O problema é apenas hello-time alto; PortFast em switch-switch é best practice Cisco.",
+      "BPDU received prova que PortFast bloqueia automaticamente qualquer loop sem risco."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "PortFast (edge) assume host final. Em link switch-switch, a porta vai a forwarding antes da convergência completa; se houver caminho alternativo, frames podem loopar até STP reagir. O output mostra portfast edge em uplink com BPDUs recebidos — sinal claro de vizinho STP. Correção: remover PortFast do uplink e usar uplink/trunk normal; se PortFast for mantido por engano, ao menos BPDU Guard err-disable a porta ao ver BPDU. VTP e hello-time não explicam o sintoma principal."
+  },
+  {
+    "id": 72,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8093 — A gerência exige que SW-CORE1 seja sempre root da VLAN 750. Após manutenção, SW-CORE2 (priority default) tornou-se root e o uplink preferencial ficou Alternate/Blocking.",
+    "cli_output": "SW-CORE1# show spanning-tree vlan 750\nVLAN0750\n  Spanning tree enabled protocol rstp\n  Root ID    Priority    32768\n             Address     00aa.bbcc.0002\n  Bridge ID  Priority    32768  (priority 32768 sys-id-ext 750)\n             Address     00aa.bbcc.0001\n\nSW-CORE2# show spanning-tree vlan 750 bridge\nVlan             Bridge ID\nVLAN750       32768 00aa.bbcc.0002\n\nSW-CORE1# show running-config | include spanning-tree vlan 750\n! (nenhum comando de root/priority)",
+    "alternativas": [
+      "Aplicar spanning-tree vlan 750 root primary em SW-CORE1 para forçar prioridade baixa e reassumir o root.",
+      "Configurar priority 38418607 em SW-CORE1; qualquer número alto garante root.",
+      "Root é eleito só por MAC; comandos de priority são ignorados em RSTP.",
+      "Basta PortFast global para eleger root da VLAN 750."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Com priorities iguais (32768), vence o menor MAC — SW-CORE2. root primary ajusta a priority para um valor baixo (tipicamente 24576) garantindo SW-CORE1 como root. Priorities inválidas/altas não ajudam. PortFast não elege root."
+  },
+  {
+    "id": 73,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8096 — Time de campus migrou DTP: SW1 Gi1/0/1 em dynamic auto e SW2 Gi1/0/1 em dynamic desirable. Precisam confirmar se o link vira trunk ou access antes de liberar VLANs 20–40.",
+    "cli_output": "SW1# show interfaces gi1/0/1 switchport\nName: Gi1/0/1\nAdministrative Mode: dynamic auto\nOperational Mode: trunk\nAdministrative Trunking Encapsulation: dot1q\nOperational Trunking Encapsulation: dot1q\nNegotiation of Trunking: On\n\nSW2# show interfaces gi1/0/1 switchport\nName: Gi1/0/1\nAdministrative Mode: dynamic desirable\nOperational Mode: trunk\nNegotiation of Trunking: On\n\nSW1# show interfaces trunk\nPort        Mode             Encapsulation  Status        Native vlan\nGi1/0/1     desirable        802.1q         trunking      1",
+    "alternativas": [
+      "Auto + Desirable forma trunk via DTP; Operational Mode trunk confirma o resultado.",
+      "Auto + Desirable sempre resulta em access port.",
+      "A combinação coloca ambos em err-disabled.",
+      "DTP com desirable derruba o link (down/down)."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Dynamic desirable inicia negociação DTP; dynamic auto aceita. Resultado operacional: trunk. O show switchport confirma Operational Mode: trunk. Não há err-disable nem down por essa matriz DTP."
+  },
+  {
+    "id": 74,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8105 — Hosts na VLAN 10 pingam entre si; hosts na VLAN 20 pingam entre si; não há tráfego inter-VLAN. Existe apenas L2 entre access e um roteador R1 com um único cabo no switch (Gi0/1).",
+    "cli_output": "SW1# show vlan brief\nVLAN Name       Status    Ports\n10   USERS      active    Gi1/0/2, Gi1/0/3\n20   VOICE      active    Gi1/0/4, Gi1/0/5\n\nSW1# show interfaces gi1/0/1 switchport\nAdministrative Mode: static access\nAccess Mode VLAN: 10 (USERS)\n\nR1# show ip interface brief\nInterface     IP-Address      Status\nGi0/1         10.10.10.1      up\n\nR1# show vlan\n% Ambiguous command / sem subinterfaces 802.1Q",
+    "alternativas": [
+      "Falta router-on-a-stick: subinterfaces 802.1Q no roteador + trunk no switch para rotear entre VLANs.",
+      "Basta outro access link entre dois switches para rotear VLAN 10↔20.",
+      "Um único IP no physical do roteador na VLAN 10 já roteia todas as VLANs.",
+      "STP bloqueia inter-VLAN por padrão até root primary."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "VLANs são broadcast domains separados; só um dispositivo L3 interliga. Com um cabo, o padrão é trunk no switch + subinterfaces no roteador (encapsulation dot1Q 10/20 e IPs de gateway). Access na VLAN 10 + um IP só atende a VLAN 10. Trunk entre switches não roteia. STP não substitui roteamento inter-VLAN."
+  },
+  {
+    "id": 75,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8117 — Link entre SW-A e SW-B permanece access. SW-B está em dynamic auto. O engenheiro precisa que SW-A tente ativamente formar trunk.",
+    "cli_output": "SW-A# show interfaces gi1/0/1 switchport\nAdministrative Mode: dynamic auto\nOperational Mode: static access\nNegotiation of Trunking: On\n\nSW-B# show interfaces gi1/0/1 switchport\nAdministrative Mode: dynamic auto\nOperational Mode: static access",
+    "alternativas": [
+      "Configurar switchport mode dynamic desirable em SW-A para iniciar DTP e formar trunk com auto.",
+      "Configurar switchport nonegotiate para forçar DTP ativo.",
+      "dynamic auto em ambos já forma trunk automaticamente.",
+      "Somente lldp run cria trunk 802.1Q."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Auto+Auto não inicia trunk. Desirable envia DTP e combina com auto → trunk. nonegotiate desliga DTP. LLDP não negocia encapsulamento de trunk."
+  },
+  {
+    "id": 76,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8126 — Frames da VLAN 10 precisam cruzar o trunk untagged (nativa). Hosts na VLAN 10 perdem conectividade inter-switch; VLANs tagged 20/30 ok.",
+    "cli_output": "SW1# show interfaces trunk\nPort        Mode         Encapsulation  Status        Native vlan\nGi1/0/24    on           802.1q         trunking      1\n\nPort        Vlans allowed on trunk\nGi1/0/24    1,10,20,30\n\nSW1# show running-config interface gi1/0/24\ninterface GigabitEthernet1/0/24\n switchport mode trunk\n switchport trunk allowed vlan 1,10,20,30\n! (native default 1)",
+    "alternativas": [
+      "Configurar switchport trunk native vlan 10 para enviar/receber VLAN 10 untagged no trunk.",
+      "switchport trunk allowed vlan 10 remove o tag mas mantém native 1 sem impacto.",
+      "switchport mode access é obrigatório para untagged multi-VLAN.",
+      "Apenas switchport trunk encapsulation dot1q muda a native para 10."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "No 802.1Q, a native VLAN é untagged. Com native 1, frames da VLAN 10 saem tagged e podem quebrar desenhos que esperam untagged-10. native vlan 10 alinha o comportamento. allowed vlan só filtra; mode access não é trunk; encapsulation não define native sozinha."
+  },
+  {
+    "id": 77,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8128 — Captura na VLAN 40 mostra o mesmo unicast replicado em várias portas. Destino 0050.56de.ad01 não está na CAM.",
+    "cli_output": "SW1# show mac address-table address 0050.56de.ad01\n% Unicast MAC address not found in MAC address table\n\nSW1# show mac address-table dynamic vlan 40\nVlan    Mac Address       Type        Ports\n40      0050.56aa.0001    DYNAMIC     Gi1/0/2\n40      0050.56aa.0002    DYNAMIC     Gi1/0/3",
+    "alternativas": [
+      "Destino desconhecido → flflooding do frame nas portas da VLAN (exceto origem).",
+      "Fonte desconhecida causa flood do frame de dados.",
+      "Switch altera FCS para invalidar o frame quando MAC falta.",
+      "Flood só ocorre se source=destination MAC."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Unknown unicast: sem entrada CAM para o destino, o switch flooda na VLAN. A aprendizagem é pelo source MAC. Não se corrompe FCS nem se exige source=destination."
+  },
+  {
+    "id": 78,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8153 — Servidor novo na VLAN 50; primeiros pings geram tráfego em todas as portas da VLAN até o MAC ser aprendido.",
+    "cli_output": "SW-DC# show mac address-table dynamic vlan 50\nVlan    Mac Address       Type        Ports\n50      0011.2233.4401    DYNAMIC     Gi1/0/10\n! servidor 0011.2233.99aa ainda ausente\n\nSW-DC# show interfaces gi1/0/11 status\nPort      Name       Status       Vlan\nGi1/0/11  NEW-SRV    connected    50",
+    "alternativas": [
+      "Sem MAC de destino na tabela, o switch flooda o frame inalterado nas demais portas da VLAN de ingresso.",
+      "O switch grava o destino na CAM antes de encaminhar e nunca flooda.",
+      "O switch err-disable a porta quando o destino é desconhecido.",
+      "O frame é descartado até existir entrada estática manual."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Comportamento clássico de unknown unicast flflooding na VLAN. Depois que o servidor responde, o source MAC é aprendido e o unicast passa a ser filtrado para a porta correta."
+  },
+  {
+    "id": 79,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8160 — R1 não encaminha destinos desconhecidos à Internet edge 192.168.1.1. Rotas específicas ok; tudo mais falha.",
+    "cli_output": "R1# show ip route\nGateway of last resort is not set\n      10.0.0.0/8 is variably subnetted...\nC        10.1.1.0/24 is directly connected, GigabitEthernet0/0\n\nR1# show running-config | include ip route|default\nip route 10.2.2.0 255.255.255.0 10.1.1.2\n! sem default route",
+    "alternativas": [
+      "Configurar ip route 0.0.0.0 0.0.0.0 192.168.1.1 para gateway of last resort.",
+      "Usar ip default-gateway 192.168.1.1 em roteador com ip routing (substitui default route).",
+      "ip route 192.168.1.1 0.0.0.0 0.0.0.0 instala default válida.",
+      "ip route default-route 192.168.1.1 é a sintaxe IOS padrão."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Default route = 0.0.0.0/0 via next-hop. Em roteador com routing ativo, ip default-gateway não substitui a tabela de roteamento como em host. Sintaxes invertidas/inventadas não instalam gateway of last resort."
+  },
+  {
+    "id": 80,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8161 — Pacotes a 10.10.1.22 escolhem next-hop inesperado. Várias estáticas overlap existem.",
+    "cli_output": "R1# show ip route 10.10.1.22\nRouting entry for 10.10.1.20/30\n  Known via \"static\", distance 1, metric 0\n  Routing Descriptor Blocks:\n  * 10.10.255.1\n\nR1# show running-config | include ip route 10.10.1\nip route 10.10.1.0 255.255.255.240 10.10.255.1\nip route 10.10.1.20 255.255.255.252 10.10.255.1\nip route 10.10.1.16 255.255.255.252 10.10.255.1\nip route 10.10.1.20 255.255.255.254 10.10.255.1",
+    "alternativas": [
+      "Longest match: 10.10.1.20/30 cobre .20–.23 e inclui .22; vence /28 e não-cobertura de /30.16 e /31.",
+      "Sempre vence a rota com maior máscara decimal listada primeiro no config.",
+      "10.10.1.16/30 inclui .22 porque /30 cobre 16 endereços.",
+      "10.10.1.20/31 inclui .22 (.20 e .21 only é falso)."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "IOS usa longest-match. .22 ∈ 10.10.1.20/30 (.20–.23). /28 também cobre mas é menos específico. .16/30 = .16–.19. /31 = .20–.21. Logo a estática /30 .20 é a escolhida."
+  },
+  {
+    "id": 81,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8163 — Rota primária OSPF para 172.16.0.0/16 cai, mas o backup estático não entra na tabela.",
+    "cli_output": "R1# show running-config | include ip route 172.16\nip route 172.16.0.0 255.255.0.0 10.0.0.2 1\n\nR1# show ip route 172.16.0.0\nRouting entry for 172.16.0.0/16\n  Known via \"ospf 1\", distance 110, metric 20\n\n! link OSPF down:\nR1# show ip route 172.16.0.0\n% Network not in table\n! estático também some da candidatura efetiva — AD 1 competia como primária, não floating",
+    "alternativas": [
+      "Floating static precisa de AD maior que a primária (ex. 210 > 110 OSPF) para ficar de backup.",
+      "Floating static deve ter AD menor que OSPF para ser backup.",
+      "default-information originate é obrigatório para qualquer floating static.",
+      "AD maior na rota primária é o mecanismo de floating static."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Com AD 1 o estático é sempre preferido a OSPF (110) quando presente; não é floating. Configure ip route ... 210 (ou similar) para instalar só quando a primária sumir. default-information originate não define floating static."
+  }
+]

@@ -1,0 +1,702 @@
+[
+  {
+    "id": 266,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network engineer is asked to congure VLANS 2, 3, and 4 for a new implementation. Some ports must be assigned to the new VLANS withunused ports remaining. Which action should be taken for the unused ports?",
+    "alternativas": [
+      "congure in a nondefault native VLAN",
+      "congure ports in the native VLAN",
+      "congure ports in a black hole VLAN",
+      "congure ports as access ports"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 267,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What mechanism carries multicast trac between remote sites and supports encryption?",
+    "alternativas": [
+      "ISATAP",
+      "IPsec over ISATAP",
+      "GRE",
+      "GRE over IPsec"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 268,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which action implements physical access control as part of the security program of an organization?",
+    "alternativas": [
+      "setting up IP cameras to monitor key infrastructure",
+      "conguring a password for the console port",
+      "backing up syslogs at a remote location",
+      "conguring enable passwords on network devices"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 269,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which eld within the access-request packet is encrypted by RADIUS?",
+    "alternativas": [
+      "authorized services",
+      "password",
+      "authenticator",
+      "username"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 270,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A Cisco engineer is conguring a factory-default router with these three passwords:✑ The user EXEC password for console access is p4ssw0rd1.✑ The user EXEC password for Telnet access is s3cr3t2.✑ The password for privileged EXEC mode is priv4t3p4ss.Which command sequence must the engineer congure?",
+    "alternativas": [
+      "enable secret priv4t3p4ss ! line con 0 password p4ssw0rd1 ! line vty 0 15 password s3cr3t2",
+      "enable secret priv4t3p4ss ! line con 0 password p4ssw0rd1 login ! line vty 0 15 password s3cr3t2 login",
+      "enable secret priv4t3p4ss ! line con 0 password login p4ssw0rd1 ! line vty 0 15 password login s3cr3t2 login",
+      "enable secret privilege 15 priv4t3p4ss ! line con 0 password p4ssw0rd1 login ! line vty 0 15 password s3cr3t2 login"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 271,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function of Opportunistic Wireless Encryption in an environment?",
+    "alternativas": [
+      "provide authentication",
+      "protect trac on open networks",
+      "offer compression",
+      "increase security by using a WEP connection"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 272,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which encryption method is used by WPA3?",
+    "alternativas": [
+      "TKIP",
+      "AES",
+      "SAE",
+      "PSK"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 273,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which type of trac is sent with pure IPsec?",
+    "alternativas": [
+      "multicast trac from a server at one site to hosts at another location",
+      "broadcast packets from a switch that is attempting to locate a MAC address at one of several remote sites",
+      "unicast messages from a host at a remote site to a server at headquarters",
+      "spanning-tree updates between switches that are at two different sites"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 274,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How does authentication differ from authorization?",
+    "alternativas": [
+      "Authentication is used to record what resource a user accesses, and authorization is used to determine what resources a user can access.",
+      "Authentication veries the identity of a person accessing a network, and authorization determines what resource a user can access.",
+      "Authentication is used to determine what resources a user is allowed to access, and authorization is used to track what equipment isallowed access to the network.",
+      "Authentication is used to verify a person's identity, and authorization is used to create syslog messages for logins."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 275,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer has congured the domain name, user name, and password on the local router. What is the next step to complete the congurationfor a Secure Shell access RSA key?",
+    "alternativas": [
+      "crypto key import rsa pem",
+      "crypto key generate rsa",
+      "crypto key zeroize rsa",
+      "crypto key pubkey-chain rsa"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 276,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which wireless security protocol relies on Perfect Forward Secrecy?",
+    "alternativas": [
+      "WEP",
+      "WPA2",
+      "WPA",
+      "WPA3"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 277,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which characteristic differentiates the concept of authentication from authorization and accounting?",
+    "alternativas": [
+      "consumption-based billing",
+      "identity verication",
+      "user-activity logging",
+      "service limitations"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 278,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function of Cisco Advanced Malware Protection for a Next-Generation IPS?",
+    "alternativas": [
+      "inspecting specic les and le types for malware",
+      "authorizing potentially compromised wireless trac",
+      "authenticating end users",
+      "URL ltering"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 279,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a feature of WPA?",
+    "alternativas": [
+      "TKIP/MIC encryption",
+      "small Wi-Fi application",
+      "preshared key",
+      "802.1x authentication"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 280,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How does WPA3 improve security?",
+    "alternativas": [
+      "It uses SAE for authentication.",
+      "It uses RC4 for encryption.",
+      "It uses TKIP for encryption.",
+      "It uses a 4-way handshake for authentication."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 281,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function of a Next-Generation IPS?",
+    "alternativas": [
+      "correlates user activity with network events",
+      "serves as a controller within a controller-based network",
+      "integrates with a RADIUS server to enforce Layer 2 device authentication rules",
+      "makes forwarding decisions based on learned MAC addresses"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 282,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which IPsec transport mode encrypts the IP header and the payload?",
+    "alternativas": [
+      "pipe",
+      "transport",
+      "control",
+      "tunnel"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 283,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which device separates networks by security domains?",
+    "alternativas": [
+      "intrusion protection system",
+      "rewall",
+      "wireless controller",
+      "access point"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 284,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How are VLAN hopping attacks mitigated?",
+    "alternativas": [
+      "manually implement trunk ports and disable DTP",
+      "congure extended VLANs",
+      "activate all ports and place in the default VLAN",
+      "enable dynamic ARP inspection"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 285,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which enhancements were implemented as part of WPA3?",
+    "alternativas": [
+      "Forward secrecy and SAE in personal mode for secure initial key exchange",
+      "802.1x authentication and AES-128 encryption",
+      "AES-64 in personal mode and AES-128 in enterprise mode",
+      "TKIP encryption improving WEP and per-packet keying"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 286,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "When a site-to-site VPN is congured which IPsec mode provides encapsulation and encryption of the entire original IP packet?",
+    "alternativas": [
+      "IPsec transport mode with AH",
+      "IPsec tunnel mode with AH",
+      "IPsec transport mode with ESP",
+      "IPsec tunnel mode with ESP"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 287,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "In an SDN architecture, which function of a network node is centralized on a controller?",
+    "alternativas": [
+      "Creates the IP routing table",
+      "Discards a message due ltering",
+      "Makes a routing decision",
+      "Provides protocol access for remote access devices"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 288,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which management security process is invoked when a user logs in to a network device using their username and password?",
+    "alternativas": [
+      "authentication",
+      "auditing",
+      "accounting",
+      "authorization"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 289,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which enhancement is implemented in WPA3?",
+    "alternativas": [
+      "employs PKI to identify access points",
+      "applies 802.1x authentication",
+      "uses TKIP",
+      "protects against brute force attacks"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 290,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which port security violation mode allows from valid MAC addresses to pass but blocks trac from invalid MAC addresses?",
+    "alternativas": [
+      "restrict",
+      "shutdown",
+      "protect",
+      "shutdown VLAN"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 291,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A customer wants to provide wireless access to contractors using a guest portal on Cisco ISE. The portal is also used by employees. A solution isimplemented, but contractors receive a certicate error when they attempt to access the portal. Employees can access the portal without anyerrors. Which change must be implemented to allow the contractors and employees to access the portal?",
+    "alternativas": [
+      "Install an Internal CA signed certicate on the Cisco ISE.",
+      "Install a trusted third-party certicate on the Cisco ISE.",
+      "Install an internal CA signed certicate on the contractor devices.",
+      "Install a trusted third-party certicate on the contractor devices."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 292,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network engineer is implementing a corporate SSID for WPA3-Personal security with a PSK. Which encryption cipher must be congured?",
+    "alternativas": [
+      "CCMP128",
+      "GCMP256",
+      "CCMP256",
+      "GCMP128"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 293,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a practice that protects a network from VLAN hopping attacks?",
+    "alternativas": [
+      "Implement port security on internet-facing VLANs",
+      "Enable dynamic ARP inspection",
+      "Assign all access ports to VLANs other than the native VLAN",
+      "Congure an ACL to prevent trac from changing VLANs"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 294,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An organization has decided to start using cloud-provided services. Which cloud service allows the organization to install its own operatingsystem on a virtual machine?",
+    "alternativas": [
+      "platform-as-a-service",
+      "network-as-a-service",
+      "software-as-a-service",
+      "infrastructure-as-a-service"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 295,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How do traditional campus device management and Cisco DNA Center device management differ in regards to deployment?",
+    "alternativas": [
+      "Traditional campus device management allows a network to scale more quickly than with Cisco DNA Center device management.",
+      "Cisco DNA Center device management can deploy a network more quickly than traditional campus device management.",
+      "Cisco DNA Center device management can be implemented at a lower cost than most traditional campus device management options.",
+      "Traditional campus device management schemes can typically deploy patches and updates more quickly than Cisco DNA Center devicemanagement."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 296,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which purpose does a northbound API serve in a controller-based networking architecture?",
+    "alternativas": [
+      "facilitates communication between the controller and the applications",
+      "reports device errors to a controller",
+      "generates statistics for network hardware and trac",
+      "communicates between the controller and the physical network hardware"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 297,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What benet does controller-based networking provide versus traditional networking?",
+    "alternativas": [
+      "allows conguration and monitoring of the network from one centralized point",
+      "provides an added layer of security to protect from DDoS attacks",
+      "combines control and data plane functionality on a single device to minimize latency",
+      "moves from a two-tier to a three-tier network architecture to provide maximum redundancy"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 298,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is an advantage of Cisco DNA Center versus traditional campus device management?",
+    "alternativas": [
+      "It is designed primarily to provide network assurance.",
+      "It supports numerous extensibility options, including cross-domain adapters and third-party SDKs.",
+      "It supports high availability for management functions when operating in cluster mode.",
+      "It enables easy autodiscovery of network elements in a browneld deployment."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 299,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How does Cisco DNA Center gather data from the network?",
+    "alternativas": [
+      "Devices use the call-home protocol to periodically send data to the controller",
+      "Devices establish an IPsec tunnel to exchange data with the controller",
+      "The Cisco CLI Analyzer tool gathers data from each licensed network device and streams it to the controller",
+      "Network devices use different services like SNMP, syslog, and streaming telemetry to send data to the controller"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 300,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which statement compares traditional networks and controller-based networks?",
+    "alternativas": [
+      "Only controller-based networks decouple the control plane and the data plane.",
+      "Traditional and controller-based networks abstract policies from device congurations.",
+      "Only traditional networks natively support centralized management.",
+      "Only traditional networks offer a centralized control plane."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 301,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What software-dened architecture plane assists network devices with making packet-forwarding decisions by providing Layer 2 reachability andLayer 3 routing information?",
+    "alternativas": [
+      "management plane",
+      "control plane",
+      "data plane",
+      "policy plane"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 302,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which type of API allows SDN controllers to dynamically make changes to the network?",
+    "alternativas": [
+      "northbound API",
+      "REST API",
+      "SOAP API",
+      "southbound API"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 303,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which option about JSON is true -",
+    "alternativas": [
+      "uses predened tags or angle brackets () to delimit markup text",
+      "used to describe structured data that includes arrays",
+      "used for storing information",
+      "similar to HTML, it is more verbose than XML"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 304,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which option best describes an API?",
+    "alternativas": [
+      "a contract that describes how various components communicate and exchange data with each other",
+      "an architectural style (versus a protocol) for designing applications",
+      "a stateless client-server model",
+      "request a certain type of data by specifying the URL path that models the data"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 305,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which of the following is the JSON encoding of a dictionary or hash?",
+    "alternativas": [
+      "{\"keyג :€\"value\"}",
+      "[\"keyג ,€\"value\"]",
+      "{\"keyג ,€\"value\"}",
+      "(\"keyג :€\"value\")"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 306,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which role does a hypervisor provide for each virtual machine in server virtualization?",
+    "alternativas": [
+      "infrastructure-as-a-service",
+      "Software-as-a-service",
+      "control and distribution of physical resources",
+      "services as a hardware controller"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 307,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the function of a server?",
+    "alternativas": [
+      "It transmits packets between hosts in the same broadcast domain.",
+      "It provides shared applications to end users.",
+      "It routes trac between Layer 3 devices.",
+      "It ׁreates security zones between trusted and untrusted networks."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 308,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which CRUD operation modies an existing table or view?",
+    "alternativas": [
+      "read",
+      "update",
+      "replace",
+      "create"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 309,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "In software-dened architectures, which plane is distributed and responsible for trac forwarding?",
+    "alternativas": [
+      "management plane",
+      "policy plane",
+      "data plane",
+      "control plane"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 310,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which conguration management mechanism uses TCP port 22 by default when communicating with managed nodes?",
+    "alternativas": [
+      "Ansible",
+      "Python",
+      "Puppet",
+      "Chef"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 311,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What does an SDN controller use as a communication protocol to relay forwarding changes to a southbound API?",
+    "alternativas": [
+      "Java",
+      "REST",
+      "OpenFlow",
+      "XML"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 312,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What uses HTTP messages to transfer data to applications residing on different hosts?",
+    "alternativas": [
+      "OpenStack",
+      "OpFlex",
+      "REST",
+      "OpenFlow"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 313,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which JSON data type is an unordered set of attribute-value pairs?",
+    "alternativas": [
+      "string",
+      "array",
+      "Boolean",
+      "object"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 314,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which protocol is used in Software Dened Access (SDA) to provide a tunnel between two edge nodes in different fabrics?",
+    "alternativas": [
+      "Generic Router Encapsulation (GRE)",
+      "Virtual Local Area Network (VLAN)",
+      "Virtual Extensible LAN (VXLAN)",
+      "Point-to-Point Protocol (PPP)"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 315,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which plane is centralized by an SDN controller?",
+    "alternativas": [
+      "management-plane",
+      "data-plane",
+      "services-plane",
+      "control-plane"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  }
+]

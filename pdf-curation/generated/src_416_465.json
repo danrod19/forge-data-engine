@@ -1,0 +1,702 @@
+[
+  {
+    "id": 416,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which type of security program is violated when a group of employees enters a building using the ID badge of only one person?",
+    "alternativas": [
+      "intrusion detection",
+      "network authorization",
+      "physical access control",
+      "user awareness"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 417,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of RSA?",
+    "alternativas": [
+      "It uses preshared keys for encryption.",
+      "It is an asymmetric encryption algorithm.",
+      "It is a symmetric decryption algorithm.",
+      "It requires both sides to have identical keys for encryption."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 418,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is an enhancement implemented in WPA3?",
+    "alternativas": [
+      "applies 802.1x authentication and AES-128 encryption",
+      "employs PKI and RADIUS to identify access points",
+      "uses TKIP and per-packet keying",
+      "defends against deauthentication and disassociation attacks"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 419,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which action must be taken when password protection is implemented?",
+    "alternativas": [
+      "Use less than eight characters in length when passwords are complex.",
+      "Include special characters and make passwords as long as allowe",
+      "C. Share passwords with senior IT management to ensure proper oversight.",
+      "Store passwords as contacts on a mobile device with single-factor authentication."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 420,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer must congure R1 for a new user account. The account must meet these requirements:• It must be congured in the local database.• The username is engineer2.• It must use the strongest password congurable.Which command must the engineer congure on the router?",
+    "alternativas": [
+      "R1(cong)# username engineer2 privilege 1 password 7 test2021",
+      "R1(cong)# username engineer2 secret 4 $1$b1Ju$kZbBS1Pyh4QzwXyZ",
+      "R1(cong)# username engineer2 algorithm-type scrypt secret test2021",
+      "R1(cong)# username engineer2 secret 5 password $1$b1Ju$kZbBS1Pyh4QzwXyZ"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 421,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of RSA?",
+    "alternativas": [
+      "It uses preshared keys for encryption.",
+      "It is a public-key cryptosystem.",
+      "It is a private-key encryption algorithm.",
+      "It requires both sides to have identical keys."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 422,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is used as a solution for protecting an individual network endpoint from attack?",
+    "alternativas": [
+      "antivirus software",
+      "wireless controller",
+      "router",
+      "Cisco DNA Center"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 423,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which security method is used to prevent man-in-the-middle attacks?",
+    "alternativas": [
+      "authentication",
+      "anti-replay",
+      "authorization",
+      "accounting"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 424,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which cipher is supported for wireless encryption only with the WPA2 standard?",
+    "alternativas": [
+      "RC4",
+      "AES",
+      "SHA",
+      "AES256"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 425,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which WPA mode uses PSK authenticaton?",
+    "alternativas": [
+      "Local",
+      "Personal",
+      "Enterprise",
+      "Client"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 426,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "To improve corporate security, an organization is planning to implement badge authentication to limit access to the data center. Which element ofa security program is being deployed?",
+    "alternativas": [
+      "user awareness",
+      "user training",
+      "physical access control",
+      "vulnerability verication"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 427,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which benet does Cisco DNA Center provide over traditional campus management?",
+    "alternativas": [
+      "Cisco DNA Center automates HTTPS for secure web access, and traditional campus management uses HTTP.",
+      "Cisco DNA Center leverages SNMPv3 for encrypted management, and traditional campus management uses SNMPv2.",
+      "Cisco DNA Center leverages APIs, and traditional campus management requires manual data gathering.",
+      "Cisco DNA Center automates SSH access for encrypted entry, and SSH is absent from traditional campus management."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 428,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How does Chef conguration management enforce a required device conguration?",
+    "alternativas": [
+      "The Chef Infra Server uses its congured cookbook to push the required conguration to the remote device requesting updates.",
+      "The installed agent on the device connects to the Chef Infra Server and pulls its required conguration from the cookbook.",
+      "The Chef Infra Server uses its congured cookbook to alert each remote device when it is time for the device to pull a new conguration.",
+      "The installed agent on the device queries the Chef Infra Server and the server responds by pushing the conguration from the cookbook."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 429,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the PUT method within HTTP?",
+    "alternativas": [
+      "It replaces data at the destination.",
+      "It is a nonidempotent operation.",
+      "It is a read-only operation.",
+      "It displays a web site."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 430,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which advantage does the network assurance capability of Cisco DNA Center provide over traditional campus management?",
+    "alternativas": [
+      "Cisco DNA Center leverages YANG and NETCONF to assess the status of fabric and nonfabric devices, and traditional campus managementuses CLI exclusively.",
+      "Cisco DNA Center handles management tasks at the controller to reduce the load on infrastructure devices, and traditional campusmanagement uses the data backbone.",
+      "Cisco DNA Center automatically compares security postures among network devices, and traditional campus management needs manualcomparisons.",
+      "Cisco DNA Center correlates information from different management protocols to obtain insights, and traditional campus managementrequires manual analysis."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 431,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the purpose of a southbound API in a controller-based networking architecture?",
+    "alternativas": [
+      "facilitates communication between the controller and the applications",
+      "allows application developers to interact with the network",
+      "integrates a controller with other automation and orchestration tools",
+      "facilitates communication between the controller and the networking hardware"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 432,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which function generally performed by a traditional network device is replaced by a software-dened controller?",
+    "alternativas": [
+      "building route tables and updating the forwarding table",
+      "encapsulation and decapsulation of packets in a data-link frame",
+      "changing the source or destination address during NAT operations",
+      "encryption and decryption for VPN link processing"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 433,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What describes a northbound REST API for SDN?",
+    "alternativas": [
+      "network-element-facing interface for GET, POST, PUT, and DELETE methods",
+      "application-facing interface for SNMP GET requests",
+      "application-facing interface for GET, POST, PUT, and DELETE methods",
+      "network-element-facing interface for the control and data planes"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 434,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "When is the PUT method used within HTTP?",
+    "alternativas": [
+      "to update a DNS server",
+      "when a nonidempotent operation is needed",
+      "to display a web site",
+      "when a read-only operation is required"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 435,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the advantage of separating the control plane from the data plane within an SDN network?",
+    "alternativas": [
+      "limits data queries to the control plane",
+      "reduces cost",
+      "decreases overall network complexity",
+      "ooads the creation of virtual machines to the data plane"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 436,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function of a northbound API in an SDN environment?",
+    "alternativas": [
+      "It relies on global provisioning and conguration.",
+      "It upgrades software and restores les.",
+      "It supports distributed processing for conguration.",
+      "It provides orchestration and network automation services."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 437,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is an Ansible inventory?",
+    "alternativas": [
+      "unit of Python code to be executed within Ansible",
+      "le that denes the target devices upon which commands and tasks are executed",
+      "device with Ansible installed that manages target devices",
+      "collection of actions to perform on target devices, expressed in YAML format"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 438,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function of a northbound API?",
+    "alternativas": [
+      "It relies on global provisioning and conguration.",
+      "It upgrades software and restores les.",
+      "It supports distributed processing for conguration.",
+      "It provides a path between an SDN controller and network applications."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 439,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network architect is considering whether to implement Cisco DNA Center to deploy devices on a new network. The organization is focused onreducing the time it currently takes to deploy devices in a traditional campus design. For which reason would Cisco DNA Center be moreappropriate than traditional management options?",
+    "alternativas": [
+      "Cisco DNA Center supports deployment with a single pane of glass.",
+      "Cisco DNA Center provides zero-touch provisioning to third-party devices.",
+      "Cisco DNA Center reduces the need for analytics on third-party access points and devices.",
+      "Cisco DNA Center minimizes the level of syslog output when reporting on Cisco devices."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 440,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "In a cloud-computing environment, what is rapid elasticity?",
+    "alternativas": [
+      "control and monitoring or resource consumption by the tenant",
+      "automatic adjustment of capacity based on need",
+      "pooling resources in a multitenant model based on need",
+      "self-service of computing resources by the tenant"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 441,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which interface enables communication between a program on the controller and a program on the networking device?",
+    "alternativas": [
+      "software virtual interface",
+      "tunnel interface",
+      "northbound interface",
+      "southbound interface"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 442,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which interface type enables an application running on a client to send data over an IP network to a server?",
+    "alternativas": [
+      "northbound interface",
+      "application programming interface",
+      "southbound interface",
+      "Representational State Transfer application programming interface"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 443,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What does trac shaping do?",
+    "alternativas": [
+      "It queues excess trac",
+      "It sets QoS attributes within a packet",
+      "It organizes trac into classes",
+      "It modies the QoS attributes of a packet"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 444,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the benet of using private IPv4 addressing?",
+    "alternativas": [
+      "to enable secure connectivity over the Internet",
+      "to shield internal network devices from external access",
+      "to provide reliable connectivity between like devices",
+      "to be routable over an external network"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 445,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Two switches have been implemented and all interfaces are at the default conguration level. A trunk link must be implemented between twoswitches with these requirements:• using an industry-standard trunking protocol• permitting VLANs 1-10 and denying other VLANsHow must the interconnecting ports be congured?",
+    "alternativas": [
+      "switchport mode dynamicchannel-protocol lacpswitchport trunk allowed vlans 1-10",
+      "switchport mode trunkswitchport trunk allowed vlans 1-10switchport trunk native vlan 11",
+      "switchport mode trunkswitchport trunk encapsulation dot1qswitchport trunk allowed vlans 1-10",
+      "switchport mode dynamic desirablechannel-group 1 mode desirableswitchport trunk encapsulation islswitchport trunk allowed vlan except 11-4094"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 446,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network administrator wants the syslog server to lter incoming messages into different les based on their importance. Which ltering criteriamust be used?",
+    "alternativas": [
+      "message body",
+      "level",
+      "facility",
+      "process ID"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 447,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which interface or port on the WLC is the default for in-band device administration and communications between the controller and accesspoints?",
+    "alternativas": [
+      "console port",
+      "management interface",
+      "virtual interface",
+      "service port"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 448,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the recommended switch load-balancing mode for Cisco WLCs?",
+    "alternativas": [
+      "source-destination IP address",
+      "destination IP address",
+      "destination MAC address",
+      "source-destination MAC address"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 449,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What must be considered when using 802.11a?",
+    "alternativas": [
+      "It is chosen over 802.11b when a lower-cost solution is necessary",
+      "It is susceptible to interference from 2.4 GHz devices such as microwave ovens",
+      "It is compatible with 802.11b- and 802 11g-compliant wireless devices",
+      "It is used in place of 802.11b/g when many nonoverlapping channels are required"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 450,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is represented by the word \"LB20\" within this JSON schema?",
+    "alternativas": [
+      "value",
+      "array",
+      "object",
+      "key"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 451,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is represented beginning with line 1 and ending with line 5 within this JSON schema?",
+    "alternativas": [
+      "key",
+      "object",
+      "array",
+      "value"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 452,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is represented by the word \"IDS\" within this JSON schema?",
+    "alternativas": [
+      "object",
+      "value",
+      "array",
+      "key"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 453,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is represented in line 4 within this JSON schema?",
+    "alternativas": [
+      "object",
+      "array",
+      "key",
+      "value"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 454,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is represented by the word \"port\" within this JSON schema?",
+    "alternativas": [
+      "key",
+      "value",
+      "array",
+      "object"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 455,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What provides connection redundancy, increased bandwidth, and load sharing between a wireless LAN controller and a Layer 2 switch?",
+    "alternativas": [
+      "rst hop redundancy",
+      "VLAN trunking",
+      "tunneling",
+      "link aggregation"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 456,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which interface is used to send trac to the destination network?",
+    "alternativas": [
+      "F0/5",
+      "F0/6",
+      "F0/12",
+      "F0/9"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 457,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the purpose of an SSID?",
+    "alternativas": [
+      "It identies an individual access point on a WLAN.",
+      "It differentiates trac entering access points.",
+      "It provides network security.",
+      "It identies a WLAN."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 458,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What describes the functionality of southbound APIs?",
+    "alternativas": [
+      "They enable communication between the controller and the network device.",
+      "They communicate with the management plane.",
+      "They use HTTP messages to communicate.",
+      "They convey information from the controller to the SDN applications."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 459,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which command must be entered so that the default gateway is automatically distributed when DHCP is congured on a router?",
+    "alternativas": [
+      "dns-server",
+      "default-router",
+      "ip helper-address",
+      "default-gateway"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 460,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which 802.11 management frame type is sent when a client roams between access points on the same SSID?",
+    "alternativas": [
+      "Reassociation Request",
+      "Authentication Request",
+      "Association Request",
+      "Probe Request"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 461,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a functionality of the control plane in the network?",
+    "alternativas": [
+      "It looks up an egress interface in the forwarding information base.",
+      "It forwards trac to the next hop.",
+      "It exchanges topology information with other routers.",
+      "It provides CLI access to the network device."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 462,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is represented by the word \"VPN11\" within this JSON schema?",
+    "alternativas": [
+      "key",
+      "array",
+      "object",
+      "value"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 463,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which port type supports the spanning-tree portfast command without additional conguration?",
+    "alternativas": [
+      "Layer 3 main interfaces",
+      "Layer 3 subinterfaces",
+      "trunk ports",
+      "access ports"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 464,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is represented by the word \"R29\" within this JSON schema?",
+    "alternativas": [
+      "array",
+      "key",
+      "object",
+      "value"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 465,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is represented in line 2 within this JSON schema?",
+    "alternativas": [
+      "object",
+      "value",
+      "key",
+      "array"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  }
+]

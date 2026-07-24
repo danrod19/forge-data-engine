@@ -1,0 +1,1548 @@
+[
+  {
+    "source_id": 16,
+    "traditional": {
+      "id": 16,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the difference regarding reliability and communication type between TCP and UDP?",
+      "alternativas": [
+        "TCP is reliable and is a connectionless protocol; UDP is not reliable and is a connection-oriented protocol.",
+        "TCP is not reliable and is a connectionless protocol; UDP is reliable and is a connection-oriented protocol.",
+        "TCP is not reliable and is a connection-oriented protocol; UDP is reliable and is a connectionless protocol.",
+        "TCP is reliable and is a connection-oriented protocol; UDP is not reliable and is a connectionless protocol."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "TCP establishes a session (three-way handshake), numbers segments, uses acknowledgments, and retransmits lost data — that combination makes it connection-oriented and reliable from the application view.\nUDP does not build a connection, does not retransmit, and does not guarantee delivery; it only provides a lightweight datagram service with optional checksum, so it is connectionless and best-effort.\nOption A swaps the connection models: TCP is not connectionless, and UDP is not connection-oriented.\nOption B reverses reliability and connection properties for both protocols.\nOption C correctly notes TCP as connection-oriented but wrongly claims TCP is unreliable and UDP is reliable.\nThe only fully correct pairing is option D (index 3)."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 17,
+    "traditional": {
+      "id": 17,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of IPv6 address is publicly routable in the same way as IPv4 public addresses?",
+      "alternativas": [
+        "multicast",
+        "unique local",
+        "link-local",
+        "global unicast"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Global unicast addresses (typically 2000::/3) are assigned for Internet-wide uniqueness and are routed on the public IPv6 Internet similarly to public IPv4 addresses.\nUnique local addresses (fc00::/7, commonly fd00::/8) are for site-local use and are not meant to be advertised on the global Internet.\nLink-local addresses (fe80::/10) are valid only on the local link and never leave that segment.\nMulticast addresses (ff00::/8) identify groups of receivers, not a single publicly routable host endpoint like a public unicast.\nTherefore the publicly routable unicast type is global unicast."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 18,
+    "traditional": {
+      "id": 18,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the expected outcome when an EUI-64 address is generated?",
+      "alternativas": [
+        "The interface ID is configured as a random 64-bit value",
+        "The characters FE80 are inserted at the beginning of the MAC address of the interface",
+        "The seventh bit of the original MAC address of the interface is inverted",
+        "The MAC address of the interface is used as the interface ID without modification"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "EUI-64 builds a 64-bit interface identifier from a 48-bit MAC by inserting FFFE in the middle and flipping the U/L bit (the seventh bit of the first byte).\nThat bit flip is the defining step of the classic EUI-64 algorithm used with SLAAC.\nA random 64-bit value describes privacy extensions or random IIDs, not classic EUI-64.\nFE80 is the link-local prefix, not something inserted into the MAC itself.\nUsing the MAC unchanged without FFFE and without the U/L flip is incorrect for EUI-64.\nHence the expected outcome called out here is inversion of the seventh bit (option C)."
+    },
+    "ticket": {
+      "id": 18,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #1801 — Hosts IPv6 mostram interface ID diferente do MAC do NIC; o time de inventário esperava o MAC “cru” e suspeita de erro de SLAAC. Switch L3 com EUI-64 na SVI.",
+      "cli_output": "R1# show ipv6 interface vlan 10\nVlan10 is up, line protocol is up\n  IPv6 is enabled, link-local address is FE80::C800:11FF:FE22:3344\n  Global unicast address(es):\n    2001:DB8:10:1:C800:11FF:FE22:3344, subnet is 2001:DB8:10:1::/64 [EUI]\n\nR1# show interfaces vlan 10\n  Hardware is EtherSVI, address is ca00.1122.3344\n\n! MAC ca00.1122.3344 → IID C800:11FF:FE22:3344 (FFFE + U/L bit flip CA→C8)",
+      "alternativas": [
+        "O IID EUI-64 inverte o bit U/L e insere FFFE; o MAC não aparece “cru” no endereço IPv6 — comportamento esperado.",
+        "FE80 no início do GUA prova que o prefixo global está errado e o SLAAC falhou.",
+        "EUI-64 usa o MAC sem qualquer modificação; o show indica bug de IOS.",
+        "O bit invertido só ocorre com privacy extensions, nunca com EUI-64."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Com EUI-64, o MAC ca00.1122.3344 vira C800:11FF:FE22:3344: FFFE no meio e flip do 7º bit (CA→C8).\nIsso é o comportamento correto, não um erro de inventário.\nFE80 é só o link-local; o GUA usa o prefixo 2001:DB8:10:1::/64 com o mesmo IID.\nPrivacy extensions gerariam IID aleatório, não este padrão EUI."
+    }
+  },
+  {
+    "source_id": 19,
+    "traditional": {
+      "id": 19,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A corporate office uses four floors in a building.\n• Floor 1 has 24 users.\n• Floor 2 has 29 users.\n• Floor 3 has 28 users.\n• Floor 4 has 22 users.\nWhich subnet summarizes and gives the most efficient distribution of IP addresses for the router configuration?",
+      "alternativas": [
+        "192.168.0.0/24 as summary and 192.168.0.0/28 for each floor",
+        "192.168.0.0/23 as summary and 192.168.0.0/25 for each floor",
+        "192.168.0.0/25 as summary and 192.168.0.0/27 for each floor",
+        "192.168.0.0/26 as summary and 192.168.0.0/29 for each floor"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "The largest floor needs 29 host addresses. A /27 provides 32 addresses (30 usable hosts), which fits 29 users with room for gateway and spare capacity.\nFour contiguous /27 subnets total a /25 summary (128 addresses), which is an efficient block: 192.168.0.0/25 covering four /27s.\nA /28 (14 usable) is too small for 29 users.\nA /25 per floor wastes space (126 usable each) and a /23 summary is larger than needed.\nA /29 (6 usable) is far too small for any floor.\nThus 192.168.0.0/25 summary with 192.168.0.0/27 per floor is the best fit."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 20,
+    "traditional": {
+      "id": 20,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a characteristic of spine-and-leaf architecture?",
+      "alternativas": [
+        "Each link between leaf switches allows for higher bandwidth.",
+        "It provides greater predictability on STP blocked ports.",
+        "It provides variable latency.",
+        "Each device is separated by the same number of hops."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "In a spine-and-leaf fabric, every leaf connects to every spine, so any two endpoints are typically separated by a fixed hop count (leaf–spine–leaf), giving consistent latency and path length.\nLeaf switches do not form a full mesh of leaf-to-leaf links as the primary design; east-west traffic goes leaf–spine–leaf.\nSTP blocked-port behavior is not the design goal of modern spine-leaf (often Layer 3 ECMP instead of large L2 domains).\nVariable latency is the opposite of the intended equal-cost, predictable fabric.\nTherefore “same number of hops” is the characteristic that matches spine-and-leaf."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 21,
+    "traditional": {
+      "id": 21,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Using direct sequence spread spectrum, which three 2.4-GHz channels are used to limit collisions?",
+      "alternativas": [
+        "5, 6, 7",
+        "1, 2, 3",
+        "1, 6, 11",
+        "1, 5, 10"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "In the 2.4 GHz ISM band (DSSS/OFDM as used by 802.11b/g/n), channels 1, 6, and 11 are the classic nonoverlapping set in the United States and many regions.\nUsing adjacent channels such as 5–6–7 or 1–2–3 causes heavy spectral overlap and co-channel/adjacent interference.\nChannels 1, 5, and 10 are not the standard nonoverlapping triple taught for 2.4 GHz WLAN design.\nLimiting collisions/interference among neighboring APs depends on spacing nonoverlapping channels — 1, 6, and 11."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 22,
+    "traditional": {
+      "id": 22,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How do TCP and UDP differ in the way they guarantee packet delivery?",
+      "alternativas": [
+        "TCP uses retransmissions, acknowledgment, and parity checks, and UDP uses cyclic redundancy checks only",
+        "TCP uses two-dimensional parity checks, checksums, and cyclic redundancy checks, and UDP uses retransmissions only",
+        "TCP uses checksum, acknowledgements, and retransmissions, and UDP uses checksums only",
+        "TCP uses checksum, parity checks, and retransmissions, and UDP uses acknowledgements only"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "TCP detects errors with a checksum and recovers with acknowledgments and retransmissions of lost segments.\nUDP may use a checksum for error detection but provides no recovery (no ACK/retransmit) at the transport layer.\nParity-check wording is not the standard model of TCP/UDP delivery guarantees in CCNA-level descriptions.\nUDP does not use retransmissions or acknowledgments as its delivery model.\nOption C correctly contrasts TCP recovery mechanisms with UDP’s checksum-only approach."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 23,
+    "traditional": {
+      "id": 23,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A wireless administrator has configured a WLAN; however, the clients need access to a less congested 5-GHz network for their voice quality. Which action must be taken to meet the requirement?",
+      "alternativas": [
+        "enable Band Select",
+        "enable DTIM",
+        "enable RX-SOP",
+        "enable AAA override"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Cisco Band Select (Client Band Select) steers dual-band clients toward the 5 GHz band when appropriate, reducing load on congested 2.4 GHz and improving experience for voice-capable clients.\nDTIM relates to power-save delivery timing for multicast/broadcast, not band preference.\nRX-SOP adjusts receive start of packet sensitivity for cell sizing, not primarily “prefer 5 GHz for voice.”\nAAA override applies dynamic policy from RADIUS (VLAN/ACL/QoS), not band steering.\nTo move clients to less congested 5 GHz for voice quality, enable Band Select."
+    },
+    "ticket": {
+      "id": 23,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #2301 — Voz wireless ruim no 2.4 GHz (utilização alta). Clientes dual-band não sobem para 5 GHz. WLC com Band Select desabilitado no SSID CORP-VOICE.",
+      "cli_output": "WLC> show wlan 12\nWLAN Identifier.................................. 12\nProfile Name..................................... CORP-VOICE\nNetwork Name (SSID).............................. CORP-VOICE\nStatus........................................... Enabled\n...\nBand Select...................................... Disabled\n\nWLC> show advanced 802.11b summary\nAP Name  Channel  Utilization\nAP-FL2   6        82%\n\nWLC> show advanced 802.11a summary\nAP Name  Channel  Utilization\nAP-FL2   36       18%",
+      "alternativas": [
+        "Band Select está Disabled; habilitar Client Band Select no WLAN para preferir 5 GHz menos congestionado.",
+        "DTIM alto no 5 GHz impede qualquer associação em 802.11a/n/ac.",
+        "Utilization 82% no 2.4 GHz é ideal para voice e não requer ação.",
+        "AAA override é a única feature que move clientes de banda no CCNA."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "O show wlan confirma Band Select Disabled enquanto o 2.4 GHz está congestionado e o 5 GHz livre.\nBand Select é a feature de steering para dual-band clients.\nHabilite Band Select no WLAN CORP-VOICE (e valide radio policy inclui 5 GHz)."
+    }
+  },
+  {
+    "source_id": 24,
+    "traditional": {
+      "id": 24,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the destination MAC address of a broadcast frame?",
+      "alternativas": [
+        "00:00:0c:07:ac:01",
+        "ff:ff:ff:ff:ff:ff",
+        "43:2e:08:00:00:0c",
+        "00:00:0c:43:2e:08"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "An Ethernet Layer-2 broadcast uses the all-ones destination MAC address ff:ff:ff:ff:ff:ff so every station on the LAN segment processes the frame.\n00:00:0c:07:ac:01 is a well-known HSRP virtual MAC pattern (example), not a broadcast.\nOther unicast-looking addresses identify specific NICs or vendor OUIs, not “everyone.”\nSwitches flood broadcasts out all ports in the VLAN (except the ingress), but the destination address field itself is ff:ff:ff:ff:ff:ff."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 25,
+    "traditional": {
+      "id": 25,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "For what two purposes does the Ethernet protocol use physical addresses? (Choose two concept — cleaned to one best combined answer set)",
+      "alternativas": [
+        "to uniquely identify devices at Layer 2 and allow communication between devices on the same network",
+        "to allow communication with devices on a different network without a router",
+        "to differentiate a Layer 2 frame from a Layer 3 packet by rewriting the EtherType to IP",
+        "to establish a priority system that decides which device transmits first using MAC values"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Ethernet MAC (physical) addresses uniquely identify interfaces at Layer 2 so frames can be delivered between devices on the same LAN/broadcast domain.\nThey do not replace IP routing: reaching a different network requires a Layer-3 hop (router/gateway).\nMACs are not a general priority scheduler for media access in the sense of “highest MAC wins always” as the design purpose of addressing.\nEtherType identifies the payload type; MACs do not exist to “turn a frame into a packet.”\nThe cleaned correct idea combines unique L2 identity with same-network delivery (option A)."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 26,
+    "traditional": {
+      "id": 26,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "You are configuring your edge router interface with a public IP address for Internet connectivity. The router needs to obtain the IP address from the service provider dynamically. Which command is needed on interface FastEthernet 0/0 to accomplish this?",
+      "alternativas": [
+        "ip default-gateway",
+        "ip route",
+        "ip default-network",
+        "ip address dhcp"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "On a Cisco router interface, ip address dhcp makes that interface a DHCP client so the ISP can assign the address dynamically.\nip default-gateway is used on Layer-2 switches (or hosts), not the primary way for a router to get its WAN IP.\nip route and ip default-network deal with routing, not interface address assignment from a DHCP server.\nip address dynamic is not the standard IOS interface command for DHCP client mode.\nTherefore the required interface command is ip address dhcp."
+    },
+    "ticket": {
+      "id": 26,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #2601 — Edge R-EDGE precisa de IP público dinâmico do ISP na Fa0/0. Interface sem IP; Internet down. Time usou ip default-gateway por engano.",
+      "cli_output": "R-EDGE# show run interface fastEthernet 0/0\ninterface FastEthernet0/0\n description WAN-ISP\n ip default-gateway 203.0.113.1\n duplex auto\n speed auto\n\nR-EDGE# show ip interface brief\nInterface                  IP-Address      OK? Method Status                Protocol\nFastEthernet0/0            unassigned      YES unset  up                    up\n\nR-EDGE# show ip route\nGateway of last resort is not set",
+      "alternativas": [
+        "Falta ip address dhcp na Fa0/0; ip default-gateway não atribui IP de interface em roteador.",
+        "ip default-gateway na interface faz o IOS obter DHCP automaticamente.",
+        "Status up/up com unassigned é impossível; o cabo está down.",
+        "Basta ip route 0.0.0.0 0.0.0.0 Fa0/0 sem endereço IP."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Roteadores usam ip address dhcp no interface para cliente DHCP no ISP.\nip default-gateway é comando de host/L2 switch, não preenche IP da Fa0/0.\nCom unassigned, não há WAN IP nem default funcional."
+    }
+  },
+  {
+    "source_id": 27,
+    "traditional": {
+      "id": 27,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which technique can you use to route IPv6 traffic over an IPv4 infrastructure?",
+      "alternativas": [
+        "NAT",
+        "6to4 tunneling",
+        "L2TPv3",
+        "dual-stack"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "6to4 (and related IPv6-over-IPv4 tunneling approaches) encapsulate IPv6 packets so they can traverse an IPv4-only underlay.\nClassic NAT (NAT44) does not by itself provide IPv6 transport across IPv4.\nL2TPv3 is a Layer-2 tunneling technology, not the standard CCNA answer for carrying IPv6 over IPv4 routing infrastructure.\nDual-stack means both protocols run natively end-to-end; it does not alone carry IPv6 across an IPv4-only path without tunnels or translation.\nFor routing IPv6 over IPv4 infrastructure, tunneling such as 6to4 is the matching technique here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 28,
+    "traditional": {
+      "id": 28,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which WAN access technology is preferred for a small office / home office architecture?",
+      "alternativas": [
+        "broadband cable access",
+        "frame-relay packet switching",
+        "dedicated point-to-point leased line",
+        "Integrated Services Digital Network switching"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "SOHO sites commonly use inexpensive broadband access (cable, DSL, fiber-to-the-home style services) for Internet and VPN backhaul.\nFrame Relay and classic ISDN are legacy WAN technologies rarely preferred for modern SOHO.\nDedicated leased lines are reliable but costly and overkill for many small/home offices.\nAmong the listed options, broadband cable access is the preferred SOHO choice."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 29,
+    "traditional": {
+      "id": 29,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the binary pattern of unique IPv6 unique local address?",
+      "alternativas": [
+        "00000000",
+        "11111100",
+        "11111111",
+        "11111101"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Unique local addresses fall under fc00::/7. The first 7 bits of the prefix are 1111110, and the L bit makes the commonly used fd00::/8 appear as 11111101 for locally assigned ULA — many exam items present the FC00::/7 leading pattern as 11111100.\nCisco CCNA-style items often key “unique local” to the FC00::/7 binary start 1111 110x → 11111100 as the listed pattern among short 8-bit choices.\n00000000 is not a ULA identifier pattern.\n11111111 is associated with multicast ff00::/8 style leading ones, not ULA.\n11111101 corresponds to fd00::/8 specifically; the source answer key selects 11111100 for the ULA /7 pattern.\nKeep answer index 1 as in the source key for FC00::/7."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 30,
+    "traditional": {
+      "id": 30,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the same for both copper and fiber interfaces when using SFP modules?",
+      "alternativas": [
+        "They support an inline optical attenuator to enhance signal strength",
+        "They accommodate single-mode and multi-mode in a single module",
+        "They provide minimal interruption to services by being hot-swappable",
+        "They offer reliable bandwidth up to 100 Mbps in half duplex mode"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "SFP (and similar pluggables) are hot-swappable on both copper and optical variants, allowing replacement with minimal service disruption when the platform supports OIR.\nOptical attenuators apply to fiber optics, not copper SFPs.\nA single module does not universally speak both SMF and MMF as a general “same for copper and fiber” property.\n100 Mbps half duplex is not the shared modern characteristic of copper vs fiber SFP ports (many are 1G+).\nHot-swappability is the common property."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 31,
+    "traditional": {
+      "id": 31,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which function is performed by the collapsed core layer in a two-tier architecture?",
+      "alternativas": [
+        "enforcing routing policies",
+        "marking interesting traffic for data policies",
+        "applying security policies",
+        "attaching users to the edge of the network"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "In a two-tier (collapsed core) design, core and distribution roles merge. That collapsed layer still performs distribution/core jobs such as routing between VLANs/buildings and enforcing routing policies toward the rest of the network.\nAttaching end users is the access layer function, not the collapsed core.\nWhile security and QoS can appear in multiple layers, the classic answer for collapsed-core responsibilities emphasizes inter-VLAN/core routing policy functions.\n“Marking interesting traffic for data policies” is vague and not the defining collapsed-core role.\nAmong the options, enforcing routing policies best matches the collapsed core/distribution role."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 32,
+    "traditional": {
+      "id": 32,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a recommended approach to avoid co-channel congestion while installing access points that use the 2.4 GHz frequency?",
+      "alternativas": [
+        "different nonoverlapping channels",
+        "one overlapping channel",
+        "one nonoverlapping channel",
+        "different overlapping channels"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Neighboring APs on 2.4 GHz should use different nonoverlapping channels (commonly 1, 6, and 11) to reduce co-channel and adjacent-channel interference.\nUsing one channel everywhere maximizes co-channel contention.\nOverlapping channels (e.g., 1 and 2) cause harmful interference.\n“One nonoverlapping channel” for all APs still creates co-channel congestion across the floor.\nPlan different nonoverlapping channels across adjacent cells."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 33,
+    "traditional": {
+      "id": 33,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A manager asks a network engineer to advise which cloud service models are used so employees do not have to waste their time installing, managing, and updating software that is only used occasionally. Which cloud service model does the engineer recommend?",
+      "alternativas": [
+        "infrastructure-as-a-service",
+        "platform-as-a-service",
+        "business process as service to support different types of service",
+        "software-as-a-service"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "SaaS delivers ready-to-use applications managed by the provider; users do not install or patch the application stack themselves — ideal for occasional-use software.\nIaaS provides virtual machines/storage/network where the customer still manages the OS and apps.\nPaaS provides a development/runtime platform, not primarily end-user occasional apps.\n“Business process as a service” is not the standard NIST model highlighted for this CCNA-style question.\nRecommend software-as-a-service (SaaS)."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 34,
+    "traditional": {
+      "id": 34,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer observes high usage on the 2.4 GHz channels and lower usage on the 5 GHz channels. What must be configured to allow clients to preferentially use 5 GHz access points?",
+      "alternativas": [
+        "Client Band Select",
+        "Re-Anchor Roamed Clients",
+        "OEAP Split Tunnel",
+        "11ac MU-MIMO"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Client Band Select biases dual-band clients to associate on 5 GHz when the WLAN/AP allows it, balancing load away from crowded 2.4 GHz.\nRe-Anchor Roamed Clients relates to mobility/anchor behavior for guest/roam scenarios.\nOEAP split tunnel is for teleworker AP traffic splitting, not enterprise band preference.\nMU-MIMO improves spatial efficiency on capable radios; it does not by itself force 5 GHz preference.\nConfigure Client Band Select."
+    },
+    "ticket": {
+      "id": 34,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #3401 — Utilização 2.4 GHz alta e 5 GHz ociosa no mesmo AP. Clientes dual-band permanecem em 2.4. Band Select off.",
+      "cli_output": "WLC> show wlan 5\nSSID..................................... CORP\nBand Select.............................. Disabled\nRadio Policy............................. All\n\nWLC> show ap auto-rf 802.11b AP-CORE\nLoad Profile............................. Failed\n\nWLC> show ap auto-rf 802.11a AP-CORE\nLoad Profile............................. Passed",
+      "alternativas": [
+        "Habilitar Client Band Select para preferir 5 GHz com 2.4 congestionado.",
+        "Radio Policy All impede 5 GHz; mudar para 802.11b only.",
+        "OEAP Split Tunnel move clientes para 5 GHz automaticamente.",
+        "Load Profile Failed no 2.4 GHz indica que Band Select deve permanecer Disabled."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Band Select Disabled + 2.4 overloaded e 5 GHz healthy = cenário clássico para Client Band Select.\nRadio Policy All já permite ambas as bandas; falta steering."
+    }
+  },
+  {
+    "source_id": 35,
+    "traditional": {
+      "id": 35,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which networking function occurs on the data plane?",
+      "alternativas": [
+        "processing inbound SSH management traffic",
+        "sending and receiving OSPF Hello packets",
+        "facilitates spanning-tree elections",
+        "forwarding remote client/server traffic"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "The data plane (forwarding plane) moves user packets from ingress to egress based on tables built by other planes.\nSSH management is management plane.\nOSPF Hellos and STP elections are control-plane protocol activities.\nForwarding client/server traffic is the classic data-plane function."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 36,
+    "traditional": {
+      "id": 36,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a network appliance that checks the state of a packet to determine whether the packet is legitimate?",
+      "alternativas": [
+        "Layer 2 switch",
+        "LAN controller",
+        "load balancer",
+        "firewall"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Stateful firewalls track connection state (and related tables) to decide if packets belong to legitimate sessions.\nA basic Layer-2 switch forwards based on MAC learning, not full connection state for legitimacy.\nLAN controllers (WLC) manage APs/WLAN policy, not the general definition of stateful packet legitimacy checking.\nLoad balancers distribute flows across servers; state may exist for persistence, but the exam answer for legitimacy checks is firewall.\nAnswer: firewall."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 37,
+    "traditional": {
+      "id": 37,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a role of access points in an enterprise network?",
+      "alternativas": [
+        "integrate with SNMP in preventing DDoS attacks",
+        "serve as a first line of defense in an enterprise network",
+        "connect wireless devices to a wired network",
+        "support secure user logins to devices on the network"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Access points bridge 802.11 wireless clients onto the wired campus infrastructure (often via CAPWAP to a WLC in lightweight designs).\nThey are not primarily DDoS prevention appliances via SNMP.\nFirst line of defense is typically firewall/edge security, not the AP’s core role definition.\nUser authentication may involve 802.1X with RADIUS, but the fundamental AP role is wireless-to-wired attachment.\nCorrect: connect wireless devices to a wired network."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 38,
+    "traditional": {
+      "id": 38,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An implementer is preparing hardware for virtualization to create virtual machines on a host. What is needed to provide communication between hardware and virtual machines?",
+      "alternativas": [
+        "router",
+        "hypervisor",
+        "switch",
+        "straight cable"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "The hypervisor (VMM) abstracts physical hardware and presents virtual hardware to VMs, mediating CPU, memory, storage, and I/O between host hardware and guests.\nA physical router or switch may connect the host northbound but is not what enables VM-to-hardware virtualization communication on the host.\nA straight-through cable is irrelevant to the hypervisor role.\nHypervisor is required."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 39,
+    "traditional": {
+      "id": 39,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "In which situation is private IPv4 addressing appropriate for a new subnet on the network of an organization?",
+      "alternativas": [
+        "The network has multiple endpoint listeners, and it is desired to limit the number of broadcasts.",
+        "The ISP requires the new subnet to be advertised to the Internet for web services.",
+        "There is limited unique address space, and traffic on the new subnet will stay local within the organization.",
+        "Traffic on the subnet must traverse a site-to-site VPN to an outside organization."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "RFC1918 private addressing is ideal when hosts stay internal (or use NAT/VPN carefully) and public IPv4 space is scarce.\nIf the ISP must advertise the subnet for public web services, public (or provider-assigned) addressing is required, not pure private without NAT strategy.\nBroadcast control is a L2 design issue, not the reason private addressing was created.\nSite-to-site VPN can carry private addresses, but the option as written is not the cleanest “most appropriate” vs internal-only traffic with limited public space.\nBest answer: limited unique space and local traffic stays inside the organization."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 40,
+    "traditional": {
+      "id": 40,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which 802.11 frame type is indicated by a probe response after a client sends a probe request?",
+      "alternativas": [
+        "data",
+        "management",
+        "control",
+        "action"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Probe request/response are 802.11 management frames used for network discovery.\nData frames carry MSDU payload for user traffic.\nControl frames (ACK, RTS/CTS, etc.) coordinate medium access.\nAction frames are a management subtype family, but the standard classification for probe response in CCNA is management.\nAnswer: management."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 41,
+    "traditional": {
+      "id": 41,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the maximum bandwidth of a T1 point-to-point connection?",
+      "alternativas": [
+        "1.544 Mbps",
+        "2.048 Mbps",
+        "34.368 Mbps",
+        "43.7 Mbps"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "A T1 (DS1) circuit provides 1.544 Mbps of bandwidth in North American digital hierarchy.\n2.048 Mbps is E1, not T1.\n34.368 Mbps is in the E3 range, not T1.\n43.7 Mbps is not the T1 rate.\nMaximum T1 bandwidth among the options is 1.544 Mbps."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 42,
+    "traditional": {
+      "id": 42,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a characteristic of cloud-based network topology?",
+      "alternativas": [
+        "onsite network services are provided with physical Layer 2 and Layer 3 components",
+        "wireless connections provide the sole access method to services",
+        "physical workstations are configured to share resources",
+        "services are provided by a public, private, or hybrid deployment"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Cloud services are delivered via public, private, or hybrid cloud deployment models rather than solely on-premises physical L2/L3 gear for those services.\nOn-prem physical L2/L3 describes traditional campus/data center, not the defining cloud topology characteristic.\nWireless-only access is not required for cloud.\nWorkstation resource sharing is peer-to-peer/file-share thinking, not cloud topology.\nCorrect: public/private/hybrid service deployment."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 43,
+    "traditional": {
+      "id": 43,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which network action occurs within the data plane?",
+      "alternativas": [
+        "reply to an incoming ICMP echo request",
+        "make a configuration change from an incoming NETCONF RPC",
+        "run routing protocols (OSPF, EIGRP, RIP, BGP)",
+        "compare the destination IP address to the IP routing table"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Data-plane forwarding looks up the destination (FIB/CEF/routing table information used for forwarding) and switches the packet to the next hop/interface.\nICMP echo replies are often handled by the control/management processing path depending on platform, and are not the best pure data-plane example vs table lookup forwarding.\nNETCONF configuration is management plane.\nRunning routing protocols is control plane.\nThe clearest data-plane action listed is comparing the destination IP to the forwarding/routing information to forward the packet."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 44,
+    "traditional": {
+      "id": 44,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What are network endpoints?",
+      "alternativas": [
+        "support inter-VLAN connectivity",
+        "a threat to the network if they are compromised",
+        "act as routers to connect a user to the service provider network",
+        "enforce policies for campus-wide traffic going to the Internet"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Endpoints (PCs, phones, IoT, servers) are where users and applications live; if compromised they become a major threat vector (malware, lateral movement).\nInter-VLAN connectivity is a router/L3-switch function.\nConnecting users to SP is CPE/edge routing, not the definition of endpoints.\nCampus Internet policy enforcement is typically firewall/edge security devices.\nAmong the options, recognizing endpoints as threats when compromised matches security-focused CCNA wording."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 45,
+    "traditional": {
+      "id": 45,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Why was the RFC 1918 address space defined?",
+      "alternativas": [
+        "conserve public IPv4 addressing",
+        "support the NAT protocol",
+        "preserve public IPv6 address space",
+        "reduce instances of overlapping IP addresses"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "RFC 1918 defines private IPv4 ranges so organizations can number internal hosts without consuming unique public IPv4 addresses, conserving the public pool.\nNAT is a related technology often used with private addresses, but RFC 1918’s primary stated purpose is private addressing / conservation, not “to support NAT” as a protocol dependency.\nIt does not address IPv6 public space.\nPrivate space can still overlap between organizations; reducing overlap is not the main design goal versus conservation.\nAnswer: conserve public IPv4 addressing."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 46,
+    "traditional": {
+      "id": 46,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of organization should use a collapsed-core architecture?",
+      "alternativas": [
+        "small and needs to reduce networking costs",
+        "large and must minimize downtime when hardware fails",
+        "large and requires a flexible, scalable network design",
+        "currently small but is expected to grow dramatically in the near future"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Collapsed-core (two-tier) reduces device count and cost by combining core and distribution — suitable for smaller networks with limited scale needs.\nLarge networks needing high availability and scale typically keep a three-tier design with clearer failure domains.\nExplosive growth expectations often argue against over-collapsing the core long-term.\nBest fit: small organization reducing networking costs."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 47,
+    "traditional": {
+      "id": 47,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network administrator is setting up a new IPv6 network using the 64-bit address 2001:0EB8:00C1:2200:0001:0000:0000:0331/64. To simplify the configuration, the administrator has decided to compress the address. Which IP address must the administrator configure?",
+      "alternativas": [
+        "ipv6 address 2001:EB8:C1:22:1::331/64",
+        "ipv6 address 21:EB8:C1:2200:1::331/64",
+        "ipv6 address 2001:EB8:C1:2200:1:0000:331/64",
+        "ipv6 address 2001:EB8:C1:2200:1::331/64"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Start from 2001:0EB8:00C1:2200:0001:0000:0000:0331/64.\nDrop leading zeros: 2001:EB8:C1:2200:1:0:0:331.\nCompress the longest zero run (two hextets) to :: → 2001:EB8:C1:2200:1::331/64.\nOption A wrongly shortens 2200 to 22.\nOption B corrupts 2001 into 21.\nOption C leaves an explicit 0000 and does not use :: correctly for the double-zero field pair.\nCorrect compressed form is option D."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 48,
+    "traditional": {
+      "id": 48,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is an appropriate use for private IPv4 addressing?",
+      "alternativas": [
+        "to allow hosts inside to communicate in both directions with hosts outside the organization",
+        "on internal hosts that stream data solely to external resources",
+        "on the public-facing interface of a firewall",
+        "on hosts that communicate only with other internal hosts"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Private IPv4 addresses are appropriate on internal-only hosts that do not need unique public addressing.\nBidirectional communication with arbitrary Internet hosts requires public addressing or NAT/proxy designs — private alone is insufficient as “the” use case for that goal.\nPublic-facing firewall interfaces typically use public (or provider) addresses.\nStreaming solely to external resources usually still needs NAT/public path; the clean textbook use is internal-to-internal communication.\nAnswer: hosts that communicate only with other internal hosts."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 49,
+    "traditional": {
+      "id": 49,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a similarity between 1000BASE-LX and 1000BASE-T standards?",
+      "alternativas": [
+        "Both use the same data-link header and trailer formats.",
+        "Both cable types support RJ-45 connectors.",
+        "Both support up to 550 meters between nodes.",
+        "Both cable types support LR connectors."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "1000BASE-T (copper) and 1000BASE-LX (fiber) differ in physical media but both carry Ethernet frames with the same IEEE 802.3 data-link framing (header/trailer structure) at 1 Gbps.\nRJ-45 is for copper, not LX fiber.\nDistance and connector types differ between copper and single-mode/multimode LX optics.\nThe shared property is Ethernet data-link framing."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 50,
+    "traditional": {
+      "id": 50,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which function forwards frames to ports that have a matching destination MAC address?",
+      "alternativas": [
+        "frame flooding",
+        "frame filtering",
+        "frame pushing",
+        "frame switching"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "When the destination MAC is known, a switch performs frame switching/forwarding out the learned port.\nFlooding is used for unknown unicast/broadcast/multicast behaviors (send out other ports), not selective known-unicast delivery.\nFiltering drops frames (e.g., same-segment decisions / security), not the positive act of forwarding to the match port.\n“Frame pushing” is not standard switching terminology here.\nCorrect function name: frame switching."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 51,
+    "traditional": {
+      "id": 51,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of IPv6 address is similar to a unicast address but is assigned to multiple devices on the same network at the same time?",
+      "alternativas": [
+        "global unicast address",
+        "link-local address",
+        "anycast address",
+        "multicast address"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Anycast uses a unicast-form address assigned to multiple interfaces; packets go to the “nearest” node per routing.\nGlobal and link-local unicast identify a single interface (per node) in normal use.\nMulticast delivers to all members of a group, which is a different model than anycast’s one-nearest delivery.\nThe description matches anycast."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 52,
+    "traditional": {
+      "id": 52,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a characteristic of private IPv4 addressing?",
+      "alternativas": [
+        "composed of up to 65,536 available addresses",
+        "issued by IANA in conjunction with an autonomous system number",
+        "used without tracking or registration",
+        "traverse the Internet when an outbound ACL is applied"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Private addresses (RFC 1918) can be used internally without registration/tracking with a public registry for each host.\nThe private space is far larger than 65,536 addresses across 10/8, 172.16/12, and 192.168/16.\nIANA does not issue private blocks with AS numbers the way public PI/PA space works.\nPrivate addresses do not freely traverse the public Internet merely because an ACL is applied; NAT or similar is required for Internet reachability.\nCharacteristic: used without tracking or registration."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 53,
+    "traditional": {
+      "id": 53,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the function of a controller in controller-based networking?",
+      "alternativas": [
+        "It serves as the centralized management point of an SDN architecture",
+        "It is a pair of core routers that maintain all routing decisions for a campus",
+        "It centralizes the data plane for the network",
+        "It is the card on a core router that maintains all routing decisions for a campus."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "In controller-based / SDN architectures, the controller centralizes control/management functions and programs network devices.\nIt does not mean two campus core routers by definition.\nThe data plane remains distributed on the forwarding devices; the controller does not usually “centralize the data plane.”\nIt is not merely a line card on a core router.\nFunction: centralized management/control point of SDN."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 54,
+    "traditional": {
+      "id": 54,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How do TCP and UDP fit into a query-response model?",
+      "alternativas": [
+        "TCP avoids using sequencing and UDP avoids using acknowledgments",
+        "TCP establishes a connection prior to sending data, and UDP sends immediately",
+        "TCP encourages out-of-order packet delivery, and UDP prevents re-ordering",
+        "TCP uses error detection for packets, and UDP uses error recovery."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "In client/server query-response apps, TCP pays the connection-setup cost before data; UDP can send the request/response datagrams immediately without a handshake.\nTCP uses sequencing; it does not avoid it.\nTCP prefers in-order delivery; UDP does not prevent reordering.\nUDP has no transport error recovery; TCP does recovery. Option D reverses the recovery idea.\nBest contrast: connection first (TCP) vs send immediately (UDP)."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 55,
+    "traditional": {
+      "id": 55,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What provides centralized control of authentication and roaming in an enterprise network?",
+      "alternativas": [
+        "a lightweight access point",
+        "a wireless LAN controller",
+        "a firewall",
+        "a LAN switch"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "A WLC centralizes WLAN configuration, security policy, authentication integration, and mobility/roaming control for lightweight APs.\nLightweight APs depend on the WLC for much of that control plane.\nFirewalls and LAN switches are important but are not the enterprise WLAN central brain for AP authentication/roaming.\nAnswer: wireless LAN controller."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 56,
+    "traditional": {
+      "id": 56,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which set of 2.4 GHz nonoverlapping wireless channels is standard in the United States?",
+      "alternativas": [
+        "channels 1, 6, 11, and 14",
+        "channels 2, 7, 9, and 11",
+        "channels 2, 7, and 11",
+        "channels 1, 6, and 11"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "US 2.4 GHz WLAN design standard nonoverlapping channels are 1, 6, and 11.\nChannel 14 is not used in the US for 802.11.\nOther listed mixes include overlapping channels or nonstandard sets.\nAnswer: 1, 6, and 11."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 57,
+    "traditional": {
+      "id": 57,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network engineer is installing an IPv6-only capable device. The client has requested that the device IP address be reachable only from the internal network. Which type of IPv6 address must the engineer assign?",
+      "alternativas": [
+        "IPv4-compatible IPv6 address",
+        "unique local address",
+        "link-local address",
+        "aggregatable global address"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Unique local addresses (ULA, fc00::/7 / fd00::/8) are for internal site addressing and are not globally routable on the Internet — matching “reachable only from the internal network.”\nLink-local is only same-link, not site-wide internal reachability.\nGlobal unicast is Internet-routable by design.\nIPv4-compatible IPv6 addresses are obsolete and not the internal-only solution.\nCORRECTED from source index 2 (link-local) to index 1 (unique local): link-local cannot serve internal multi-hop LAN/site reachability."
+    },
+    "ticket": {
+      "id": 57,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #5701 — Servidor IPv6-only deve ser alcançável só na rede interna (vários VLANs/site), sem Internet. Configuraram só link-local; outros andares não alcançam.",
+      "cli_output": "SRV# show ipv6 interface brief\nGigabitEthernet0/0  [up/up]\n    FE80::A1B2:C3FF:FE45:6789\n    ! (sem GUA/ULA)\n\nR1# ping FE80::A1B2:C3FF:FE45:6789\n% Invalid source / not on same link when sourcing from remote VLAN",
+      "alternativas": [
+        "Falta ULA (fd00::/8) site-local; link-local não roteia entre VLANs do campus interno.",
+        "Link-local FE80 roteia entre todos os andares por padrão OSPFv3.",
+        "Global unicast 2001:db8:: é a única forma de manter tráfego só interno.",
+        "IPv4-compatible ::ffff:10.0.0.1 é obrigatória em IPv6-only."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Link-local não atravessa roteadores. Para reachability interna multi-subnet sem Internet, use unique local (fd00::/8) e roteamento IPv6 interno.\nA chave da fonte apontava link-local; isso conflita com “internal network” multi-hop — ULA é a resposta correta."
+    }
+  },
+  {
+    "source_id": 58,
+    "traditional": {
+      "id": 58,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a requirement for nonoverlapping Wi-Fi channels?",
+      "alternativas": [
+        "different security settings",
+        "discontinuous frequency ranges",
+        "unique SSIDs",
+        "different transmission speeds"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Nonoverlapping channels occupy frequency ranges that do not significantly overlap in spectrum (e.g., 1/6/11 in 2.4 GHz).\nSecurity settings and SSIDs can be identical across APs; that does not define nonoverlap.\nData rates do not define channel overlap.\nRequirement: discontinuous (nonoverlapping) frequency ranges."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 59,
+    "traditional": {
+      "id": 59,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network engineer must implement an IPv6 configuration on the vlan 2000 interface to create a routable locally-unique unicast address that is blocked from being advertised to the internet. Which configuration must the engineer apply?",
+      "alternativas": [
+        "interface vlan 2000\nipv6 address ff00:0000:aaaa::1234:2343/64",
+        "interface vlan 2000\nipv6 address fd00::1234:2343/64",
+        "interface vlan 2000\nipv6 address fe80:0000:aaaa::1234:2343/64",
+        "interface vlan 2000\nipv6 address fc00:0000:aaaa::a15d:1234:2343:8aca/64"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Need a unique local unicast (ULA): fc00::/7, with locally assigned addresses using fd00::/8 in practice.\nff00::/8 is multicast, not a host unicast ULA.\nfe80::/10 is link-local, not site-routable ULA across the enterprise the same way.\nfd00::1234:2343/64 is a clear ULA configuration.\nfc00::/8 is reserved in RFC 4193 for future definition; operational ULA is fd00::/8. Source key selected fc00… (index 3); we correct to fd00 (index 1) as the standards-correct ULA assignment."
+    },
+    "ticket": {
+      "id": 59,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #5901 — SVI Vlan2000 precisa de IPv6 interno site-local (não Internet). Configuraram ff00::/ multicast por engano.",
+      "cli_output": "R1# show run interface vlan 2000\ninterface Vlan2000\n ipv6 address ff00:0:aaaa::1234:2343/64\n\nR1# show ipv6 interface vlan 2000\n  IPv6 is enabled\n  Joined group address(es):\n    FF00:0:AAAA::1234:2343\n  ! sem unicast ULA",
+      "alternativas": [
+        "ff00::/8 é multicast; usar ULA fd00::/8 (ex.: fd00::1234:2343/64) para unicast local de site.",
+        "ff00:: é ULA válida e deve ser anunciada na Internet.",
+        "fe80:: na SVI impede qualquer ping na mesma VLAN.",
+        "Multicast ff00 é o formato exigido para “locally-unique unicast”."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Locally-unique site unicast = ULA fd00::/8 (fc00::/7). Multicast prefix está errado no running-config.\nCorrigir para fd00::/64 na Vlan2000."
+    }
+  },
+  {
+    "source_id": 60,
+    "traditional": {
+      "id": 60,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When a switch receives a frame for a known destination MAC address, how is the frame handled?",
+      "alternativas": [
+        "flooded to all ports except the one from which it originated",
+        "forwarded to the first available port",
+        "sent to the port identified for the known MAC address",
+        "broadcast to all ports"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Known unicast: switch consults the MAC address table and forwards out only the port associated with that destination MAC.\nFlooding is for unknown unicast (and similar cases), not known entries.\n“First available port” is not how MAC learning works.\nBroadcast is for broadcast destination MAC, not known unicast.\nAnswer: sent to the learned port."
+    },
+    "ticket": {
+      "id": 60,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #6001 — Usuário alega que o switch “floda tudo”. Captura mostra unicast conhecido saindo só em uma porta. Validar comportamento.",
+      "cli_output": "SW1# show mac address-table address 0050.56ab.cdef\n          Mac Address Table\n-------------------------------------------\nVlan    Mac Address       Type        Ports\n----    -----------       --------    -----\n  10    0050.56ab.cdef    DYNAMIC     Gi1/0/8\n\nSW1# show mac address-table dynamic interface gi1/0/8\n  10    0050.56ab.cdef    DYNAMIC     Gi1/0/8",
+      "alternativas": [
+        "MAC conhecido → frame unicast é enviado só à porta aprendida (Gi1/0/8), não flooded.",
+        "Entrada DYNAMIC força flood em todas as portas da VLAN.",
+        "Unicast conhecido é sempre broadcast ff:ff:ff:ff:ff:ff.",
+        "Type DYNAMIC significa porta err-disabled."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Tabela MAC com porta Gi1/0/8 prova known unicast switching para essa porta.\nFlood é o caso de unknown unicast/broadcast."
+    }
+  },
+  {
+    "source_id": 61,
+    "traditional": {
+      "id": 61,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the collapsed layer in collapsed core architectures?",
+      "alternativas": [
+        "Core and distribution",
+        "access and WAN",
+        "distribution and access",
+        "core and WAN"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Collapsed-core merges the core and distribution layers into one tier while access remains separate (two-tier campus).\nAccess+WAN or core+WAN are not the standard collapsed pair name.\nDistribution+access collapse would remove the user edge separation differently and is not the usual “collapsed core” term.\nAnswer: core and distribution."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 62,
+    "traditional": {
+      "id": 62,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a characteristic of a SOHO network?",
+      "alternativas": [
+        "includes at least three tiers of devices to provide load balancing and redundancy",
+        "connects each switch to every other switch in the network",
+        "enables multiple users to share a single broadband connection",
+        "provides high throughput access for 1000 or more users"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "SOHO networks typically share one broadband Internet link among a few users/devices.\nThree-tier redundant designs and 1000+ user campuses are enterprise scale.\nFull mesh of all switches is not a SOHO characteristic.\nAnswer: multiple users share a single broadband connection."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 63,
+    "traditional": {
+      "id": 63,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the role of disaggregation in controller-based networking?",
+      "alternativas": [
+        "It divides the control-plane and data-plane functions.",
+        "It streamlines traffic handling by assigning individual devices to perform either Layer 2 or Layer 3 functions",
+        "It summarizes the routes between the core and distribution layers of the network topology",
+        "It enables a network topology to quickly adjust from a ring network to a star network"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Disaggregation in SDN/controller models separates (disaggregates) control-plane decision making from data-plane forwarding elements.\nIt is not primarily about forcing devices to be only L2 or only L3.\nRoute summarization and ring-to-star conversion are unrelated definitions.\nRole: divide control-plane and data-plane functions."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 64,
+    "traditional": {
+      "id": 64,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a function performed by a web server?",
+      "alternativas": [
+        "send and retrieve email from client devices",
+        "securely store files for FTP access",
+        "authenticate and authorize a user's identity",
+        "provide an application that is transmitted over HTTP"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Web servers deliver HTTP/HTTPS application content to clients.\nEmail send/retrieve is mail server (SMTP/IMAP/POP) roles.\nFTP storage is an FTP server function.\nAAA may be integrated but is not the defining web server function among these choices.\nAnswer: provide an application transmitted over HTTP."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 65,
+    "traditional": {
+      "id": 65,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which protocol uses SSL?",
+      "alternativas": [
+        "SSH",
+        "HTTPS",
+        "HTTP",
+        "Telnet"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "HTTPS is HTTP over TLS/SSL for encrypted web transport.\nSSH uses its own binary protocol and algorithms, not classic SSL as the answer.\nHTTP is cleartext.\nTelnet is cleartext remote access.\nAnswer: HTTPS."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 66,
+    "traditional": {
+      "id": 66,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which PoE mode enables powered-device detection and guarantees power when the device is detected?",
+      "alternativas": [
+        "auto",
+        "static",
+        "dynamic",
+        "active"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "On Cisco switches, power inline auto (auto mode) performs PD discovery/classification and supplies power when a valid powered device is detected, up to available budget.\nStatic mode pre-allocates a configured wattage and is less about flexible detection-only behavior.\n“Dynamic” and “active” are not the standard pair of interface PoE modes taught as auto vs static in CCNA-style IOS.\nAnswer: auto."
+    },
+    "ticket": {
+      "id": 66,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #6601 — AP não liga via PoE. Porta em power inline never; precisa detectar PD e alimentar automaticamente.",
+      "cli_output": "SW1# show run interface gi1/0/12\ninterface GigabitEthernet1/0/12\n description AP-FLOOR2\n switchport access vlan 99\n power inline never\n\nSW1# show power inline gi1/0/12\nInterface Admin  Oper       Power   Device\nGi1/0/12  never  off        0.0     n/a",
+      "alternativas": [
+        "Admin never desliga PoE; configurar power inline auto para detecção e alimentação do AP.",
+        "Oper off com never é o estado desejado para APs Cisco.",
+        "power inline static é obrigatório e auto não detecta PD.",
+        "VLAN 99 impede PoE na porta."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "power inline never disables PoE. auto enables detection and powering of PDs when budget allows.\nChange to power inline auto and verify show power inline."
+    }
+  },
+  {
+    "source_id": 67,
+    "traditional": {
+      "id": 67,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How is RFC 1918 addressing used in a network?",
+      "alternativas": [
+        "They are used to access the Internet from the internal network without conversion.",
+        "They are used in place of public addresses for increased security.",
+        "They are used with NAT to preserve public IPv4 addresses.",
+        "They are used by Internet Service Providers to route over the Internet."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Private RFC 1918 addresses are commonly combined with NAT so many internal hosts share scarce public IPv4 addresses.\nThey cannot access the global Internet without translation/proxy of some form.\nSecurity is improved operationally by hiding topology, but the primary exam association is address preservation via NAT.\nISPs do not route RFC 1918 as global Internet destinations.\nAnswer: used with NAT to preserve public IPv4 addresses."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 68,
+    "traditional": {
+      "id": 68,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which WAN topology has the highest degree of reliability?",
+      "alternativas": [
+        "point-to-point",
+        "router-on-a-stick",
+        "full mesh",
+        "hub-and-spoke"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Full mesh provides multiple alternate paths between sites, yielding the highest redundancy/reliability among common WAN topologies listed.\nPoint-to-point is simple but single path per link pair.\nHub-and-spoke depends on the hub and has limited alternate paths.\nRouter-on-a-stick is a LAN inter-VLAN method, not a WAN reliability topology.\nAnswer: full mesh."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 69,
+    "traditional": {
+      "id": 69,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What causes a port to be placed in the err-disabled state?",
+      "alternativas": [
+        "nothing plugged into the port",
+        "link flapping",
+        "latency",
+        "shutdown command issued on the port"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Link flapping can trigger err-disable (link-flap) when the interface transitions up/down too frequently.\nAn empty port is simply down/notconnect, not err-disabled.\nLatency does not by itself err-disable a port.\nshutdown is administratively down, a different state than err-disabled.\nAnswer: link flapping."
+    },
+    "ticket": {
+      "id": 69,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #6901 — Porta do usuário em err-disabled após cabo intermitente. Logs de link-flap.",
+      "cli_output": "SW1# show interfaces gi1/0/22 status\nPort      Name       Status         Vlan  Duplex  Speed\nGi1/0/22  USER       err-disabled   10    auto    auto\n\nSW1# show logging | include ERR_DISABLE|flap\n%PM-4-ERR_DISABLE: link-flap error detected on Gi1/0/22, putting Gi1/0/22 in err-disable state\n%LINK-3-UPDOWN: Interface GigabitEthernet1/0/22, changed state to up\n%LINK-3-UPDOWN: Interface GigabitEthernet1/0/22, changed state to down",
+      "alternativas": [
+        "Link flapping disparou err-disable; corrigir cabo/patch e reativar a porta (no shut / recovery).",
+        "err-disabled ocorre porque nada está plugado na porta.",
+        "shutdown administrativo gera o log link-flap.",
+        "Latency alta coloca a porta em err-disabled por padrão."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Log link-flap + err-disabled is the classic physical intermittency case.\nFix cabling, then recover the interface."
+    }
+  },
+  {
+    "source_id": 70,
+    "traditional": {
+      "id": 70,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network engineer must configure an interface with IP address 10.10.10.145 and a subnet mask equivalent to 11111111.11111111.11111111.11111000. Which subnet mask must the engineer use?",
+      "alternativas": [
+        "/29",
+        "/30",
+        "/27",
+        "/28"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Binary mask …11111000 has five zeros in the last octet → 8−5=3 host bits → /29 (255.255.255.248).\n/30 is …11111100 (2 host bits).\n/28 is …11110000 (4 host bits).\n/27 is …11100000 (5 host bits).\nThe given pattern is /29."
+    },
+    "ticket": {
+      "id": 70,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #7001 — Precisam IP 10.10.10.145 com máscara binária …11111000. Configuraram /28 por engano e o host caiu fora da subnet do gateway.",
+      "cli_output": "R1# show run interface gi0/0\ninterface GigabitEthernet0/0\n ip address 10.10.10.145 255.255.255.240\n\nR1# show ip interface gi0/0\n  Internet address is 10.10.10.145/28\n\n! Máscara pedida: 255.255.255.248 (/29)",
+      "alternativas": [
+        "…11111000 = /29 (255.255.255.248); trocar de /28 para /29.",
+        "/28 é idêntico a …11111000.",
+        "/30 é a única máscara válida com .145.",
+        "Binary 11111000 no último octeto é /27."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Count host bits in the last octet: three zeros ⇒ /29.\nRunning-config /28 does not match the specified binary mask."
+    }
+  },
+  {
+    "source_id": 71,
+    "traditional": {
+      "id": 71,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which property is shared by 10GBASE-SR and 10GBASE-LR interfaces?",
+      "alternativas": [
+        "Both use the single-mode fiber type.",
+        "Both require UTP cable media for transmission.",
+        "Both require fiber cable media for transmission.",
+        "Both use the multimode fiber type."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Both 10GBASE-SR and 10GBASE-LR are optical Ethernet PHYs requiring fiber media.\nSR is multimode; LR is single-mode — they do not share the same fiber type.\nNeither is UTP-based like 10GBASE-T.\nShared property: fiber media."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 72,
+    "traditional": {
+      "id": 72,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which device permits or denies network traffic based on a set of rules?",
+      "alternativas": [
+        "switch",
+        "firewall",
+        "wireless controller",
+        "access point"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Firewalls enforce permit/deny policy using rules (ACLs, stateful policies).\nSwitches primarily forward frames (though ACLs may exist, the device role named here is firewall).\nWLC and AP focus on wireless attachment/policy, not the general packet filter definition.\nAnswer: firewall."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 73,
+    "traditional": {
+      "id": 73,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the role of a firewall in an enterprise network?",
+      "alternativas": [
+        "determines which packets are allowed to cross from unsecured to secured networks",
+        "processes unauthorized packets and allows passage to less secure segments of the network",
+        "forwards packets based on stateless packet inspection",
+        "explicitly denies all packets from entering an administrative domain"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Firewalls control traffic between trust zones, deciding what may pass from less-trusted to more-trusted networks (and vice versa per policy).\nDeliberately allowing unauthorized packets is the opposite of the role.\nMany enterprise firewalls are stateful, not only stateless.\nThey do not blindly deny all traffic; they apply policy.\nAnswer: determine which packets may cross between unsecured and secured networks."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 74,
+    "traditional": {
+      "id": 74,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which action is taken by a switch port enabled for PoE power classification override?",
+      "alternativas": [
+        "As power usage on a PoE switch port is checked, data flow to the connected device is temporarily paused",
+        "When a powered device begins drawing power from a PoE switch port, a syslog message is generated",
+        "If a switch determines that a device is using less than the minimum configured power, it assumes the device has failed and disconnects it",
+        "Should a monitored port exceed the maximum administrative value for power, the port is shut down and err-disabled"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "With PoE policing/classification override behaviors on Cisco platforms, exceeding the configured maximum power can err-disable/shut the port to protect the budget and device.\nPausing all data while checking power is not the described override action.\nSyslog on power-draw start is not the defining override action.\nDisconnecting for drawing less than minimum is not the standard description.\nAnswer: exceed max administrative power → shut/err-disabled."
+    },
+    "ticket": {
+      "id": 74,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #7401 — Porta PoE com power inline police foi para err-disabled após AP high-power. Logs de power deny.",
+      "cli_output": "SW1# show power inline gi1/0/15\nInterface Admin  Oper       Power(Watts)  Device\nGi1/0/15  auto   errdisable 15.4          Ieee PD\n\nSW1# show logging | include POWER|ERR\n%ILPOWER-3-CONTROLLER_PORT_ERR: Controller port error, Interface Gi1/0/15: Power given, but Power Controller does not report Power Good\n%PM-4-ERR_DISABLE: pwr-err on Gi1/0/15",
+      "alternativas": [
+        "Porta excedeu/errou orçamento de potência PoE e foi err-disabled; ajustar max power/police ou PD, depois recuperar a interface.",
+        "errdisable PoE ocorre só se a porta estiver sem cabo.",
+        "Ieee PD no show prova que a porta nunca recebeu power.",
+        "Oper errdisable é o estado normal de APs em produção."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "PoE police/max power violations lead to err-disable on the port.\nFix power budget/PD class, then recover the port."
+    }
+  },
+  {
+    "source_id": 75,
+    "traditional": {
+      "id": 75,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a function of spine-and-leaf architecture?",
+      "alternativas": [
+        "Offers predictable latency of the traffic path between end devices.",
+        "Exclusively sends multicast traffic between servers that are directly connected to the spine.",
+        "Mitigates oversubscription by adding a layer of leaf switches.",
+        "Limits payload size of traffic within the leaf layer."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Equal hop counts leaf–spine–leaf provide predictable latency/bandwidth characteristics for east-west traffic.\nMulticast is not exclusively server-to-spine only by definition of the architecture.\nAdding leaves addresses scale-out of endpoints; the predictability of path length is the key function listed correctly in A.\nPayload size limiting is not a spine-leaf function.\nAnswer: predictable latency path between end devices."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 76,
+    "traditional": {
+      "id": 76,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which action is taken by the data plane within a network device?",
+      "alternativas": [
+        "Constructs a routing table based on a routing protocol.",
+        "Forwards traffic to the next hop.",
+        "Looks up an egress interface in the forwarding information base.",
+        "Provides CLI access to the network device."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Data plane forwards user traffic toward the next hop/egress based on forwarding tables.\nBuilding routing tables is control plane.\nFIB lookup is part of forwarding; many keys accept “forwards to next hop” as the data-plane action. Source index is 1.\nCLI access is management plane.\nKeep source answer: forwards traffic to the next hop (index 1). Note option C is also data-plane-related; exam key prioritizes B."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 77,
+    "traditional": {
+      "id": 77,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the function of the control plane?",
+      "alternativas": [
+        "It exchanges routing table information.",
+        "It provides CLI access to the network device.",
+        "It looks up an egress interface in the forwarding information base.",
+        "It forwards traffic to the next hop."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Control plane runs protocols that build and exchange routing/forwarding information (e.g., OSPF/EIGRP/BGP).\nCLI is management plane.\nFIB lookup and forwarding are data plane.\nAnswer: exchanges routing table information."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 78,
+    "traditional": {
+      "id": 78,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which cable/media choices support higher multi-gigabit rates (about 2.5–5 Gbps) commonly needed when connecting an access point to a switch/WLC path? (Cleaned from broken Choose-two OCR)",
+      "alternativas": [
+        "Cat 5e (multi-gigabit capable on supporting switch ports)",
+        "1000BASE-LX/LH fiber only (max 1 Gbps optical Ethernet standard as named)",
+        "Cat 3 cabling",
+        "Cat 5 (non-e) as the preferred modern AP uplink"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Multi-gigabit (2.5G/5G) AP uplinks on copper typically require at least Cat 5e (often Cat 6) and mGig switch ports; 10GBASE-T also needs quality copper.\nOCR source mixed Choose-two options (10GBASE-T, Cat 5e, etc.). Cleaned to four coherent choices.\n1000BASE-LX/LH is a 1G optical standard name, not the multi-gig copper answer.\nCat 3 cannot sustain multi-gig AP uplinks.\nCat 5 (non-e) is below modern multi-gig recommendations versus Cat 5e/6.\nBest cleaned answer: Cat 5e multi-gig capable path (index 0). Original source_rc=0 mapped to first listed tech after cleanup."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 79,
+    "traditional": {
+      "id": 79,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a benefit for external users who consume public cloud resources?",
+      "alternativas": [
+        "Implemented over a dedicated WAN",
+        "All hosted on physical servers",
+        "Accessed over the Internet",
+        "Located in the same data center as the users"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Public cloud resources are consumed by external users primarily over the Internet.\nDedicated WAN is more private connectivity (e.g., Direct Connect/MPLS), not the general public-cloud user benefit statement.\nCloud abstracts whether physical servers are visible to the consumer.\nUsers are not necessarily in the same DC as the cloud provider region.\nAnswer: accessed over the Internet."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 80,
+    "traditional": {
+      "id": 80,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer must update the configuration on two PCs in two different subnets to communicate locally with each other. One PC is configured with IP address 192.168.25.128/25 and the other with 192.168.25.100/25. Which network mask must the engineer configure on both PCs to enable the communication?",
+      "alternativas": [
+        "255.255.255.248",
+        "255.255.255.224",
+        "255.255.255.0",
+        "255.255.255.252"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "With /25, 192.168.25.0–127 and 192.168.25.128–255 are different subnets. .100 and .128 fall in different halves, so they are not local to each other.\nUsing 255.255.255.0 (/24) places both addresses in 192.168.25.0/24 so they communicate as on-link peers (same L2 assumed).\n/28,/27,/30 keep them separated or create tiny subnets that still won't cover both.\nAnswer: 255.255.255.0."
+    },
+    "ticket": {
+      "id": 80,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8001 — PC-A 192.168.25.100/25 e PC-B 192.168.25.128/25 no mesmo switch/VLAN não se pingam (ARP incompleto entre si). Gateway comum inexistente.",
+      "cli_output": "PC-A> ipconfig\n  IPv4 Address. . . . . . . . . . . : 192.168.25.100\n  Subnet Mask . . . . . . . . . . . : 255.255.255.128\nPC-B> ipconfig\n  IPv4 Address. . . . . . . . . . . : 192.168.25.128\n  Subnet Mask . . . . . . . . . . . : 255.255.255.128\n\nPC-A> ping 192.168.25.128\n  Destination host unreachable (on-link calculation fails / wrong subnet)",
+      "alternativas": [
+        "Com /25, .100 e .128 estão em subnets diferentes; usar máscara 255.255.255.0 (/24) se devem ser on-link na mesma VLAN.",
+        "/25 coloca .100 e .128 no mesmo bloco 192.168.25.128/25.",
+        "255.255.255.252 faz ambos hosts da mesma /30 automaticamente.",
+        "O problema é só Spanning Tree PortFast."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "/25 splits at .128. Host .100 is in the lower half; .128 is the network address of the upper half / first address issues aside, they are not the same subnet.\nWiden to /24 for local communication on one VLAN without a router."
+    }
+  },
+  {
+    "source_id": 81,
+    "traditional": {
+      "id": 81,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which key function is provided by the data plane?",
+      "alternativas": [
+        "Originating packets",
+        "Exchanging routing table data",
+        "Making routing decisions",
+        "Forwarding traffic to the next hop"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Data plane forwards transit traffic to the next hop/egress interface.\nExchanging routing data and making control decisions are control plane.\n“Originating packets” is ambiguous (could be local process) and not the key data-plane definition.\nAnswer: forwarding traffic to the next hop."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 82,
+    "traditional": {
+      "id": 82,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When should an engineer implement a collapsed-core architecture?",
+      "alternativas": [
+        "Only when using VSS technology",
+        "For small networks with minimal need for growth",
+        "For large networks that are connected to multiple remote sites",
+        "The access and distribution layers must be on the same device"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Collapsed core suits small networks that do not need independent core/distribution scaling.\nVSS is optional technology, not a requirement for collapsed core.\nLarge multi-site networks usually keep hierarchical modularity.\nAccess and distribution on the same device is not the definition (core+distribution collapse).\nAnswer: small networks with minimal growth need."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 83,
+    "traditional": {
+      "id": 83,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A client experiences slow throughput from a server that is directly connected to the core switch in a data center. A network engineer finds minimal latency on connections to the server, but data transfers are unreliable, and the output of the show interfaces counters errors command shows a high FCS-Err count on the interface that is connected to the server. What is the cause of the throughput issue?",
+      "alternativas": [
+        "a physical cable fault",
+        "a speed mismatch",
+        "high bandwidth usage",
+        "a cable that is too long"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "High FCS/CRC errors with unreliable transfers and low latency strongly indicate Layer-1 problems such as bad cable, connectors, or NIC/phy issues.\nSpeed mismatch more often shows duplex/collision patterns or link issues, but FCS with “minimal latency” points to corruption on the wire.\nHigh bandwidth usage causes congestion drops/latency, not typically interface FCS error counters.\nExcessive length can cause errors, but the standard best answer among these for FCS-Err is physical cable fault.\nAnswer: a physical cable fault."
+    },
+    "ticket": {
+      "id": 83,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8301 — Throughput ruim ao servidor no core; latência baixa; show interfaces com FCS-Err alto na porta do server.",
+      "cli_output": "CORE# show interfaces gi1/0/48\nGigabitEthernet1/0/48 is up, line protocol is up\n  Full-duplex, 1000Mb/s, media type is 10/100/1000BaseTX\n  15231 input errors, 14802 CRC, 14802 frame, 0 overrun\n  0 output errors, 0 collisions\n\nCORE# show interfaces gi1/0/48 counters errors\nPort        Align-Err    FCS-Err   Xmit-Err    Rcv-Err\nGi1/0/48          120      14802         0      15231",
+      "alternativas": [
+        "FCS/CRC altos indicam falha física (cabo/conector/NIC); substituir cabo e retestar.",
+        "FCS-Err alto com full-duplex prova congestionamento de banda apenas.",
+        "Latência mínima elimina qualquer problema de Layer 1.",
+        "0 collisions com CRC alto indica mismatch de native VLAN."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "FCS-Err/CRC on the server-facing interface is Layer-1 corruption evidence.\nReplace/test cable and NIC path; not a pure utilization issue."
+    }
+  },
+  {
+    "source_id": 84,
+    "traditional": {
+      "id": 84,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the difference between 1000BASE-LX/LH and 1000BASE-ZX interfaces?",
+      "alternativas": [
+        "1000BASE-LX/LH interoperates with multimode and single-mode fiber, and 1000BASE-ZX needs a conditioning patch cable with multimode.",
+        "1000BASE-ZX interoperates with dual-rate 100M/1G 10Km SFP over multimode fiber, and 1000BASE-LX/LH supports only single-rate",
+        "1000BASE-ZX is supported on links up to 1000 km, and 1000BASE-LX/LH operates over links up to 70 km",
+        "1000BASE-LX/LH is supported on links up to 10 km, and 1000BASE-ZX operates over links up to 70 km"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "1000BASE-LX/LH is commonly specified around up to ~10 km on single-mode (and shorter on multimode with conditions).\n1000BASE-ZX is a long-reach single-mode optic often rated around ~70 km.\n1000 km is unrealistic for ZX in this comparison.\nThe distance contrast in option D matches typical CCNA/vendor comparison items.\nAnswer: LX/LH ~10 km vs ZX ~70 km."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 85,
+    "traditional": {
+      "id": 85,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which concern is addressed with the use of private IPv4 addressing?",
+      "alternativas": [
+        "Lack of routing protocol support for CIDR and VLSM",
+        "Lack of security protocols at the network perimeter",
+        "Lack of available TCP/UDP ports per IPv4 address",
+        "Lack of available publicly routable unique IPv4 addresses"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Private addressing (with NAT) addresses the scarcity of publicly routable unique IPv4 addresses.\nRouting protocols support CIDR/VLSM independently of RFC 1918.\nSecurity protocols at the perimeter are a different concern.\nTCP/UDP port counts per IP are not why RFC 1918 exists (OCR “IPv5” cleaned to IPv4).\nAnswer: lack of available publicly routable unique IPv4 addresses."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 86,
+    "traditional": {
+      "id": 86,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the path for traffic sent from one user workstation to another workstation on a separate switch in a three-tier architecture model?",
+      "alternativas": [
+        "access → core → access",
+        "access → distribution → distribution → access",
+        "access → core → distribution → access",
+        "access → distribution → core → distribution → access"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "In classic three-tier campus, user switches are access. Traffic between access switches goes up to distribution, across the core if needed, to the remote distribution, then down to the remote access switch.\nSkipping distribution or core violates the hierarchical model path for inter-switch user traffic across the campus.\nAnswer: access → distribution → core → distribution → access."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 87,
+    "traditional": {
+      "id": 87,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the difference between IPv6 unicast and anycast addressing?",
+      "alternativas": [
+        "An individual IPv6 unicast address is supported on a single interface on one node, but an IPv6 anycast address is assigned to a group of interfaces on multiple nodes.",
+        "IPv6 anycast nodes must be explicitly configured to recognize the anycast address, but IPv6 unicast nodes require no special configuration.",
+        "IPv6 unicast nodes must be explicitly configured to recognize the unicast address, but IPv6 anycast nodes require no special configuration.",
+        "Unlike an IPv6 anycast address, an IPv6 unicast address is assigned to a group of interfaces on multiple nodes."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Unicast identifies one interface; anycast reuses a unicast-form address on multiple nodes so routing delivers to the nearest member.\nOption D reverses the definitions.\nOptions B/C oversimplify configuration requirements incorrectly relative to the core definition.\nBest difference: unicast one interface vs anycast many nodes."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 88,
+    "traditional": {
+      "id": 88,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which WAN topology provides a combination of simplicity, quality, and availability?",
+      "alternativas": [
+        "partial mesh",
+        "full mesh",
+        "point-to-point",
+        "hub-and-spoke"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Point-to-point leased-style links are simple to understand/configure and can offer predictable quality/availability on that circuit.\nFull mesh maximizes availability but is complex/costly.\nHub-and-spoke is simple but hub-centric availability risk.\nPartial mesh is a compromise, not the option keyed as simplest quality/availability combo here.\nSource answer: point-to-point."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 89,
+    "traditional": {
+      "id": 89,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How are the switches in a spine-and-leaf topology interconnected?",
+      "alternativas": [
+        "Each leaf switch is connected to one of the spine switches",
+        "Each leaf switch is connected to each spine switch.",
+        "Each leaf switch is connected to two spine switches, making a loop.",
+        "Each leaf switch is connected to a central leaf switch, then uplinked to a core spine switch."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Canonical spine-and-leaf: every leaf connects to every spine (full bipartite connectivity).\nConnecting each leaf to only one spine loses fabric properties.\n“Two spines making a loop” misstates L3 ECMP fabric design as STP loops.\nLeaf-to-leaf hierarchy is not spine-leaf.\nAnswer: each leaf to each spine."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 90,
+    "traditional": {
+      "id": 90,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the primary effect of the spanning-tree portfast command?",
+      "alternativas": [
+        "It immediately enables the port in the listening state.",
+        "It immediately puts the port into the forwarding state when the link comes up.",
+        "It enables BPDU messages.",
+        "It minimizes spanning-tree convergence time on edge ports."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "PortFast skips the listening/learning delay on edge ports so hosts get connectivity quickly, minimizing STP transition delay for those ports (faster edge convergence).\nIt should put the port into forwarding quickly, not listening.\nIt does not “enable BPDU messages” as its primary purpose (BPDUs still exist; BPDU Guard is a related edge protection).\nSource index 3 emphasizes minimized STP convergence time on the edge; option B is also directionally true after OCR fix — keep source rc=3 as the keyed primary effect statement."
+    },
+    "ticket": {
+      "id": 90,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9001 — Servidor demora ~30s para ter rede no boot; porta access sem PortFast. STP rapid-pvst.",
+      "cli_output": "SW-SRV# show spanning-tree interface gi1/0/1\nVlan             Role Sts Cost      Prio.Nbr Type\n---------------- ---- --- --------- -------- --------------------------------\nVLAN0050         Desg LRN 4         128.1    P2p\n\nSW-SRV# show run interface gi1/0/1\ninterface GigabitEthernet1/0/1\n switchport access vlan 50\n switchport mode access\n! (sem spanning-tree portfast)\n\nSW-SRV# show spanning-tree summary\nPortfast Default             is disabled",
+      "alternativas": [
+        "Sem PortFast a porta edge passa por learning; habilitar spanning-tree portfast para ir a forwarding mais rápido no boot do servidor.",
+        "Sts LRN indica loop permanente e a porta nunca fará forwarding.",
+        "PortFast Default disabled prova que o switch não roda STP.",
+        "VLAN 50 access impede PortFast em qualquer plataforma."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "PortFast is for edge ports to reduce STP wait before forwarding.\nLearning state on a server access port at boot matches the symptom.\nEnable portfast (and BPDU Guard)."
+    }
+  }
+]

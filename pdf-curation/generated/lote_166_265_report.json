@@ -1,0 +1,33 @@
+{
+  "file": "C:\\Users\\maria\\Desktop\\ccna\\pdf-curation\\generated\\lote_166_265_enriched.json",
+  "traditional": 100,
+  "tickets": 14,
+  "tickets_null": 86,
+  "answer_fixes": [
+    {
+      "id": 225,
+      "from": 3,
+      "to": 2,
+      "reason": "Valid NTP server set uses ntp master 2 (not ntp stratum); option index 2 matches requirements."
+    }
+  ],
+  "choose_two_ids": [
+    249
+  ],
+  "ticket_ids": [
+    167,
+    172,
+    183,
+    185,
+    202,
+    207,
+    208,
+    214,
+    226,
+    230,
+    246,
+    250,
+    257,
+    258
+  ]
+}

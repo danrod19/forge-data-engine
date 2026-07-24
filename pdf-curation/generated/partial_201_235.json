@@ -1,0 +1,716 @@
+[
+  {
+    "source_id": 201,
+    "traditional": {
+      "id": 201,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network engineer must back up 20 network router configurations globally within a customer environment. Which protocol allows the engineer to perform this function using the Cisco IOS MIB?",
+      "alternativas": [
+        "ARP",
+        "SNMP",
+        "SMTP",
+        "CDP"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "SNMP with Cisco IOS MIBs can read/write configuration objects for bulk backup/automation. ARP/CDP/SMTP do not provide IOS MIB-based global config backup."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 202,
+    "traditional": {
+      "id": 202,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command enabfiles a router to become a DHCP client?",
+      "alternativas": [
+        "ip address dhcp",
+        "ip dhcp client",
+        "ip helper-address",
+        "ip dhcp pool"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "ip address dhcp under an interface makes that interface a DHCP client. ip helper-address is relay; ip dhcp pool is server; ip dhcp client is not the standard enable form alone."
+    },
+    "ticket": {
+      "id": 202,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9202 — Interface WAN do roteador de filial precisa obter IP automaticamente do ISP (DHCP client).",
+      "cli_output": "R1# show running-config interface gi0/0\ninterface GigabitEthernet0/0\n description WAN-ISP\n ip address 192.0.2.10 255.255.255.0\n! estático legado\n\nR1# show ip interface brief\nInterface              IP-Address      OK? Method Status\nGigabitEthernet0/0     192.0.2.10      YES NVRAM  up",
+      "alternativas": [
+        "Configurar ip address dhcp na interface para virar cliente DHCP.",
+        "ip helper-address na WAN faz o roteador ser cliente DHCP.",
+        "ip dhcp pool na WAN obtém endereço do ISP.",
+        "ip dhcp client sozinho sem ip address dhcp é o padrão IOS."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Cliente DHCP no IOS: ip address dhcp na interface. helper-address é relay; pool é servidor."
+    }
+  },
+  {
+    "source_id": 203,
+    "traditional": {
+      "id": 203,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which function does an SNMP agent perform?",
+      "alternativas": [
+        "It sends information about MIB variabfifiles in response to requests from the NMS",
+        "It manages routing between Layer 3 devices in a network",
+        "It coordinates user authentication between a network device and a TACACS+ or RADIUS server",
+        "It requests information from remote network nodes about catastrophic system events"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "An SNMP agent on the device responds to NMS Get/GetNext/GetBulk and can send traps/informs about MIB objects. It is not a routing protocol, not AAA coordinator, and does not poll remote nodes as its primary role."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 204,
+    "traditional": {
+      "id": 204,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command must be entered when a device is configured as an NTP server?",
+      "alternativas": [
+        "ntp peer",
+        "ntp master",
+        "ntp authenticate",
+        "ntp server"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ntp master makes the device an authoritative NTP server (stratum configurable). ntp server points to an upstream server (client). peer/authenticate are other NTP features."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 205,
+    "traditional": {
+      "id": 205,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What event has occurred if a router sends a notice level message to a syslog server?",
+      "alternativas": [
+        "A certicate has expired",
+        "An interface line has changed status",
+        "A TCP connection has been torn down",
+        "An ICMP connection has been built"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Interface up/down is a typical severity 5 notice-level syslog. Certificate expiry, TCP teardown, ICMP are not the classic notice example keyed here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 206,
+    "traditional": {
+      "id": 206,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the primary purpose of a First Hop Redundancy Protocol?",
+      "alternativas": [
+        "It allows directly connected neighbors to share configuration information",
+        "It reduces routing failures by allowing Layer 3 load balancing between OSPF neighbors that have the same link metric",
+        "It allows a router to use bridge priorities to create multiple loop-free paths to a single destination",
+        "It reduces routing failures by allowing more than one router to represent itself as the default gateway of a network"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "FHRP (HSRP/VRRP/GLBP) lets multiple routers share a virtual default gateway so hosts keep a stable gateway if one router fails. It is not CDP sharing, not OSPF ECMP, not STP multipath."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 207,
+    "traditional": {
+      "id": 207,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer is configuring NAT to translate the source subnet of 10.10.0.0/24 to any one of three addresses: 192.168.3.1, 192.168.3.2, or192.168.3.3. Which configuration should be used?",
+      "alternativas": [
+        "enable\nconfigure terminal\nip nat pool mypool 192.168.3.1 192.168.3.3 prefix-length 30\naccess-list 1 permit 10.10.0.0 0.0.0.255 ip natoutside destination list 1 pool mypool\ninterface g1/1\nip nat inside\ninterface g1/2\nip nat outside",
+        "enable\nconfigure terminal\nip nat pool mypool 192.168.3.1 192.168.3.3 prefix-length 30\naccess-list 1 permit 10.10.0.0 0.0.0.254\nip nat insidesource list 1 pool mypool\ninterface g1/1\nip nat inside\ninterface g1/2\nip nat outside",
+        "enable\nconfigure terminal\nip nat pool mypool 192.168.3.1 192.168.3.3 prefix-length 30\nroute-map permit 10.10.0.0 255.255.255.0 ip natoutside destination list 1 pool mypool\ninterface g1/1\nip nat inside\ninterface g1/2\nip nat outside",
+        "enable\nconfigure terminal\nip nat pool mypool 192.168.3.1 192.168.3.3 prefix-length 30\naccess-list 1 permit 10.10.0.0 0.0.0.255\nip nat insidesource list 1 pool mypool\ninterface g1/1\nip nat inside\ninterface g1/2\nip nat outside"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Dynamic NAT with a pool of three outside addresses: ip nat pool ... prefix-length, ACL matching 10.10.0.0/24 (wildcard 0.0.0.255), ip nat inside source list 1 pool mypool, and correct inside/outside interfaces. Wrong ACL wildcard, outside destination NAT, or route-map misuse are incorrect."
+    },
+    "ticket": {
+      "id": 207,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9207 — NAT dinâmico deve traduzir 10.10.0.0/24 para o pool 192.168.3.1–3. Traduções não ocorrem.",
+      "cli_output": "R1# show running-config | section nat|access-list 1\nip nat pool mypool 192.168.3.1 192.168.3.3 prefix-length 30\naccess-list 1 permit 10.10.0.0 0.0.0.255\nip nat outside destination list 1 pool mypool\ninterface GigabitEthernet1/1\n ip nat inside\ninterface GigabitEthernet1/2\n ip nat outside\n\nR1# show ip nat translations\n! empty",
+      "alternativas": [
+        "Trocar para ip nat inside source list 1 pool mypool (inside source, não outside destination).",
+        "Manter outside destination; só falta overload.",
+        "Wildcard 0.0.0.254 é obrigatório para /24.",
+        "Remover ip nat inside/outside das interfaces."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Tradução da sub-rede interna usa inside source list + pool. outside destination inverte o modelo e não atende o requisito. ACL /24 usa 0.0.0.255."
+    }
+  },
+  {
+    "source_id": 208,
+    "traditional": {
+      "id": 208,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When the active router in an HSRP group fails, which router assumes the role and forwards packets?",
+      "alternativas": [
+        "forwarding",
+        "listening",
+        "standby",
+        "backup"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "In HSRP, the Standby router becomes Active and forwards when the Active fails. VRRP uses Backup; there is no HSRP role named backup/forwarding as the successor name."
+    },
+    "ticket": {
+      "id": 208,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9208 — Active HSRP R1 falhou. Quem deve encaminhar o VIP agora?",
+      "cli_output": "R2# show standby\nGigabitEthernet0/0 - Group 1\n  State is Active\n    1 state change, last state change 00:00:12\n  Virtual IP address is 10.1.1.1\n  Active router is local\n  Standby router is unknown expired\n  Priority 90 (configured 90)\n  Group name is \"hsrp-Gi0/0-1\" (default)\n\n! R1 unreachable",
+      "alternativas": [
+        "O router Standby assume Active e encaminha pacotes do VIP.",
+        "O papel Listening vira forwarder permanente sem virar Active.",
+        "Backup (termo VRRP) é o nome HSRP do sucessor.",
+        "Forwarding é um estado HSRP estável separado de Active."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "HSRP: Standby → Active no failover. Listening é estado transitório/auxiliar. Backup é VRRP. Não há role estável “forwarding” como sucessor nomeado."
+    }
+  },
+  {
+    "source_id": 209,
+    "traditional": {
+      "id": 209,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What protocol allows an engineer to back up 20 network router configurations globally while using the copy function?",
+      "alternativas": [
+        "TCP",
+        "SMTP",
+        "FTP",
+        "SNMP"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "SNMP can be used with MIBs to retrieve/back up configurations at scale; the item pairs SNMP with global backup via management functions. FTP can copy files but the keyed answer in this bank is SNMP for the global/MIB scenario; TCP/SMTP are not config-backup tools here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 210,
+    "traditional": {
+      "id": 210,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which keyword in a NAT configuration enabfiles the use of one outside IP address for multiple inside hosts?",
+      "alternativas": [
+        "source",
+        "static",
+        "pool",
+        "overload"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "overload enables PAT so many inside hosts share one (or few) outside address(es) using ports. pool defines addresses; static is 1:1; source is direction syntax."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 211,
+    "traditional": {
+      "id": 211,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which feature or protocol determines whether the QoS on the network is sufficient to support IP services?",
+      "alternativas": [
+        "LLDP",
+        "CDP",
+        "IP SLA",
+        "EEM"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "IP SLA measures delay, jitter, loss to validate whether the path meets application/QoS needs. LLDP/CDP are discovery; EEM is event scripting."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 212,
+    "traditional": {
+      "id": 212,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the purpose of traffic shaping?",
+      "alternativas": [
+        "to be a marking mechanism that identifies different ows",
+        "to provide fair queuing for buffered ows",
+        "to mitigate delays over slow links",
+        "to limit the bandwidth that a ow can use"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Traffic shaping queues excess traffic and meters send rate to a limit (buffers rather than hard-drop by default). Marking classifies/tags; fair queuing schedules; mitigating delay over slow links is incomplete—shaping specifically rate-limits by buffering."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 213,
+    "traditional": {
+      "id": 213,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a function of TFTP in network operations?",
+      "alternativas": [
+        "transfers IOS images from a server to a router for fifirmware upgrades",
+        "transfers a backup configuration file from a server to a switch using a username and password",
+        "transfers configuration fifiles from a server to a router on a congested link",
+        "transfers fifiles between file systems on a router"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "TFTP commonly transfers IOS images and configs without authentication over UDP/69—used for firmware upgrades. It does not use username/password like FTP/SCP."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 214,
+    "traditional": {
+      "id": 214,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Where does the configuration reside when a helper address is configured lo support DHCP?",
+      "alternativas": [
+        "on the router closest to the server",
+        "on the router closest to the client",
+        "on every router along the path",
+        "on the switch trunk interface"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ip helper-address is configured on the interface facing DHCP clients (router closest to clients) to relay broadcasts to a remote server."
+    },
+    "ticket": {
+      "id": 214,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9214 — Clientes na VLAN 40 não recebem DHCP; servidor está em outro site. Relay ausente.",
+      "cli_output": "R1# show ip interface gi0/0.40\nGigabitEthernet0/0.40 is up, line protocol is up\n  Internet address is 10.40.0.1/24\n  Helper address is not set\n\nR1# show running-config interface gi0/0.40\ninterface GigabitEthernet0/0.40\n encapsulation dot1Q 40\n ip address 10.40.0.1 255.255.255.0",
+      "alternativas": [
+        "Configurar ip helper-address no roteador mais próximo dos clientes (SVI/subif da VLAN 40).",
+        "helper-address só no roteador colado ao servidor DHCP.",
+        "Precisa em todos os hops do caminho WAN.",
+        "No trunk L2 do switch, não no gateway L3 dos clientes."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Relay fica na interface L3 do subnet do cliente para capturar broadcasts DHCP e unicasts ao servidor. Não é necessário em cada hop."
+    }
+  },
+  {
+    "source_id": 215,
+    "traditional": {
+      "id": 215,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What facilitates a Telnet connection between devices by entering the device name?",
+      "alternativas": [
+        "SNMP",
+        "DNS lookup",
+        "syslog",
+        "NTP"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "DNS resolves a hostname to an IP so Telnet/SSH can connect by name. SNMP/syslog/NTP do not perform name resolution for the session."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 216,
+    "traditional": {
+      "id": 216,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer is installing a new wireless printer with a static IP address on the Wi-Fi network. Which feature must be enabled and configured toprevent connection issues with the printer?",
+      "alternativas": [
+        "client exclusion",
+        "DHCP address assignment",
+        "passive client",
+        "static IP tunneling"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "On Cisco WLC, Passive Client allows devices that do not ARP normally (some static printers) to work correctly with controller bridging. DHCP assignment contradicts static IP. Exclusion/tunneling are wrong features for this case."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 217,
+    "traditional": {
+      "id": 217,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When a client and server are not on the same physical network, which device is used to forward requests and replies between client and server forDHCP?",
+      "alternativas": [
+        "DHCPOFFER",
+        "DHCP relay agent",
+        "DHCP server",
+        "DHCPDISCOVER"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "A DHCP relay agent (helper-address) forwards client DHCP messages between subnets to the server. DHCPOFFER/DISCOVER are message types, not devices."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 218,
+    "traditional": {
+      "id": 218,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which protocol requires authentication to transfer a backup configuration file from a router to a remote server?",
+      "alternativas": [
+        "FTP",
+        "SMTP",
+        "TFTP",
+        "DTP"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "FTP authenticates with username/password when transferring files. TFTP has no auth. SMTP is mail; DTP is trunk negotiation."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 219,
+    "traditional": {
+      "id": 219,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which condition must be met before an NMS handfiles an SNMP trap from an agent?",
+      "alternativas": [
+        "The NMS must receive the same trap from two different SNMP agents to verify that it is reliable.",
+        "The NMS must receive a trap and an inform message from the SNMP agent within a configured interval.",
+        "The NMS software must be loaded with the MIB associated with the trap.",
+        "The NMS must be configured on the same router as the SNMP agent."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "The NMS must load the MIB that defines the trap OIDs to interpret and handle the trap meaningfully. Duplicate traps, inform pairing, or co-location on the agent router are not prerequisites."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 220,
+    "traditional": {
+      "id": 220,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer is configuring switch SW1 to act as an NTP server when all upstream NTP server connectivity fails. Which configuration must beused?",
+      "alternativas": [
+        "SW1# config t\nSW1(config)#ntp peer 192.168.1.1 SW1(config)#ntp access-group peer accesslist1",
+        "SW1# config t\nSW1(config)#ntp master SW1(config)#ntp server 192.168.1.1",
+        "SW1# config t\nSW1(config)#ntp backup SW1(config)#ntp server 192.168.1.1",
+        "SW1# config t\nSW1(config)#ntp server 192.168.1.1 SW1(config)#ntp access-group peer accesslist1"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ntp master makes the switch a local NTP server when upstream fails; also pointing ntp server to upstream is valid client+master design. ntp backup is invalid. peer alone is not the master fallback pattern keyed here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 221,
+    "traditional": {
+      "id": 221,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network administrator must enable DHCP services between two sites. What must be configured for the router to pass DHCPDISCOVERmessages on to the server?",
+      "alternativas": [
+        "DHCP Binding",
+        "a DHCP Relay Agent",
+        "DHCP Snooping",
+        "a DHCP Pool"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "DHCP relay agent (ip helper-address) forwards DHCPDISCOVER to a server on another subnet. Binding/snooping/pool are not the relay function."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 222,
+    "traditional": {
+      "id": 222,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which level of severity must be set to get informational syslogs?",
+      "alternativas": [
+        "alert",
+        "critical",
+        "notice",
+        "debug"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Syslog severity debug (7) includes informational (6) and all higher-priority levels. Setting a higher severity number threshold allows more verbose messages including informational."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 223,
+    "traditional": {
+      "id": 223,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "On workstations running Microsoft Windows, which protocol provides the default gateway for the device?",
+      "alternativas": [
+        "STP",
+        "DHCP",
+        "SNMP",
+        "DNS"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "DHCP commonly provides default gateway (option 3) to Windows hosts. STP/SNMP/DNS do not assign the gateway."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 224,
+    "traditional": {
+      "id": 224,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command implies the use of SNMPv3?",
+      "alternativas": [
+        "snmp-server user",
+        "snmp-server host",
+        "snmp-server enable traps",
+        "snmp-server community"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "snmp-server user configures SNMPv3 users (auth/priv). community is v1/v2c. host/enable traps exist across versions but user implies v3."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 225,
+    "traditional": {
+      "id": 225,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "R1 as an NTP server must have:✑ NTP authentication enabled✑ NTP packets sourced from Interface loopback 0✑ NTP stratum 2✑ NTP packets only permitted to client IP 209.165.200.225How should R1 be configured?",
+      "alternativas": [
+        "ntp authenticate\nntp authentication-key 2 sha1 CISCO123\nntp source Loopback0\nntp access-group server-only 10\nntp master 2 ! access-list10 permit udp host 209.165.200.225 any eq 123",
+        "ntp authenticate\nntp authentication-key 2 md5 CISCO123\nntp interface Loopback0\nntp access-group server-only 10\nntp stratum 2 !\naccess-list 10 permit 209.165.200.225",
+        "ntp authenticate\nntp authentication-key 2 md5 CISCO123\nntp source Loopback0\nntp access-group server-only 10\nntp master 2 ! access-list10 permit 209.165.200.225",
+        "ntp authenticate\nntp authentication-key 2 md5 CISCO123\nntp source Loopback0\nntp access-group server-only 10\nntp stratum 2 ! access-list10 permit udp host 209.165.200.225 any eq 123"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Requirements: ntp authenticate + md5 key, ntp source Loopback0, ntp master 2 (stratum 2), access-group server-only with ACL permitting the client. sha1 key type, ntp interface (invalid), or ntp stratum (invalid IOS) fail. The correct set is md5 + source Loopback0 + master 2 + ACL permit to the client."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 226,
+    "traditional": {
+      "id": 226,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network engineer is configuring a switch so that it is remotely reachable via SSH. The engineer has already configured the host name on therouter. Which additional command must the engineer configure before entering the command to generate the RSA key?",
+      "alternativas": [
+        "password password",
+        "ip ssh authentication-retries 2",
+        "ip domain-name domain",
+        "crypto key generate rsa modulus 1024"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "crypto key generate rsa requires hostname and ip domain-name (or domain name) already set. The domain-name is the missing prerequisite before key generation. Generating the key is the next step after domain-name, not before."
+    },
+    "ticket": {
+      "id": 226,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9226 — Engenheiro configurou hostname e tenta gerar chave RSA para SSH; comando falha pedindo domain name.",
+      "cli_output": "R1# show running-config | include hostname|domain\nhostname R1\n! sem ip domain-name\n\nR1(config)# crypto key generate rsa\n% Please define a domain-name first.",
+      "alternativas": [
+        "Configurar ip domain-name antes de crypto key generate rsa.",
+        "password password é pré-requisito da chave RSA.",
+        "ip ssh authentication-retries deve vir antes da chave.",
+        "Gerar a chave antes do hostname e domain."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "RSA key pair no IOS exige hostname + domain-name. authentication-retries e passwords não substituem esse pré-requisito."
+    }
+  },
+  {
+    "source_id": 227,
+    "traditional": {
+      "id": 227,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which QoS traffic handling technique retains excess packets in a queue and reschedufiles these packets for later transmission when the configuredmaximum bandwidth has been surpassed?",
+      "alternativas": [
+        "traffic policing",
+        "weighted random early detection",
+        "traffic prioritization",
+        "traffic shaping"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Shaping buffers excess packets and releases them later to conform to a rate. Policing drops/marks excess. WRED drops probabilistically for congestion avoidance. Prioritization is scheduling emphasis."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 228,
+    "traditional": {
+      "id": 228,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command must be entered to configure a DHCP relay?",
+      "alternativas": [
+        "ip dhcp relay",
+        "ip dhcp pool",
+        "ip address dhcp",
+        "ip helper-address"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "ip helper-address enables DHCP relay on an interface. ip dhcp pool is server; ip address dhcp is client; ip dhcp relay is not the classic IOS command form."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 229,
+    "traditional": {
+      "id": 229,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network analyst is tasked with configuring the date and time on a router using EXEC mode. The date must be set to January 1, 2020 and thetime must be set to12:00 am. Which command should be used?",
+      "alternativas": [
+        "clock timezone",
+        "clock summer-time date",
+        "clock summer-time recurring",
+        "clock set"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "clock set in EXEC sets the system date/time. timezone/summer-time configure offsets/DST rules, not the absolute stamp alone."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 230,
+    "traditional": {
+      "id": 230,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command creates a static NAT binding for a PC address of 10.1.1.1 to the public routable address 209.165.200.225 assigned to the PC?",
+      "alternativas": [
+        "R1(config)#ip nat inside source static 10.1.1.1 209.165.200.225",
+        "R1(config)#ip nat outside source static 209.165.200.225 10.1.1.1",
+        "R1(config)#ip nat inside source static 209.165.200.225 10.1.1.1",
+        "R1(config)#ip nat outside source static 10.1.1.1 209.165.200.225"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Static inside source NAT: ip nat inside source static <inside-local> <inside-global>. Swapping addresses or using outside source changes the translation direction/meaning."
+    },
+    "ticket": {
+      "id": 230,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9230 — PC 10.1.1.1 precisa de NAT estático para 209.165.200.225. Tradução incorreta configurada.",
+      "cli_output": "R1# show running-config | include nat\nip nat outside source static 209.165.200.225 10.1.1.1\ninterface Gi0/0\n ip nat inside\ninterface Gi0/1\n ip nat outside\n\nR1# show ip nat translations\nPro Inside global      Inside local       Outside local      Outside global\n--- ---                ---                10.1.1.1           209.165.200.225",
+      "alternativas": [
+        "Usar ip nat inside source static 10.1.1.1 209.165.200.225.",
+        "Manter outside source static com endereços invertidos.",
+        "inside source static 209.165.200.225 10.1.1.1 está correto.",
+        "NAT estático não exige inside/outside nas interfaces."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Inside-local 10.1.1.1 ↔ inside-global 209.165.200.225 usa inside source static na ordem local→global. outside source inverte o modelo. Interfaces inside/outside são necessárias."
+    }
+  },
+  {
+    "source_id": 231,
+    "traditional": {
+      "id": 231,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What prevents a workstation from receiving a DHCP address?",
+      "alternativas": [
+        "STP",
+        "VTP",
+        "802.1Q",
+        "DTP"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "This item keys 802.1Q (trunking/native VLAN issues can black-hole or misdeliver DHCP). In broader practice STP-blocked ports or missing relay also block DHCP; the bank answer remains 802.1Q per source."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 232,
+    "traditional": {
+      "id": 232,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a feature of TFTP?",
+      "alternativas": [
+        "offers anonymous user login ability",
+        "uses two separate connections for control and data traffic",
+        "relies on the well-known TCP port 20 to transmit data",
+        "provides secure data transfer"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "TFTP allows simple file transfer without user login (anonymous-style). It is UDP-based, not dual TCP connections like FTP, and is not secure."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 233,
+    "traditional": {
+      "id": 233,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which QoS forwarding per-hop behavior changes a specific value in a packet header to set the class of service for the packet?",
+      "alternativas": [
+        "shaping",
+        "classication",
+        "policing",
+        "marking"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Marking writes CoS/DSCP/IPP values into headers for classification downstream. Classification identifies traffic; policing/shaping enforce rates."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 234,
+    "traditional": {
+      "id": 234,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the purpose of the ip address dhcp command?",
+      "alternativas": [
+        "to configure an interface as a DHCP relay",
+        "to configure an interface as a DHCP client",
+        "to configure an interface as a DHCP helper",
+        "to configure an interface as a DHCP server"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ip address dhcp configures the interface as a DHCP client. Relay/helper use helper-address; server uses dhcp pool."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 235,
+    "traditional": {
+      "id": 235,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer is configuring SSH version 2 exclusively on the R1 router. What is the minimum configuration required to permit remote managementusing the cryptographic protocol?",
+      "alternativas": [
+        "hostname R1\nservice password-encryption\ncrypto key generate rsa general-keys modulus 1024\nusername cisco privilege 15 password 0cisco123\nip ssh version 2\nline vty 0 15\ntransport input ssh\nlogin local",
+        "hostname R1\nip domain name cisco\ncrypto key generate rsa general-keys modulus 1024\nusername cisco privilege 15 password 0 cisco123ip ssh version 2\nline vty 0 15\ntransport input ssh\nlogin local",
+        "hostname R1\ncrypto key generate rsa general-keys modulus 1024\nusername cisco privilege 15 password 0 cisco123\nip ssh version 2 line vty0 15\ntransport input ssh\nlogin local",
+        "hostname R1\nip domain name cisco\ncrypto key generate rsa general-keys modulus 1024\nusername cisco privilege 15 password 0 cisco123ip ssh version 2\nline vty 0 15\ntransport input all\nlogin local"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "SSH v2 needs hostname, ip domain-name, RSA key, user/VTY login local, transport input ssh, and ip ssh version 2. Missing domain-name breaks key gen; transport input all allows Telnet; password-encryption is optional not exclusive requirement."
+    },
+    "ticket": null
+  }
+]

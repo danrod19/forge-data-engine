@@ -1,0 +1,944 @@
+[
+  {
+    "source_id": 416,
+    "traditional": {
+      "id": 416,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of security program is violated when a group of employees enters a building using the ID badge of only one person?",
+      "alternativas": [
+        "intrusion detection",
+        "network authorization",
+        "physical access control",
+        "user awareness"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Using another person’s badge/ID to enter a facility violates physical access control. IDS/network authorization/user awareness are different security program elements."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 417,
+    "traditional": {
+      "id": 417,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a characteristic of RSA?",
+      "alternativas": [
+        "It uses preshared keys for encryption.",
+        "It is an asymmetric encryption algorithm.",
+        "It is a symmetric decryption algorithm.",
+        "It requires both sides to have identical keys for encryption."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "RSA is a public-key (asymmetric) algorithm with different public/private keys. Preshared identical keys describe symmetric cryptography, not RSA."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 418,
+    "traditional": {
+      "id": 418,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is an enhancement implemented in WPA3?",
+      "alternativas": [
+        "applies 802.1x authentication and AES-128 encryption",
+        "employs PKI and RADIUS to identify access points",
+        "uses TKIP and per-packet keying",
+        "defends against deauthentication and disassociation attacks"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "WPA3 requires Protected Management Frames, helping defend against deauth/disassociation spoofing, and adds SAE. TKIP is legacy WPA, not a WPA3 enhancement."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 419,
+    "traditional": {
+      "id": 419,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which action must be taken when password protection is implemented?",
+      "alternativas": [
+        "Use less than eight characters in length when passwords are complex.",
+        "Include special characters and make passwords as long as allowe",
+        "Share passwords with senior IT management to ensure proper oversight.",
+        "Store passwords as contacts on a mobile device with single-factor authentication."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Strong passwords should be long and include complexity (special characters, mixed case, numbers). Short passwords, sharing, or storing in contacts weaken security."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 420,
+    "traditional": {
+      "id": 420,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer must configure R1 for a new user account. The account must meet these requirements:• It must be configured in the local database.• The username is engineer2.• It must use the strongest password congurable.Which command must the engineer configure on the router?",
+      "alternativas": [
+        "R1(config)# username engineer2 privilege 1 password 7 test2021",
+        "R1(config)# username engineer2 secret 4 $1$b1Ju$kZbBS1Pyh4QzwXyZ",
+        "R1(config)# username engineer2 algorithm-type scrypt secret test2021",
+        "R1(config)# username engineer2 secret 5 password $1$b1Ju$kZbBS1Pyh4QzwXyZ"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "algorithm-type scrypt secret uses a strong hashing algorithm for local username secrets. Type 7 password is weak/reversible; type 4 is deprecated/broken; malformed secret 5 syntax is wrong."
+    },
+    "ticket": {
+      "id": 420,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #11420 — Conta local engineer2 deve usar o hash mais forte disponível no IOS moderno. Senha type 7 foi rejeitada pela auditoria.",
+      "cli_output": "R1# show running-config | include username\nusername engineer2 privilege 1 password 7 08324D400E1C03161E\n\nR1# show aaa users\n! local user present, weak reversible password",
+      "alternativas": [
+        "Recriar com username engineer2 algorithm-type scrypt secret <senha>.",
+        "Manter password 7; é o mais forte no IOS.",
+        "secret 4 com hash MD5 legado é recomendado atualmente.",
+        "secret 5 password <hash> é a sintaxe documentada preferida."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "algorithm-type scrypt secret aplica hashing forte ao segredo local. Type 7 é reversível. Type 4 está deprecado/inseguro. Sintaxe secret 5 password é inválida/errada."
+    }
+  },
+  {
+    "source_id": 421,
+    "traditional": {
+      "id": 421,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a characteristic of RSA?",
+      "alternativas": [
+        "It uses preshared keys for encryption.",
+        "It is a public-key cryptosystem.",
+        "It is a private-key encryption algorithm.",
+        "It requires both sides to have identical keys."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "RSA is a public-key cryptosystem (asymmetric). It does not use a single shared private key on both sides like symmetric crypto."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 422,
+    "traditional": {
+      "id": 422,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is used as a solution for protecting an individual network endpoint from attack?",
+      "alternativas": [
+        "antivirus software",
+        "wireless controller",
+        "router",
+        "Cisco DNA Center"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Endpoint protection (antivirus/EDR) defends the individual host. WLC/router/DNA Center are infrastructure/management, not host AV."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 423,
+    "traditional": {
+      "id": 423,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which security method is used to prevent man-in-the-middle attacks?",
+      "alternativas": [
+        "authentication",
+        "anti-replay",
+        "authorization",
+        "accounting"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Anti-replay (sequence checks, typically in IPsec) prevents capture-and-replay MITM-style abuse of packets. AAA authN/authZ/accounting are related but not the anti-replay mechanism named here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 424,
+    "traditional": {
+      "id": 424,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which cipher is supported for wireless encryption only with the WPA2 standard?",
+      "alternativas": [
+        "RC4",
+        "AES",
+        "SHA",
+        "AES256"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "WPA2 data confidentiality uses AES-CCMP. RC4/TKIP are older; SHA is hashing, not the WLAN cipher suite name here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 425,
+    "traditional": {
+      "id": 425,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which WPA mode uses PSK authentication?",
+      "alternativas": [
+        "Local",
+        "Personal",
+        "Enterprise",
+        "Client"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "WPA Personal mode uses a PSK. Enterprise uses 802.1X/EAP. Local/Client are not WPA mode names for PSK."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 426,
+    "traditional": {
+      "id": 426,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "To improve corporate security, an organization is planning to implement badge authentication to limit access to the data center. Which element ofa security program is being deployed?",
+      "alternativas": [
+        "user awareness",
+        "user training",
+        "physical access control",
+        "vulnerability verification"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Badge readers limiting facility entry are physical access control. Awareness/training are people programs; vulnerability verification is assessment."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 427,
+    "traditional": {
+      "id": 427,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which benefit does Cisco DNA Center provide over traditional campus management?",
+      "alternativas": [
+        "Cisco DNA Center automates HTTPS for secure web access, and traditional campus management uses HTTP.",
+        "Cisco DNA Center leverages SNMPv3 for encrypted management, and traditional campus management uses SNMPv2.",
+        "Cisco DNA Center leverages APIs, and traditional campus management requires manual data gathering.",
+        "Cisco DNA Center automates SSH access for encrypted entry, and SSH is absent from traditional campus management."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "DNA Center is API-driven and intent-based versus traditional campus managers that are often CLI/SNMP device-centric. That extensibility/automation is the key contrast."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 428,
+    "traditional": {
+      "id": 428,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How does Chef configuration management enforce a required device configuration?",
+      "alternativas": [
+        "The Chef Infra Server uses its configured cookbook to push the required configuration to the remote device requesting updates.",
+        "The installed agent on the device connects to the Chef Infra Server and pulls its required configuration from the cookbook.",
+        "The Chef Infra Server uses its configured cookbook to alert each remote device when it is time for the device to pull a new configuration.",
+        "The installed agent on the device queries the Chef Infra Server and the server responds by pushing the configuration from the cookbook."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Chef agents (clients) pull/query the Chef Infra Server for cookbooks/recipes and enforce desired state. It is agent-based pull, not purely push-only from server without client participation."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 429,
+    "traditional": {
+      "id": 429,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the PUT method within HTTP?",
+      "alternativas": [
+        "It replaces data at the destination.",
+        "It is a nonidempotent operation.",
+        "It is a read-only operation.",
+        "It displays a web site."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "HTTP PUT replaces/updates the target resource representation and is idempotent. It is not read-only (GET) and not primarily for rendering a website."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 430,
+    "traditional": {
+      "id": 430,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which advantage does the network assurance capability of Cisco DNA Center provide over traditional campus management?",
+      "alternativas": [
+        "Cisco DNA Center leverages YANG and NETCONF to assess the status of fabric and nonfabric devices, and traditional campus managementuses CLI exclusively.",
+        "Cisco DNA Center handfifiles management tasks at the controller to reduce the load on infrastructure devices, and traditional campusmanagement uses the data backbone.",
+        "Cisco DNA Center automatically compares security postures among network devices, and traditional campus management needs manualcomparisons.",
+        "Cisco DNA Center correlates information from different management protocols to obtain insights, and traditional campus managementrequires manual analysis."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "DNA Center assurance correlates multi-source telemetry for health insights beyond siloed traditional tools. The advantage is integrated assurance analytics."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 431,
+    "traditional": {
+      "id": 431,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the purpose of a southbound API in a controller-based networking architecture?",
+      "alternativas": [
+        "facilitates communication between the controller and the applications",
+        "allows application developers to interact with the network",
+        "integrates a controller with other automation and orchestration tools",
+        "facilitates communication between the controller and the networking hardware"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Southbound APIs connect the controller to network devices for programming. Northbound faces applications/orchestration."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 432,
+    "traditional": {
+      "id": 432,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which function generally performed by a traditional network device is replaced by a software-defined controller?",
+      "alternativas": [
+        "building route tabfifiles and updating the forwarding table",
+        "encapsulation and decapsulation of packets in a data-link frame",
+        "changing the source or destination address during NAT operations",
+        "encryption and decryption for VPN link processing"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "SDN controllers take over control-plane duties such as computing routes and updating forwarding state. Encapsulation, NAT rewrite, and VPN crypto remain data-plane/device functions."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 433,
+    "traditional": {
+      "id": 433,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What describes a northbound REST API for SDN?",
+      "alternativas": [
+        "network-element-facing interface for GET, POST, PUT, and DELETE methods",
+        "application-facing interface for SNMP GET requests",
+        "application-facing interface for GET, POST, PUT, and DELETE methods",
+        "network-element-facing interface for the control and data planes"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Northbound REST APIs face applications using HTTP methods GET/POST/PUT/DELETE. Southbound faces network elements; SNMP is not the NB REST model."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 434,
+    "traditional": {
+      "id": 434,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When is the PUT method used within HTTP?",
+      "alternativas": [
+        "to update a DNS server",
+        "when a nonidempotent operation is needed",
+        "to display a web site",
+        "when a read-only operation is required"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "PUT is used to create/replace/update a resource representation (idempotent update). It is not for read-only display and is not the nonidempotent method (that is typically POST)."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 435,
+    "traditional": {
+      "id": 435,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the advantage of separating the control plane from the data plane within an SDN network?",
+      "alternativas": [
+        "limits data queries to the control plane",
+        "reduces cost",
+        "decreases overall network complexity",
+        "offloads the creation of virtual machines to the data plane"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Separating control and data planes centralizes decisions and simplifies device operations/complexity for policy and automation. It does not offload VM creation onto the data plane."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 436,
+    "traditional": {
+      "id": 436,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a function of a northbound API in an SDN environment?",
+      "alternativas": [
+        "It relies on global provisioning and configuration.",
+        "It upgrades software and restores fifiles.",
+        "It supports distributed processing for configuration.",
+        "It provides orchestration and network automation services."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Northbound APIs enable orchestration and network automation applications above the controller. Device software restore paths are not the NB definition."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 437,
+    "traditional": {
+      "id": 437,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is an Ansible inventory?",
+      "alternativas": [
+        "unit of Python code to be executed within Ansible",
+        "file that defines the target devices upon Which commands and tasks are executed",
+        "device with Ansible installed that manages target devices",
+        "collection of actions to perform on target devices, expressed in YAML format"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "An Ansible inventory is the file (or source) listing target hosts/groups. Playbooks are actions; modules/tasks are units of work; the control node runs Ansible."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 438,
+    "traditional": {
+      "id": 438,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a function of a northbound API?",
+      "alternativas": [
+        "It relies on global provisioning and configuration.",
+        "It upgrades software and restores fifiles.",
+        "It supports distributed processing for configuration.",
+        "It provides a path between an SDN controller and network applications."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Northbound APIs support centralized/global provisioning and automation interfaces for apps. The path controller→devices is southbound."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 439,
+    "traditional": {
+      "id": 439,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network architect is considering whether to implement Cisco DNA Center to deploy devices on a new network. The organization is focused onreducing the time it currently takes to deploy devices in a traditional campus design. For which reason would Cisco DNA Center be moreappropriate than traditional management options?",
+      "alternativas": [
+        "Cisco DNA Center supports deployment with a single pane of glass.",
+        "Cisco DNA Center provides zero-touch provisioning to third-party devices.",
+        "Cisco DNA Center reduces the need for analytics on third-party access points and devices.",
+        "Cisco DNA Center minimizes the level of syslog output when reporting on Cisco devices."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "DNA Center enables zero-touch/automated provisioning at scale for new sites, a major advantage over pure box-by-box traditional rollout."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 440,
+    "traditional": {
+      "id": 440,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "In a cloud-computing environment, What is rapid elasticity?",
+      "alternativas": [
+        "control and monitoring or resource consumption by the tenant",
+        "automatic adjustment of capacity based on need",
+        "pooling resources in a multitenant model based on need",
+        "self-service of computing resources by the tenant"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Rapid elasticity is automatic scale-out/in of cloud capacity with demand. Multitenancy, measured service, and self-service are other NIST cloud characteristics."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 441,
+    "traditional": {
+      "id": 441,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which interface enabfiles communication between a program on the controller and a program on the networking device?",
+      "alternativas": [
+        "software virtual interface",
+        "tunnel interface",
+        "northbound interface",
+        "southbound interface"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Southbound interface is controller↔network device programs/agents. Northbound is controller↔applications."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 442,
+    "traditional": {
+      "id": 442,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which interface type enabfiles an application running on a client to send data over an IP network to a server?",
+      "alternativas": [
+        "northbound interface",
+        "application programming interface",
+        "southbound interface",
+        "Representational State Transfer application programming interface"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "An API lets a client application send/receive data to a service over the network. NBI/SBI are SDN-specific directions; REST is one API style."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 443,
+    "traditional": {
+      "id": 443,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What does traffic shaping do?",
+      "alternativas": [
+        "It queues excess traffic",
+        "It sets QoS attributes within a packet",
+        "It organizes traffic into classes",
+        "It modifies the QoS attributes of a packet"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Traffic shaping queues excess traffic and meters the send rate to a limit. Marking/classification set or identify QoS attributes rather than queue for rate conformance."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 444,
+    "traditional": {
+      "id": 444,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the benefit of using private IPv4 addressing?",
+      "alternativas": [
+        "to enable secure connectivity over the Internet",
+        "to shield internal network devices from external access",
+        "to provide reliable connectivity between like devices",
+        "to be routable over an external network"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Private IPv4 helps shield internal hosts from direct external addressing/exposure (with perimeter controls). It is not Internet-routable without NAT."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 445,
+    "traditional": {
+      "id": 445,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Two switches have been implemented and all interfaces are at the default configuration level. A trunk link must be implemented between twoswitches with these requirements:• using an industry-standard trunking protocol• permitting VLANs 1-10 and denying other VLANsHow must the interconnecting ports be configured?",
+      "alternativas": [
+        "switchport mode dynamic\nchannel-protocol lacp\nswitchport trunk allowed vlan 1-10",
+        "switchport mode trunk\nswitchport trunk allowed vlan 1-10\nswitchport trunk native vlan 11",
+        "switchport mode trunk\nswitchport trunk encapsulation dot1q\nswitchport trunk allowed vlan 1-10",
+        "switchport mode dynamic desirable\nchannel-group 1 mode desirable\nswitchport trunk encapsulation isl\nswitchport trunk allowed vlan except 11-4094"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Industry-standard trunking is 802.1Q (dot1q) with mode trunk and allowed VLANs. ISL is Cisco-proprietary; dynamic-only without encapsulation may be incomplete on some platforms; LACP is EtherChannel not trunk protocol."
+    },
+    "ticket": {
+      "id": 445,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #11445 — Trunk 802.1Q entre SW1–SW2 deve permitir só VLANs 1–10; defaults ainda em DTP.",
+      "cli_output": "SW1# show interfaces gi1/0/1 switchport\nAdministrative Mode: dynamic auto\nOperational Mode: static access\nAdministrative Trunking Encapsulation: negotiate\n\nSW1# show running-config interface gi1/0/1\ninterface GigabitEthernet1/0/1\n! sem trunk/dot1q/allowed",
+      "alternativas": [
+        "switchport mode trunk, encapsulation dot1q (se exigido), allowed vlan 1-10.",
+        "ISL + desirable atende “industry-standard”.",
+        "Somente channel-protocol lacp cria trunk 802.1Q.",
+        "dynamic auto sozinho força 802.1Q allowed 1-10."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Padrão da indústria é 802.1Q. mode trunk + encapsulation dot1q + allowed 1-10 cumpre. ISL é proprietário; LACP é EtherChannel."
+    }
+  },
+  {
+    "source_id": 446,
+    "traditional": {
+      "id": 446,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network administrator wants the syslog server to filter incoming messages into different files based on their importance. Which filtering criteriamust be used?",
+      "alternativas": [
+        "message body",
+        "level",
+        "facility",
+        "process ID"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Syslog severity level is commonly used to filter messages into different files/destinations. Facility categorizes source; PID/body are less typical primary file-split keys."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 447,
+    "traditional": {
+      "id": 447,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which interface or port on the WLC is the default for in-band device administration and communications between the controller and accesspoints?",
+      "alternativas": [
+        "console port",
+        "management interface",
+        "virtual interface",
+        "service port"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "WLC management interface is the default in-band admin and CAPWAP-related management path. Service port is OOB; console is serial; virtual is for mobility/webauth."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 448,
+    "traditional": {
+      "id": 448,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the recommended switch load-balancing mode for Cisco WLCs?",
+      "alternativas": [
+        "source-destination IP address",
+        "destination IP address",
+        "destination MAC address",
+        "source-destination MAC address"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Cisco recommends source-destination IP load-balancing on neighboring switches for WLC LAG for better distribution of CAPWAP flows."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 449,
+    "traditional": {
+      "id": 449,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What must be considered when using 802.11a?",
+      "alternativas": [
+        "It is chosen over 802.11b when a lower-cost solution is necessary",
+        "It is susceptible to interference from 2.4 GHz devices such as microwave ovens",
+        "It is compatible with 802.11b- and 802.11g-compliant wireless devices",
+        "It is used in place of 802.11b/g when many nonoverlapping channels are required"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "802.11a (5 GHz) offers many nonoverlapping channels versus crowded 2.4 GHz b/g. It is not cheaper than b, not 2.4 GHz interference prone the same way, and not backward compatible with b/g RF."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 450,
+    "traditional": {
+      "id": 450,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is represented by the word \"LB20\" within this JSON schema?",
+      "alternativas": [
+        "value",
+        "array",
+        "object",
+        "key"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "In JSON, a quoted string after a colon is a value. Keys are left-hand names; objects/arrays are structures."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 451,
+    "traditional": {
+      "id": 451,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is represented beginning with line 1 and ending with line 5 within this JSON schema?",
+      "alternativas": [
+        "key",
+        "object",
+        "array",
+        "value"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "A brace-delimited structure spanning multiple lines is a JSON object (set of key/value pairs)."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 452,
+    "traditional": {
+      "id": 452,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is represented by the word \"IDS\" within this JSON schema?",
+      "alternativas": [
+        "object",
+        "value",
+        "array",
+        "key"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "A left-hand property name such as \"IDS\" is a JSON key."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 453,
+    "traditional": {
+      "id": 453,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is represented in line 4 within this JSON schema?",
+      "alternativas": [
+        "object",
+        "array",
+        "key",
+        "value"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "A nested {} structure on a line is a JSON object value."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 454,
+    "traditional": {
+      "id": 454,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is represented by the word \"port\" within this JSON schema?",
+      "alternativas": [
+        "key",
+        "value",
+        "array",
+        "object"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "The property name \"port\" is a key in the object."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 455,
+    "traditional": {
+      "id": 455,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What provides connection redundancy, increased bandwidth, and load sharing between a wireless LAN controller and a Layer 2 switch?",
+      "alternativas": [
+        "rst hop redundancy",
+        "VLAN trunking",
+        "tunneling",
+        "link aggregation"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "LAG/EtherChannel between WLC and switch provides redundancy, more bandwidth, and load sharing. FHRP is gateway redundancy; trunking is VLAN tagging."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 456,
+    "traditional": {
+      "id": 456,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which interface is used to send traffic to the destination network?",
+      "alternativas": [
+        "F0/5",
+        "F0/6",
+        "F0/12",
+        "F0/9"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Based on the routing/CEF exhibit (not shown in text bank), traffic to the destination uses the interface indicated by the longest-match route—here F0/12 per the keyed answer."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 457,
+    "traditional": {
+      "id": 457,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the purpose of an SSID?",
+      "alternativas": [
+        "It identifies an individual access point on a WLAN.",
+        "It differentiates traffic entering access points.",
+        "It provides network security.",
+        "It identifies a WLAN."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "SSID names a WLAN for client discovery/association. It is not primarily a single-AP hardware ID or a security mechanism by itself."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 458,
+    "traditional": {
+      "id": 458,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What describes the functionality of southbound APIs?",
+      "alternativas": [
+        "They enable communication between the controller and the network device.",
+        "They communicate with the management plane.",
+        "They use HTTP messages to communicate.",
+        "They convey information from the controller to the SDN applications."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Southbound APIs enable controller communication with network devices to program forwarding. Northbound faces apps; HTTP alone does not define SB."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 459,
+    "traditional": {
+      "id": 459,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command must be entered so that the default gateway is automatically distributed when DHCP is configured on a router?",
+      "alternativas": [
+        "dns-server",
+        "default-router",
+        "ip helper-address",
+        "default-gateway"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "In a DHCP pool, default-router distributes the default gateway to clients. ip helper-address is relay; dns-server is DNS option; default-gateway is host/router command elsewhere."
+    },
+    "ticket": {
+      "id": 459,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #11459 — Pool DHCP ok, clientes sem gateway. Servidor IOS local.",
+      "cli_output": "R1# show running-config | section dhcp\nip dhcp pool LAN\n network 10.10.10.0 255.255.255.0\n dns-server 8.8.8.8\n! sem default-router\n\nR1# show ip dhcp binding\n! clientes com IP, sem default gateway no lease options",
+      "alternativas": [
+        "Adicionar default-router 10.10.10.1 no pool DHCP.",
+        "ip helper-address no mesmo pool define o gateway.",
+        "dns-server já envia o default gateway.",
+        "default-gateway global no roteador preenche a opção DHCP automaticamente."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Opção de gateway no IOS DHCP pool é default-router. helper-address é relay. dns-server só DNS."
+    }
+  },
+  {
+    "source_id": 460,
+    "traditional": {
+      "id": 460,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which 802.11 management frame type is sent when a client roams between access points on the same SSID?",
+      "alternativas": [
+        "Reassociation Request",
+        "Authentication Request",
+        "Association Request",
+        "Probe Request"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "When roaming between APs on the same ESS/SSID, the client sends a Reassociation Request. Association is initial; probe discovers; authentication is security exchange."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 461,
+    "traditional": {
+      "id": 461,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a functionality of the control plane in the network?",
+      "alternativas": [
+        "It looks up an egress interface in the forwarding information base.",
+        "It forwards traffic to the next hop.",
+        "It exchanges topology information with other routers.",
+        "It provides CLI access to the network device."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Control plane exchanges routing/topology information (e.g., OSPF/EIGRP/BGP). Forwarding lookups and next-hop send are data plane; CLI is management."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 462,
+    "traditional": {
+      "id": 462,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is represented by the word \"VPN11\" within this JSON schema?",
+      "alternativas": [
+        "key",
+        "array",
+        "object",
+        "value"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "\"VPN11\" on the right side of a pair is a JSON value."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 463,
+    "traditional": {
+      "id": 463,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which port type supports the spanning-tree portfast command without additional configuration?",
+      "alternativas": [
+        "Layer 3 main interfaces",
+        "Layer 3 subinterfaces",
+        "trunk ports",
+        "access ports"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "spanning-tree portfast applies to access ports without the trunk keyword. Trunk edges need portfast trunk; L3 interfaces are not classic STP edge access ports."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 464,
+    "traditional": {
+      "id": 464,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is represented by the word \"R29\" within this JSON schema?",
+      "alternativas": [
+        "array",
+        "key",
+        "object",
+        "value"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "\"R29\" appears as data content on the right-hand side of a JSON pair, so it is a value. Keys are the left-hand property names; objects and arrays are the structural containers."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 465,
+    "traditional": {
+      "id": 465,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is represented in line 2 within this JSON schema?",
+      "alternativas": [
+        "object",
+        "value",
+        "key",
+        "array"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "A brace-delimited {} block beginning around line 2 is a JSON object containing nested key/value pairs, not a primitive key, value, or array by itself."
+    },
+    "ticket": null
+  }
+]

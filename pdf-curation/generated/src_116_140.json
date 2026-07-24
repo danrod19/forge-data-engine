@@ -1,0 +1,352 @@
+[
+  {
+    "id": 116,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer must congure interswitch VLAN communication between a Cisco switch and a third-party switch. Which action should be taken?",
+    "alternativas": [
+      "congure DSCP",
+      "congure IEEE 802.1q",
+      "congure ISL",
+      "congure IEEE 802.1p"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 117,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer requires a switch interface to actively attempt to establish a trunk link with a neighbor switch. What command must be congured?",
+    "alternativas": [
+      "switchport mode trunk",
+      "switchport mode dynamic desirable",
+      "switchport nonegotiate",
+      "switchport mode dynamic auto"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 118,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer must establish a trunk link between two switches. The neighboring switch is set to trunk or desirable mode. What action should betaken?",
+    "alternativas": [
+      "congure switchport nonegotiate",
+      "congure switchport mode dynamic desirable",
+      "congure switchport mode dynamic auto",
+      "congure switchport trunk dynamic desirable"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 119,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which spanning-tree enhancement avoids the learning and listening states and immediately places ports in the forwarding state?",
+    "alternativas": [
+      "BPDUlter",
+      "PortFast",
+      "Backbonefast",
+      "BPDUguard"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 120,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How does the dynamically-learned MAC address feature function?",
+    "alternativas": [
+      "The CAM table is empty until ingress trac arrives at each port",
+      "Switches dynamically learn MAC addresses of each connecting CAM table.",
+      "The ports are restricted and learn up to a maximum of 10 dynamically-learned addresses",
+      "It requires a minimum number of secure MAC addresses to be lled dynamically"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 121,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "When using Rapid PVST+, which command guarantees the switch is always the root bridge for VLAN 200?",
+    "alternativas": [
+      "spanning-tree vlan 200 priority 614440",
+      "spanning-tree vlan 200 priority 0",
+      "spanning-tree vlan 200 root primary",
+      "spanning-tree vlan 200 priority 38813258"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 122,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer needs to add an old switch back into a network. To prevent the switch from corrupting the VLAN database, with action must be taken?",
+    "alternativas": [
+      "Add the switch in the VTP domain with a lower revision number.",
+      "Add the switch in the VTP domain with a higher revision number.",
+      "Add the switch with DTP set to dynamic desirable.",
+      "Add the switch with DTP set to desirable."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 123,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which technology prevents client devices from arbitrarily connecting to the network without state remediation?",
+    "alternativas": [
+      "802.11n",
+      "802.1x",
+      "MAC Authentication Bypass",
+      "IP Source Guard"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 124,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which protocol does an access point use to draw power from a connected switch?",
+    "alternativas": [
+      "Internet Group Management Protocol",
+      "Cisco Discovery Protocol",
+      "Adaptive Wireless Path Protocol",
+      "Neighbor Discovery Protocol"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 125,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An administrator must secure the WLC from receiving spoofed association requests. Which steps must be taken to congure the WLC to restrictthe requests and force the user to wait 10 ms to retry an association request?",
+    "alternativas": [
+      "Enable MAC ltering and set the SA Query timeout to 10.",
+      "Enable 802.1x Layer 2 security and set the Comeback timer to 10.",
+      "Enable Security Association Teardown Protection and set the SA Query timeout to 10.",
+      "Enable the Protected Management Frame service and set the Comeback timer to 10."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 126,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer must congure trac for a VLAN that is untagged by the switch as it crosses a trunk link. Which command should be used?",
+    "alternativas": [
+      "switchport trunk encapsulation dot1q",
+      "switchport trunk allowed vlan 10",
+      "switchport mode trunk",
+      "switchport trunk native vlan 10"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 127,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the benet of conguring PortFast on an interface?",
+    "alternativas": [
+      "The frames entering the interface are marked with the higher priority and then processed faster by a switch.",
+      "After the cable is connected, the interface is available faster to send and receive user dat",
+      "C. Real-time voice and video frames entering the interface are processed faster.",
+      "After the cable is connected, the interface uses the fastest speed setting available for that cable type."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 128,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Why does a switch ood a frame to all ports?",
+    "alternativas": [
+      "The frame has zero destination MAC addresses.",
+      "The destination MAC address of the frame is unknown.",
+      "The source MAC address of the frame is unknown",
+      "The source and destination MAC addresses of the frame are the same."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 129,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which access point mode relies on a centralized controller for management, roaming, and SSID conguration?",
+    "alternativas": [
+      "lightweight mode",
+      "autonomous mode",
+      "bridge mode",
+      "repeater mode"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 130,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which access layer threat-mitigation technique provides security based on identity?",
+    "alternativas": [
+      "Dynamic ARP Inspection",
+      "DHCP snooping",
+      "802.1x",
+      "using a non-default native VLAN"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 131,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which interface mode must be congured to connect the lightweight APs in a centralized architecture?",
+    "alternativas": [
+      "WLAN dynamic",
+      "trunk",
+      "access",
+      "management"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 132,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which switching concept is used to create separate broadcast domains?",
+    "alternativas": [
+      "STP",
+      "VTP",
+      "VLAN",
+      "CSMA/CD"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 133,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a requirement when conguring or removing LAG on a WLC?",
+    "alternativas": [
+      "The incoming and outgoing ports for trac ow must be specied if LAG is enable",
+      "B. The management interface must be reassigned if LAG is disabled",
+      "The controller must be rebooted after enabling or reconguring LAG",
+      "Multiple untagged interfaces on the same port must be supported"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 134,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which type of port is used to connect the wired network when an autonomous AP maps two VLANs to its WLANs?",
+    "alternativas": [
+      "access",
+      "LAG",
+      "trunk",
+      "EtherChannel"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 135,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network administrator needs to aggregate 4 ports into a single logical link which must negotiate layer 2 connectivity to ports on another switch.What must be congured when using active mode on both sides of the connection?",
+    "alternativas": [
+      "LLDP",
+      "LACP",
+      "Cisco vPC",
+      "802 1q trunks"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 136,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer is conguring data and voice services to pass through the same port. The designated switch interface fastethernet0/1 must transmitpackets using the same priority for data when they are received from the access port of the IP phone. Which conguration must be used?",
+    "alternativas": [
+      "interface fastethernet0/1 switchport voice vlan dot1p",
+      "interface fastethernet0/1 switchport priority extend cos 7",
+      "interface fastethernet0/1 switchport voice vlan untagged",
+      "interface fastethernet0/1 switchport priority extend trust"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 137,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which protocol must be implemented to support separate authorization and authentication solutions for wireless APs?",
+    "alternativas": [
+      "RADIUS",
+      "TACACS+",
+      "802.1X",
+      "Kerberos"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 138,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which port type supports the spanning-tree portfast command without additional conguration?",
+    "alternativas": [
+      "trunk ports",
+      "Layer 3 sub interfaces",
+      "Layer 3 main interfaces",
+      "access ports"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 139,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A Cisco engineer must congure a single switch interface to meet these requirements:✑ Accept untagged frames and place them in VLAN 20Accept tagged frames in VLAN 30 when CDP detects a Cisco IP phoneWhich command set must the engineer apply?",
+    "alternativas": [
+      "switchport mode dynamic desirable switchport access vlan 20 switchport trunk allowed vlan 30 switchport voice vlan 30",
+      "switchport mode access switchport access vlan 20 switchport voice vlan 30",
+      "switchport mode dynamic auto switchport trunk native vlan 20 switchport trunk allowed vlan 30 switchport voice vlan 30",
+      "switchport mode trunk switchport access vlan 20 switchport voice vlan 30"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 140,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What does a switch use to build its MAC address table?",
+    "alternativas": [
+      "VTP",
+      "DTP",
+      "ingress trac",
+      "egress trac"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  }
+]

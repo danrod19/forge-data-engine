@@ -1,0 +1,27 @@
+{
+  "rejected_found": 184,
+  "recovered": 184,
+  "still_impossible": 0,
+  "exhibit_or_trash": 0,
+  "output": "C:\\Users\\maria\\Desktop\\ccna\\pdf-curation\\final\\questions_traditional_recovered.json",
+  "partials": [
+    "recovery_partials/recovered_0_60.json",
+    "recovery_partials/recovered_60_120.json",
+    "recovery_partials/recovered_120_184.json"
+  ],
+  "examples_before_after": [
+    {
+      "id": 570,
+      "before": "RFC1918 private IPv4 is reused internally without global uniqueness, conserving public space and reducing direct Internet exposure. Correct choice: provides an added level of protection against Internet exposure. The other options misstate the mechanism, apply to a different technology, or reverse key properties (for example, “allows servers and workstations to communicate across public network b…” is incorrect here).",
+      "after": "Private IPv4 (RFC 1918) is not advertised as public Internet space, so internal hosts are not directly reachable from the global Internet without NAT or a similar edge translation—this reduces direct exposure. The correct answer (“provides an added level of protection against Internet exposure”) captures that protection/conservation role. Option A (“allows servers and workstations to communicate across public network boundaries”) fails because private addresses do not by themselves enable free communication across public boundaries. Option B (“provides a reduction in size of the forwarding table on network routers”) is also incorrect: private addressing does not shrink the global Internet routing table for other enterprises, nor make private-to-private Internet paths routable without tunnels/NAT.",
+      "enunciado": "Which goal is achieved by the implementation of private IPv4 addressing on a network?"
+    },
+    {
+      "id": 571,
+      "before": "Routers install routes by longest match and administrative distance; floating statics use higher AD as backup. Correct choice: switch(config)#lldp port-description. The other options misstate the mechanism, apply to a different technology, or reverse key properties (for example, “switch#lldp port-description…” is incorrect here).",
+      "after": "LLDP TLVs such as port-description are enabled from global configuration on classic IOS (for example `lldp port-description` under config mode), not from privileged exec alone or line mode. Correct: switch(config)#lldp port-description. Option A (“switch#lldp port-description”) uses the wrong mode/prompt, so the TLV is not applied system-wide as required. Option C (“switch(config-line)#lldp port-description”) is similarly invalid syntax/context for this TLV.",
+      "enunciado": "An engineer needs to configure LLDP to send the port description type length value (TLV). What command sequence must be implemented?"
+    }
+  ],
+  "banned_remaining": []
+}

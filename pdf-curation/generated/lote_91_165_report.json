@@ -1,0 +1,54 @@
+{
+  "file": "C:\\Users\\maria\\Desktop\\ccna\\pdf-curation\\generated\\lote_91_165_enriched.json",
+  "traditional": 75,
+  "tickets": 11,
+  "tickets_null": 64,
+  "answer_fixes": [
+    {
+      "id": 133,
+      "from": 1,
+      "to": 2,
+      "reason": "LAG enable/remove on WLC requires controller reboot (not management reassignment as primary requirement)."
+    },
+    {
+      "id": 137,
+      "from": 0,
+      "to": 1,
+      "reason": "Separate authentication and authorization → TACACS+; RADIUS merges them."
+    },
+    {
+      "id": 139,
+      "from": 3,
+      "to": 1,
+      "reason": "IP phone data+voice: access VLAN 20 + voice VLAN 30, not full trunk as best answer."
+    },
+    {
+      "id": 156,
+      "from": 1,
+      "to": 3,
+      "reason": "Legitimate AP alarms stop by classifying as Friendly; containment is for true rogues."
+    },
+    {
+      "id": 158,
+      "from": 2,
+      "to": 3,
+      "reason": "AP join uses CAPWAP Discovery Request; DHCP Discover is for addressing only."
+    }
+  ],
+  "choose_two_ids": [
+    98
+  ],
+  "ticket_ids": [
+    91,
+    93,
+    96,
+    105,
+    117,
+    126,
+    128,
+    153,
+    160,
+    161,
+    163
+  ]
+}

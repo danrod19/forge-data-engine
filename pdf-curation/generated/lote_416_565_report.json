@@ -1,0 +1,44 @@
+{
+  "file": "C:\\Users\\maria\\Desktop\\ccna\\pdf-curation\\generated\\lote_416_565_enriched.json",
+  "traditional": 150,
+  "tickets": 12,
+  "tickets_null": 138,
+  "answer_fixes": [
+    {
+      "id": 417,
+      "from": 3,
+      "to": 1,
+      "reason": "RSA is asymmetric; identical keys describe symmetric crypto."
+    },
+    {
+      "id": 434,
+      "from": 1,
+      "to": 0,
+      "reason": "PUT updates/replaces a resource; it is idempotent, not nonidempotent."
+    },
+    {
+      "id": 435,
+      "from": 3,
+      "to": 2,
+      "reason": "Plane separation simplifies operations/complexity; it does not offload VM creation to data plane."
+    }
+  ],
+  "choose_two_ids": [
+    522
+  ],
+  "ticket_ids": [
+    420,
+    445,
+    459,
+    490,
+    495,
+    498,
+    509,
+    529,
+    538,
+    542,
+    547,
+    556
+  ],
+  "missing_expl": []
+}

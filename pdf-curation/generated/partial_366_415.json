@@ -1,0 +1,1042 @@
+[
+  {
+    "source_id": 366,
+    "traditional": {
+      "id": 366,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How does Rapid PVST+ create a fast loop-free network topology?",
+      "alternativas": [
+        "It uses multiple active paths between end stations.",
+        "It requires multiple links between core switches.",
+        "It maps multiple VLANs into the same spanning-tree instance.",
+        "It generates one spanning-tree instance for each VLAN."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Rapid PVST+ runs one STP instance per VLAN for fast per-VLAN loop-free topology. MST maps VLANs to fewer instances; multiple active paths would be a loop without special multipath tech."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 367,
+    "traditional": {
+      "id": 367,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network administrator plans an update to the WI-FI networks in multiple branch offices. Each location is configured with an SSID called “office”.The administrator wants every user who connects to the SSID at any location to have the same access level. What must be set the same on eachnetwork to meet the requirement?",
+      "alternativas": [
+        "radio policy",
+        "profile name",
+        "NAS-ID configuration",
+        "security policies"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "When the same WLAN profile is reused across branches, NAS-ID (and site identifiers) help AAA distinguish locations. Radio/security may be shared; NAS-ID is the differentiation keyed here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 368,
+    "traditional": {
+      "id": 368,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command enabfiles HTTP access to the Cisco WLC?",
+      "alternativas": [
+        "config network telnet enable",
+        "config network secureweb enable",
+        "config certificate generate webadmin",
+        "config network webmode enable"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "On AireOS WLC CLI, config network webmode enable allows HTTP access to the GUI. secureweb is HTTPS; telnet is CLI; certificate generate is related but not the enable for HTTP mode."
+    },
+    "ticket": {
+      "id": 368,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #10368 — Precisam acessar a GUI do WLC via HTTP (lab). HTTPS ok; HTTP recusado.",
+      "cli_output": "WLC) > show network summary\nWeb Mode.................................... Disable\nSecure Web Mode............................. Enable\n\nWLC) > ping 10.0.0.50\n!!!!!",
+      "alternativas": [
+        "Habilitar config network webmode enable para HTTP na GUI.",
+        "config network telnet enable libera HTTP.",
+        "config network secureweb enable desliga HTTPS e liga HTTP.",
+        "Gerar certificado webadmin substitui webmode."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Web Mode = HTTP GUI. secureweb = HTTPS. Telnet é CLI. Certificado não substitui o enable de webmode."
+    }
+  },
+  {
+    "source_id": 369,
+    "traditional": {
+      "id": 369,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which port state profficesses BPDUs, but does not forward packets or update the address database in Rapid PVST+?",
+      "alternativas": [
+        "blocking",
+        "learning",
+        "listening",
+        "disabled"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "In classic STP states, blocking (or discarding in RSTP) processes BPDUs but does not forward frames or learn MACs. Learning updates MAC table; listening does not learn on classic STP the same way."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 370,
+    "traditional": {
+      "id": 370,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A switch is forwarding a frame out of all interfaces except the interface that received the frame. What is the technical term for this profficess?",
+      "alternativas": [
+        "ARP",
+        "CDP",
+        "flflooding",
+        "multicast"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Unknown unicast/broadcast flooding sends a frame out all ports in the VLAN except the ingress. ARP/CDP/multicast are protocols or traffic types, not the switch action name."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 371,
+    "traditional": {
+      "id": 371,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which switch concept is used to create separate broadcast domains?",
+      "alternativas": [
+        "STP",
+        "VTP",
+        "VLAN",
+        "CSMA/CD"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "VLANs create separate broadcast domains. STP breaks loops; VTP propagates VLAN DB; CSMA/CD is media access."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 372,
+    "traditional": {
+      "id": 372,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How must a switch interface be configured when an AP is in FlexConnect mode?",
+      "alternativas": [
+        "access port",
+        "EtherChannel",
+        "PoE port",
+        "trunk port"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "FlexConnect APs often use access ports when a single management/data VLAN is switched locally; trunk is used when multiple local WLANs/VLANs must be tagged. This bank keys access mode for the FlexConnect interface."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 373,
+    "traditional": {
+      "id": 373,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the root port in STP?",
+      "alternativas": [
+        "It is the port with the highest priority toward the root bridge.",
+        "It is the port on the root switch that leads to the designated port on another switch.",
+        "It is the port that is elected only when the root bridge has precisely one port on a single LAN segment.",
+        "It is the port on a switch with the lowest cost to reach the root bridge."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Root port is the port on a non-root switch with lowest path cost to the root bridge. It is not defined by highest priority toward root."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 374,
+    "traditional": {
+      "id": 374,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When a switch receives a frame from an unknown source MAC address, which action does the switch take with the frame?",
+      "alternativas": [
+        "It sends the frame to ports within the CAM table identied with an unknown source MAC address.",
+        "It floods the frame out all interfaces, including the interface it was received on.",
+        "It associates the source MAC address with the LAN port on which it was received and saves it to the MAC address table.",
+        "It attempts to send the frame back to the source to ensure that the source MAC address is still available for transmissions."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "On unknown source MAC, the switch learns/associates the source MAC to the ingress port in the CAM table (and may flood if dest unknown). It does not flood including the ingress, nor bounce the frame to source as the primary action."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 375,
+    "traditional": {
+      "id": 375,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When the LAG configuration is updated on a Cisco WLC, which additional task must be performed when changes are complete?",
+      "alternativas": [
+        "Reboot the WLC.",
+        "Flush all MAC addresses from the WLC.",
+        "Re-enable the WLC interfaces.",
+        "Re-associate the WLC with the access point."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "After LAG changes on a Cisco WLC, a reboot is required for the port-channel membership to apply cleanly."
+    },
+    "ticket": {
+      "id": 375,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #10375 — LAG recém-alterado no WLC; port-channel no switch não agrega como esperado.",
+      "cli_output": "WLC) > show lag summary\nLAG Enabled\n\nSW1# show etherchannel summary\nGroup  Port-channel  Protocol    Ports\n1      Po1(SU)         -         Gi1/0/1(P) Gi1/0/2(D)\n\n! mudança de interfaces LAG no WLC ainda não refletida após config",
+      "alternativas": [
+        "Reboot do WLC após alteração de LAG para aplicar membership.",
+        "Só flush de MAC no WLC aplica LAG.",
+        "Re-enable interfaces no switch sem reboot no WLC basta sempre.",
+        "Reassociar APs reconfigura LAG do distribution port."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Mudanças de LAG no AireOS WLC exigem reboot do controller. MAC flush/AP reassoc não aplicam o bundle."
+    }
+  },
+  {
+    "source_id": 376,
+    "traditional": {
+      "id": 376,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network engineer starts to implement a new wireless LAN by configuring the authentication server and creating the dynamic interface. Whatmust be performed next to complete the basic configuration?",
+      "alternativas": [
+        "Create the new WLAN and bind the dynamic interface to it.",
+        "configure high availability and redundancy for the access points.",
+        "Enable Telnet and RADIUS access on the management interface.",
+        "Install the management interface and add the management IP."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Basic WLAN bring-up sequence: management connectivity, dynamic interfaces, AAA, then create WLAN and bind the dynamic interface. HA and Telnet are not the immediate next basic step."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 377,
+    "traditional": {
+      "id": 377,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command configures the Cisco WLC to prevent a serial session with the WLC CLI from being automatically logged out?",
+      "alternativas": [
+        "config sessions maxsessions 0",
+        "config serial timeout 9600",
+        "config serial timeout 0",
+        "config sessions timeout 0"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "config serial timeout 0 prevents the serial/console CLI session from timing out automatically on the WLC."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 378,
+    "traditional": {
+      "id": 378,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A Cisco engineer at a new branch office is configuring a wireless network with access points that connect to a controller that is based at corporateheadquarters. Wireless client traffic must terminate at the branch office and access-point survivability is required in the event of a WAN outage.Which access point mode must be selected?",
+      "alternativas": [
+        "Lightweight with local switching disabled",
+        "FlexConnect with local switching enabled",
+        "OceExtend with high availability disabled",
+        "Local with AP fallback enabled"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Branch APs with WAN-limited controller connectivity use FlexConnect with local switching so user data can bridge locally if CAPWAP is constrained."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 379,
+    "traditional": {
+      "id": 379,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is an advantage of using auto mode versus static mode for power allocation when an access point is connected to a PoE switch port?",
+      "alternativas": [
+        "Power policing is enabled at the same time.",
+        "The default level is used for the access point.",
+        "All four pairs of the cable are used.",
+        "It detects the device is a powered device."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "PoE auto mode discovers the powered device class via negotiation (CDP/LLDP/802.3af) rather than static watt allocation. Four-pair is not guaranteed by auto alone."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 380,
+    "traditional": {
+      "id": 380,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a specification for SSIDs?",
+      "alternativas": [
+        "They must include one number and one letter.",
+        "They are a Cisco proprietary security feature.",
+        "They are case sensitive.",
+        "They dene the VLAN on a switch."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "SSIDs are case-sensitive text identifiers. They are not proprietary-only, do not require letter+number, and do not themselves define switch VLANs."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 381,
+    "traditional": {
+      "id": 381,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a reason to configure a trunk port that connects to a WLC distribution port?",
+      "alternativas": [
+        "Provide redundancy if there is a link failure for out-of-band management.",
+        "Allow multiple VLANs to be used in the data path.",
+        "Permit multiple VLANs to provide out-of-band management.",
+        "Eliminate redundancy with a link failure in the data path."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Trunking the WLC distribution ports allows multiple user VLANs in the data path. OOB management is usually service port, not the reason for data trunking."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 382,
+    "traditional": {
+      "id": 382,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which switching feature removes unused MAC addresses from the MAC address table, which allows new MAC addresses to be added?",
+      "alternativas": [
+        "MAC address aging",
+        "MAC move",
+        "MAC address auto purge",
+        "dynamic MAC address learning"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "MAC aging removes inactive dynamic entries so the table can learn new addresses. Move/auto-purge names are not the standard feature title."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 383,
+    "traditional": {
+      "id": 383,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which WLC port connects to a switch to pass normal access-point traffic?",
+      "alternativas": [
+        "redundancy",
+        "service",
+        "console",
+        "distribution system"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Distribution system ports connect the WLC to the switched network for AP and client data paths. Service is OOB; console is serial; redundancy is SSO link."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 384,
+    "traditional": {
+      "id": 384,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the primary purpose of a console port on a Cisco WLC?",
+      "alternativas": [
+        "in-band management via an asynchronous transport",
+        "in-band management via an IP transport",
+        "out-of-band management via an asynchronous transport",
+        "out-of-band management via an IP transport"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "WLC console port is out-of-band management over asynchronous serial. It is not IP transport."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 385,
+    "traditional": {
+      "id": 385,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which port type does a lightweight AP use to connect to the wired network when it is configured in local mode?",
+      "alternativas": [
+        "EtherChannel",
+        "access",
+        "LAG",
+        "trunk"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Local-mode lightweight APs typically attach with an access port in the AP management VLAN; CAPWAP tunnels user VLANs. Trunks are more common in FlexConnect multi-VLAN designs."
+    },
+    "ticket": {
+      "id": 385,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #10385 — AP lightweight local mode não sobe CAPWAP; porta do switch está trunk nativo errado.",
+      "cli_output": "SW1# show running-config interface gi1/0/12\ninterface GigabitEthernet1/0/12\n description AP-LOCAL\n switchport mode trunk\n switchport trunk native vlan 1\n switchport trunk allowed vlan 1,10,20\n\nAP# show capwap client rcb\n! Discovery failing / wrong VLAN",
+      "alternativas": [
+        "Em local mode, usar access na VLAN de management do AP (CAPWAP), não trunk multi-VLAN desnecessário.",
+        "EtherChannel é obrigatório para todo AP local mode.",
+        "LAG no AP resolve discovery.",
+        "Trunk é sempre mandatório em local mode centralizado."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Local mode: AP em access na VLAN de gerência; user VLANs vão no túnel CAPWAP. Trunk multi-VLAN é típico de FlexConnect local switching."
+    }
+  },
+  {
+    "source_id": 386,
+    "traditional": {
+      "id": 386,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which step immediately follows receipt of the EAP success message when session resumption is disabled for an EAP-TLS connection?",
+      "alternativas": [
+        "PMKID caching",
+        "four-way handshake",
+        "802.1X authentication",
+        "EAPOL-key frame"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "After EAP-Success (without session resumption shortcuts), the 4-way handshake derives PTK/GTK for data protection."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 387,
+    "traditional": {
+      "id": 387,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a reason to implement LAG on a Cisco WLC?",
+      "alternativas": [
+        "Allow for stateful failover between WLCs.",
+        "Increase security by encrypting management frames.",
+        "Increase the available throughput on the link.",
+        "Enable the connected switch ports to use different Layer 2 configurations."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "LAG increases aggregate throughput and provides link redundancy between WLC and switch. It is not primarily inter-WLC stateful failover or management-frame encryption."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 388,
+    "traditional": {
+      "id": 388,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A wireless access point is needed and must meet these requirements:• “zero-touch” deployed and managed by a WLC• profficess only real-time MAC functionality• used in a split-MAC architectureWhich access point type must be used?",
+      "alternativas": [
+        "mesh",
+        "autonomous",
+        "lightweight",
+        "cloud-based"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Zero-touch lightweight APs join a WLC via CAPWAP and are centrally managed. Autonomous is self-managed; mesh/cloud are other deployment models."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 389,
+    "traditional": {
+      "id": 389,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which interface is used for out-of-band management on a WLC?",
+      "alternativas": [
+        "management",
+        "virtual",
+        "dynamic",
+        "service port"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "The service port is the WLC out-of-band management Ethernet interface. Management is in-band; virtual is for mobility/webauth; dynamic maps WLANs."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 390,
+    "traditional": {
+      "id": 390,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network engineer must migrate a router loopback interface to the IPv6 address space. If the current IPv4 address of the interface is10.54.73.1/32, and the engineer configures IPv6 address 0:0:0:0:0:ffff:a36:4901, which prefix length must be used?",
+      "alternativas": [
+        "/64",
+        "/96",
+        "/124",
+        "/128"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "A single IPv4 loopback host maps cleanly to IPv6 /128. /64 is a subnet, not a single host loopback equivalent."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 391,
+    "traditional": {
+      "id": 391,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A Cisco engineer notices that two OSPF neighbors are connected using a crossover Ethernet cable. The neighbors are taking too long to becomefully adjacent. Which command must be issued under the interface configuration on each router to reduce the time required for the adjacency toreach the FULL state?",
+      "alternativas": [
+        "ip ospf dead-interval 40",
+        "ip ospf network broadcast",
+        "ip ospf priority 0",
+        "ip ospf network point-to-point"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Two routers on Ethernet with crossover still default to OSPF broadcast (DR election). ip ospf network point-to-point removes DR/BDR on that link."
+    },
+    "ticket": {
+      "id": 391,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #10391 — Dois roteadores OSPF ligados por cabo crossover Ethernet elegem DR/BDR; desejam ponto a ponto.",
+      "cli_output": "R1# show ip ospf interface gi0/0\nNetwork Type BROADCAST, Cost: 1\nState DR, Priority 1\nDesignated Router (ID) 1.1.1.1\nBackup Designated router (ID) 2.2.2.2",
+      "alternativas": [
+        "ip ospf network point-to-point no link elimina eleição DR/BDR.",
+        "ip ospf network broadcast remove DR.",
+        "priority 0 em ambos impede adjacência total.",
+        "dead-interval 40 sozinho muda o network type."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "point-to-point é o network type correto para link /30 sem DR. broadcast força DR/BDR."
+    }
+  },
+  {
+    "source_id": 392,
+    "traditional": {
+      "id": 392,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the benefit of using FHRP?",
+      "alternativas": [
+        "reduced ARP traffic on the network",
+        "balancing traffic across multiple gateways in proportion to their loads",
+        "higher degree of availability",
+        "reduced management overhead on network routers"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "FHRP increases first-hop availability with virtual gateway redundancy. GLBP can load-balance; classic HSRP benefit stated here is availability."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 393,
+    "traditional": {
+      "id": 393,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Why is a first-hop redundancy protocol implemented?",
+      "alternativas": [
+        "to enable multiple switches to operate as a single unit",
+        "to provide load-sharing for a multilink segment",
+        "to prevent loops in a network",
+        "to protect against default gateway failures"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "FHRP is implemented to protect against default gateway failures. Loop prevention is STP; stacking is multichassis; multilink is bundling."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 394,
+    "traditional": {
+      "id": 394,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a similarity between global and unique local IPv6 addresses?",
+      "alternativas": [
+        "They use the same profficess for subnetting.",
+        "They are part of the multicast IPv6 group type.",
+        "They are routable on the global internet.",
+        "They are allocated by the same organization."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Global unicast and unique local addresses both use the same /64 subnetting practices for interface IDs. ULA is not global Internet routable; different allocation authorities."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 395,
+    "traditional": {
+      "id": 395,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer must configure the IPv6 address 2001:0db8:0000:0000:0700:0003:400F:572B on the serial0/0 interface of the HQ router and wants tocompress it for easier configuration. Which command must be issued on the router interface?",
+      "alternativas": [
+        "ipv6 address 2001:db8::700:3:400F:572B",
+        "ipv6 address 2001:db8:0::700:3:4F:572B",
+        "ipv6 address 2001::db8:0000::700:3:400F:572B",
+        "ipv6 address 2001:0db8::7:3:4F:572B"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Compress IPv6 by removing leading zeros and replacing longest zero run with :: once: 2001:db8::700:3:400F:572B. Options that alter hex digits or double :: incorrectly are wrong."
+    },
+    "ticket": {
+      "id": 395,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #10395 — Precisam comprimir 2001:0db8:0000:0000:0700:0003:400F:572B na Serial0/0.",
+      "cli_output": "R1(config-if)# ipv6 address 2001:0db8:0000:0000:0700:0003:400F:572B/64\nR1# show ipv6 interface serial0/0 | include address\n  2001:DB8:0:0:700:3:400F:572B, subnet is 2001:DB8:0:0:700:3:400F:572B/64",
+      "alternativas": [
+        "Forma comprimida correta: 2001:db8::700:3:400F:572B.",
+        "2001:db8:0::700:3:4F:572B preserva todos os hex originais.",
+        "Dois :: na mesma linha são válidos se curtos.",
+        "0700 pode virar :7: sem perder nibble."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Remover zeros à esquerda e colapsar a maior sequência de zeros com um único ::. Não alterar dígitos hex (4F ≠ 400F)."
+    }
+  },
+  {
+    "source_id": 396,
+    "traditional": {
+      "id": 396,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of IPv4 address type helps to conserve the globally unique address classes?",
+      "alternativas": [
+        "loopback",
+        "multicast",
+        "private",
+        "public"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Private IPv4 conserves public/global unique addresses. Multicast/loopback/public do not serve that conservation role the same way."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 397,
+    "traditional": {
+      "id": 397,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When deploying a new network that includes both Cisco and third-party network devices, which redundancy protocol avoids the interruption ofnetwork traffic if the default gateway router fails?",
+      "alternativas": [
+        "VRRP",
+        "FHRP",
+        "GLBP",
+        "HSRP"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "In multivendor networks, VRRP (open standard) is the FHRP of choice. HSRP/GLBP are Cisco-oriented."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 398,
+    "traditional": {
+      "id": 398,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which Cisco proprietary protocol ensures traffic recovers immediately, transparently, and automatically when edge devices or access circuits fail?",
+      "alternativas": [
+        "FHRP",
+        "VRRP",
+        "HSRP",
+        "SLB"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "HSRP is Cisco proprietary first-hop redundancy that fails over the active gateway transparently. VRRP is open; FHRP is the category name."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 399,
+    "traditional": {
+      "id": 399,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer must configure a core router with a oating static default route to the backup router at 10.200.0.2. Which command meets therequirements?",
+      "alternativas": [
+        "ip route 0.0.0.0 0.0.0.0 10.200.0.2 1",
+        "ip route 0.0.0.0 0.0.0.0 10.200.0.2 10",
+        "ip route 0.0.0.0 0.0.0.0 10.200.0.2",
+        "ip route 0.0.0.0 0.0.0.0 10.200.0.2 oating"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Floating static default uses a higher AD than the primary (e.g., AD 10 if primary is better). AD 1 or default 1 would compete as primary; 'floating' is not a keyword."
+    },
+    "ticket": {
+      "id": 399,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #10399 — Default estática de backup para 10.200.0.2 não “flutua”; compete com a primária.",
+      "cli_output": "R1# show running-config | include ip route 0.0.0.0\nip route 0.0.0.0 0.0.0.0 10.100.0.2\nip route 0.0.0.0 0.0.0.0 10.200.0.2 1\n\nR1# show ip route 0.0.0.0\nRouting entry for 0.0.0.0/0\n  Known via \"static\", distance 1, metric 0\n  * 10.100.0.2\n  * 10.200.0.2",
+      "alternativas": [
+        "Usar AD maior no backup, ex. ip route 0.0.0.0 0.0.0.0 10.200.0.2 10.",
+        "AD 1 no backup é o padrão de floating static.",
+        "Sem AD explícito o backup fica com AD 255 e nunca sobe.",
+        "Palavra-chave floating existe na sintaxe IOS."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Floating static = AD maior que a primária. AD 1 iguala e load-share/compete. Não há keyword floating."
+    }
+  },
+  {
+    "source_id": 400,
+    "traditional": {
+      "id": 400,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A router received three destination prefixes: 10.0.0.0/8, 10.0.0.0/16, and 10.0.0.0/24. When the show ip route command is executed, which output does it return?",
+      "alternativas": [
+        "Gateway of last resort is 172.16.1.1 to network 0.0.0.0\nO E2 10.0.0.0/8 [110/5] via 192.168.1.1, 00:01:00, Ethernet0\nO E2 10.0.0.0/16 [110/5] via 192.168.2.1, 00:01:00, Ethernet1\nO E2 10.0.0.0/24 [110/5] via 192.168.3.1, 00:01:00, Ethernet2",
+        "Gateway of last resort is 172.16.1.1 to network 0.0.0.0\nO E2 10.0.0.0/8 [110/5] via 192.168.1.1, 00:01:00, Ethernet0",
+        "Gateway of last resort is 172.16.1.1 to network 0.0.0.0\nO E2 10.0.0.0/24 [110/5] via 192.168.3.1, 00:01:00, Ethernet2",
+        "Gateway of last resort is 172.16.1.1 to network 0.0.0.0\nO E2 10.0.0.0/16 [110/5] via 192.168.2.1, 00:01:00, Ethernet1\nO E2 10.0.0.0/24 [110/5] via 192.168.3.1, 00:01:00, Ethernet2"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Different prefix lengths are separate routes; show ip route lists all three OSPF E2 prefixes (/8, /16, /24), not only the longest. Longest match is used at forwarding time per packet."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 401,
+    "traditional": {
+      "id": 401,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the role of community strings in SNMP operations?",
+      "alternativas": [
+        "It translates alphanumeric MIB output values to numeric values.",
+        "It passes the Active Directory username and password that are required for device access.",
+        "It serves as a sequence tag on SNMP traffic messages.",
+        "It serves as a password to protect access to MIB objects."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "SNMP community strings act like passwords (v1/v2c) controlling access to MIB objects. They are not AD credentials or sequence tags."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 402,
+    "traditional": {
+      "id": 402,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which syslog severity level is considered the most severe and results in the system being considered unusable?",
+      "alternativas": [
+        "Error",
+        "Emergency",
+        "Alert",
+        "Critical"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Syslog severity 0 Emergency is the most severe (system unusable). Alert/Critical/Error are less severe numbers higher in the scale."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 403,
+    "traditional": {
+      "id": 403,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "The clients and DHCP server reside on different subnets. Which command must be used to forward requests and replies between clients on the10.10.0.1/24 subnet and the DHCP server at 192.168.10.1?",
+      "alternativas": [
+        "ip route 192.168.10.1",
+        "ip dhcp address 192.168.10.1",
+        "ip default-gateway 192.168.10.1",
+        "ip helper-address 192.168.10.1"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "ip helper-address on the client-facing L3 interface relays DHCP to a server on another subnet."
+    },
+    "ticket": {
+      "id": 403,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #10403 — Clientes VLAN 20 sem DHCP; servidor 192.168.10.1 em outra subnet.",
+      "cli_output": "R1# show ip interface gi0/0.20\nInternet address is 10.20.0.1/24\nHelper address is not set\n\nR1# show running-config interface gi0/0.20\ninterface GigabitEthernet0/0.20\n encapsulation dot1Q 20\n ip address 10.20.0.1 255.255.255.0",
+      "alternativas": [
+        "Configurar ip helper-address 192.168.10.1 na interface dos clientes.",
+        "ip route 192.168.10.1 substitui o relay DHCP.",
+        "ip default-gateway no roteador relaya DHCPDISCOVER.",
+        "ip dhcp address não existe; use só no servidor."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "DHCP relay = ip helper-address no gateway da subnet cliente. Rotas/default-gateway não relayam broadcasts DHCP."
+    }
+  },
+  {
+    "source_id": 404,
+    "traditional": {
+      "id": 404,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which IP header eld is changed by a Cisco device when QoS marking is enabled?",
+      "alternativas": [
+        "ECN",
+        "Header Checksum",
+        "Type of Service",
+        "DSCP"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "QoS marking modifies the Type of Service byte (DSCP/IPP). The header checksum is recalculated when the header changes but is not the QoS marking field itself."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 405,
+    "traditional": {
+      "id": 405,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A DHCP pool has been created with the name CONTROL. The pool uses the next to last usable IP address as the default gateway for the DHCPclients. The server is located at 172.16.32.15. What is the next step in the profficess for clients on the 192.168.52.0/24 subnet to reach the DHCPserver?",
+      "alternativas": [
+        "ip helper-address 172.16.32.15",
+        "ip default-gateway 192.168.52.253",
+        "ip forward-protocol udp 137",
+        "ip default-network 192.168.52.253"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "For a /24 pool, usable .1–.254; next-to-last usable gateway is .253, configured as default-router/default-gateway in the DHCP context of this item. helper-address is relay, not pool gateway."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 406,
+    "traditional": {
+      "id": 406,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the purpose of classifying network traffic in QoS?",
+      "alternativas": [
+        "configures traffic-matching rufifiles on network devices",
+        "services traffic according to its class",
+        "identifies the type of traffic that will receive a particular treatment",
+        "writes the class identifier of a packet to a dedicated eld in the packet header"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Classification identifies which traffic belongs to which class for subsequent QoS treatment. Marking writes values; queuing services classes; matching rules implement classification."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 407,
+    "traditional": {
+      "id": 407,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the purpose of configuring different levels of syslog for different devices on the network?",
+      "alternativas": [
+        "to set the severity of syslog messages from each device",
+        "to control the number of syslog messages from different devices that are stored locally",
+        "to identify the source from which each syslog message originated",
+        "to rate-limit messages for different severity levels from each device"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Different trap/severity levels per device control how much and which severity of syslog each device emits. Facility identifies process origin; rate-limit is separate."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 408,
+    "traditional": {
+      "id": 408,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a purpose of traffic shaping?",
+      "alternativas": [
+        "It enabfifiles policy-based routing.",
+        "It enabfifiles dynamic ow identification.",
+        "It provides best-effort service.",
+        "It limits bandwidth usage."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Traffic shaping limits the offered rate by buffering excess toward a configured bandwidth. It is not primarily PBR or best-effort definition."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 409,
+    "traditional": {
+      "id": 409,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineering team asks an implementer to configure syslog for warning conditions and error conditions. Which command does the implementerconfigure to achieve the desired result?",
+      "alternativas": [
+        "logging trap 5",
+        "logging trap 2",
+        "logging trap 3",
+        "logging trap 4"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "logging trap 4 sets severity to warning (4), including errors (3) and more severe. trap 5 is notice (more verbose); 2/3 are critical/error only thresholds differently."
+    },
+    "ticket": {
+      "id": 409,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #10409 — Syslog remoto deve incluir warning e error, sem inundar com notice/informational.",
+      "cli_output": "R1# show logging | include Trap\nTrap logging: level informational, 1200 message lines logged\n\nR1# show running-config | include logging trap\nlogging trap informational",
+      "alternativas": [
+        "logging trap 4 (warnings) inclui severities 0–4 (emergency…warning/error).",
+        "logging trap 5 é mais restrito que 4 e exclui warnings.",
+        "logging trap 2 envia também informational.",
+        "trap 3 exclui errors e só manda critical."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Trap level N envia mensagens com severity ≤ N. Level 4 warning cobre errors (3) e acima. Level 5 notice é mais verboso."
+    }
+  },
+  {
+    "source_id": 410,
+    "traditional": {
+      "id": 410,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which WLC management connection type is vulnerable to man-in-the-middle attacks?",
+      "alternativas": [
+        "console",
+        "Telnet",
+        "SSH",
+        "HTTPS"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Telnet is cleartext and vulnerable to MITM/credential theft. SSH/HTTPS encrypt; console is local physical."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 411,
+    "traditional": {
+      "id": 411,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of encryption does WPA1 use for data protection?",
+      "alternativas": [
+        "PEAP",
+        "TKIP",
+        "AES",
+        "EAP"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "WPA (WPA1) uses TKIP for data protection. AES-CCMP is WPA2; PEAP/EAP are authentication methods."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 412,
+    "traditional": {
+      "id": 412,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network engineer must configure an access list on a new Cisco IOS router. The access list must deny HTTP traffic to network 10.125.128.32/27from the 192.168.240.0/20 network, but it must allow the 192.168.240.0/20 network to reach the rest of the 10.0.0.0/8 network. Whichconfiguration must the engineer apply?",
+      "alternativas": [
+        "ip access-list extended deny_outbound\n10 permit ip 192.168.240.0 255.255.240.0 10.0.0.0 255.0.0.0\n20 deny tcp 192.168.240.0 255.255.240.0 10.125.128.32 255.255.255.224 eq 443\n30 permit ip any any",
+        "ip access-list extended deny_outbound\n10 deny tcp 192.168.240.0 0.0.15.255 10.125.128.32 0.0.0.31 eq 80\n20 permit ip 192.168.240.0 0.0.15.255 10.0.0.0 0.255.255.255\n30 deny ip any any log",
+        "ip access-list extended deny_outbound\n10 deny tcp 10.125.128.32 255.255.255.224 192.168.240.0 255.255.240.0 eq 443\n20 deny tcp 192.168.240.0 255.255.240.0 10.125.128.32 255.255.255.224 eq 443\n30 permit ip 192.168.240.0 255.255.240.0 10.0.0.0 255.0.0.0",
+        "ip access-list extended deny_outbound\n10 deny tcp 192.168.240.0 0.0.15.255 any eq 80\n20 deny tcp 192.168.240.0 0.0.15.255 10.125.128.32 0.0.0.31 eq 80\n30 permit ip 192.168.240.0 0.0.15.255 10.0.0.0 0.255.255.255"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Correct ACL order: deny HTTP (tcp/80) from 192.168.240.0/20 to 10.125.128.32/27 with proper wildcards, then permit the rest of 10.0.0.0/8, then deny/log as needed. Wrong order (permit first), wrong mask style, or wrong ports/direction fail the requirement."
+    },
+    "ticket": {
+      "id": 412,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #10412 — ACL deve negar HTTP de 192.168.240.0/20 para 10.125.128.32/27 e permitir restante de 10.0.0.0/8.",
+      "cli_output": "R1# show access-lists deny_outbound\nExtended IP access list deny_outbound\n    10 permit ip 192.168.240.0 0.0.15.255 10.0.0.0 0.255.255.255\n    20 deny tcp 192.168.240.0 0.0.15.255 10.125.128.32 0.0.0.31 eq www\n! permit genérico casa primeiro — HTTP nunca é negado\n\nR1# show ip interface gi0/1 | include access\n  Outgoing access list is deny_outbound",
+      "alternativas": [
+        "Colocar deny tcp ... eq 80 antes do permit para 10.0.0.0/8, com wildcards corretos /20 e /27.",
+        "Permit any no topo é best practice para esse requisito.",
+        "Usar máscara 255.255.240.0 no lugar de wildcard em extended ACL IOS clássica.",
+        "Negar eq 443 atende “HTTP” na definição da questão."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "ACLs são top-down: deny HTTP específico deve vir antes do permit amplo para 10/8. Wildcards: /20 → 0.0.15.255, /27 → 0.0.0.31. HTTP = tcp/80."
+    }
+  },
+  {
+    "source_id": 413,
+    "traditional": {
+      "id": 413,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the definition of backdoor malware?",
+      "alternativas": [
+        "malicious code that is installed onto a computer to allow access by an unauthorized user",
+        "malicious program that is used to launch other malicious programs",
+        "malicious code that infects a user machine and then uses that machine to send spam",
+        "malicious code with the main purpose of downloading other malicious code"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "A backdoor is malicious code that opens unauthorized access for later control. Other options describe droppers/worms/downloaders more than the backdoor definition."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 414,
+    "traditional": {
+      "id": 414,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What does WPA3 provide in wireless networking?",
+      "alternativas": [
+        "backward compatibility with WPA and WPA2",
+        "safeguards against brute force attacks with SAE",
+        "increased security and requirement of a complex configuration",
+        "optional Protected Management Frame negotiation"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "WPA3 SAE protects better against offline brute-force attacks on personal networks. Backward compatibility and PMF details are secondary to the SAE safeguard named here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 415,
+    "traditional": {
+      "id": 415,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which global command encrypts all passwords in the running configuration?",
+      "alternativas": [
+        "service password-encryption",
+        "enable password-encryption",
+        "enable secret",
+        "password-encrypt"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "service password-encryption encrypts/obscures plaintext passwords in the running configuration. enable secret hashes the enable password only; enable password-encryption is not a standard global command name."
+    },
+    "ticket": {
+      "id": 415,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #10415 — Auditoria: senhas line em claro no show run.",
+      "cli_output": "R1# show running-config | include password|secret\nenable secret 5 $1$mERr$...\nline vty 0 4\n password LabClearText\n! service password-encryption ausente",
+      "alternativas": [
+        "Aplicar service password-encryption para ofuscar senhas plaintext na config.",
+        "enable password-encryption é o comando global padrão.",
+        "enable secret criptografa todas as senhas de linha automaticamente.",
+        "password-encrypt é sinônimo válido no IOS."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "service password-encryption aplica type 7 às senhas em claro. enable secret só no enable. Comandos inventados não existem."
+    }
+  }
+]

@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CCNA Forge
 
-## Getting Started
+Plataforma de estudos gamificada para a certificação **Cisco CCNA 200-301 v2.0**.
 
-First, run the development server:
+Visual **Hacker/Terminal Moderno** · Mobile First · Next.js 15 SPA
+
+## Stack
+
+- **Next.js 15** (App Router)
+- **Tailwind CSS** + **shadcn/ui**
+- **Framer Motion** (animações e feedback)
+- **JetBrains Mono** (tipografia terminal)
+- **Lucide React** (ícones)
+
+## Funcionalidades
+
+- **Trilha / Ticket de Suporte** — sintoma + saída CLI, 4 alternativas e explicações
+- **Simulado** — banco de ~700 questões traditional, timer opcional e revisão de erros
+- **Estudo por Tópicos** — 6 domínios do CCNA 200-301 com progresso e prática filtrada
+- **Sobre a Prova** — guia do exame (duração, formatos, pesos, mudança v2.0)
+- **Sistema de vidas** (3/5) com paywall ao zerar
+- **Streak** e botão **Upgrade PRO**
+- Navegação inferior: **Trilha · Simulado · Estudo · Sobre a Prova**
+
+## Como rodar
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Pipeline do banco de questões
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run fix-ocr        # limpo → corrigido (OCR)
+npm run build-premium  # corrigido → premium (150–200 melhores)
+```
 
-## Learn More
+| Arquivo | Uso |
+|---------|-----|
+| `questions_bulk_limpo.json` | Extração bruta |
+| `questions_bulk_corrigido.json` | Backup OCR corrigido |
+| `questions_simulado_premium.json` | **Simulado** (preferencial) |
 
-To learn more about Next.js, take a look at the following resources:
+## Estrutura
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/                  # App Router (layout + page SPA)
+├── components/
+│   ├── layout/           # TopBar, BottomNav
+│   ├── ticket/           # TicketDeSuporte, TerminalCLI, Explicacao, PaywallModal
+│   ├── simulado/         # SimuladoMode
+│   ├── estudo/           # Estudo por Tópicos
+│   ├── sobre/            # Sobre a Prova
+│   └── ui/               # shadcn primitives
+├── data/
+│   ├── questions.ts              # Tickets mock
+│   ├── domains.ts                # Domínios CCNA
+│   ├── questions_bulk_limpo.json
+│   └── questions_bulk_corrigido.json
+├── types/question.ts
+└── lib/
+scripts/
+└── fix-ocr-questions.mjs # Correção inteligente de OCR
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tema
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Token        | Valor     |
+|-------------|-----------|
+| Background  | slate-950 |
+| Accent      | #22c55e   |
+| Secondary   | #22d3ee   |
+| PRO / Gold  | #fbbf24   |

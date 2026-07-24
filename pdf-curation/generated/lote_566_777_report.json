@@ -1,0 +1,54 @@
+{
+  "file": "C:\\Users\\maria\\Desktop\\ccna\\pdf-curation\\generated\\lote_566_777_enriched.json",
+  "traditional": 212,
+  "tickets": 12,
+  "tickets_null": 200,
+  "answer_fixes": [
+    {
+      "id": 596,
+      "from": 0,
+      "to": 2,
+      "reason": "Traffic shaping limits bandwidth by queuing excess; fair queuing is a different scheduler concept."
+    },
+    {
+      "id": 653,
+      "from": 2,
+      "to": 0,
+      "reason": "PortFast brings edge ports to forwarding immediately; UplinkFast is uplink recovery."
+    },
+    {
+      "id": 690,
+      "from": 2,
+      "to": 1,
+      "reason": "FHRP provides resilient default gateway service to hosts; loop-free topology is STP."
+    },
+    {
+      "id": 770,
+      "from": 1,
+      "to": 2,
+      "reason": "Valid set is enable secret + line passwords with login; 'enable secret privilege 15' is invalid."
+    }
+  ],
+  "choose_two_ids": [
+    586,
+    588
+  ],
+  "ticket_ids": [
+    574,
+    579,
+    598,
+    602,
+    630,
+    655,
+    685,
+    727,
+    739,
+    761,
+    770,
+    777
+  ],
+  "id_range": [
+    566,
+    777
+  ]
+}

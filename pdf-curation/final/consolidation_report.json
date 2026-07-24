@@ -1,0 +1,107 @@
+{
+  "batches": [
+    "lote_01_enriched.json",
+    "lote_166_265_enriched.json",
+    "lote_16_90_enriched.json",
+    "lote_266_415_enriched.json",
+    "lote_416_565_enriched.json",
+    "lote_566_777_enriched.json",
+    "lote_91_165_enriched.json"
+  ],
+  "traditional": {
+    "before": 777,
+    "after": 511,
+    "discarded": 266,
+    "by_reason": {
+      "template": 184,
+      "exhibit": 2,
+      "expl_short": 16,
+      "alts_lt_4": 0,
+      "no_enunciado": 0,
+      "missing": 0,
+      "duplicate": 64
+    },
+    "template_exhibit": 186
+  },
+  "tickets": {
+    "before": 82,
+    "after": 81,
+    "discarded": 1,
+    "by_reason": {
+      "no_sintoma": 0,
+      "no_cli": 0,
+      "alts_lt_4": 0,
+      "expl_short": 1,
+      "missing": 0,
+      "duplicate": 0
+    }
+  },
+  "outputs": {
+    "traditional": "C:\\Users\\maria\\Desktop\\ccna\\pdf-curation\\final\\questions_traditional_enriched.json",
+    "tickets": "C:\\Users\\maria\\Desktop\\ccna\\pdf-curation\\final\\tickets_from_bulk.json"
+  },
+  "examples": {
+    "traditional": [
+      {
+        "id": 1,
+        "question_type": "traditional",
+        "isPremium": true,
+        "enunciado": "How do TCP and UDP differ in the way that they establish a connection between two endpoints?",
+        "alternativas": [
+          "TCP uses the three-way handshake, and UDP does not guarantee message delivery.",
+          "TCP uses synchronization packets, and UDP uses acknowledgment packets.",
+          "UDP provides reliable message transfer, and TCP is a connectionless protocol.",
+          "UDP uses SYN, SYN ACK, and FIN bits in the frame header while TCP uses SYN, SYN ACK, and ACK bits."
+        ],
+        "resposta_correta": 0,
+        "explicacao_profunda": "TCP is connection-oriented: before data transfer it completes a three-way handshake (SYN → SYN-ACK → ACK) so both endpoints agree on sequence numbers and readiness. UDP is connectionless and sends datagrams without a setup phase or delivery guarantee. Option B is incomplete and misleading — UDP does not use ACK packets for transport reliability. Option C reverses the roles: UDP is unreliable/connectionless; TCP is reliable/connection-oriented. Option D confuses layers and protocols: SYN/FIN/ACK are TCP segment flags in the transport header, not UDP frame bits, and UDP does not implement that handshake."
+      },
+      {
+        "id": 2,
+        "question_type": "traditional",
+        "isPremium": true,
+        "enunciado": "In which way does a spine-and-leaf architecture allow for scalability in a network when additional access ports are required?",
+        "alternativas": [
+          "A spine switch and a leaf switch can be added with redundant connections between them.",
+          "A spine switch can be added with at least 40 GB uplinks.",
+          "A leaf switch can be added with connections to every spine switch.",
+          "A leaf switch can be added with a single connection to a core spine switch."
+        ],
+        "resposta_correta": 2,
+        "explicacao_profunda": "In a spine-and-leaf fabric, every leaf connects to every spine. To add access ports you deploy a new leaf and uplink it to all spines, preserving equal-cost multipath and predictable east-west latency. Adding only a spine does not by itself create new access ports for endpoints. A single uplink from leaf to one spine breaks the full-mesh leaf-to-spine design and creates a bottleneck/single path. Fixed uplink speeds (e.g. 40 Gbps) are a capacity choice, not the scalability mechanism when you need more edge ports."
+      }
+    ],
+    "tickets": [
+      {
+        "id": 1,
+        "question_type": "ticket",
+        "isPremium": true,
+        "sintoma": "Chamado #7104 — O servidor de monitoramento em R1 Gi0/1 deveria receber um GUA IPv6 derivado do prefixo 2001:DB8:5:112::/64 e do MAC da interface (EUI-64). O link-local sobe, mas o endereço global esperado (baseado no MAC) não aparece. A equipe colou um endereço estático incompleto e pede o comando correto para gerar o IID automaticamente a partir do prefixo e do MAC.",
+        "cli_output": "R1# show ipv6 interface gi0/1\nGigabitEthernet0/1 is up, line protocol is up\n  IPv6 is enabled, link-local address is FE80::C801:1AFF:FE23:4501\n  No global unicast address is configured\n  ND reachable time is 30000 milliseconds\n  ND advertised reachable time is 0 milliseconds\n\nR1# show running-config interface gi0/1\ninterface GigabitEthernet0/1\n description MONITOR-SRV\n ipv6 enable\n ! (sem ipv6 address ... eui-64)\n\nR1# show interfaces gi0/1\nGigabitEthernet0/1 is up, line protocol is up\n  Hardware is CSR vNIC, address is c801.1a23.4501 (bia c801.1a23.4501)",
+        "alternativas": [
+          "Configurar ipv6 address 2001:DB8:5:112::/64 eui-64 na Gi0/1 para gerar o IID a partir do MAC com o prefixo especificado.",
+          "Configurar apenas ipv6 address dhcp e esperar que o MAC seja enviado como prefixo pelo servidor.",
+          "Configurar ipv6 address 2001:DB8:5:112::2/64 link-local para forçar o GUA a partir do MAC.",
+          "Manter só ipv6 enable; o GUA EUI-64 é criado automaticamente sem prefixo configurado."
+        ],
+        "resposta_correta": 0,
+        "explicacao_profunda": "Com apenas ipv6 enable, a interface obtém link-local (FE80::/10) mas não instala GUA. Para um endereço global a partir de um prefixo que você especifica e do MAC da interface, o comando correto é ipv6 address 2001:DB8:5:112::/64 eui-64 — o IOS monta o interface ID no formato EUI-64 a partir do MAC c801.1a23.4501. DHCPv6 não usa o prefixo+MAC da forma pedida. Marcar um /64 como link-local está semanticamente errado (link-local é FE80::/10). Sem anunciar/configurar prefixo, EUI-64 sozinho não materializa GUA."
+      },
+      {
+        "id": 2,
+        "question_type": "ticket",
+        "isPremium": true,
+        "sintoma": "Chamado #7112 — Link ponto a ponto entre R-CORE e R-EDGE deveria usar um /30. Após a mudança, o ping entre os peers falha intermitentemente e a equipe de WAN reporta máscara inconsistente. R-CORE ficou com 209.165.201.1; precisam validar qual combinação de IP utilizável + máscara /30 está correta no peer.",
+        "cli_output": "R-EDGE# show running-config interface gi0/0\ninterface GigabitEthernet0/0\n description to R-CORE\n ip address 209.165.201.2 255.255.255.248\n!\nR-EDGE# show ip interface brief\nInterface              IP-Address      OK? Method Status                Protocol\nGigabitEthernet0/0     209.165.201.2   YES NVRAM  up                    up\n\nR-CORE# show running-config interface gi0/0\ninterface GigabitEthernet0/0\n description to R-EDGE\n ip address 209.165.201.1 255.255.255.252\n!\nR-EDGE# show ip route 209.165.201.1\n% Network not in table\n\nR-EDGE# ping 209.165.201.1\nSending 5, 100-byte ICMP Echos to 209.165.201.1, timeout is 2 seconds:\n.....\nSuccess rate is 0 percent (0/5)",
+        "alternativas": [
+          "Corrigir R-EDGE para ip address 209.165.201.2 255.255.255.252 (/30); a máscara /29 atual coloca o peer fora da mesma sub-rede utilizável.",
+          "Usar 10.2.1.3 255.255.255.252 em R-EDGE; .3/30 é sempre o melhor host em qualquer /30.",
+          "Manter 255.255.255.248 e mudar só o IP para 172.16.1.4, que já é um /30 válido.",
+          "Trocar ambos para 192.168.1.1 255.255.255.248; /29 é o padrão Cisco para links serial ponto a ponto."
+        ],
+        "resposta_correta": 0,
+        "explicacao_profunda": "R-CORE está em 209.165.201.1/30 (máscara 255.255.255.252). R-EDGE está em .2 com 255.255.255.248 (/29), então o cálculo de rede/broadcast diverge e o peer deixa de ser tratado como on-link corretamente. A combinação utilizável /30 correta no peer é 209.165.201.2 255.255.255.252. 10.2.1.3/30 é broadcast da rede 10.2.1.0/30. 172.16.1.4 com /29 não atende o requisito /30. /29 não é o padrão obrigatório para P2P — o desenho pedido é /30."
+      }
+    ]
+  }
+}

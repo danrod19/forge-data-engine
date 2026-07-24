@@ -1,0 +1,508 @@
+[
+  {
+    "source_id": 141,
+    "traditional": {
+      "id": 141,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command entered on a switch configured with Rapid PVST+ listens and learns for a specific time period?",
+      "alternativas": [
+        "switch(config)#spanning-tree vlan 1 priority 4096",
+        "switch(config)#spanning-tree vlan 1 hello-time 10",
+        "switch(config)#spanning-tree vlan 1 max-age 6",
+        "switch(config)#spanning-tree vlan 1 forward-time 20"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "spanning-tree vlan <id> forward-time sets the listening and learning duration (forward delay) used by timers in PVST/Rapid PVST compatibility modes. priority elects root. hello-time is BPDU interval. max-age is BPDU aging. Only forward-time matches “listens and learns for a specific time period.”"
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 142,
+    "traditional": {
+      "id": 142,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What must a network administrator consider when deciding whether to configure a new wireless network with APs in autonomous mode or APs running in cloud-based mode?",
+      "alternativas": [
+        "Autonomous mode APs are less dependent on an underlay but more complex to maintain than APs in cloud-based mode.",
+        "Cloud-based mode APs rely on underlays and are more complex to maintain than APs in autonomous mode.",
+        "Cloud-based mode APs are easy to deploy but harder to automate than APs in autonomous mode.",
+        "Autonomous mode APs are easy to deploy and automate than APs in cloud-based mode."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Autonomous APs do not depend on a cloud/controller underlay for basic operation but are harder to maintain at scale. Cloud-managed APs need connectivity to the management service and are usually easier to maintain centrally. The other statements reverse complexity or automation facts."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 143,
+    "traditional": {
+      "id": 143,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which state is bypassed in Rapid PVST+ when PortFast is enabled on a port?",
+      "alternativas": [
+        "blocking",
+        "forwarding",
+        "learning",
+        "discarding"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "With PortFast, Rapid PVST+ edge ports skip intermediate learning delays and move quickly to forwarding; the learning state is bypassed on that edge path. Forwarding is the desired end state. Discarding/blocking may still apply to non-edge roles, but the classic teaching point is skipping learning/listening."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 144,
+    "traditional": {
+      "id": 144,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a function of store-and forward switching?",
+      "alternativas": [
+        "It reduces latency by eliminating error checking within the frame",
+        "It produces an effective level of error-free network traffic using CRCs.",
+        "It buffers frames and forwards regardless of errors within the frames.",
+        "It forwards a frame by checking only the destination MAC address"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Store-and-forward buffers the entire frame and uses FCS/CRC to drop damaged frames, improving effective error-free delivery at the cost of latency. Cut-through reduces latency by starting forward earlier and does less complete error checking. Forwarding regardless of errors is not store-and-forward."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 145,
+    "traditional": {
+      "id": 145,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which WLC interface provides out-of-band management in the Cisco Unified Wireless Network Architecture?",
+      "alternativas": [
+        "AP-Manager",
+        "service port",
+        "dynamic",
+        "virtual"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "The WLC service port is the out-of-band management interface in Cisco Unified Wireless Network architecture. AP-Manager handles AP CAPWAP. Dynamic interfaces map WLANs/VLANs. Virtual is for mobility/web auth redirection."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 146,
+    "traditional": {
+      "id": 146,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which mode must be set for APs to communicate to a Wireless LAN Controller using the Control and Provisioning of Wireless Access Points(CAPWAP) protocol?",
+      "alternativas": [
+        "route",
+        "bridge",
+        "lightweight",
+        "autonomous"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "CAPWAP is used by lightweight APs to communicate with a WLC. Autonomous APs do not use CAPWAP to a controller for primary management. Bridge/route are not the CAPWAP client mode names."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 147,
+    "traditional": {
+      "id": 147,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which switch technology establishes a network connection immediately when it is plugged in?",
+      "alternativas": [
+        "PortFast",
+        "BPDU guard",
+        "UplinkFast",
+        "BackboneFast"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "PortFast places edge ports into forwarding immediately (with STP still running). BPDU Guard protects PortFast ports. UplinkFast/BackboneFast speed up recovery after failures but do not make every plugged cable forward instantly like PortFast on an edge port."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 148,
+    "traditional": {
+      "id": 148,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command on a port enters the forwarding state immediately when a PC is connected to it?",
+      "alternativas": [
+        "switch(config)#spanning-tree portfast default",
+        "switch(config)#spanning-tree portfast BPDU guard default",
+        "switch(config-if)#spanning-tree portfast trunk",
+        "switch(config-if)#no spanning-tree portfast"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "spanning-tree portfast default enables PortFast globally on all access ports so a connected PC reaches forwarding quickly. bpduguard default is protection, not the PortFast enable itself. portfast trunk is for trunk edges. no portfast disables it."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 149,
+    "traditional": {
+      "id": 149,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which channel-group mode must be configured when multiple distribution interfaces connected to a WLC are bundled?",
+      "alternativas": [
+        "Channel-group mode passive.",
+        "Channel-group mode on.",
+        "Channel-group mode desirable.",
+        "Channel-group mode active."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "WLC LAG bundles are static EtherChannels: switch side must use channel-group mode on (no PAgP/LACP negotiation with classic AireOS LAG). active/passive/desirable are negotiation modes not used for standard WLC LAG."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 150,
+    "traditional": {
+      "id": 150,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which Layer 2 switch function encapsulates packets for different VLANs so that the packets traverse the same port and maintain trafficseparation between the VLANs?",
+      "alternativas": [
+        "VLAN marking",
+        "VLAN numbering",
+        "VLAN DSCP",
+        "VLAN tagging"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "VLAN tagging (802.1Q) inserts a tag so multiple VLANs share a trunk while keeping traffic separated. DSCP is L3. VLAN ID numbering alone does not encapsulate. “Marking” is ambiguous QoS language."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 151,
+    "traditional": {
+      "id": 151,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which value is the unique identifier that an access point uses to establish and maintain wireless connectivity to wireless network devices?",
+      "alternativas": [
+        "VLAN ID",
+        "SSID",
+        "RFID",
+        "WLAN ID"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "The SSID is the network name clients use to discover and maintain association with the WLAN. VLAN ID is wired segmentation. RFID is asset tracking. WLAN ID is a controller object index, not the RF identifier clients scan."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 152,
+    "traditional": {
+      "id": 152,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer must configure neighbor discovery between the company router and an ISP.What is the next step to complete the configuration if the ISP uses a third-party router?",
+      "alternativas": [
+        "Enable LLDP globally.",
+        "Disable CDP on gi0/0.",
+        "Enable LLDP TLVs on the ISP router.",
+        "Disable auto-negotiation."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "With a third-party ISP router, enable LLDP globally (lldp run) for standards-based neighbor discovery. CDP may be disabled toward the ISP as hygiene, but the positive next step to complete multivendor discovery is LLDP. You do not configure the ISP router from the enterprise exam item perspective."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 153,
+    "traditional": {
+      "id": 153,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What does a switch do when it receives a frame whose destination MAC address is missing from the MAC address table?",
+      "alternativas": [
+        "It changes the checksum of the frame to a value that indicates an invalid frame.",
+        "It updates the CAM table with the destination MAC address of the frame.",
+        "It appends the table with a static entry for the MAC and shuts down the port.",
+        "It floods the frame unchanged across all remaining ports in the incoming VLAN."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "If the destination MAC is unknown, the switch floods the frame out all ports in that VLAN except the ingress port. It learns from source MACs, not by writing the unknown destination as a learned entry. It does not alter checksums or shut ports for ordinary unknown unicasts."
+    },
+    "ticket": {
+      "id": 153,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8153 — Servidor novo na VLAN 50; primeiros pings geram tráfego em todas as portas da VLAN até o MAC ser aprendido.",
+      "cli_output": "SW-DC# show mac address-table dynamic vlan 50\nVlan    Mac Address       Type        Ports\n50      0011.2233.4401    DYNAMIC     Gi1/0/10\n! servidor 0011.2233.99aa ainda ausente\n\nSW-DC# show interfaces gi1/0/11 status\nPort      Name       Status       Vlan\nGi1/0/11  NEW-SRV    connected    50",
+      "alternativas": [
+        "Sem MAC de destino na tabela, o switch flooda o frame inalterado nas demais portas da VLAN de ingresso.",
+        "O switch grava o destino na CAM antes de encaminhar e nunca flooda.",
+        "O switch err-disable a porta quando o destino é desconhecido.",
+        "O frame é descartado até existir entrada estática manual."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Comportamento clássico de unknown unicast flooding na VLAN. Depois que o servidor responde, o source MAC é aprendido e o unicast passa a ser filtrado para a porta correta."
+    }
+  },
+  {
+    "source_id": 154,
+    "traditional": {
+      "id": 154,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "By default, how long will the switch continue to know a workstation MAC address after the workstation stops sending traffic?",
+      "alternativas": [
+        "200 seconds",
+        "300 seconds",
+        "600 seconds",
+        "900 seconds"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Default MAC address aging time on Cisco Catalyst switches is 300 seconds. After 300s without frames from that source, the dynamic entry is removed."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 155,
+    "traditional": {
+      "id": 155,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A project objective is to minimize the association time to the different access points as mobile devices move around the office. The ideal solution must cover numerous devices and device types, including laptops, mobile phones, tablets and wireless printers. What must be configured?",
+      "alternativas": [
+        "802.11v BSS Max Idle Service",
+        "802.11v Disassociation Imminent",
+        "802.11ax BSS configure",
+        "802.11k neighbor List Dual Band"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "802.11v features such as Disassociation Imminent help steer/roam clients more intelligently to reduce sticky-client delays as devices move. 802.11k neighbor lists also assist roaming; this item keys 802.11v Disassociation Imminent. 802.11ax BSS config is not the specific association-time minimizer named here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 156,
+    "traditional": {
+      "id": 156,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A WLC sends alarms about a rogue AP, and the network administrator verifies that the alarms are caused by a legitimate autonomous AP. How must the alarms be stopped for the MAC address of the AP?",
+      "alternativas": [
+        "Remove the AP from WLC management",
+        "Place the AP into manual containment.",
+        "Manually remove the AP from Pending state.",
+        "Set the AP Class Type to Friendly."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Legitimate APs seen as rogues should be classified as Friendly (or internal) so alarms stop without containment. Manual containment is for actual threats and can disrupt a legitimate AP. Removing from WLC management or Pending state does not correctly clear a rogue alarm for an outside autonomous AP MAC."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 157,
+    "traditional": {
+      "id": 157,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is one reason to implement LAG on a Cisco WLC?",
+      "alternativas": [
+        "to increase security and encrypt management frames",
+        "to enable connected switch ports to failover and use different VLANs",
+        "to provide link redundancy and load balancing",
+        "to allow for stateful and link-state failover"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "LAG on a WLC bundles multiple physical distribution ports for higher throughput and link redundancy with load balancing toward the neighboring switch. It is not primarily a management-frame encryption feature nor per-port VLAN failover magic."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 158,
+    "traditional": {
+      "id": 158,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When an access point is seeking to join wireless LAN controller, which message is sent to the AP-Manager interface?",
+      "alternativas": [
+        "Discovery response",
+        "DHCP request",
+        "DHCP discover",
+        "Discovery request"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "During join, the AP sends CAPWAP Discovery Request messages toward candidate controllers (including AP-Manager addressing as applicable). Discovery Response comes from the WLC. DHCP Discover/Request obtain an IP address for the AP, not the CAPWAP join message to AP-Manager."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 159,
+    "traditional": {
+      "id": 159,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "After installing a new Cisco ISE server which task must the engineer perform on the Cisco WLC to connect wireless clients on a specific VLAN based on their credentials?",
+      "alternativas": [
+        "Disable the LAG Mode on Next Reboot.",
+        "Enable the Event Driven RRM.",
+        "Enable the Allow AAA Override.",
+        "Enable the Authorize MIC APs against auth-list or AAA"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Allow AAA Override lets RADIUS/ISE return attributes (Interface/VLAN, ACL, QoS) that override WLAN defaults so users land on credential-specific VLANs. LAG and EDRRM are unrelated. MIC AP auth-list is about AP authorization, not client VLAN assignment."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 160,
+    "traditional": {
+      "id": 160,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Router R1 must send all traffic without a matching routing-table entry to 192.168.1.1. Which configuration accomplishes this task?",
+      "alternativas": [
+        "R1#config t R1(config)#ip routing R1(config)#ip route default-route 192.168.1.1",
+        "R1#config t R1(config)#ip routing R1(config)#ip route 192.168.1.1 0.0.0.0 0.0.0.0",
+        "R1#config t R1(config)#ip routing R1(config)#ip route 0.0.0.0 0.0.0.0 192.168.1.1",
+        "R1#config t R1(config)#ip routing R1(config)#ip default-gateway 192.168.1.1"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "A default route is ip route 0.0.0.0 0.0.0.0 192.168.1.1. ip default-gateway is for non-routing hosts. Invented syntax default-route is invalid. Swapping network/mask/next-hop order is wrong."
+    },
+    "ticket": {
+      "id": 160,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8160 — R1 não encaminha destinos desconhecidos à Internet edge 192.168.1.1. Rotas específicas ok; tudo mais falha.",
+      "cli_output": "R1# show ip route\nGateway of last resort is not set\n      10.0.0.0/8 is variably subnetted...\nC        10.1.1.0/24 is directly connected, GigabitEthernet0/0\n\nR1# show running-config | include ip route|default\nip route 10.2.2.0 255.255.255.0 10.1.1.2\n! sem default route",
+      "alternativas": [
+        "Configurar ip route 0.0.0.0 0.0.0.0 192.168.1.1 para gateway of last resort.",
+        "Usar ip default-gateway 192.168.1.1 em roteador com ip routing (substitui default route).",
+        "ip route 192.168.1.1 0.0.0.0 0.0.0.0 instala default válida.",
+        "ip route default-route 192.168.1.1 é a sintaxe IOS padrão."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Default route = 0.0.0.0/0 via next-hop. Em roteador com routing ativo, ip default-gateway não substitui a tabela de roteamento como em host. Sintaxes invertidas/inventadas não instalam gateway of last resort."
+    }
+  },
+  {
+    "source_id": 161,
+    "traditional": {
+      "id": 161,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A packet is destined for 10.10.1.22. Which static route does the router choose to forward the packet?",
+      "alternativas": [
+        "ip route 10.10.1.0 255.255.255.240 10.10.255.1",
+        "ip route 10.10.1.20 255.255.255.252 10.10.255.1",
+        "ip route 10.10.1.16 255.255.255.252 10.10.255.1",
+        "ip route 10.10.1.20 255.255.255.254 10.10.255.1"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Longest-match routing: 10.10.1.22 falls in 10.10.1.20/30 ( .20–.23 ) which is more specific than 10.10.1.0/28. 10.10.1.16/30 is .16–.19 (does not include .22). 10.10.1.20/31 is .20–.21 only. Therefore 10.10.1.20/30 wins."
+    },
+    "ticket": {
+      "id": 161,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8161 — Pacotes a 10.10.1.22 escolhem next-hop inesperado. Várias estáticas overlap existem.",
+      "cli_output": "R1# show ip route 10.10.1.22\nRouting entry for 10.10.1.20/30\n  Known via \"static\", distance 1, metric 0\n  Routing Descriptor Blocks:\n  * 10.10.255.1\n\nR1# show running-config | include ip route 10.10.1\nip route 10.10.1.0 255.255.255.240 10.10.255.1\nip route 10.10.1.20 255.255.255.252 10.10.255.1\nip route 10.10.1.16 255.255.255.252 10.10.255.1\nip route 10.10.1.20 255.255.255.254 10.10.255.1",
+      "alternativas": [
+        "Longest match: 10.10.1.20/30 cobre .20–.23 e inclui .22; vence /28 e não-cobertura de /30.16 e /31.",
+        "Sempre vence a rota com maior máscara decimal listada primeiro no config.",
+        "10.10.1.16/30 inclui .22 porque /30 cobre 16 endereços.",
+        "10.10.1.20/31 inclui .22 (.20 e .21 only é falso)."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "IOS usa longest-match. .22 ∈ 10.10.1.20/30 (.20–.23). /28 também cobre mas é menos específico. .16/30 = .16–.19. /31 = .20–.21. Logo a estática /30 .20 é a escolhida."
+    }
+  },
+  {
+    "source_id": 162,
+    "traditional": {
+      "id": 162,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "R1 has learned route 10.10.10.0/24 via numerous routing protocols. Which route is instafilled?",
+      "alternativas": [
+        "route with the next hop that has the highest IP",
+        "route with the lowest cost",
+        "route with the lowest administrative distance",
+        "route with the shortest prefix length"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "When the same prefix is learned via multiple routing sources, Cisco IOS installs the route with the lowest administrative distance. Metrics are compared within the same protocol. Prefix length would mean different prefixes (longest match), not equal /24s. Highest next-hop IP is irrelevant."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 163,
+    "traditional": {
+      "id": 163,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When a oating static route is configured, which action ensures that the backup route is used when the primary route fails?",
+      "alternativas": [
+        "The administrative distance must be higher on the primary route so that the backup route becomes secondary.",
+        "The default-information originate command must be configured for the route to be instafifilled into the routing table.",
+        "The oating static route must have a lower administrative distance than the primary route so it is used as a backup.",
+        "The oating static route must have a higher administrative distance than the primary route so it is used as a backup"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "A floating static route is a backup with a higher administrative distance than the primary route so it is installed only when the primary is withdrawn. Lower AD would make it preferred, not backup. default-information originate is OSPF/BGP redistribution of defaults, not the floating static mechanism."
+    },
+    "ticket": {
+      "id": 163,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8163 — Rota primária OSPF para 172.16.0.0/16 cai, mas o backup estático não entra na tabela.",
+      "cli_output": "R1# show running-config | include ip route 172.16\nip route 172.16.0.0 255.255.0.0 10.0.0.2 1\n\nR1# show ip route 172.16.0.0\nRouting entry for 172.16.0.0/16\n  Known via \"ospf 1\", distance 110, metric 20\n\n! link OSPF down:\nR1# show ip route 172.16.0.0\n% Network not in table\n! estático também some da candidatura efetiva — AD 1 competia como primária, não floating",
+      "alternativas": [
+        "Floating static precisa de AD maior que a primária (ex. 210 > 110 OSPF) para ficar de backup.",
+        "Floating static deve ter AD menor que OSPF para ser backup.",
+        "default-information originate é obrigatório para qualquer floating static.",
+        "AD maior na rota primária é o mecanismo de floating static."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Com AD 1 o estático é sempre preferido a OSPF (110) quando presente; não é floating. Configure ip route ... 210 (ou similar) para instalar só quando a primária sumir. default-information originate não define floating static."
+    }
+  },
+  {
+    "source_id": 164,
+    "traditional": {
+      "id": 164,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A user configured OSPF and advertised the Gigabit Ethernet interface in OSPF. By default, to which type of OSPF network does this interface belong?",
+      "alternativas": [
+        "point-to-multipoint",
+        "point-to-point",
+        "broadcast",
+        "nonbroadcast"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "By default, OSPF treats Ethernet/GigabitEthernet as network type broadcast (DR/BDR election). Point-to-point/nonbroadcast/point-to-multipoint require explicit configuration or different media."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 165,
+    "traditional": {
+      "id": 165,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which attribute does a router use to select the best path when two or more different routes to the same destination exist from two different routing protocols?",
+      "alternativas": [
+        "dual algorithm",
+        "metric",
+        "administrative distance",
+        "hop count"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Between different routing protocols, administrative distance selects which source is trusted for a given prefix. Metrics are protocol-specific and not directly comparable across protocols. Hop count is RIP’s metric. Dual algorithm refers to EIGRP internals, not inter-protocol selection."
+    },
+    "ticket": null
+  }
+]

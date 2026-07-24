@@ -1,0 +1,702 @@
+[
+  {
+    "id": 466,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of private IPv4 addressing?",
+    "alternativas": [
+      "is used without allocation from a regional internet authority",
+      "is used when trac on the subnet must traverse a site-to-site VPN to an outside organization",
+      "reduces the forwarding table on network routers",
+      "provides unlimited address ranges"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 467,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which interface condition is occurring in this output?",
+    "alternativas": [
+      "bad NIC",
+      "high throughput",
+      "queueing",
+      "broadcast storm"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 468,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of private IPv4 addressing?",
+    "alternativas": [
+      "is used when the ISP requires the new subnet to be advertised to the internet for web services",
+      "provides unlimited address ranges",
+      "is used when the network has multiple endpoint listeners",
+      "alleviates the shortage of IPv4 addresses"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 469,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of private IPv4 addressing?",
+    "alternativas": [
+      "is used when trac on the subnet must traverse a site-to-site VPN to an outside organization",
+      "allows endpoints to communicate across public network boundaries",
+      "is used on hosts that communicate only with other internal hosts",
+      "reduces network complexity"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 470,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of private IPv4 addressing?",
+    "alternativas": [
+      "traverses the internet when an outbound ACL is applied",
+      "alleviates the shortage of IPv4 addresses",
+      "is used when the ISP requires the new subnet to be advertised to the internet for web services",
+      "enables secure connectivity over the internet"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 471,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which interface condition is occurring in this output?",
+    "alternativas": [
+      "broadcast storm",
+      "duplex mismatch",
+      "high throughput",
+      "queueing"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 472,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of private IPv4 addressing?",
+    "alternativas": [
+      "is used when the ISP requires the new subnet to be advertised to the internet for web services",
+      "allows multiple companies to use the same addresses without conict",
+      "is used on the external interface of a rewall",
+      "allows endpoints to communicate across public network boundaries"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 473,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of an SSID in wireless networks?",
+    "alternativas": [
+      "identies an access point on a WLAN",
+      "uses the password to connect to an access point",
+      "uses policies to prevent unauthorized users",
+      "uses a case-sensitive text string"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 474,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of private IPv4 addressing?",
+    "alternativas": [
+      "reduces network complexity",
+      "is used on hosts that communicate only with other internal hosts",
+      "simplies the addressing in the network",
+      "reduces network maintenance costs"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 475,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of encryption in wireless networks?",
+    "alternativas": [
+      "identies an access point on a WLAN",
+      "uses the password to connect to an access point",
+      "uses integrity checks to identify forgery attacks in the frame",
+      "uses authentication protocols to secure a network"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 476,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of private IPv4 addressing?",
+    "alternativas": [
+      "simplies the addressing in the network",
+      "complies with PCI regulations",
+      "reduces the forwarding table on network routers",
+      "is used on hosts that communicate only with other internal hosts"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 477,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of an SSID in wireless networks?",
+    "alternativas": [
+      "eliminates network piggybacking",
+      "prompts a user for a login ID",
+      "broadcasts a beacon signal to announce its presence by default",
+      "must include a combination of letters and numbers"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 478,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of encryption in wireless networks?",
+    "alternativas": [
+      "provides increased protection against spyware",
+      "prompts a user for a login ID",
+      "uses ciphers to detect and prevent zero-day network attacks",
+      "prevents the interception of data as it transits a network"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 479,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of an SSID in wireless networks?",
+    "alternativas": [
+      "intercepts data threats before they attack a network",
+      "encodes connections at the sending and receiving ends",
+      "broadcasts a beacon signal to announce its presence by default",
+      "identies an access point on a WLAN"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 480,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of private IPv4 addressing?",
+    "alternativas": [
+      "composed of up to 65,536 available addresses",
+      "issued by IANA in conjunction with an autonomous system number",
+      "used without tracking or registration",
+      "traverse the Internet when an outbound ACL is applied"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 481,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How does MAC learning function on a switch?",
+    "alternativas": [
+      "broadcasts frames to all ports without queueing",
+      "sends an ARP request to locate unknown destinations",
+      "adds unknown source MAC addresses to the address table",
+      "sends a retransmission request when a new frame is received"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 482,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which interface condition is occurring in this output?",
+    "alternativas": [
+      "broadcast storm",
+      "collisions",
+      "high throughput",
+      "duplex mismatch"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 483,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of an SSID in wireless networks?",
+    "alternativas": [
+      "converts electrical current to radio waves",
+      "uses policies to prevent unauthorized users",
+      "broadcasts a beacon signal to announce its presence by default",
+      "prompts a user for a login ID"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 484,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which interface is used to send trac to the destination network?",
+    "alternativas": [
+      "G0/9",
+      "G0/20",
+      "G0/16",
+      "G0/11"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 485,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is represented by the word \"fe5/42\" within this JSON schema?",
+    "alternativas": [
+      "array",
+      "object",
+      "value",
+      "key"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 486,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How does frame switching function on a switch?",
+    "alternativas": [
+      "rewrites the source and destination MAC address",
+      "forwards frames to a neighbor port using CDP",
+      "forwards known destinations to the destination port",
+      "is disabled by default on all interfaces and VLANs"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 487,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of an SSID in wireless networks?",
+    "alternativas": [
+      "uses policies to prevent unauthorized users",
+      "identies an access point on a WLAN",
+      "prompts a user for a login ID",
+      "associates a name to a WLAN"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 488,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is represented by the word \"port\" within this JSON schema?",
+    "alternativas": [
+      "value",
+      "array",
+      "key",
+      "object"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 489,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which interface condition is occurring in this output?",
+    "alternativas": [
+      "collisions",
+      "broadcast storm",
+      "duplex mismatch",
+      "queueing"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 490,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 1A network engineer must create a diagram of a multivendor network.which command must be configured on the Cisco devices so that the topology of the networkcan be mapped?",
+    "alternativas": [
+      "Device(config)#lldp run",
+      "Device(config)#cdp run",
+      "Device(config)# cdp enable",
+      "Device(config)# flow-sampler-map topology"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 491,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 2Which feature on the Cisco Wireless LAN Controller when enabled restricts management access from specific networks?",
+    "alternativas": [
+      "CPU ACL",
+      "TACACS",
+      "Flex ACL",
+      "RADIUS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 492,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 3When a site-to-site VPN is used, which protocol is responsible for the transport of user data?",
+    "alternativas": [
+      "IKEv2",
+      "IKEv1",
+      "IPsec",
+      "MD5"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 493,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 4How do TCP and UDP differ in the way that they establish a connection between two endpoints？",
+    "alternativas": [
+      "TCP use the three-way handshake,and UDP dose no guarantee message delivery",
+      "TCP use synchronization packets,and UDP uses acknowledgement packets",
+      "UDP provides reliable message transfer,and TCP is a connectionless protocol.",
+      "UDP use SYN,SYN ACK,and FIN bits in the frame header while TCP uses SYN,SYN ACK,and ACK bis."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 494,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 8What benefit does controller-based networking provide versus traditional networking?",
+    "alternativas": [
+      "provides an added layer of security to protect from DDoS attacks",
+      "combines control and data plane functionality on a single device to minimize latency--- PAGE 1016 ---",
+      "moves from a two-tier to a three-tier network architecture to provide maximum redundancy",
+      "allows configuration and monitoring of the network from one centralized point"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 495,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 9When a floating static route is configured, which action ensures that the backup route is used when the primary route fails?",
+    "alternativas": [
+      "The floating static route must have a higher administrative distance than the primary route so it is used as a backup",
+      "The administrative distance must be higher on the primary route so that the backup route becomes secondary.",
+      "The floating static route must have a lower administrative distance than the primary route so it is used as a backup",
+      "The default-information originate command must be configured for the route to be installed into the routing table"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 496,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 13what is the expected outcome when an EUI-64 address is generated?",
+    "alternativas": [
+      "The seventh bit of original MAC address of the interface is inverted",
+      "The interface ID is configured as a random 64-bit value",
+      "The characters FE80 are inserted at the beginning of the MAC address of the interface",
+      "The MAC address of the interface is used as the interface ID without modification"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 497,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 14Which function does an SNMP agent perform?",
+    "alternativas": [
+      "It manages routing between Layer 3 devices in a network,",
+      "It coordinates user authentication between a network device and a TACACS+ or RADIUS server.",
+      "It sends information about MIB variables in response to requests from the NMS.--- PAGE 1018 ---",
+      "It requests information from remote network nodes about catastrophic system events."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 498,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 18Which command prevents passwords from being stored in the configuration as plaintext on a router or switch?",
+    "alternativas": [
+      "enable secret",
+      "service password-encryption--- PAGE 1020 ---",
+      "username Cisco password encrypt",
+      "enable password"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 499,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 19R1 has learned route 10.10.10.0/24 via numerous routing protocols,which route is installed?",
+    "alternativas": [
+      "route with the lowest cost",
+      "route with the shortest prefix length",
+      "route with the next hop that has the highest IP",
+      "route with the lowest administrative distance"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 500,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 20which network allows devices to communicate without the need to access the internet?",
+    "alternativas": [
+      "172.9.0.0/16",
+      "172.28.0.0/16",
+      "192.0.0.0/18",
+      "209.165.201.0/24"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 501,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 21Which attribute does a router use to select the best path when two or more different routes to the same destination exist from twodifferent routing protocols?",
+    "alternativas": [
+      "dual algorithm",
+      "metric",
+      "administrative distance",
+      "hop count--- PAGE 1021 ---"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 502,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 22which command must be entered when a device is configured as an NTP server?",
+    "alternativas": [
+      "ntp master",
+      "ntp sever",
+      "ntp authenticate",
+      "ntp peer"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 503,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 23When OSPF learns multiple paths to a network, how does it select a route?",
+    "alternativas": [
+      "It multiple the active K value by 256 to calculate the route with the lowest metri",
+      "B. For each existing interface, it adds the metric from the source router to the destination to calculate the route with the lowestbandwidth.",
+      "It divides a reference bandwidth of 100 Mbps by the actual bandwidth of the existing interface to calculate the router with the lowestcost.",
+      "It count the umber of hops between the source router and the destination to determine the router with the lowest metric"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 504,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 24What is a characteristic of spine-and-leaf architecture?",
+    "alternativas": [
+      "It provides variable latency.",
+      "Each link between leaf switches allows for higher bandwidth.",
+      "Each device is separated by the same number of hops.",
+      "It provides greater predictability on STP blocked ports."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 505,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 26Which action must be taken to assign a global unicast IPv6 address on an interface that is derived from the MAC address of that interface?",
+    "alternativas": [
+      "explicitly assign a link-local address",
+      "disable the EUI-64 bit process",
+      "enable SLAAC on an interface",
+      "configure a stateful DHCPv6 server on the network"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 506,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 28In which way does a spine-and-leaf architecture allow for scalability in a network when additional access ports are required?",
+    "alternativas": [
+      "A spine switch and a leaf switch can be added with redundant connections between them",
+      "A spine switch can be added with at least 40 GB uplinks",
+      "A leaf switch can be added with connections to every spine switch",
+      "A leaf switch can be added with a single connection to a core spine switch"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 507,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 30Which configuration is needed to generate an RSA key for SSH on a router?",
+    "alternativas": [
+      "Configure the version of SSH",
+      "Configure VTY access.",
+      "Create a user with a password",
+      "Assign a DNS domain name"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 508,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 31Which API is used in controller-based architectures to interact with edge devices?",
+    "alternativas": [
+      "overlay",
+      "northbound",
+      "underlay",
+      "southbound"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 509,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 32Router R1 must send all traffic without a matching routing-table entry to 192.168.1.1.which configuration accomplishes this task?",
+    "alternativas": [
+      "R1# config tR1(config)# ip routingR1(config)# ip route default-route 192.168.1.1",
+      "R1# config tR1(config)# ip routingR1(config)# ip route 0.0.0.0 0.0.0.0 192.168.1.1",
+      "R1# config tR1(config)# ip routingR1(config)# ip route 192.168.1.1 0.0.0.0 0.0.0.0",
+      "R1# config t--- PAGE 1025 ---R1(config)# ip routingR1(config)# ip default-gateway 192.168.1.1"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 510,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 33What is a benefit of using a Cisco Wireless LAN Controller?",
+    "alternativas": [
+      "Central AP management requires more complex configurations",
+      "Unique SSIDs cannot use the same authentication method",
+      "It supports autonomous and lightweight APs",
+      "It eliminates the need to configure each access point individually"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 511,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 34An engineer must configure a /30 subnet between two routers.which usable IP address and subnet mask combination meets this criteria?",
+    "alternativas": [
+      "interface e0/0description to HQ-A370:98968ip address 10.2.1.3 255.255.255.252",
+      "interface e0/0description to HQ-A370:98968ip address 192.168.1.1 255.255.255.248",
+      "interface e0/0description to HQ-A370:98968ip address 172.16.1.4 255.255.255.248",
+      "interface e0/0description to HQ-A370:98968ip address 209.165.201.2 255.255.255.252"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 512,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 35Which unified access point mode continues to serve wireless clients after losing connectivity to the Cisco Wireless LAN Controller?",
+    "alternativas": [
+      "sniffer",
+      "mesh",
+      "flexconnect",
+      "local"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 513,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 37which WPA3 enhancement protects against hackers viewing traffic on the Wi-Fi network?",
+    "alternativas": [
+      "TKIP encryption",
+      "SAE encryption",
+      "AES encryption",
+      "scrambled encryption key"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 514,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 42What is a difference between RADIUS and TACACS+?",
+    "alternativas": [
+      "TACACS+ encrypts only password information and RADIUS encrypts the entire payload",
+      "RADIUS logs all commands that are entered by the administrator, but TACACS+ logs only start, stop, and interim commands",
+      "RADIUS is most appropriate for dial authentication, but TACACS+ can be used for multiple types of authentication",
+      "TACACS+ separates authentication and authorization, and RADIUS merges them"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 515,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 45What is an advantage of Cisco DNA Center versus traditional campus device management?",
+    "alternativas": [
+      "It supports numerous extensibility options including cross-domain adapters and third-party SDKs.",
+      "It supports high availability for management functions when operating in cluster mode.--- PAGE 1033 ---",
+      "It enables easy autodiscovery of network elements m a brownfield deployment.",
+      "It is designed primarily to provide network assurance"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  }
+]

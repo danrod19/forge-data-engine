@@ -1,0 +1,98 @@
+{
+  "file": "C:\\Users\\maria\\Desktop\\ccna\\pdf-curation\\generated\\lote_266_415_enriched.json",
+  "traditional": 150,
+  "tickets": 14,
+  "tickets_null": 136,
+  "answer_fixes": [
+    {
+      "id": 268,
+      "from": 1,
+      "to": 0,
+      "reason": "Physical access control = cameras/facilities; console password is logical access."
+    },
+    {
+      "id": 270,
+      "from": 3,
+      "to": 1,
+      "reason": "Valid set is enable secret + line passwords with login; 'enable secret privilege 15' is invalid syntax."
+    },
+    {
+      "id": 276,
+      "from": 0,
+      "to": 3,
+      "reason": "Perfect Forward Secrecy is a WPA3 feature, not WEP."
+    },
+    {
+      "id": 327,
+      "from": 3,
+      "to": 1,
+      "reason": "Controller↔applications is northbound; REST is appropriate; OpenFlow is southbound."
+    },
+    {
+      "id": 342,
+      "from": 2,
+      "to": 0,
+      "reason": "L3 switches route between VLANs (inter-VLAN routing)."
+    },
+    {
+      "id": 345,
+      "from": 1,
+      "to": 3,
+      "reason": "Nonoverlapping channels primarily reduce interference."
+    },
+    {
+      "id": 346,
+      "from": 1,
+      "to": 3,
+      "reason": "SSID identifies a wireless network for clients, not a wired network."
+    },
+    {
+      "id": 376,
+      "from": 3,
+      "to": 0,
+      "reason": "After dynamic interface + auth server, next basic step is create WLAN and bind the interface."
+    },
+    {
+      "id": 384,
+      "from": 3,
+      "to": 2,
+      "reason": "WLC console is out-of-band management via asynchronous serial, not IP."
+    },
+    {
+      "id": 385,
+      "from": 0,
+      "to": 1,
+      "reason": "Lightweight AP in local mode typically uses an access port on the AP management VLAN."
+    },
+    {
+      "id": 393,
+      "from": 2,
+      "to": 3,
+      "reason": "FHRP protects against default gateway failure, not STP loops."
+    },
+    {
+      "id": 404,
+      "from": 1,
+      "to": 2,
+      "reason": "QoS marking changes the ToS field (DSCP/IPP); checksum may be recalculated but is not the marking field."
+    }
+  ],
+  "choose_two_ids": [],
+  "ticket_ids": [
+    270,
+    275,
+    284,
+    290,
+    368,
+    375,
+    385,
+    391,
+    395,
+    399,
+    403,
+    409,
+    412,
+    415
+  ],
+  "missing_expl": []
+}

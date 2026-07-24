@@ -1,0 +1,352 @@
+[
+  {
+    "id": 141,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which command entered on a switch congured with Rapid PVST+ listens and learns for a specic time period?",
+    "alternativas": [
+      "switch(cong)#spanning-tree vlan 1 priority 4096",
+      "switch(cong)#spanning-tree vlan 1 hello-time 10",
+      "switch(cong)#spanning-tree vlan 1 max-age 6",
+      "switch(cong)#spanning-tree vlan 1 forward-time 20"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 142,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What must a network administrator consider when deciding whether to congure a new wireless network with APs in autonomous mode or APsrunning in cloud- based mode?",
+    "alternativas": [
+      "Autonomous mode APs are less dependent on an underlay but more complex to maintain than APs in cloud-based mode.",
+      "Cloud-based mode APs relay on underlays and are more complex to maintain than APs in autonomous mode.",
+      "Cloud-based mode APs are easy to deploy but harder to automate than APs in autonomous mode.",
+      "Autonomous mode APs are easy to deploy and automate than APs in cloud-based mode."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 143,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which state is bypassed in Rapid PVST+ when PortFast is enabled on a port?",
+    "alternativas": [
+      "blocking",
+      "forwarding",
+      "learning",
+      "discarding"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 144,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function of store-and forward switching?",
+    "alternativas": [
+      "It reduces latency by eliminating error checking within the frame",
+      "It produces an effective level of error-free network trac using CRCs.",
+      "It buffers frames and forwards regardless of errors within the frames.",
+      "It forwards a frame by checking only the destination MAC address"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 145,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which WLC interface provides out-of-band management in the Cisco Unied Wireless Network Architecture?",
+    "alternativas": [
+      "AP-Manager",
+      "service port",
+      "dynamic",
+      "virtual"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 146,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which mode must be set for Aps to communicate to a Wireless LAN Controller using the Control and Provisioning of Wireless Access Points(CAPWAP) protocol?",
+    "alternativas": [
+      "route",
+      "bridge",
+      "lightweight",
+      "autonomous"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 147,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which switch technology establishes a network connection immediately when it is plugged in?",
+    "alternativas": [
+      "PortFast",
+      "BPDU guard",
+      "UplinkFast",
+      "BackboneFast"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 148,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which command on a port enters the forwarding state immediately when a PC is connected to it?",
+    "alternativas": [
+      "switch(cong)#spanning-tree portfast default",
+      "switch(cong)#spanning-tree portfast bpduguard default",
+      "switch(cong-if)#spanning-tree portfast trunk",
+      "switch(cong-if)#no spanning-tree portfast"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 149,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which channel-group mode must be congured when multiple distribution interfaces connected to a WLC are bundled?",
+    "alternativas": [
+      "Channel-group mode passive.",
+      "Channel-group mode on.",
+      "Channel-group mode desirable.",
+      "Channel-group mode active."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 150,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which Layer 2 switch function encapsulates packets for different VLANs so that the packets transverse the same port and maintain tracseparation between theVLANs?",
+    "alternativas": [
+      "VLAN marking",
+      "VLAN numbering",
+      "VLAN DSCP",
+      "VLAN tagging"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 151,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which value is the unique identier that an access point uses to establish and maintain wireless connectivity to wireless network devices?",
+    "alternativas": [
+      "VLAN ID",
+      "SSID",
+      "RFID",
+      "WLAN ID"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 152,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer must congure neighbor discovery between the company router and an ISP.What is the next step to complete the conguration if the ISP uses a third-party router?",
+    "alternativas": [
+      "Enable LLDP globally.",
+      "Disable CDP on gi0/0.",
+      "Enable LLDP TLVs on the ISP router.",
+      "Disable auto-negotiation."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 153,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What does a switch do when it receives a frame whose destination MAC address is missing from the MAC address table?",
+    "alternativas": [
+      "It changes the checksum of the frame to a value that indicates an invalid frame.",
+      "It updates the CAM table with the destination MAC address of the frame.",
+      "It appends the table with a static entry for the MAC and shuts down the port.",
+      "It oods the frame unchanged across all remaining ports in the incoming VLAN."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 154,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "By default, how long will the switch continue to know a workstation MAC address after the workstation stops sending trac?",
+    "alternativas": [
+      "200 seconds",
+      "300 seconds",
+      "600 seconds",
+      "900 seconds"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 155,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A project objective is to minimize the association time to the different access points as mobile devices move around the oce. The ideal solutionmust cover numerous devices and device types, including laptops, mobile phones, tablets and wireless printers. What must be congured?",
+    "alternativas": [
+      "802.11v BSS Max Idle Service",
+      "802.11v Disassociation Imminent",
+      "802.11ax BSS congure",
+      "802.11k neighbor List Dual Band"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 156,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A WLC sends alarms about a rogue AP, and the network administrator veries that the alarms are caused by a legitimate autonomous AP. Howmust the alarms be stopped for the MAC address of the AP?",
+    "alternativas": [
+      "Remove the AP from WLC management",
+      "Place the AP into manual containment.",
+      "Manually remove the AP from Pending state.",
+      "Set the AP Class Type to Friendly."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 157,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is one reason to implement LAG on a Cisco WLC?",
+    "alternativas": [
+      "to increase security and encrypt management frames",
+      "to enable connected switch ports to failover and use different VLANs",
+      "to provide link redundancy and load balancing",
+      "to allow for stateful and link-state failover"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 158,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "When an access point is seeking to join wireless LAN controller, which message is sent to the AP-Manager interface?",
+    "alternativas": [
+      "Discovery response",
+      "DHCP request",
+      "DHCP discover",
+      "Discovery request"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 159,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "After installing a new Cisco ISE server which task must the engineer perform on the Cisco WLC to connect wireless clients on a specic VLANbased on their credentials?",
+    "alternativas": [
+      "Disable the LAG Mode on Next Reboot.",
+      "Enable the Event Driven RRM.",
+      "Enable the Allow AAA Override.",
+      "Enable the Authorize MIC APs against auth-list or AAA"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 160,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Router R1 must send all trac without a matching routing-table entry to 192.168.1.1. Which conguration accomplishes this task?",
+    "alternativas": [
+      "R1#cong t R1(cong)#ip routing R1(cong)#ip route default-route 192.168.1.1",
+      "R1#cong t R1(cong)#ip routing R1(cong)#ip route 192.168.1.1 0.0.0.0 0.0.0.0",
+      "R1#cong t R1(cong)#ip routing R1(cong)#ip route 0.0.0.0 0.0.0.0 192.168.1.1",
+      "R1#cong t R1(cong)#ip routing R1(cong)#ip default-gateway 192.168.1.1"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 161,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A packet is destined for 10.10.1.22. Which static route does the router choose to forward the packet?",
+    "alternativas": [
+      "ip route 10.10.1.0 255.255.255.240 10.10.255.1",
+      "ip route 10.10.1.20 255.255.255.252 10.10.255.1",
+      "ip route 10.10.1.16 255.255.255.252 10.10.255.1",
+      "ip route 10.10.1.20 255.255.255.254 10.10.255.1"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 162,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "R1 has learned route 10.10.10.0/24 via numerous routing protocols. Which route is installed?",
+    "alternativas": [
+      "route with the next hop that has the highest IP",
+      "route with the lowest cost",
+      "route with the lowest administrative distance",
+      "route with the shortest prex length"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 163,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "When a oating static route is congured, which action ensures that the backup route is used when the primary route fails?",
+    "alternativas": [
+      "The administrative distance must be higher on the primary route so that the backup route becomes secondary.",
+      "The default-information originate command must be congured for the route to be installed into the routing table.",
+      "The oating static route must have a lower administrative distance than the primary route so it is used as a backup.",
+      "The oating static route must have a higher administrative distance than the primary route so it is used as a backup"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 164,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A user congured OSPF and advertised the Gigabit Ethernet interface in OSPF. By default, to which type of OSPF network does this interfacebelong?",
+    "alternativas": [
+      "point-to-multipoint",
+      "point-to-point",
+      "broadcast",
+      "nonbroadcast"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 165,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which attribute does a router use to select the best path when two or more different routes to the same destination exist from two differentrouting protocols?",
+    "alternativas": [
+      "dual algorithm",
+      "metric",
+      "administrative distance",
+      "hop count"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  }
+]

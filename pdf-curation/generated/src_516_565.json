@@ -1,0 +1,702 @@
+[
+  {
+    "id": 516,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 47Which design element is a best practice when deploying an 802.11b wireless infrastructure?",
+    "alternativas": [
+      "disabling TPC so that access points can negotiate signal levels with their attached wireless devices.",
+      "setting the maximum data rate to 54 Mbps on the Cisco Wireless LAN Controller",
+      "allocating non overlapping channels to access points that are in close physical proximity to one another",
+      "configuring access points to provide clients with a maximum of 5 Mbps"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 517,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 48How do traditional campus device management and Cisco DNA Center device management differ in regards to deployment?",
+    "alternativas": [
+      "Cisco DNA Center device management can be implemented at a lower cost than most traditional campus device management options",
+      "Traditional campus device management schemes can typically deploy patches and updates more quickly than Cisco DNA Center device management.--- PAGE 1034 ---",
+      "Cisco DNA Center device management can deploy a network more quickly than traditional campus device management",
+      "Traditional campus device management allows a network to scale more quickly than with Cisco DNA Center device management."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 518,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 50Which set of action satisfy the requirement for multi-factor authentication?",
+    "alternativas": [
+      "The user swipes a key fob, then clicks through an email link",
+      "The user enters a user name and password, and then clicks a notification in an authentication app on a mobile device",
+      "The user enters a PIN into an RSA token, and then enters the displayed RSA key on a login scre",
+      "The user enters a user name and password and then re-enters the credentials on a second screen"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 519,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 51How do AAA operations compare regarding user identification,user services,and access control?",
+    "alternativas": [
+      "Authorization provides access control,and authentication tracks user services",
+      "Accounting tracks user services,and authentication provides access control.",
+      "Authorization identifies users,and authentication provides access control--- PAGE 1035 ---",
+      "Authentication identifies users,and accounting tracks user services"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 520,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 52What is a difference between local AP mode and FlexConnect AP mode?",
+    "alternativas": [
+      "FlexConnect AP mode fails to function if the AP loses connectivity with the WL",
+      "B. FlexConnect AP mode bridges the traffic from the AP to the WLC when local switching is configure",
+      "C. Local AP mode creates two CAPWAP tunnels per AF to the WL",
+      "D. Local AP mode causes the AP to behave as if it were an autonomous AP."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 521,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 53which function dose the range of private IPv4 addresses perform?",
+    "alternativas": [
+      "allow multiple companies to each use the same address without conflicts",
+      "provides a direct connection for hosts from outside of the enterprise network",
+      "ensues that NAT is not required to reach the internet with private range addressing",
+      "enable secure communications to the internet for all external hosts"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 522,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 55A fram that enters a switch fails the Frame Check Sequence.Which two interface counters are incremented?",
+    "alternativas": [
+      "input erros",
+      "frame",
+      "giants",
+      "CRCE. runts"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 523,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 56what event has occurred if a router sends a notice level message to a syslog server?",
+    "alternativas": [
+      "An interface line has changed status",
+      "An ICMP connection has been built",
+      "A certificate has expired",
+      "A TCP connection has been torn down"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 524,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 57An organization has decided to start using cloud-provided services.Which cloud service allows the organization to install its ownoperating system on a virtual machine?",
+    "alternativas": [
+      "platform-as-a-service",
+      "software-as-a-service",
+      "network-as-a-service--- PAGE 1038 ---",
+      "infrastructure-as-a-service"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 525,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 61Which command is used to specify the delay time in seconds for LLDP to initialize on any interface?",
+    "alternativas": [
+      "lldp timer",
+      "lldp holdtime",
+      "lldp reinit",
+      "lldp tlv-select"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 526,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 63which statement identifies the functionality of virtual machines?",
+    "alternativas": [
+      "The hypervisor communicates on Layer 3 without the need for additional resources",
+      "Each hypervisor can support a single virtual machine and a single software switch--- PAGE 1041 ---",
+      "The hypervisor can virtual physical components including CPU,memory,and storage",
+      "Virtualized servers run most efficiently when they are physically connected to a switch that is separate from the hypervisor."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 527,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 65Which option about JSON is true?",
+    "alternativas": [
+      "uses predefined tags or angle brackets () to delimit markup text",
+      "used to describe structured data that includes arrays",
+      "used for storing information",
+      "similar to HTML, it is more verbose than XML"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 528,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 66Which statement correctly compares traditional networks and controller-based networks?",
+    "alternativas": [
+      "Only traditional networks offer a centralized control plane",
+      "Only traditional networks natively support centralized management",
+      "Traditional and controller-based networks abstract policies from device configurations",
+      "Only controller-based networks decouple the control plane and the data plane--- PAGE 1042 ---"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 529,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 69Which command enables a router to become a DHCP client?",
+    "alternativas": [
+      "ip address dhcp",
+      "ip helper-address",
+      "ip dhcp pool",
+      "ip dhcp client"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 530,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 71what is the default behavior of a layer 2 switch when a frame with an unknown destination MAC address is received ?",
+    "alternativas": [
+      "The Layer 2 switch forwards the packet and adds the destination MAC address to its MAC address table",
+      "The Layer 2 switch sends a copy of a packet to CPU for destination MAC address learning",
+      "The Layer 2 switch floods packets to all ports except the receiving port in the given VLAN",
+      "The Layer 2 switch dorps the received frame"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 531,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 74A user configured OSPF in a single area between two routers A serial interface connecting R1 and R2 is running encapsulation PPP.Bydefault which OSPF network type is seen on this interface when the user types show ip ospf interface on R1 or R2?",
+    "alternativas": [
+      "port-to-multipoint",
+      "broadcast",
+      "point-to-point",
+      "non-broadcast"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 532,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 78which IPv6 address type provides communication between subnets and cannot route on the internet?",
+    "alternativas": [
+      "link-local--- PAGE 1049 ---",
+      "unique local",
+      "multicast",
+      "global unicast"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 533,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 79which 802.11 frame type is association reponse ?",
+    "alternativas": [
+      "management",
+      "protected frame",
+      "action",
+      "control"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 534,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 82Which action is taken by a switch port enabled for PoE power classification override?",
+    "alternativas": [
+      "When a powered device begins drawing power from a PoE switch port a syslog message is generated",
+      "As power usage on a PoE switch port is checked data flow to the connected device is temporarily paused",
+      "If a switch determines that a device is using less than the minimum configured power it assumes the device has failed anddisconnects",
+      "If a monitored port exceeds the maximum administrative value for power, the port is shutdown and err-disabled"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 535,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 85Which QoS Profile is selected in the GUI when configuring a voice over WLAN deployment?",
+    "alternativas": [
+      "Bronze",
+      "Platinum",
+      "Silver",
+      "Gold"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 536,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 86A router running EIGRP has learned the same route from two different paths.Which parameter does the router use to select the bestpath?",
+    "alternativas": [
+      "cost",
+      "administrative distance",
+      "metric",
+      "as-path"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 537,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 88How do TCP and UDP differ in the way they provide reliability for delivery of packets?",
+    "alternativas": [
+      "TCP does not guarantee delivery or error checking to ensure that there is no corruption of data; UDP provides message acknowledgement and retransmitsdata if lost.",
+      "TCP provides flow control to avoid overwhelming a receiver by sending too many packets at once; UDP sends packets to the receiver in a continuous streamwithout checking for sequencing.",
+      "TCP uses windowing to deliver packets reliably; UDP provides reliable message transfer between hosts by establishing a three-way handshake",
+      "TCP is a connectionless protocol that does not provide reliable delivery of data; UDP is a connection-oriented protocol that uses sequencing to provide reliabledelivery."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 538,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 91A packet is destined for 10.10.1.22 .which static route does the router choose to forward the packet ?",
+    "alternativas": [
+      "ip route 10.10.1.0 255.255.255.240 10.10.255.1",
+      "ip route 10.10.1.20 255.255.255.252 10.10.255.1",
+      "ip route 10.10.1.20 255.255.255.254 10.10.255.1",
+      "ip route 10.10.1.16 255.255.255.252 10.10.255.1"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 539,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 92An email user has been lured into clicking a link in an email sent by their company's security organization. The webpage that opensreports that it was safe but the link could have contained malicious code.Which type of security program is in place?",
+    "alternativas": [
+      "Physical access control",
+      "Social engineering attack",
+      "brute force attack",
+      "user awareness"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 540,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 94Refer to Exhibit. Which action do the switches take on the trunk link?",
+    "alternativas": [
+      "The trunk does not form and the ports go into an err-disabled status.",
+      "The trunk forms but the mismatched native VLANs are merged into a single broadcast domain.",
+      "The trunk does not form, but VLAN 99 and VLAN 999 are allowed to traverse the link.",
+      "The trunk forms but VLAN 99 and VLAN 999 are in a shutdown state."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 541,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 95which IPv6 address block sends packets to a group address rather than a single address ?",
+    "alternativas": [
+      "2000::/3",
+      "FC00::/7",
+      "FE80::/10",
+      "FF00::/8"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 542,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 96Two switches are connected and using Cisco Dynamic Trunking Protocol SW1 is set to Dynamic Desirable What is the result of thisconfiguration?",
+    "alternativas": [
+      "The link is in a downstate.",
+      "The link is in an error disables state",
+      "The link is becomes an access port.",
+      "The link becomes a trunk port."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 543,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 100An engineer must configure a WLAN using the strongest encryption type for WPA2- PSK. Which cipher fulfills the configurationrequirement?",
+    "alternativas": [
+      "WEP",
+      "RC4",
+      "AES",
+      "TKIP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 544,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 101which command automatically generates an IPv6 address from a specified IPv6 prefix and MAC address of an interface?",
+    "alternativas": [
+      "ipv6 address dhcp--- PAGE 1063 ---",
+      "ipv6 address 2001:DB8:5:112::/64 eui-64",
+      "ipv6 address autoconfig",
+      "ipv6 address 2001:DB8:5:112::2/64 link-local"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 545,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 102A corporate office uses four floors in a building>Floor 1 has 24 users>Floor 2 has 29 users>Floor 3 has 28 users>Floor 4 has 22 usersWhich subnet summarizes and gives the most efficient distribution of IP addresses for the router configuration?",
+    "alternativas": [
+      "192.168.0.0/25 as summary and 192.168.0.0/27 for each floor",
+      "192.168.0.0/26 as summary and 192.168.0.0/29 for each floor",
+      "192.168.0.0/24 as summary and 192.168.0.0/28 for each floor",
+      "192.168.0.0/23 as summary and 192.168.0.0/25 for each floor"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 546,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 105What is the primary different between AAA authentication and authorization?",
+    "alternativas": [
+      "Authentication verifies a username and password, and authorization handles the communication between the authentication agentand the user database",
+      "Authentication identifies a user who is attempting to access a system, and authorization validates the users password",
+      "Authentication identifies and verifies a user who is attempting to access a system, and authorization controls the tasks the user canperform.",
+      "Authentication controls the system processes a user can access and authorization logs the activities the user initiates"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 547,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 106Which configuration issue is preventing the OSPF neighbor relationship from being established between the two routers?",
+    "alternativas": [
+      "R2 is using the passive-interface default command--- PAGE 1066 ---",
+      "R1 has an incorrect network command for interface Gi1/0",
+      "R2 should have its network command in area 1",
+      "R1 interface Gi1/0 has a larger MTU size"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 548,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 108Which type of address is the public IP address of a NAT device?",
+    "alternativas": [
+      "outside global",
+      "outside local",
+      "inside global",
+      "inside localE. outside public--- PAGE 1067 ---F. inside public"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 549,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 109What makes Cisco DNA Center different from traditional network management applications and their management of networks?",
+    "alternativas": [
+      "It only supports auto-discovery of network elements in a green field deployment.",
+      "It modular design allows someone to implement different versions to meet the specific needs of an organization",
+      "It abstracts policy from the actual device configuration",
+      "It does not support high availability of management functions when operating in cluster mode"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 550,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 113Which type of wireless encryption is used for WPA2 in preshared key mode?",
+    "alternativas": [
+      "TKIP with RC4",
+      "RC4--- PAGE 1069 ---",
+      "AES-128",
+      "AES-256"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 551,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 117R1 has learned route 192.168.12.0/24 via IS-IS, OSPF, RIP and Internal EIGRP Under normal operating conditions, which routingprotocol is installed in the routing table?",
+    "alternativas": [
+      "IS-IS",
+      "RIP",
+      "Internal EIGRP",
+      "OSPF"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 552,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 120A network engineer must back up 20 network router configurations globally within a customer environment.Which protocol allows theengineer to perform this function using the Cisco IOS MIB?",
+    "alternativas": [
+      "ARP",
+      "SNMP",
+      "SMTP",
+      "CDP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 553,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 122An engineer configured an OSPF neighbor as a designated router. Which state verifies the designated router is in the proper mode?",
+    "alternativas": [
+      "Exchange",
+      "2-way",
+      "Full",
+      "Init"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 554,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 125Refer to Exhibit. How does SW2 interact with other switches in this VTP domain?",
+    "alternativas": [
+      "It processes VTP updates from any VTP clients on the network on its access ports.",
+      "It receives updates from all VTP servers and forwards all locally configured VLANs out all trunk ports",
+      "It forwards only the VTP advertisements that it receives on its trunk ports.--- PAGE 1075 ---",
+      "It transmits and processes VTP updates from any VTP Clients on the network on its trunk ports"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 555,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 126Which mode allows access points to be managed by Cisco Wireless LAN Controllers?",
+    "alternativas": [
+      "autonomous",
+      "lightweight",
+      "bridge",
+      "mobility express"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 556,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 127Which result occurs when PortFast is enabled on an interface that is connected to another switch?",
+    "alternativas": [
+      "Spanning tree may fail to detect a switching loop in the network that causes broadcast storms",
+      "VTP is allowed to propagate VLAN configuration information from switch to switch automatically",
+      "Root port choice and spanning tree recalculation are accelerated when a switch link goes down",
+      "After spanning tree converges PortFast shuts down any port that receives BPDUs."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 557,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 132Which MAC address is recognized as a VRRP virtual address?",
+    "alternativas": [
+      "0000.5E00.010a",
+      "0005.3711.0975",
+      "0000.0C07.AC99",
+      "0007.C070/AB01"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 558,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 133How does Cisco DNA Center gather data from the network?",
+    "alternativas": [
+      "Devices establish an IPsec tunnel to exchange data with the controller",
+      "Devices use the call-home protocol to periodically send data to the controller.",
+      "Network devices use different services like SNMP, syslog, and streaming telemetry to send data to the controller.",
+      "The Cisco CLI Analyzer tool gathers data from each licensed network device .and streams it to the controller."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 559,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 134A user configured OSPF and advertised the Gigabit Ethernet interface in OSPF By default, which type of OSPF network does thisinterface belong to?",
+    "alternativas": [
+      "point-to-multipoint",
+      "point-to-point",
+      "broadcast",
+      "nonbroadcast"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 560,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 135what is the difference regrading reliability and communication type between TCP and UDP?",
+    "alternativas": [
+      "TCP is reliable and is a connectionless protocol; UDP is not reliable and is a connection-oriented protocol.",
+      "TCP is not reliable and is a connectionless protocol; UDP is reliable and is a connection-oriented protocol.",
+      "TCP is reliable and is a connection-oriented protocol; UDP is not reliable and is a connectionless protocol.",
+      "TCP is not reliable and is a connection-oriented protocol; UDP is reliable and is a connectionless protocol."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 561,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 137If a notice-level messaging is sent to a syslog server, which event has occurred?",
+    "alternativas": [
+      "A network device has restarted",
+      "An ARP inspection has failed",
+      "A routing instance has flapped",
+      "A debug operation is running"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 562,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 138How does HSRP provide first hop redundancy?",
+    "alternativas": [
+      "It load-balances traffic by assigning the same metric value to more than one route to the same destination in the IP routing table.",
+      "It load-balances Layer 2 traffic along the path by flooding traffic out all interfaces configured with the same VLAN.",
+      "It forwards multiple packets to the same destination over different routed links n the data path",
+      "It uses a shared virtual MAC and a virtual IP address to a group of routers that serve as the default gateway for hosts on a LAN"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 563,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 139What is the primary effect of the spanning-tree portfast command?",
+    "alternativas": [
+      "it enables BPDU messages",
+      "It minimizes spanning-tree convergence time",
+      "It immediately puts the port into the forwarding state when the switch is reloaded",
+      "It immediately enables the port in the listening state"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 564,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 140which IPv6 address block forwards packets to a multicast address rather than a unicast address?",
+    "alternativas": [
+      "2000::/3",
+      "FC00::/7",
+      "FE80::/10",
+      "FF00::/12"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 565,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "QUESTION 141which purpose does a northbound API serve in a controller-based networking architecture?",
+    "alternativas": [
+      "communicates between the controller and the physical network hardware",
+      "reports device errors to a controller",
+      "generates statistics for network hardware and traffic",
+      "facilitates communication between the controller and the applications"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  }
+]

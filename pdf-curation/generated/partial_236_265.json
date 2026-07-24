@@ -1,0 +1,598 @@
+[
+  {
+    "source_id": 236,
+    "traditional": {
+      "id": 236,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which per-hop traffic-control feature does an ISP implement to mitigate the potential negative effects of a customer exceeding its committedbandwidth?",
+      "alternativas": [
+        "policing",
+        "queuing",
+        "marking",
+        "shaping"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "ISPs typically police customer traffic that exceeds the committed rate (drop/remark) at the edge. Shaping is more common on the customer egress. Queuing/marking alone do not enforce the contract the same way."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 237,
+    "traditional": {
+      "id": 237,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which remote access protocol provides unsecured remote CLI access?",
+      "alternativas": [
+        "console",
+        "Telnet",
+        "SSH",
+        "Bash"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Telnet provides remote CLI without encryption. SSH is secure. Console is local. Bash is a shell, not a Cisco remote access protocol here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 238,
+    "traditional": {
+      "id": 238,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a syslog facility?",
+      "alternativas": [
+        "host that is configured for the system to send log messages",
+        "password that authenticates a Network Management System to receive log messages",
+        "group of log messages associated with the configured severity level",
+        "set of values that represent the processes that can generate a log message"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "A syslog facility is a category identifying the message source/process (e.g., local0, kern). It is not the destination host, password, or merely the severity grouping."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 239,
+    "traditional": {
+      "id": 239,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which QoS queuing method discards or marks packets that exceed the desired bit rate of traffic ow?",
+      "alternativas": [
+        "CBWFQ",
+        "policing",
+        "LLQ",
+        "shaping"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Policing drops or remarks packets exceeding a rate. Shaping queues. CBWFQ/LLQ are scheduling methods."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 240,
+    "traditional": {
+      "id": 240,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which QoS per-hop behavior changes the value of the ToS field in the IPv4 packet header?",
+      "alternativas": [
+        "Shaping",
+        "Policing",
+        "Classication",
+        "Marking"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Marking changes ToS/DSCP/CoS fields. Classification reads them; policing/shaping rate-control."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 241,
+    "traditional": {
+      "id": 241,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the function of FTP?",
+      "alternativas": [
+        "Always operated without user connection validation",
+        "Uses block number to identify and mitigate data-transfer errors",
+        "Relies on the well-known UDP port 69 for data transfer",
+        "Uses two separate connections for control and data traffic"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "FTP uses separate control (TCP 21) and data (TCP 20/passive) connections. It is not UDP/69 (TFTP). It typically authenticates users."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 242,
+    "traditional": {
+      "id": 242,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How does TFTP operate in a network?",
+      "alternativas": [
+        "Provides secure data transfer",
+        "Relies on the well-known TCP port 20 to transmit data",
+        "Uses block numbers to identify and mitigate data-transfer errors",
+        "Requires two separate connections for control and data traffic"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "TFTP uses block numbers/ACKs for reliability over UDP and is simple/unauthenticated. Not secure, not TCP/20, not dual FTP-style connections."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 243,
+    "traditional": {
+      "id": 243,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How does QoS optimize voice traffic?",
+      "alternativas": [
+        "by reducing bandwidth usage",
+        "by reducing packet loss",
+        "by differentiating voice and video traffic",
+        "by increasing jitter"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "QoS for voice prioritizes and protects voice (LLQ, low loss/jitter/latency) by treating it differently from bulk data. Differentiating classes is how optimization is applied; reducing loss is the outcome. The keyed option is differentiating voice and video traffic in this bank."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 244,
+    "traditional": {
+      "id": 244,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An organization secures its network with multi-factor authentication using an authenticator app on employee smartphones. How is the applicationsecured in the case of a user's smartphone being lost or stolen?",
+      "alternativas": [
+        "The application requires the user to enter a PIN before it provides the second factor",
+        "The application requires an administrator password to reactivate after a configured interval",
+        "The application verifies that the user is in a specific location before it provides the second factor",
+        "The application challenges a user by requiring an administrator password to reactivate when the smartphone is rebooted"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Authenticator apps typically require a device PIN/biometric before showing OTP codes if the phone is lost/stolen. Admin password/reactivation or location-only checks are not the standard primary control described."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 245,
+    "traditional": {
+      "id": 245,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which device performs stateful inspection of traffic?",
+      "alternativas": [
+        "switch",
+        "fifirewall",
+        "access point",
+        "wireless controller"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Firewalls perform stateful inspection of traffic flows. Switches/APs/WLCs are not primarily stateful firewalls."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 246,
+    "traditional": {
+      "id": 246,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network administrator enabled port security on a switch interface connected to a printer. What is the next configuration action in order to allowthe port to learn the MAC address of the printer and insert it into the table automatically?",
+      "alternativas": [
+        "enable dynamic MAC address learning",
+        "implement static MAC addressing",
+        "enable sticky MAC addressing",
+        "implement auto MAC address learning"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Port-security sticky learns the MAC dynamically and writes it to the running config as a secure sticky address. Static requires manual MAC; 'auto/dynamic learning' alone is not the port-security sticky feature name."
+    },
+    "ticket": {
+      "id": 246,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9246 — Port-security na porta da impressora; MAC deve ser aprendido e gravado automaticamente.",
+      "cli_output": "SW1# show port-security interface gi1/0/10\nPort Security              : Enabled\nPort Status                : Secure-up\nMaximum MAC Addresses      : 1\nTotal MAC Addresses        : 0\nConfigured MAC Addresses   : 0\nSticky MAC Addresses       : 0\nSecurity Violation Count   : 0\n\nSW1# show running-config interface gi1/0/10\ninterface GigabitEthernet1/0/10\n switchport mode access\n switchport port-security\n! sem sticky",
+      "alternativas": [
+        "Habilitar switchport port-security mac-address sticky para aprender e fixar o MAC na config.",
+        "Só static MAC manual atende “automaticamente”.",
+        "enable dynamic MAC address learning é o comando port-security.",
+        "auto MAC address learning existe como feature separada obrigatória."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Sticky port-security aprende o MAC dinâmico e o converte em sticky na running-config. Static é manual. Não há comando genérico “auto MAC” no lugar de sticky."
+    }
+  },
+  {
+    "source_id": 247,
+    "traditional": {
+      "id": 247,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which effect does the aaa new-model configuration command have?",
+      "alternativas": [
+        "It enabfiles AAA services on the device.",
+        "It configures the device to connect to a RADIUS server for AAA.",
+        "It associates a RADIUS server to the group.",
+        "It configures a local user on the device."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "aaa new-model enables the AAA model on IOS. It does not by itself define RADIUS servers, groups, or local users."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 248,
+    "traditional": {
+      "id": 248,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which technology must be implemented to configure network device monitoring with the highest security?",
+      "alternativas": [
+        "IP SLA",
+        "syslog",
+        "NetFlow",
+        "SNMPv3"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "SNMPv3 provides authentication and encryption for monitoring—highest security among the listed management options. Syslog/NetFlow/IP SLA lack comparable mandatory authPriv security."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 249,
+    "traditional": {
+      "id": 249,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer is asked to protect unused ports that are configured in the default VLAN on a switch. Which two steps will fulfill the request? (Choose two.)",
+      "alternativas": [
+        "Configure the ports as trunk ports.",
+        "Enable the Cisco Discovery Protocol.",
+        "Configure the port type as access and place in VLAN 99.",
+        "Administratively shut down the ports."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Protect unused default-VLAN ports: shut them down and/or put as access in an unused black-hole VLAN (e.g., 99). Do not trunk them or EtherChannel them unnecessarily. CDP enable does not protect unused ports. Choose-two cleaned to four options; index kept on access VLAN 99."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 250,
+    "traditional": {
+      "id": 250,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "The service password-encryption command is entered on a router. What is the effect of this configuration?",
+      "alternativas": [
+        "restricts unauthorized users from viewing clear-text passwords in the running configuration",
+        "prevents network administrators from configuring clear-text passwords",
+        "protects the VLAN database from unauthorized PC connections on the switch",
+        "encrypts the password exchange when a VPN tunnel is established"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "service password-encryption applies weak reversible encryption to plain-text passwords in the config so casual viewing of running-config does not show cleartext. It does not block admins from setting passwords, protect VLAN DB, or encrypt VPN tunnels."
+    },
+    "ticket": {
+      "id": 250,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9250 — Auditoria viu senhas em claro no show run. Precisam ofuscar senhas type 7 no arquivo de config.",
+      "cli_output": "R1# show running-config | include password|secret\nenable password Cisco123\nline vty 0 4\n password LabPass\n! service password-encryption não configurado",
+      "alternativas": [
+        "Aplicar service password-encryption para ofuscar senhas em claro na configuração.",
+        "O comando impede admins de configurar senhas novas.",
+        "Ele criptografa túneis VPN IPsec automaticamente.",
+        "Protege o VLAN database do switch via VTP."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "service password-encryption aplica cifra reversível (type 7) a passwords em texto claro no config, dificultando leitura casual. Não é VPN crypto nem VTP protection. enable secret é hashing forte separado para enable."
+    }
+  },
+  {
+    "source_id": 251,
+    "traditional": {
+      "id": 251,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which WPA3 enhancement protects against hackers viewing traffic on the Wi-Fi network?",
+      "alternativas": [
+        "SAE encryption",
+        "TKIP encryption",
+        "scrambled encryption key",
+        "AES encryption"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "WPA3 SAE (Simultaneous Authentication of Equals) improves handshake security vs PSK dictionary attacks and protects better against offline attacks on Wi-Fi. TKIP is legacy. AES is cipher; SAE is the WPA3 enhancement named here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 252,
+    "traditional": {
+      "id": 252,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of wireless encryption is used for WPA2 in preshared key mode?",
+      "alternativas": [
+        "AES-128",
+        "TKIP with RC4",
+        "AES-256",
+        "RC4"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "WPA2-PSK commonly uses AES-CCMP. Exam banks often list AES-256 as the keyed option even though CCMP is 128-bit AES; TKIP/RC4 are legacy WPA/WEP-era."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 253,
+    "traditional": {
+      "id": 253,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command prevents passwords from being stored in the configuration as plain text on a router or switch?",
+      "alternativas": [
+        "enable secret",
+        "enable password",
+        "service password-encryption",
+        "username cisco password encrypt"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "service password-encryption obscures plain-text passwords in the configuration file. enable secret uses MD5/modern hashing for the enable password specifically but the item asks about passwords stored as plain text generally—service password-encryption is the direct answer."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 254,
+    "traditional": {
+      "id": 254,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which goal is achieved by the implementation of private IPv4 addressing on a network?",
+      "alternativas": [
+        "provides an added level of protection against Internet exposure",
+        "provides a reduction in size of the forwarding table on network routers",
+        "allows communication across the Internet to other private networks",
+        "allows servers and workstations to communicate across public network boundaries"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Private IPv4 (RFC1918) is not routed on the public Internet, reducing direct exposure. It does not shrink FIB globally, nor enable private-to-private Internet communication without NAT/VPN."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 255,
+    "traditional": {
+      "id": 255,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of attack is mitigated by dynamic ARP inspection?",
+      "alternativas": [
+        "DDoS",
+        "malware",
+        "man-in-the-middle",
+        "worm"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Dynamic ARP Inspection mitigates ARP spoofing/poisoning used in man-in-the-middle attacks. Not primarily DDoS/malware/worm defenses."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 256,
+    "traditional": {
+      "id": 256,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a function of a remote access VPN?",
+      "alternativas": [
+        "establishes a secure tunnel between two branch sites",
+        "uses cryptographic tunneling to protect the privacy of data for multiple users simultaneously",
+        "used exclusively when a user is connected to a company's internal network",
+        "allows the users to access company internal network resources through a secure tunnel"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Remote access VPN lets individual users securely reach internal resources over the Internet. Site-to-site connects branches. It is not only for on-prem users."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 257,
+    "traditional": {
+      "id": 257,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a practice that protects a network from VLAN hopping attacks?",
+      "alternativas": [
+        "Enable dynamic ARP inspection",
+        "configure an ACL to prevent traffic from changing VLANs",
+        "Change native VLAN to an unused VLAN ID",
+        "Implement port security on internet-facing VLANs"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Changing the native VLAN from default and disabling unused trunking reduces double-tagging VLAN hopping risk. DAI is ARP; ACLs are not the classic hopping fix; port-security helps MAC attacks more than hopping."
+    },
+    "ticket": {
+      "id": 257,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9257 — Segurança pede mitigação de VLAN hopping em trunks com native VLAN 1 default.",
+      "cli_output": "SW1# show interfaces trunk\nPort        Mode         Encapsulation  Status        Native vlan\nGi1/0/24    on           802.1q         trunking      1\n\nSW1# show vlan brief | include 1 | 999\n1    default                          active\n999  BLACKHOLE                        active",
+      "alternativas": [
+        "Alterar native VLAN para VLAN não usada (ex. 999) e alinhar nos dois lados; evitar native 1.",
+        "Só DAI mitiga VLAN hopping double-tag.",
+        "ACL “prevent changing VLANs” é o controle clássico Cisco para hopping.",
+        "Port-security em VLANs de Internet é a mitigação principal de hopping."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Ataques double-tag exploram native VLAN default. Práticas: native VLAN unused, same on both ends, disable unused ports, avoid DTP. DAI/port-security tratam outros vetores."
+    }
+  },
+  {
+    "source_id": 258,
+    "traditional": {
+      "id": 258,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Where does a switch maintain DHCP snooping information?",
+      "alternativas": [
+        "In the CAM table",
+        "In the frame forwarding database",
+        "In the MAC address table",
+        "In the binding database"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "DHCP snooping builds a binding database (MAC/IP/VLAN/port/lease). CAM/MAC table is for L2 forwarding, not DHCP bindings."
+    },
+    "ticket": {
+      "id": 258,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9258 — DHCP snooping habilitado; equipe pergunta onde ficam os bindings IP-MAC-porta.",
+      "cli_output": "SW1# show ip dhcp snooping binding\nMacAddress         IpAddress       Lease(sec) Type           VLAN Interface\n------------------ --------------- ---------- -------------  ---- -------------------\n00:11:22:33:44:55  10.10.10.50     86400      dhcp-snooping  10   GigabitEthernet1/0/5\n\nSW1# show mac address-table dynamic vlan 10\nVlan    Mac Address       Type        Ports\n10      0011.2233.4455    DYNAMIC     Gi1/0/5",
+      "alternativas": [
+        "Bindings de DHCP snooping ficam no binding database (show ip dhcp snooping binding).",
+        "Ficam só na CAM table sem base separada.",
+        "Ficam no frame forwarding database de VTP.",
+        "Não há banco; só no MAC address table sem IP."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "DHCP snooping mantém binding database (MAC, IP, lease, VLAN, port). A MAC table é L2 learning separado, sem lease DHCP."
+    }
+  },
+  {
+    "source_id": 259,
+    "traditional": {
+      "id": 259,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network administrator must configure SSH for remote access to router R1. The requirement is to use a public and private key pair to encryptmanagement traffic to and from the connecting client. Which configuration, when applied, meets the requirements?",
+      "alternativas": [
+        "R1#enable\nR1#configure terminal\nR1(config)#ip domain-name cisco.com R1(config)#crypto key generate ec keysize 1024",
+        "R1#enable\nR1#configure terminal\nR1(config)#ip domain-name cisco.com R1(config)#crypto key generate ec keysize 2048",
+        "R1#enable\nR1#configure terminal\nR1(config)#ip domain-name cisco.com R1(config)#crypto key encrypt rsa name myKey",
+        "R1#enable\nR1#configure terminal\nR1(config)#ip domain-name cisco.com R1(config)#crypto key generate rsa modulus 1024"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "SSH with RSA: ip domain-name then crypto key generate rsa modulus 1024 (or larger). EC key commands shown are incorrect forms for the classic requirement set."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 260,
+    "traditional": {
+      "id": 260,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When a WLAN with WPA2 PSK is configured in the Wireless LAN Controller GUI, which format is supported?",
+      "alternativas": [
+        "decimal",
+        "ASCII",
+        "unicode",
+        "base64"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "WLC WPA2-PSK passphrase is entered in ASCII (or hex in some UIs); ASCII is the supported format keyed here. unicode/base64/decimal are not the standard PSK entry formats."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 261,
+    "traditional": {
+      "id": 261,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which security program element involves installing badge readers on data-center doors to allow workers to enter and exit based on their job rofiles?",
+      "alternativas": [
+        "physical access control",
+        "biometrics",
+        "role-based access control",
+        "multifactor authentication"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Badge readers on doors are physical access control. RBAC is logical permissions; biometrics may be a method; MFA is multi-factor authentication broadly."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 262,
+    "traditional": {
+      "id": 262,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which function is performed by DHCP snooping?",
+      "alternativas": [
+        "listens to multicast traffic for packet forwarding",
+        "rate-limits certain traffic",
+        "propagates VLAN information between switches",
+        "provides DDoS mitigation"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "DHCP snooping can rate-limit DHCP messages on untrusted ports and build bindings. It does not do VTP, general multicast forwarding, or full DDoS mitigation."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 263,
+    "traditional": {
+      "id": 263,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which protocol is used for secure remote CLI access?",
+      "alternativas": [
+        "Telnet",
+        "HTTP",
+        "HTTPS",
+        "SSH"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "SSH encrypts remote CLI. Telnet/HTTP are insecure for CLI; HTTPS is web management, not classic CLI."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 264,
+    "traditional": {
+      "id": 264,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which implementation provides the strongest encryption combination for the wireless environment?",
+      "alternativas": [
+        "WEP",
+        "WPA + TKIP",
+        "WPA + AES",
+        "WPA2 + AES"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "WPA2 with AES (CCMP) is the strongest combination listed vs WEP, WPA+TKIP, WPA+AES. WPA3 is stronger but not listed."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 265,
+    "traditional": {
+      "id": 265,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What does physical access control regulate?",
+      "alternativas": [
+        "access to networking equipment and facilities",
+        "access to servers to prevent malicious activity",
+        "access to specific networks based on business function",
+        "access to computer networks and file systems"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Physical access control regulates entry to facilities and equipment rooms. Logical network/filesystem controls are separate domains."
+    },
+    "ticket": null
+  }
+]

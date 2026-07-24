@@ -1,0 +1,352 @@
+[
+  {
+    "id": 91,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What occurs when PortFast is enabled on an interface that is connected to another switch?",
+    "alternativas": [
+      "Root port choice and spanning-tree recalculation are accelerated when a switch link goes down.",
+      "After spanning-tree converges, PortFast shuts down any port that receives BPDUs.",
+      "VTP is allowed to propagate VLAN conguration information from switch to switch automatically.",
+      "Spanning-tree fails to detect a switching loop increasing the likelihood of broadcast storms."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 92,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer needs to congure LLDP to send the port description type length value (TLV). Which command sequence must be implemented?",
+    "alternativas": [
+      "switch(cong-if)#lldp port-description",
+      "switch#lldp port-description",
+      "switch(cong-line)#lldp port-description",
+      "switch(cong)#lldp port-description"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 93,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which conguration ensures that the switch is always the root for VLAN 750?",
+    "alternativas": [
+      "Switch(cong)#spanning-tree vlan 750 priority 38418607",
+      "Switch(cong)#spanning-tree vlan 750 priority 0",
+      "Switch(cong)#spanning-tree vlan 750 root primary",
+      "Switch(cong)#spanning-tree vlan 750 priority 614440"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 94,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which mode allows access points to be managed by Cisco Wireless LAN Controllers?",
+    "alternativas": [
+      "bridge",
+      "lightweight",
+      "mobility express",
+      "autonomous"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 95,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which command is used to specify the delay time in seconds for LLDP to initialize on any interface?",
+    "alternativas": [
+      "lldp timer",
+      "lldp tlv-select",
+      "lldp reinit",
+      "lldp holdtime"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 96,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Two switches are connected and using Cisco Dynamic Trunking Protocol. SW1 is set to Dynamic Auto and SW2 is set to Dynamic Desirable. Whatis the result of this conguration?",
+    "alternativas": [
+      "The link becomes an access port.",
+      "The link is in an error disabled state.",
+      "The link is in a down state.",
+      "The link becomes a trunk port."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 97,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which design element is a best practice when deploying an 802.11b wireless infrastructure?",
+    "alternativas": [
+      "allocating nonoverlapping channels to access points that are in close physical proximity to one another",
+      "disabling TCP so that access points can negotiate signal levels with their attached wireless devices",
+      "conguring access points to provide clients with a maximum of 5 Mbps",
+      "setting the maximum data rate to 54 Mbps on the Cisco Wireless LAN Controller"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 98,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which two command sequences must be congured on a switch to establish a Layer 3 EtherChannel with an open-standard protocol? (Choosetwo.)",
+    "alternativas": [
+      "interface GigabitEthernet0/0/1 channel-group 10 mode auto",
+      "interface GigabitEthernet0/0/1 channel-group 10 mode on",
+      "interface port-channel 10 no switchport ip address 172.16.0.1 255.255.255.0",
+      "interface GigabitEthernet0/0/1 channel-group 10 mode activeE. interface port-channel 10 switchport switchport mode trunk"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 99,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which command is used to enable LLDP globally on a Cisco IOS ISR?",
+    "alternativas": [
+      "lldp run",
+      "lldp enable",
+      "lldp transmit",
+      "cdp runE. cdp enable"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 100,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which command should you enter to congure an LLDP delay time of 5 seconds?",
+    "alternativas": [
+      "lldp timer 5000",
+      "lldp holdtime 5",
+      "lldp reinit 5000",
+      "lldp reinit 5"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 101,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How does STP prevent forwarding loops at OSI Layer 2?",
+    "alternativas": [
+      "TTL",
+      "MAC address forwarding",
+      "Collision avoidance",
+      "Port blocking"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 102,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which type does a port become when it receives the best BPDU on a bridge?",
+    "alternativas": [
+      "The designated port",
+      "The backup port",
+      "The alternate port",
+      "The root port"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 103,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which value can you modify to congure a specic interface as the preferred forwarding interface?",
+    "alternativas": [
+      "The interface number",
+      "The port priority",
+      "The VLAN priority",
+      "The hello time"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 104,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which statement about Cisco Discovery Protocol is true?",
+    "alternativas": [
+      "It is a Cisco-proprietary protocol.",
+      "It runs on the network layer.",
+      "It can discover information from routers, rewalls, and switches.",
+      "It runs on the physical layer and the data link layer."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 105,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "On a corporate network, hosts on the same VLAN can communicate with each other, but they are unable to communicate with hosts on differentVLANs. What is needed to allow communication between the VLANs?",
+    "alternativas": [
+      "a router with subinterfaces congured on the physical interface that is connected to the switch",
+      "a router with an IP address on the physical interface connected to the switch",
+      "a switch with an access link that is congured between the switches",
+      "a switch with a trunk link that is congured between the switches"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 106,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which statement about LLDP is true?",
+    "alternativas": [
+      "It is a Cisco proprietary protocol.",
+      "It is congured in global conguration mode.",
+      "The LLDP update frequency is a xed value.",
+      "It runs over the transport layer."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 107,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which technology is used to improve web trac performance by proxy caching?",
+    "alternativas": [
+      "WSA",
+      "Firepower",
+      "ASA",
+      "FireSIGHT"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 108,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What criteria is used rst during the root port selection process?",
+    "alternativas": [
+      "local port ID",
+      "lowest path cost to the toot bridge",
+      "lowest neighbor's bridge ID",
+      "lowest neighbor's port ID"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 109,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which statement about VLAN conguration is true?",
+    "alternativas": [
+      "The switch must be in VTP server or transparent mode before you can congure a VLAN",
+      "The switch must be in cong-vlan mode before you congure an extended VLAN",
+      "Dynamic inter-VLAN routing is supported on VLAN2 through VLAN 4064",
+      "A switch in VTP transparent mode save the VLAN databases to the running conguration only"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 110,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network engineer must create a diagram of a multivendor network. Which command must be congured on the Cisco devices so that thetopology of the network is allowed to be mapped?",
+    "alternativas": [
+      "Device(cong)#lldp run",
+      "Device(cong)#cdp run",
+      "Device(cong-if)#cdp enable",
+      "Device(cong)#ow-sampler-map topology"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 111,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How do AAA operations compare regarding user identication, user services, and access control?",
+    "alternativas": [
+      "Authorization provides access control, and authentication tracks user services",
+      "Authentication identies users, and accounting tracks user services",
+      "Accounting tracks user services, and authentication provides access control",
+      "Authorization identies users, and authentication provides access control"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 112,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the difference between RADIUS and TACACS+?",
+    "alternativas": [
+      "RADIUS logs all commands that are entered by the administrator, but TACACS+ logs only start, stop, and interim commands.",
+      "TACACS+ separates authentication and authorization, and RADIUS merges them.",
+      "TACACS+ encrypts only password information, and RADIUS encrypts the entire payloa",
+      "D. RADIUS is most appropriate for dial authentication, but TACACS+ can be used for multiple types of authentication."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 113,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a difference between local AP mode and FlexConnect AP mode?",
+    "alternativas": [
+      "Local AP mode creates two CAPWAP tunnels per AP to the WLC",
+      "Local AP mode causes the AP to behave as if it were an autonomous AP",
+      "FlexConnect AP mode fails to function if the AP loses connectivity with the WLC",
+      "FlexConnect AP mode bridges the trac from the AP to the WLC when local switching is congured"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 114,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which state does the switch port move to when PortFast is enabled?",
+    "alternativas": [
+      "blocking",
+      "listening",
+      "learning",
+      "forwarding"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 115,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which protocol prompts the Wireless LAN Controller to generate its own local web administration SSL certicate for GUI access?",
+    "alternativas": [
+      "RADIUS",
+      "HTTPS",
+      "TACACS+",
+      "HTTP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  }
+]

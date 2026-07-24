@@ -1,0 +1,80 @@
+{
+  "input": 719,
+  "output": 185,
+  "target": {
+    "min": 150,
+    "max": 200
+  },
+  "scoreRange": {
+    "min": 94,
+    "max": 108,
+    "avg": 100
+  },
+  "rejectCounts": {
+    "alts_muito_curtas": 84,
+    "ocr_residual": 66,
+    "trac_ocr": 65,
+    "enunciado_curto": 38,
+    "duplicata_similar": 36,
+    "score_baixo": 6,
+    "alt_config_colada": 5,
+    "alt_curta": 4,
+    "sem_keywords_ccna": 3,
+    "palavras_coladas": 2,
+    "alt_cortada": 2,
+    "caracteres_estranhos": 1,
+    "lista_asterisco_colada": 1
+  },
+  "samples": [
+    {
+      "id": 1,
+      "enunciado": "Which command automatically generates an IPv6 address from a specified IPv6 prefix and MAC address o",
+      "alts": [
+        "ipv6 address dhcp",
+        "ipv6 address 2001:DB8:5:112::/64 eui-64",
+        "ipv6 address autoconfig",
+        "ipv6 address 2001:DB8:5:112::2/64 link-local"
+      ]
+    },
+    {
+      "id": 2,
+      "enunciado": "Which action must be taken to assign a global unicast IPv6 address on an interface that is derived f",
+      "alts": [
+        "explicitly assign a link-local address",
+        "disable the EUI-64 bit process",
+        "enable SLAAC on an interface",
+        "configure a stateful DHCPv6 server on the network"
+      ]
+    },
+    {
+      "id": 3,
+      "enunciado": "A network engineer must implement an IPv6 configuration on the vlan 2000 interface to create a routa",
+      "alts": [
+        "interface vlan 2000 ipv6 address ff00:0000:aaaa::1",
+        "interface vlan 2000 ipv6 address fd00::1234:2343/6",
+        "interface vlan 2000 ipv6 address fe80:0000:aaaa::1",
+        "interface vlan 2000 ipv6 address fc00:0000:aaaa:: "
+      ]
+    },
+    {
+      "id": 4,
+      "enunciado": "What occurs when Port Fast is enabled on an interface that is connected to another switch?",
+      "alts": [
+        "Root port choice and spanning-tree recalculation a",
+        "After spanning-tree converges, Port Fast shuts dow",
+        "VTP is allowed to propagate VLAN configuration inf",
+        "Spanning-tree fails to detect a switching loop inc"
+      ]
+    },
+    {
+      "id": 5,
+      "enunciado": "Which two command sequences must be configured on a switch to establish a Layer 3 Ether Channel with",
+      "alts": [
+        "interface Gigabit Ethernet0/0/1 channel-group 10 m",
+        "interface Gigabit Ethernet0/0/1 channel-group 10 m",
+        "interface port-channel 10 no switchport ip address",
+        "interface Gigabit Ethernet0/0/1 channel-group 10 m"
+      ]
+    }
+  ]
+}

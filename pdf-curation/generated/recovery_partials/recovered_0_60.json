@@ -1,0 +1,1202 @@
+[
+  {
+    "id": 570,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which goal is achieved by the implementation of private IPv4 addressing on a network?",
+    "alternativas": [
+      "allows servers and workstations to communicate across public network boundaries",
+      "provides a reduction in size of the forwarding table on network routers",
+      "allows communication across the Internet to other private networks",
+      "provides an added level of protection against Internet exposure"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Private IPv4 (RFC 1918) is not advertised as public Internet space, so internal hosts are not directly reachable from the global Internet without NAT or a similar edge translation—this reduces direct exposure. The correct answer (“provides an added level of protection against Internet exposure”) captures that protection/conservation role. Option A (“allows servers and workstations to communicate across public network boundaries”) fails because private addresses do not by themselves enable free communication across public boundaries. Option B (“provides a reduction in size of the forwarding table on network routers”) is also incorrect: private addressing does not shrink the global Internet routing table for other enterprises, nor make private-to-private Internet paths routable without tunnels/NAT.",
+    "_meta": {
+      "source_id": 570,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "priv",
+      "before_preview": "RFC1918 private IPv4 is reused internally without global uniqueness, conserving public space and reducing direct Interne"
+    }
+  },
+  {
+    "id": 571,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer needs to configure LLDP to send the port description type length value (TLV). What command sequence must be implemented?",
+    "alternativas": [
+      "switch#lldp port-description",
+      "switch(config)#lldp port-description",
+      "switch(config-line)#lldp port-description",
+      "switch(config-if)#lldp port-description"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "LLDP TLVs such as port-description are enabled from global configuration on classic IOS (for example `lldp port-description` under config mode), not from privileged exec alone or line mode. Correct: switch(config)#lldp port-description. Option A (“switch#lldp port-description”) uses the wrong mode/prompt, so the TLV is not applied system-wide as required. Option C (“switch(config-line)#lldp port-description”) is similarly invalid syntax/context for this TLV.",
+    "_meta": {
+      "source_id": 571,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "mgmt",
+      "before_preview": "Routers install routes by longest match and administrative distance; floating statics use higher AD as backup. Correct c"
+    }
+  },
+  {
+    "id": 572,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "When the active router in an HSRP group fails, what router assumes the role and forwards packets?",
+    "alternativas": [
+      "forwarding",
+      "backup",
+      "standby",
+      "listening"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "First-hop redundancy (HSRP/VRRP/GLBP) keeps a virtual IP/MAC as the hosts’ default gateway so forwarding continues when the active/master router fails. Correct: standby. Option A (“forwarding”) confuses FHRP with STP loop prevention, ECMP, or non-FHRP roles. Option B (“backup”) describes a different protocol behavior and does not provide gateway failover semantics.",
+    "_meta": {
+      "source_id": 572,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "fhrp",
+      "before_preview": "First-hop redundancy provides a shared virtual gateway (IP/MAC) so hosts keep a stable default gateway when a router fai"
+    }
+  },
+  {
+    "id": 573,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An organization secures its network with multi-factor authentication using an authenticator app on employee smartphones. How is the applic secured in the case ofa user’s smartphone being lost or stolen?",
+    "alternativas": [
+      "The application requires the user to enter a PIN before it provides the second factor",
+      "the application challenges a user by requiring an administrator password to reactivate when the smartphone is rebooted",
+      "The application requires an administrator password to reactivate after a configured interval",
+      "The application verifies that the user is in a specific location before it provides the second factor"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Based on the CCNA 200-301 topic in the stem, the right selection is “The application requires the user to enter a PIN before it provides the second factor” because it correctly describes the operational behavior required. Option B (“the application challenges a user by requiring an administrator password to reactivate wh…”) is incorrect: it conflicts with the standard definition or configuration of this feature. Option C (“The application requires an administrator password to reactivate after a configured inter…”) is also wrong because it applies to another technology or reverses cause and effect. Review the correct option against the other three and keep the answer that alone satisfies every condition in the question.",
+    "_meta": {
+      "source_id": 573,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "general",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: The application requires the user to enter a PIN before it provide"
+    }
+  },
+  {
+    "id": 576,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which device performs stateful inspection of traffic?",
+    "alternativas": [
+      "fifirewall",
+      "switch",
+      "access point",
+      "wireless controller"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Security controls protect identity, confidentiality, and access: fifirewalls inspect stateful flows, 802.1X/AAA authenticate, SSH encrypts CLI, port-security limits MACs, and physical controls guard facilities. Correct: firewall. Option B (“switch”) confuses physical vs logical controls or names the wrong crypto/AAA property. Option C (“access point”) does not mitigate the threat or implement the control described.",
+    "_meta": {
+      "source_id": 576,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "security",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: fififirewall. It matches the protocol or feature behavior describe"
+    }
+  },
+  {
+    "id": 577,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What criteria is used first during the root port selection process?",
+    "alternativas": [
+      "local port ID",
+      "lowest path cost to the root bridge",
+      "lowest neighbor’s bridge ID",
+      "lowest neighbor’s port ID"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Spanning Tree elects a root and places redundant ports in blocking/discarding to prevent L2 loops; PortFast is for edge ports to reach forwarding quickly. Correct: lowest path cost to the root bridge. Option A (“local port ID”) mixes PortFast with uplink recovery features (UplinkFast/BackboneFast) or wrong port states. Option C (“lowest neighbor’s bridge ID”) does not match STP election/port-role rules for this scenario.",
+    "_meta": {
+      "source_id": 577,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "stp",
+      "before_preview": "Spanning Tree builds a loop-free Layer-2 topology by electing a root and blocking redundant ports; edge features like Po"
+    }
+  },
+  {
+    "id": 579,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network administrator enabled port security on a switch interface connected to a printer. What is the next configuration action in order to allow the port to learnthe MAC address of the printer and insert it into the table automatically?",
+    "alternativas": [
+      "enable dynamic MAC address learning",
+      "implement static MAC addressing.",
+      "enable sticky MAC addressing",
+      "implement auto MAC address learning"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Security controls protect identity, confidentiality, and access: fifirewalls inspect stateful flows, 802.1X/AAA authenticate, SSH encrypts CLI, port-security limits MACs, and physical controls guard facilities. Correct: enable sticky MAC addressing. Option A (“enable dynamic MAC address learning”) confuses physical vs logical controls or names the wrong crypto/AAA property. Option B (“implement static MAC addressing.”) does not mitigate the threat or implement the control described.",
+    "_meta": {
+      "source_id": 579,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "security",
+      "before_preview": "Security controls (firewall state, encryption, port security, 802.1X, DAI) protect confidentiality, integrity, and acces"
+    }
+  },
+  {
+    "id": 581,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What protocol allows an engineer to back up 20 network router configurations globally while using the copy function?",
+    "alternativas": [
+      "SMTP",
+      "SNMP",
+      "TCP",
+      "FTP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Operations protocols support management: SNMP polls/traps MIB data, syslog exports events by severity, NTP synchronizes clocks, TFTP/FTP move files, LLDP/CDP discover neighbors. Correct: SNMP. Option A (“SMTP”) names a protocol that does not perform the described management function. Option C (“TCP”) is the wrong command, severity, or transport for the task.",
+    "_meta": {
+      "source_id": 581,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "mgmt",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: SNMP. It matches the protocol or feature behavior described in the"
+    }
+  },
+  {
+    "id": 582,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which state does the switch port move to when PortFast is enabled?",
+    "alternativas": [
+      "learning",
+      "forwarding",
+      "blocking",
+      "listening"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Spanning Tree elects a root and places redundant ports in blocking/discarding to prevent L2 loops; PortFast is for edge ports to reach forwarding quickly. Correct: forwarding. Option A (“learning”) mixes PortFast with uplink recovery features (UplinkFast/BackboneFast) or wrong port states. Option C (“blocking”) does not match STP election/port-role rules for this scenario.",
+    "_meta": {
+      "source_id": 582,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "stp",
+      "before_preview": "Spanning Tree builds a loop-free Layer-2 topology by electing a root and blocking redundant ports; edge features like Po"
+    }
+  },
+  {
+    "id": 585,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which technology is used to improve web traffic performance by proxy caching?",
+    "alternativas": [
+      "WSA",
+      "Firepower",
+      "ASA",
+      "FireSIGHT"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Based on the CCNA 200-301 topic in the stem, the right selection is “WSA” because it correctly describes the operational behavior required. Option B (“Firepower”) is incorrect: it conflicts with the standard definition or configuration of this feature. Option C (“ASA”) is also wrong because it applies to another technology or reverses cause and effect. Review the correct option against the other three and keep the answer that alone satisfies every condition in the question.",
+    "_meta": {
+      "source_id": 585,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "general",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: WSA. It matches the protocol or feature behavior described in the "
+    }
+  },
+  {
+    "id": 587,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which type of attack can be mitigated by dynamic ARP inspection?",
+    "alternativas": [
+      "worm",
+      "malware",
+      "DDoS",
+      "man-in-the-middle"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Security controls protect identity, confidentiality, and access: fifirewalls inspect stateful flows, 802.1X/AAA authenticate, SSH encrypts CLI, port-security limits MACs, and physical controls guard facilities. Correct: man-in-the-middle. Option A (“worm”) confuses physical vs logical controls or names the wrong crypto/AAA property. Option B (“malware”) does not mitigate the threat or implement the control described.",
+    "_meta": {
+      "source_id": 587,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "security",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: man-in-the-middle. It matches the protocol or feature behavior des"
+    }
+  },
+  {
+    "id": 589,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What software defined architecture plane assists network devices with making packet-forwarding decisions by providing Layer 2 reachability and Layer 3 routinginformation?",
+    "alternativas": [
+      "data plane",
+      "control plane",
+      "policy plane",
+      "management plane"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Based on the CCNA 200-301 topic in the stem, the right selection is “control plane” because it correctly describes the operational behavior required. Option A (“data plane”) is incorrect: it conflicts with the standard definition or configuration of this feature. Option C (“policy plane”) is also wrong because it applies to another technology or reverses cause and effect. Review the correct option against the other three and keep the answer that alone satisfies every condition in the question.",
+    "_meta": {
+      "source_id": 589,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "general",
+      "before_preview": "Routers install routes by longest match and administrative distance; floating statics use higher AD as backup. Correct c"
+    }
+  },
+  {
+    "id": 590,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which WAN access technology is preferred for a small office / home office architecture?",
+    "alternativas": [
+      "broadband cable access",
+      "frame-relay packet switching",
+      "dedicated point-to-point leased line",
+      "Integrated Services Digital Network switching."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "WAN design trades cost, simplicity, and availability: point-to-point leased lines are simple; hub-and-spoke reduces full-mesh expense; broadband often fits SOHO. Correct: broadband cable access. Option B (“frame-relay packet switching”) is a poorer fit for the size/cost/availability goal in the stem. Option C (“dedicated point-to-point leased line”) overbuilds or under-serves the described site type.",
+    "_meta": {
+      "source_id": 590,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "wan",
+      "before_preview": "Physical/WAN design choices (media, topology, speeds) must match distance, cost, and service requirements. Correct choic"
+    }
+  },
+  {
+    "id": 592,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What mechanism carries multicast traffic between remote sites and supports encryption?",
+    "alternativas": [
+      "ISATAP",
+      "GRE over IPsec",
+      "IPsec over ISATAP",
+      "GRE"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Security controls protect identity, confidentiality, and access: fifirewalls inspect stateful flows, 802.1X/AAA authenticate, SSH encrypts CLI, port-security limits MACs, and physical controls guard facilities. Correct: GRE over IPsec. Option A (“ISATAP”) confuses physical vs logical controls or names the wrong crypto/AAA property. Option C (“IPsec over ISATAP”) does not mitigate the threat or implement the control described.",
+    "_meta": {
+      "source_id": 592,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "security",
+      "before_preview": "Security controls (firewall state, encryption, port security, 802.1X, DAI) protect confidentiality, integrity, and acces"
+    }
+  },
+  {
+    "id": 593,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network analyst is tasked with configuring the date and time on a router using EXEC mode.The date must be set to January 1,2020and the time must be set to 12:00 am.what command should be used?",
+    "alternativas": [
+      "clock timezone",
+      "clock summer-time date",
+      "clock set",
+      "clock summer-time recurring"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Operations protocols support management: SNMP polls/traps MIB data, syslog exports events by severity, NTP synchronizes clocks, TFTP/FTP move files, LLDP/CDP discover neighbors. Correct: clock set. Option A (“clock timezone”) names a protocol that does not perform the described management function. Option B (“clock summer-time date”) is the wrong command, severity, or transport for the task.",
+    "_meta": {
+      "source_id": 593,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "mgmt",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: clock set. It matches the protocol or feature behavior described i"
+    }
+  },
+  {
+    "id": 594,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which function is performed by the collapsed core layer in a two-tier architecture?",
+    "alternativas": [
+      "applying security policies",
+      "attaching users to the edge of the network",
+      "enforcing routing policies",
+      "making interesting traffic for data policies"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Campus/DC fabrics use hierarchical or spine-leaf designs: leafs connect to every spine for predictable hops; collapsed-core merges core+distribution on smaller networks. Correct: enforcing routing policies. Option A (“applying security policies”) breaks full mesh leaf-spine or misplaces access/distribution roles. Option B (“attaching users to the edge of the network”) does not scale edge ports or cost the way the architecture intends.",
+    "_meta": {
+      "source_id": 594,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "arch",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: enforcing routing policies. It matches the protocol or feature beh"
+    }
+  },
+  {
+    "id": 595,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a function of a remote access VPN?",
+    "alternativas": [
+      "used exclusively when a user is connected to a company's internal network",
+      "allows the users to access company internal network resources through a secure tunnel",
+      "uses cryptographic tunneling to protect the privacy of data for multiple users simultaneously",
+      "establishes a secure tunnel between two branch sites"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Security controls protect identity, confidentiality, and access: fifirewalls inspect stateful flows, 802.1X/AAA authenticate, SSH encrypts CLI, port-security limits MACs, and physical controls guard facilities. Correct: allows the users to access company internal network resources through a secure tunnel. Option A (“used exclusively when a user is connected to a company's internal network”) confuses physical vs logical controls or names the wrong crypto/AAA property. Option C (“uses cryptographic tunneling to protect the privacy of data for multiple users simultaneo…”) does not mitigate the threat or implement the control described.",
+    "_meta": {
+      "source_id": 595,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "security",
+      "before_preview": "Security controls (firewall state, encryption, port security, 802.1X, DAI) protect confidentiality, integrity, and acces"
+    }
+  },
+  {
+    "id": 597,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "When using Rapid PVST+, which command guarantees the switch is always the root bridge for VLAN 200?",
+    "alternativas": [
+      "spanning -tree vlan 200 priority 614440",
+      "spanning -tree vlan 200 priority 0",
+      "spanning -tree vlan 200 priority 38572422",
+      "spanning -tree vlan 200 root primary"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Spanning Tree elects a root and places redundant ports in blocking/discarding to prevent L2 loops; PortFast is for edge ports to reach forwarding quickly. Correct: spanning -tree vlan 200 priority 0. Option A (“spanning -tree vlan 200 priority 614440”) mixes PortFast with uplink recovery features (UplinkFast/BackboneFast) or wrong port states. Option C (“spanning -tree vlan 200 priority 38572422”) does not match STP election/port-role rules for this scenario.",
+    "_meta": {
+      "source_id": 597,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "stp",
+      "before_preview": "Spanning Tree builds a loop-free Layer-2 topology by electing a root and blocking redundant ports; edge features like Po"
+    }
+  },
+  {
+    "id": 598,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which command must be entered to configure a DHCP relay?",
+    "alternativas": [
+      "ip helper-address",
+      "ip address dhcp",
+      "ip dhcp pool",
+      "ip dhcp relay"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "DHCP clients request addresses from a server; if the server is remote, a relay (ip helper-address) on the client-facing L3 interface forwards DHCP messages. Pools use default-router for the gateway option. Correct: ip helper-address. Option B (“ip address dhcp”) confuses client, server, and relay roles or uses the wrong IOS command. Option C (“ip dhcp pool”) does not deliver DHCP options or relay broadcasts across subnets.",
+    "_meta": {
+      "source_id": 598,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "dhcp",
+      "before_preview": "DHCP assigns addressing/options; relays (helper-address) forward client broadcasts across subnets; pools define scopes a"
+    }
+  },
+  {
+    "id": 599,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "How does the dynamically-learned MAC address feature function?",
+    "alternativas": [
+      "The CAM table is empty until ingress traffic arrives at each port",
+      "Switches dynamically learn MAC addresses of each connecting CAM table.",
+      "The ports are restricted and learn up to a maximum of 10 dynamically-learned addresses",
+      "It requires a minimum number of secure MAC addresses to be filled dynamically"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Switches learn source MACs into the CAM table from ingress frames and forward known unicasts to one port; unknown destinations are flooded within the VLAN (except the ingress port). Correct: The CAM table is empty until ingress traffic arrives at each port. Option B (“Switches dynamically learn MAC addresses of each connecting CAM table.”) confuses learning with flooding direction or claims the switch rewrites MACs like a router. Option C (“The ports are restricted and learn up to a maximum of 10 dynamically-learned addresses”) contradicts standard Ethernet switching behavior.",
+    "_meta": {
+      "source_id": 599,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "l2",
+      "before_preview": "Switches learn source MACs on ingress and forward/filter known unicasts; unknown destinations are flooded in the VLAN. C"
+    }
+  },
+  {
+    "id": 600,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What facilitates a Telnet connection between devices by entering the device name?",
+    "alternativas": [
+      "SNMP",
+      "DNS lookup",
+      "syslog",
+      "NTP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Security controls protect identity, confidentiality, and access: fifirewalls inspect stateful flows, 802.1X/AAA authenticate, SSH encrypts CLI, port-security limits MACs, and physical controls guard facilities. Correct: DNS lookup. Option A (“SNMP”) confuses physical vs logical controls or names the wrong crypto/AAA property. Option C (“syslog”) does not mitigate the threat or implement the control described.",
+    "_meta": {
+      "source_id": 600,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "security",
+      "before_preview": "Device management and AAA features secure and monitor the network (logging, time, remote access, authentication). Correc"
+    }
+  },
+  {
+    "id": 601,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which technology can prevent client devices from arbitrarily connecting to the network without state remediation?",
+    "alternativas": [
+      "802.1x",
+      "IP Source Guard",
+      "MAC Authentication Bypass",
+      "802.11n"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Security controls protect identity, confidentiality, and access: fifirewalls inspect stateful flows, 802.1X/AAA authenticate, SSH encrypts CLI, port-security limits MACs, and physical controls guard facilities. Correct: 802.1x. Option B (“IP Source Guard”) confuses physical vs logical controls or names the wrong crypto/AAA property. Option C (“MAC Authentication Bypass”) does not mitigate the threat or implement the control described.",
+    "_meta": {
+      "source_id": 601,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "security",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: 802.1x. It matches the protocol or feature behavior described in t"
+    }
+  },
+  {
+    "id": 603,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer requires a switch interface to actively attempt to establish a trunk link with a neighbor switch. What command must beconfigured?",
+    "alternativas": [
+      "switchport mode trunk",
+      "switchport mode dynamic desirable",
+      "switchport mode dynamic auto",
+      "switchport nonegotiate"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "VLANs create separate broadcast domains; trunks carry multiple VLANs with 802.1Q tags, and the native VLAN is untagged. DTP/VTP affect negotiation and VLAN database sync. Correct: switchport mode dynamic desirable. Option A (“switchport mode trunk”) is wrong because it uses proprietary ISL, wrong DTP mode, or confuses access vs trunk behavior. Option C (“switchport mode dynamic auto”) does not meet the industry-standard trunking or isolation requirement stated.",
+    "_meta": {
+      "source_id": 603,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "vlan",
+      "before_preview": "VLANs segment broadcast domains; trunks use 802.1Q tagging (with careful native VLAN/DTP design). Correct choice: switch"
+    }
+  },
+  {
+    "id": 604,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a function of TFTP in network operations?",
+    "alternativas": [
+      "transfers a backup configuration file from a server to a switch using a username and password",
+      "transfers files between file systems on a router",
+      "transfers a configuration files from a server to a router on a congested link",
+      "transfers IOS images from a server to a router for firmware upgrades"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Operations protocols support management: SNMP polls/traps MIB data, syslog exports events by severity, NTP synchronizes clocks, TFTP/FTP move files, LLDP/CDP discover neighbors. Correct: transfers IOS images from a server to a router for firmware upgrades. Option A (“transfers a backup configuration file from a server to a switch using a username and pass…”) names a protocol that does not perform the described management function. Option B (“transfers files between file systems on a router”) is the wrong command, severity, or transport for the task.",
+    "_meta": {
+      "source_id": 604,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "mgmt",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: transfers IOS images from a server to a router for firmware upgrad"
+    }
+  },
+  {
+    "id": 605,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a recommended approach to avoid co-channel congestion while installing access points that use the 2.4 GHz frequency?",
+    "alternativas": [
+      "different nonoverlapping channels",
+      "different overlapping channels",
+      "one overlapping channel",
+      "one nonoverlapping channel"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Enterprise Wi-Fi uses SSIDs, lightweight APs with CAPWAP to a WLC (or FlexConnect), and WPA2/WPA3 security. Management/data paths and RF features (band select, QoS profiles) are controller-centric. Correct: different nonoverlapping channels. Option B (“different overlapping channels”) confuses AP modes, security ciphers, or WLC interfaces. Option C (“one overlapping channel”) does not match how CAPWAP, SSIDs, or WPA operate in this design.",
+    "_meta": {
+      "source_id": 605,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "wireless",
+      "before_preview": "Enterprise wireless uses controllers/APs, SSIDs, and modern security (WPA2/WPA3) with CAPWAP control. Correct choice: di"
+    }
+  },
+  {
+    "id": 606,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which CRUD operation modifies an existing table or view?",
+    "alternativas": [
+      "read",
+      "create",
+      "replace",
+      "update"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "In SDN/controller-based networks the control plane is centralized; southbound APIs program devices and northbound APIs face applications (often REST/JSON). DNA Center automates intent and assurance versus per-box CLI. Correct: update. Option A (“read”) reverses northbound/southbound roles or confuses data-plane forwarding with control decisions. Option B (“create”) describes traditional box-centric management or an unrelated API style.",
+    "_meta": {
+      "source_id": 606,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "sdn",
+      "before_preview": "Controller-based/SDN architectures separate control and data planes and expose northbound/southbound APIs for automation"
+    }
+  },
+  {
+    "id": 607,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a DHCP client?",
+    "alternativas": [
+      "a workstation that requests a domain name associated with its IP address",
+      "a host that is configured to request an IP address automatically",
+      "a server that dynamically assigns IP addresses to hosts.",
+      "a router that statically assigns IP addresses to hosts."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "DHCP clients request addresses from a server; if the server is remote, a relay (ip helper-address) on the client-facing L3 interface forwards DHCP messages. Pools use default-router for the gateway option. Correct: a host that is configured to request an IP address automatically. Option A (“a workstation that requests a domain name associated with its IP address”) confuses client, server, and relay roles or uses the wrong IOS command. Option C (“a server that dynamically assigns IP addresses to hosts.”) does not deliver DHCP options or relay broadcasts across subnets.",
+    "_meta": {
+      "source_id": 607,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "dhcp",
+      "before_preview": "DHCP assigns addressing/options; relays (helper-address) forward client broadcasts across subnets; pools define scopes a"
+    }
+  },
+  {
+    "id": 608,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the same for both copper and fiber interfaces when using SFP modules?",
+    "alternativas": [
+      "They support an inline optical attenuator to enhance signal strength",
+      "They provide minimal interruption to services by being hot-swappable",
+      "They offer reliable bandwidth up to 100 Mbps in half duplex mode",
+      "They accommodate single-mode and multi-mode in a single module"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Copper and fiber media differ in distance, EMI, and connectors (for example OM3/OM4 50 µm multimode). Choose the medium and connector that match the transceiver. Correct: They provide minimal interruption to services by being hot-swappable. Option A (“They support an inline optical attenuator to enhance signal strength”) cites the wrong core size, connector, or reach. Option C (“They offer reliable bandwidth up to 100 Mbps in half duplex mode”) does not match the transceiver/cable pair required.",
+    "_meta": {
+      "source_id": 608,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "fiber",
+      "before_preview": "Physical/WAN design choices (media, topology, speeds) must match distance, cost, and service requirements. Correct choic"
+    }
+  },
+  {
+    "id": 609,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer must configure Interswitch VLAN communication between a Cisco switch and a third-party switch. Which action should betaken?",
+    "alternativas": [
+      "configure IEEE 802.1p",
+      "configure IEEE 802.1q",
+      "configure ISL",
+      "configure DSCP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "VLANs create separate broadcast domains; trunks carry multiple VLANs with 802.1Q tags, and the native VLAN is untagged. DTP/VTP affect negotiation and VLAN database sync. Correct: configure IEEE 802.1q. Option A (“configure IEEE 802.1p”) is wrong because it uses proprietary ISL, wrong DTP mode, or confuses access vs trunk behavior. Option C (“configure ISL”) does not meet the industry-standard trunking or isolation requirement stated.",
+    "_meta": {
+      "source_id": 609,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "vlan",
+      "before_preview": "VLANs segment broadcast domains; trunks use 802.1Q tagging (with careful native VLAN/DTP design). Correct choice: config"
+    }
+  },
+  {
+    "id": 610,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which protocol prompts the Wireless LAN Controller to generate its own local web administration SSL certificate for GUI access?",
+    "alternativas": [
+      "HTTPS",
+      "RADIUS",
+      "TACACS+",
+      "HTTP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Enterprise Wi-Fi uses SSIDs, lightweight APs with CAPWAP to a WLC (or FlexConnect), and WPA2/WPA3 security. Management/data paths and RF features (band select, QoS profiles) are controller-centric. Correct: HTTPS. Option B (“RADIUS”) confuses AP modes, security ciphers, or WLC interfaces. Option C (“TACACS+”) does not match how CAPWAP, SSIDs, or WPA operate in this design.",
+    "_meta": {
+      "source_id": 610,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "wireless",
+      "before_preview": "Enterprise wireless uses controllers/APs, SSIDs, and modern security (WPA2/WPA3) with CAPWAP control. Correct choice: HT"
+    }
+  },
+  {
+    "id": 611,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "In software defined architectures, which plane is distributed and responsible for traffic forwarding?",
+    "alternativas": [
+      "management plane",
+      "control plane",
+      "policy plane",
+      "data plane"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Based on the CCNA 200-301 topic in the stem, the right selection is “data plane” because it correctly describes the operational behavior required. Option A (“management plane”) is incorrect: it conflicts with the standard definition or configuration of this feature. Option B (“control plane”) is also wrong because it applies to another technology or reverses cause and effect. Review the correct option against the other three and keep the answer that alone satisfies every condition in the question.",
+    "_meta": {
+      "source_id": 611,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "general",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: data plane. It matches the protocol or feature behavior described "
+    }
+  },
+  {
+    "id": 612,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which configuration management mechanism uses TCP port 22 by default when communicating with managed nodes?",
+    "alternativas": [
+      "Chef",
+      "Python",
+      "Puppet",
+      "Ansible"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "In SDN/controller-based networks the control plane is centralized; southbound APIs program devices and northbound APIs face applications (often REST/JSON). DNA Center automates intent and assurance versus per-box CLI. Correct: Ansible. Option A (“Chef”) reverses northbound/southbound roles or confuses data-plane forwarding with control decisions. Option B (“Python”) describes traditional box-centric management or an unrelated API style.",
+    "_meta": {
+      "source_id": 612,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "sdn",
+      "before_preview": "TCP is connection-oriented and reliable with handshake/ACK/windowing; UDP is connectionless best-effort. Correct choice:"
+    }
+  },
+  {
+    "id": 613,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Where does a switch maintain DHCP snooping information?",
+    "alternativas": [
+      "in the MAC address table",
+      "in the CAM table",
+      "in the binding database",
+      "in the frame forwarding database"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "DHCP clients request addresses from a server; if the server is remote, a relay (ip helper-address) on the client-facing L3 interface forwards DHCP messages. Pools use default-router for the gateway option. Correct: in the binding database. Option A (“in the MAC address table”) confuses client, server, and relay roles or uses the wrong IOS command. Option B (“in the CAM table”) does not deliver DHCP options or relay broadcasts across subnets.",
+    "_meta": {
+      "source_id": 613,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "dhcp",
+      "before_preview": "DHCP assigns addressing/options; relays (helper-address) forward client broadcasts across subnets; pools define scopes a"
+    }
+  },
+  {
+    "id": 614,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which type of security program is violated when a group of employees enters a building using the ID badge of only one person?",
+    "alternativas": [
+      "intrusion detection",
+      "user awareness",
+      "physical access control",
+      "network authorization"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Security controls protect identity, confidentiality, and access: fifirewalls inspect stateful flows, 802.1X/AAA authenticate, SSH encrypts CLI, port-security limits MACs, and physical controls guard facilities. Correct: physical access control. Option A (“intrusion detection”) confuses physical vs logical controls or names the wrong crypto/AAA property. Option B (“user awareness”) does not mitigate the threat or implement the control described.",
+    "_meta": {
+      "source_id": 614,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "security",
+      "before_preview": "Security controls (firewall state, encryption, port security, 802.1X, DAI) protect confidentiality, integrity, and acces"
+    }
+  },
+  {
+    "id": 615,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network administrator needs to aggregate 4 ports into a single logical link which must negotiate layer 2 connectivity to ports onanother switch What must be configured when using active mode on both sides of the connection?",
+    "alternativas": [
+      "802.1q trunks",
+      "Cisco vPC",
+      "LLDP",
+      "LACP"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "EtherChannel/LACP/LAG bundles multiple physical links into one logical channel for higher throughput and redundancy when both sides match (mode, VLANs, speed). Correct: LACP. Option A (“802.1q trunks”) confuses LACP with DTP/trunk encapsulation or uses a non-negotiating mode incorrectly. Option B (“Cisco vPC”) is not the open-standard bundling protocol or WLC LAG requirement.",
+    "_meta": {
+      "source_id": 615,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "ether",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: LACP. It matches the protocol or feature behavior described in the"
+    }
+  },
+  {
+    "id": 616,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "In which situation is private IPv4 addressing appropriate for a new subnet on the network of an organization?",
+    "alternativas": [
+      "There is limited unique address space, and traffic on the new subnet will stay local within the organization.",
+      "The network has multiple endpoint listeners, and it is desired to limit the number of broadcasts.",
+      "Traffic on the subnet must traverse a site-to-site VPN to an outside organization.",
+      "The ISP requires the new subnet to be advertised to the internet for web services."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Private IPv4 (RFC 1918) is not advertised as public Internet space, so internal hosts are not directly reachable from the global Internet without NAT or a similar edge translation—this reduces direct exposure. The correct answer (“There is limited unique address space, and traffic on the new subnet will stay local within the org…”) captures that protection/conservation role. Option B (“The network has multiple endpoint listeners, and it is desired to limit the number of bro…”) fails because private addresses do not by themselves enable free communication across public boundaries. Option C (“Traffic on the subnet must traverse a site-to-site VPN to an outside organization.”) is also incorrect: private addressing does not shrink the global Internet routing table for other enterprises, nor make private-to-private Internet paths routable without tunnels/NAT.",
+    "_meta": {
+      "source_id": 616,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "priv",
+      "before_preview": "RFC1918 private IPv4 is reused internally without global uniqueness, conserving public space and reducing direct Interne"
+    }
+  },
+  {
+    "id": 617,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which state does the switch port move to when PortFast is enabled?",
+    "alternativas": [
+      "forwarding",
+      "listening",
+      "blocking",
+      "learning"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Spanning Tree elects a root and places redundant ports in blocking/discarding to prevent L2 loops; PortFast is for edge ports to reach forwarding quickly. Correct: forwarding. Option B (“listening”) mixes PortFast with uplink recovery features (UplinkFast/BackboneFast) or wrong port states. Option C (“blocking”) does not match STP election/port-role rules for this scenario.",
+    "_meta": {
+      "source_id": 617,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "stp",
+      "before_preview": "Spanning Tree builds a loop-free Layer-2 topology by electing a root and blocking redundant ports; edge features like Po"
+    }
+  },
+  {
+    "id": 618,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a role of wireless controllers in an enterprise network?",
+    "alternativas": [
+      "centralize the management of access points in an enterprise network",
+      "support standalone or controller-based architectures",
+      "serve as the first line of defense in an enterprise network",
+      "provide secure user logins to devices on the network."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Enterprise Wi-Fi uses SSIDs, lightweight APs with CAPWAP to a WLC (or FlexConnect), and WPA2/WPA3 security. Management/data paths and RF features (band select, QoS profiles) are controller-centric. Correct: centralize the management of access points in an enterprise network. Option B (“support standalone or controller-based architectures”) confuses AP modes, security ciphers, or WLC interfaces. Option C (“serve as the first line of defense in an enterprise network”) does not match how CAPWAP, SSIDs, or WPA operate in this design.",
+    "_meta": {
+      "source_id": 618,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "wireless",
+      "before_preview": "Enterprise wireless uses controllers/APs, SSIDs, and modern security (WPA2/WPA3) with CAPWAP control. Correct choice: ce"
+    }
+  },
+  {
+    "id": 619,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the effect when loopback interfaces and the configured router ID are absent during the OSPF Process configuration?",
+    "alternativas": [
+      "No router ID is set, and the OSPF protocol does not run.",
+      "The highest up/up physical interface IP address is selected as the router ID.",
+      "The lowest IP address is incremented by 1 and selected as the router ID.",
+      "The router ID 0.0.0.0 is selected and placed into the routing table."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Routers choose paths with longest-prefix match, then administrative distance across sources, then metric within a protocol. Floating statics use a higher AD than the primary so they install only on failure. Correct: The highest up/up physical interface IP address is selected as the router ID.. Option A (“No router ID is set, and the OSPF protocol does not run.”) uses the wrong AD, metric comparison across protocols, or an invalid static syntax. Option C (“The lowest IP address is incremented by 1 and selected as the router ID.”) would install the wrong route preference or not provide backup behavior.",
+    "_meta": {
+      "source_id": 619,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "routing",
+      "before_preview": "OSPF adjacency and path selection depend on compatible parameters (area, timers, network type, MTU) and metrics/priority"
+    }
+  },
+  {
+    "id": 620,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is recommended for the wireless infrastructure design of an organization?",
+    "alternativas": [
+      "group access points together to increase throughput on a given channel",
+      "configure the first three access points are configured to use Channels 1, 6, and 11",
+      "include a least two access points on nonoverlapping channels to support load balancing",
+      "assign physically adjacent access points to the same Wi-Fi channel"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Enterprise Wi-Fi uses SSIDs, lightweight APs with CAPWAP to a WLC (or FlexConnect), and WPA2/WPA3 security. Management/data paths and RF features (band select, QoS profiles) are controller-centric. Correct: configure the first three access points are configured to use Channels 1, 6, and 11. Option A (“group access points together to increase throughput on a given channel”) confuses AP modes, security ciphers, or WLC interfaces. Option C (“include a least two access points on nonoverlapping channels to support load balancing”) does not match how CAPWAP, SSIDs, or WPA operate in this design.",
+    "_meta": {
+      "source_id": 620,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "wireless",
+      "before_preview": "Enterprise wireless uses controllers/APs, SSIDs, and modern security (WPA2/WPA3) with CAPWAP control. Correct choice: co"
+    }
+  },
+  {
+    "id": 621,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which 802.11 frame type is indicated by a probe response after a client sends a probe request?",
+    "alternativas": [
+      "action",
+      "management",
+      "control",
+      "data"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Enterprise Wi-Fi uses SSIDs, lightweight APs with CAPWAP to a WLC (or FlexConnect), and WPA2/WPA3 security. Management/data paths and RF features (band select, QoS profiles) are controller-centric. Correct: management. Option A (“action”) confuses AP modes, security ciphers, or WLC interfaces. Option C (“control”) does not match how CAPWAP, SSIDs, or WPA operate in this design.",
+    "_meta": {
+      "source_id": 621,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "wireless",
+      "before_preview": "Enterprise wireless uses controllers/APs, SSIDs, and modern security (WPA2/WPA3) with CAPWAP control. Correct choice: ma"
+    }
+  },
+  {
+    "id": 622,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "How do servers connect to the network in a virtual environment?",
+    "alternativas": [
+      "wireless to an access point that is physically connected to the network",
+      "a cable connected to a physical switch on the network",
+      "a virtual switch that links to an access point that is physically connected to the network",
+      "a software switch on a hypervisor that is physically connected to the network"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Hypervisors virtualize CPU, memory, storage, and NICs so multiple VMs share one host; cloud models (IaaS/PaaS/SaaS) and elasticity describe how capacity is consumed. Correct: a software switch on a hypervisor that is physically connected to the network. Option A (“wireless to an access point that is physically connected to the network”) confuses the hypervisor role with a cloud service model or physical-only networking. Option B (“a cable connected to a physical switch on the network”) is not how VMs attach or how resources are scheduled.",
+    "_meta": {
+      "source_id": 622,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "virt",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: a software switch on a hypervisor that is physically connected to "
+    }
+  },
+  {
+    "id": 623,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which CRUD operation corresponds to the HTTP GET method?",
+    "alternativas": [
+      "read",
+      "update",
+      "create",
+      "delete"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "In SDN/controller-based networks the control plane is centralized; southbound APIs program devices and northbound APIs face applications (often REST/JSON). DNA Center automates intent and assurance versus per-box CLI. Correct: read. Option B (“update”) reverses northbound/southbound roles or confuses data-plane forwarding with control decisions. Option C (“create”) describes traditional box-centric management or an unrelated API style.",
+    "_meta": {
+      "source_id": 623,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "sdn",
+      "before_preview": "Controller-based/SDN architectures separate control and data planes and expose northbound/southbound APIs for automation"
+    }
+  },
+  {
+    "id": 624,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "With REST API, which standard HTTP header tells a server which media type is expected by the client?",
+    "alternativas": [
+      "Accept-Encoding: gzip. deflate",
+      "Accept-Patch: text/example; charset=utf-8",
+      "Content-Type: application/json; charset=utf-8",
+      "Accept: application/json"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "In SDN/controller-based networks the control plane is centralized; southbound APIs program devices and northbound APIs face applications (often REST/JSON). DNA Center automates intent and assurance versus per-box CLI. Correct: Accept: application/json. Option A (“Accept-Encoding: gzip. deflate”) reverses northbound/southbound roles or confuses data-plane forwarding with control decisions. Option B (“Accept-Patch: text/example; charset=utf-8”) describes traditional box-centric management or an unrelated API style.",
+    "_meta": {
+      "source_id": 624,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "sdn",
+      "before_preview": "Controller-based/SDN architectures separate control and data planes and expose northbound/southbound APIs for automation"
+    }
+  },
+  {
+    "id": 625,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which device trafficks the state of active connections in order to make a decision to forward a packet through?",
+    "alternativas": [
+      "wireless access point",
+      "fifirewall",
+      "wireless LAN controller",
+      "router"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Security controls protect identity, confidentiality, and access: fifirewalls inspect stateful flows, 802.1X/AAA authenticate, SSH encrypts CLI, port-security limits MACs, and physical controls guard facilities. Correct: firewall. Option A (“wireless access point”) confuses physical vs logical controls or names the wrong crypto/AAA property. Option C (“wireless LAN controller”) does not mitigate the threat or implement the control described.",
+    "_meta": {
+      "source_id": 625,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "security",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: fififirewall. It matches the protocol or feature behavior describe"
+    }
+  },
+  {
+    "id": 626,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network administrator must enable DHCP services between two sites. What must be configured for the router to passDHCPDISCOVER messages on to the server?",
+    "alternativas": [
+      "a DHCP Relay Agent",
+      "DHCP Binding",
+      "a DHCP Pool",
+      "DHCP Snooping"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "DHCP clients request addresses from a server; if the server is remote, a relay (ip helper-address) on the client-facing L3 interface forwards DHCP messages. Pools use default-router for the gateway option. Correct: a DHCP Relay Agent. Option B (“DHCP Binding”) confuses client, server, and relay roles or uses the wrong IOS command. Option C (“a DHCP Pool”) does not deliver DHCP options or relay broadcasts across subnets.",
+    "_meta": {
+      "source_id": 626,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "dhcp",
+      "before_preview": "DHCP assigns addressing/options; relays (helper-address) forward client broadcasts across subnets; pools define scopes a"
+    }
+  },
+  {
+    "id": 627,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which device controls the forwarding of authentication requests for users when connecting to the network using a lightweight accesspoint?",
+    "alternativas": [
+      "TACACS server",
+      "wireless access point",
+      "RADIUS server",
+      "wireless LAN controller"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Enterprise Wi-Fi uses SSIDs, lightweight APs with CAPWAP to a WLC (or FlexConnect), and WPA2/WPA3 security. Management/data paths and RF features (band select, QoS profiles) are controller-centric. Correct: wireless LAN controller. Option A (“TACACS server”) confuses AP modes, security ciphers, or WLC interfaces. Option B (“wireless access point”) does not match how CAPWAP, SSIDs, or WPA operate in this design.",
+    "_meta": {
+      "source_id": 627,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "wireless",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: wireless LAN controller. It matches the protocol or feature behavi"
+    }
+  },
+  {
+    "id": 628,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which configuration is needed to generate an RSA key for SSH on a router?",
+    "alternativas": [
+      "Configure the version of SSH",
+      "Configure VTY access.",
+      "Create a user with a password",
+      "Assign a DNS domain name"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Security controls protect identity, confidentiality, and access: fifirewalls inspect stateful flows, 802.1X/AAA authenticate, SSH encrypts CLI, port-security limits MACs, and physical controls guard facilities. Correct: Assign a DNS domain name. Option A (“Configure the version of SSH”) confuses physical vs logical controls or names the wrong crypto/AAA property. Option B (“Configure VTY access.”) does not mitigate the threat or implement the control described.",
+    "_meta": {
+      "source_id": 628,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "security",
+      "before_preview": "Device management and AAA features secure and monitor the network (logging, time, remote access, authentication). Correc"
+    }
+  },
+  {
+    "id": 629,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the maximum bandwidth of a T1 point-to-point connection?",
+    "alternativas": [
+      "1.544 Mbps",
+      "2.048 Mbps",
+      "34.368 Mbps",
+      "43.7 Mbps"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "WAN design trades cost, simplicity, and availability: point-to-point leased lines are simple; hub-and-spoke reduces full-mesh expense; broadband often fits SOHO. Correct: 1.544 Mbps. Option B (“2.048 Mbps”) is a poorer fit for the size/cost/availability goal in the stem. Option C (“34.368 Mbps”) overbuilds or under-serves the described site type.",
+    "_meta": {
+      "source_id": 629,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "wan",
+      "before_preview": "Physical/WAN design choices (media, topology, speeds) must match distance, cost, and service requirements. Correct choic"
+    }
+  },
+  {
+    "id": 630,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer must configure traffic for a VLAN that is untagged by the switch as it crosses a trunk link. Which command should beused?",
+    "alternativas": [
+      "switchport trunk allowed vlan 10",
+      "switchport trunk native vlan 10",
+      "switchport mode trunk",
+      "switchport trunk encapsulation dot1q"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "VLANs create separate broadcast domains; trunks carry multiple VLANs with 802.1Q tags, and the native VLAN is untagged. DTP/VTP affect negotiation and VLAN database sync. Correct: switchport trunk native vlan 10. Option A (“switchport trunk allowed vlan 10”) is wrong because it uses proprietary ISL, wrong DTP mode, or confuses access vs trunk behavior. Option C (“switchport mode trunk”) does not meet the industry-standard trunking or isolation requirement stated.",
+    "_meta": {
+      "source_id": 630,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "vlan",
+      "before_preview": "VLANs segment broadcast domains; trunks use 802.1Q tagging (with careful native VLAN/DTP design). Correct choice: switch"
+    }
+  },
+  {
+    "id": 631,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "How does a Cisco Unified Wireless network respond to Wi-Fi channel overlap?",
+    "alternativas": [
+      "It alternates automatically between 2.4 GHz and 5 GHz on adjacent access points",
+      "It allows the administrator to assign channels on a per-device or per-\ninterface basis.",
+      "It segregates devices from different manufacturers onto different channels.",
+      "It analyzes client load and background noise and dynamically assigns a channel."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Enterprise Wi-Fi uses SSIDs, lightweight APs with CAPWAP to a WLC (or FlexConnect), and WPA2/WPA3 security. Management/data paths and RF features (band select, QoS profiles) are controller-centric. Correct: It analyzes client load and background noise and dynamically assigns a channel.. Option A (“It alternates automatically between 2.4 GHz and 5 GHz on adjacent access points”) confuses AP modes, security ciphers, or WLC interfaces. Option B (“It allows the administrator to assign channels on a per-device or per- interface basis.”) does not match how CAPWAP, SSIDs, or WPA operate in this design.",
+    "_meta": {
+      "source_id": 631,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "wireless",
+      "before_preview": "Enterprise wireless uses controllers/APs, SSIDs, and modern security (WPA2/WPA3) with CAPWAP control. Correct choice: It"
+    }
+  },
+  {
+    "id": 632,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What does a switch use to build its MAC address table?",
+    "alternativas": [
+      "VTP",
+      "DTP",
+      "egress traffic",
+      "ingress traffic"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Switches learn source MACs into the CAM table from ingress frames and forward known unicasts to one port; unknown destinations are flooded within the VLAN (except the ingress port). Correct: ingress traffic. Option A (“VTP”) confuses learning with flooding direction or claims the switch rewrites MACs like a router. Option B (“DTP”) contradicts standard Ethernet switching behavior.",
+    "_meta": {
+      "source_id": 632,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "l2",
+      "before_preview": "Switches learn source MACs on ingress and forward/filter known unicasts; unknown destinations are flooded in the VLAN. C"
+    }
+  },
+  {
+    "id": 633,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which network plane is centralized and manages routing decisions?",
+    "alternativas": [
+      "policy plane",
+      "management plane",
+      "control plane",
+      "data plane"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Based on the CCNA 200-301 topic in the stem, the right selection is “control plane” because it correctly describes the operational behavior required. Option A (“policy plane”) is incorrect: it conflicts with the standard definition or configuration of this feature. Option B (“management plane”) is also wrong because it applies to another technology or reverses cause and effect. Review the correct option against the other three and keep the answer that alone satisfies every condition in the question.",
+    "_meta": {
+      "source_id": 633,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "general",
+      "before_preview": "Routers install routes by longest match and administrative distance; floating statics use higher AD as backup. Correct c"
+    }
+  },
+  {
+    "id": 634,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What does a router do when configured with the default DNS lookup settings, and a URL is entered on the CLI?",
+    "alternativas": [
+      "initiates a ping request to the URL",
+      "prompts the user to specify the desired IP address",
+      "continuously attempts to resolve the URL until the command is cancelled",
+      "sends a broadcast message in an attempt to resolve the URL"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Based on the CCNA 200-301 topic in the stem, the right selection is “sends a broadcast message in an attempt to resolve the URL” because it correctly describes the operational behavior required. Option A (“initiates a ping request to the URL”) is incorrect: it conflicts with the standard definition or configuration of this feature. Option B (“prompts the user to specify the desired IP address”) is also wrong because it applies to another technology or reverses cause and effect. Review the correct option against the other three and keep the answer that alone satisfies every condition in the question.",
+    "_meta": {
+      "source_id": 634,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "general",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: sends a broadcast message in an attempt to resolve the URL. It mat"
+    }
+  },
+  {
+    "id": 635,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which type of information resides on a DHCP server ?",
+    "alternativas": [
+      "a list of statically assigned MAC addresses",
+      "a list of the available IP addresses in a pool",
+      "a list of public IP addresses and their corresponding names",
+      "usernames and passwords for the end users in a domain"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "DHCP clients request addresses from a server; if the server is remote, a relay (ip helper-address) on the client-facing L3 interface forwards DHCP messages. Pools use default-router for the gateway option. Correct: a list of the available IP addresses in a pool. Option A (“a list of statically assigned MAC addresses”) confuses client, server, and relay roles or uses the wrong IOS command. Option C (“a list of public IP addresses and their corresponding names”) does not deliver DHCP options or relay broadcasts across subnets.",
+    "_meta": {
+      "source_id": 635,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "dhcp",
+      "before_preview": "DHCP assigns addressing/options; relays (helper-address) forward client broadcasts across subnets; pools define scopes a"
+    }
+  },
+  {
+    "id": 636,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which spanning-tree enhancement avoids the learning and listening states and immediately places ports in the forwarding state ?",
+    "alternativas": [
+      "BPDU filter",
+      "Backbonefast",
+      "BPDU guard",
+      "PortFast"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Spanning Tree elects a root and places redundant ports in blocking/discarding to prevent L2 loops; PortFast is for edge ports to reach forwarding quickly. Correct: PortFast. Option A (“BPDU filter”) mixes PortFast with uplink recovery features (UplinkFast/BackboneFast) or wrong port states. Option B (“Backbonefast”) does not match STP election/port-role rules for this scenario.",
+    "_meta": {
+      "source_id": 636,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "stp",
+      "before_preview": "Spanning Tree builds a loop-free Layer-2 topology by electing a root and blocking redundant ports; edge features like Po"
+    }
+  },
+  {
+    "id": 637,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a DNS lookup operation?",
+    "alternativas": [
+      "DNS server pings the destination to verify that it is available",
+      "serves requests over destination port 53",
+      "DNS server forwards the client to an alternate IP address when the primary IP is down",
+      "responds to a request for IP address to domain name resolution to the DNS server"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "The stem asks for the defining behavior or role of a CCNA technology. The accurate description is: responds to a request for IP address to domain name resolution to the DNS server. That matches how the protocol or component operates in the Enterprise exam blueprint. Option A (“DNS server pings the destination to verify that it is available”) attributes properties of a different feature or reverses a key fact. Option B (“serves requests over destination port 53”) is a common distraffictor that sounds related but does not satisfy the definition asked.",
+    "_meta": {
+      "source_id": 637,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "general",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: responds to a request for IP address to domain name resolution to "
+    }
+  },
+  {
+    "id": 638,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a characteristic of a SOHO network?",
+    "alternativas": [
+      "connects each switch to every other switch in the network",
+      "enables multiple users to share a single broadband connection",
+      "provides high throughput access for 1000 or more users",
+      "includes at least three tiers of devices to provide load balancing and redundancy"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "WAN design trades cost, simplicity, and availability: point-to-point leased lines are simple; hub-and-spoke reduces full-mesh expense; broadband often fits SOHO. Correct: enables multiple users to share a single broadband connection. Option A (“connects each switch to every other switch in the network”) is a poorer fit for the size/cost/availability goal in the stem. Option C (“provides high throughput access for 1000 or more users”) overbuilds or under-serves the described site type.",
+    "_meta": {
+      "source_id": 638,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "wan",
+      "before_preview": "For this CCNA 200-301 item, the correct statement is: enables multiple users to share a single broadband connection. It "
+    }
+  },
+  {
+    "id": 639,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which resource is able to be shared among virtual machines deployed on the same physical server?",
+    "alternativas": [
+      "disk",
+      "applications",
+      "VM configuration file",
+      "operating system"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "First-hop redundancy (HSRP/VRRP/GLBP) keeps a virtual IP/MAC as the hosts’ default gateway so forwarding continues when the active/master router fails. Correct: disk. Option B (“applications”) confuses FHRP with STP loop prevention, ECMP, or non-FHRP roles. Option C (“VM configuration file”) describes a different protocol behavior and does not provide gateway failover semantics.",
+    "_meta": {
+      "source_id": 639,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "fhrp",
+      "before_preview": "First-hop redundancy provides a shared virtual gateway (IP/MAC) so hosts keep a stable default gateway when a router fai"
+    }
+  },
+  {
+    "id": 640,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which implementation provides the strongest encryption combination for the wireless environment?",
+    "alternativas": [
+      "WPA2 + AES",
+      "WPA + AES",
+      "WEP",
+      "WPA + TKIP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Enterprise Wi-Fi uses SSIDs, lightweight APs with CAPWAP to a WLC (or FlexConnect), and WPA2/WPA3 security. Management/data paths and RF features (band select, QoS profiles) are controller-centric. Correct: WPA2 + AES. Option B (“WPA + AES”) confuses AP modes, security ciphers, or WLC interfaces. Option C (“WEP”) does not match how CAPWAP, SSIDs, or WPA operate in this design.",
+    "_meta": {
+      "source_id": 640,
+      "source_file": "lote_566_777_enriched.json",
+      "topic": "wireless",
+      "before_preview": "NAT/PAT translates addresses between inside and outside realms; overload enables many-to-one using ports. Correct choice"
+    }
+  }
+]

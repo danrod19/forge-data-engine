@@ -1,0 +1,1052 @@
+[
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the difference regarding reliability and communication type between TCP and UDP?",
+    "alternativas": [
+      "TCP is reliable and is a connectionless protocol; UDP is not reliable and is a connection-oriented protocol.",
+      "TCP is not reliable and is a connectionless protocol; UDP is reliable and is a connection-oriented protocol.",
+      "TCP is not reliable and is a connection-oriented protocol; UDP is reliable and is a connectionless protocol.",
+      "TCP is reliable and is a connection-oriented protocol; UDP is not reliable and is a connectionless protocol."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which type of IPv6 address is publicly routable in the same way as IPv4 public addresses?",
+    "alternativas": [
+      "multicast",
+      "unique local",
+      "link-local",
+      "global unicast"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the expected outcome when an EUI-64 address is generated?",
+    "alternativas": [
+      "The interface ID is congured as a random 64-bit value",
+      "The characters FE80 are inserted at the beginning of the MAC address of the interface",
+      "The seventh bit of the original MAC address of the interface is inverted",
+      "The MAC address of the interface is used as the interface ID without modication"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A corporate oce uses four oors in a building.✑ Floor 1 has 24 users.✑ Floor 2 has 29 users.Floor 3 has 28 users.✑ Floor 4 has 22 users.Which subnet summarizes and gives the most ecient distribution of IP addresses for the router conguration?",
+    "alternativas": [
+      "192.168.0.0/24 as summary and 192.168.0.0/28 for each oor",
+      "192.168.0.0/23 as summary and 192.168.0.0/25 for each oor",
+      "192.168.0.0/25 as summary and 192.168.0.0/27 for each oor",
+      "192.168.0.0/26 as summary and 192.168.0.0/29 for each oor"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of spine-and-leaf architecture?",
+    "alternativas": [
+      "Each link between leaf switches allows for higher bandwidth.",
+      "It provides greater predictability on STP blocked ports.",
+      "It provides variable latency.",
+      "Each device is separated by the same number of hops."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Using direct sequence spread spectrum, which three 2.4-GHz channels are used to limit collisions?",
+    "alternativas": [
+      "5, 6, 7",
+      "1, 2, 3",
+      "1, 6, 11",
+      "1, 5, 10"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How do TCP and UDP differ in the way they guarantee packet delivery?",
+    "alternativas": [
+      "TCP uses retransmissions, acknowledgment, and parity checks, and UDP uses cyclic redundancy checks only",
+      "TCP uses two-dimensional parity checks, checksums, and cyclic redundancy checks, and UDP uses retransmissions only",
+      "TCP uses checksum, acknowledgements, and retransmissions, and UDP uses checksums only",
+      "TCP uses checksum, parity checks, and retransmissions, and UDP uses acknowledgements only"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A wireless administrator has congured a WLAN; however, the clients need access to a less congested 5-GHz network for their voice quality.Which action must be taken to meet the requirement?",
+    "alternativas": [
+      "enable Band Select",
+      "enable DTIM",
+      "enable RX-SOP",
+      "enable AAA override"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the destination MAC address of a broadcast frame?",
+    "alternativas": [
+      "00:00:0c:07:ac:01",
+      "ff:ff:ff:ff:ff:ff",
+      "43:2e:08:00:00:0c",
+      "00:00:0c:43:2e:08E. 00:00:0c:ff:ff:ff"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "For what two purposes does the Ethernet protocol use physical addresses?",
+    "alternativas": [
+      "to uniquely identify devices at Layer 2",
+      "to allow communication with devices on a different network",
+      "to differentiate a Layer 2 frame from a Layer 3 packet",
+      "to establish a priority system to determine which device gets to transmit rstE. to allow communication between different devices on the same networkF. to allow detection of a remote device when its physical address is unknown"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "You are conguring your edge routers interface with a public IP address for Internet connectivity. The router needs to obtain the IP address fromthe service provider dynamically.Which command is needed on interface FastEthernet 0/0 to accomplish this?",
+    "alternativas": [
+      "ip default-gateway",
+      "ip route",
+      "ip default-network",
+      "ip address dhcpE. ip address dynamic"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which technique can you use to route IPv6 trac over an IPv4 infrastructure?",
+    "alternativas": [
+      "NAT",
+      "6 to 4 tunneling",
+      "L2TPv3",
+      "dual-stack"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which WAN access technology is preferred for a small oce / home oce architecture?",
+    "alternativas": [
+      "broadband cable access",
+      "frame-relay packet switching",
+      "dedicated point-to-point leased line",
+      "Integrated Services Digital Network switching"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the binary pattern of unique ipv6 unique local address?",
+    "alternativas": [
+      "00000000",
+      "11111100",
+      "11111111",
+      "11111101"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the same for both copper and ber interfaces when using SFP modules?",
+    "alternativas": [
+      "They support an inline optical attenuator to enhance signal strength",
+      "They accommodate single-mode and multi-mode in a single module",
+      "They provide minimal interruption to services by being hot-swappable",
+      "They offer reliable bandwidth up to 100 Mbps in half duplex mode"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 31,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which function is performed by the collapsed core layer in a two-tier architecture?",
+    "alternativas": [
+      "enforcing routing policies",
+      "marking interesting trac for data policies",
+      "applying security policies",
+      "attaching users to the edge of the network"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 32,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a recommended approach to avoid co-channel congestion while installing access points that use the 2.4 GHz frequency?",
+    "alternativas": [
+      "different nonoverlapping channels",
+      "one overlapping channel",
+      "one nonoverlapping channel",
+      "different overlapping channels"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 33,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A manager asks a network engineer to advise which cloud service models are used so employees do not have to waste their time installing,managing, and updating software that is only used occasionally. Which cloud service model does the engineer recommend?",
+    "alternativas": [
+      "infrastructure-as-a-service",
+      "platform-as-a-service",
+      "business process as service to support different types of service",
+      "software-as-a-service"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 34,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer observes high usage on the 2.4GHz channels and lower usage on the 5GHz channels. What must be congured to allow clients topreferentially use5GHz access points?",
+    "alternativas": [
+      "Client Band Select",
+      "Re-Anchor Roamed Clients",
+      "OEAP Spilt Tunnel",
+      "11ac MU-MIMO"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 35,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which networking function occurs on the data plane?",
+    "alternativas": [
+      "processing inbound SSH management trac",
+      "sending and receiving OSPF Hello packets",
+      "facilitates spanning-tree elections",
+      "forwarding remote client/server trac"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 36,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a network appliance that checks the state of a packet to determine whether the packet is legitimate?",
+    "alternativas": [
+      "Layer 2 switch",
+      "LAN controller",
+      "load balancer",
+      "rewall"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 37,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a role of access points in an enterprise network?",
+    "alternativas": [
+      "integrate with SNMP in preventing DDoS attacks",
+      "serve as a rst line of defense in an enterprise network",
+      "connect wireless devices to a wired network",
+      "support secure user logins to devices on the network"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 38,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An implementer is preparing hardware for virtualization to create virtual machines on a host. What is needed to provide communication betweenhardware and virtual machines?",
+    "alternativas": [
+      "router",
+      "hypervisor",
+      "switch",
+      "straight cable"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 39,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "In which situation is private IPv4 addressing appropriate for a new subnet on the network of an organization?",
+    "alternativas": [
+      "The network has multiple endpoint listeners, and it is desired to limit the number of broadcasts.",
+      "The ISP requires the new subnet to be advertised to the Internet for web services.",
+      "There is limited unique address space, and trac on the new subnet will stay local within the organization.",
+      "Trac on the subnet must traverse a site-to-site VPN to an outside organization."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 40,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which 802.11 frame type is indicated by a probe response after a client sends a probe request?",
+    "alternativas": [
+      "data",
+      "management",
+      "control",
+      "action"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 41,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the maximum bandwidth of a T1 point-to-point connection?",
+    "alternativas": [
+      "1.544 Mbps",
+      "2.048 Mbps",
+      "34.368 Mbps",
+      "43.7 Mbps"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 42,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of cloud-based network topology?",
+    "alternativas": [
+      "onsite network services are provided with physical Layer 2 and Layer 3 components",
+      "wireless connections provide the sole access method to services",
+      "physical workstations are congured to share resources",
+      "services are provided by a public, private, or hybrid deployment"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 43,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which network action occurs within the data plane?",
+    "alternativas": [
+      "reply to an incoming ICMP echo request",
+      "make a conguration change from an incoming NETCONF RPC",
+      "run routing protocols (OSPF, EIGRP, RIP, BGP)",
+      "compare the destination IP address to the IP routing table"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 44,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What are network endpoints?",
+    "alternativas": [
+      "support inter-VLAN connectivity",
+      "a threat to the network if they are compromised",
+      "act as routers to connect a user to the service provider network",
+      "enforce policies for campus-wide trac going to the Internet"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 45,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Why was the RFC 1918 address space dened?",
+    "alternativas": [
+      "conserve public IPv4 addressing",
+      "support the NAT protocol",
+      "preserve public IPv6 address space",
+      "reduce instances of overlapping IP addresses"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 46,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which type of organization should use a collapsed-core architecture?",
+    "alternativas": [
+      "small and needs to reduce networking costs",
+      "large and must minimize downtime when hardware fails",
+      "large and requires a exible, scalable network design",
+      "currently small but is expected to grow dramatically in the near future"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 47,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network administrator is setting up a new IPv6 network using the 64-bit address 2001:0EB8:00C1:2200:0001:0000:0000:0331/64. To simplifythe conguration, the administrator has decided to compress the address. Which IP address must the administrator congure?",
+    "alternativas": [
+      "ipv6 address 2001:EB8:C1:22:1::331/64",
+      "ipv6 address 21:EB8:C1:2200:1::331/64",
+      "ipv6 address 2001:EB8:C1:2200:1:0000:331/64",
+      "ipv6 address 2001:EB8:C1:2200:1::331/64"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 48,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is an appropriate use for private IPv4 addressing?",
+    "alternativas": [
+      "to allow hosts inside to communicate in both directions with hosts outside the organization",
+      "on internal hosts that stream data solely to external resources",
+      "on the public-facing interface of a rewall",
+      "on hosts that communicate only with other internal hosts"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 49,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a similarity between 1000BASE-LX and 1000BASE-T standards?",
+    "alternativas": [
+      "Both use the same data-link header and trailer formats.",
+      "Both cable types support RJ-45 connectors.",
+      "Both support up to 550 meters between nodes.",
+      "Both cable types support LR connectors."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 50,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which function forwards frames to ports that have a matching destination MAC address?",
+    "alternativas": [
+      "frame ooding",
+      "frame ltering",
+      "frame pushing",
+      "frame switching"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 51,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which type of IPv6 address is similar to a unicast address but is assigned to multiple devices on the same network at the same time?",
+    "alternativas": [
+      "global unicast address",
+      "link-local address",
+      "anycast address",
+      "multicast address"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 52,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of private IPv4 addressing?",
+    "alternativas": [
+      "composed of up to 65,536 available addresses",
+      "issued by IANA in conjunction with an autonomous system number",
+      "used without tracking or registration",
+      "traverse the Internet when an outbound ACL is applied"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 53,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the function of a controller in controller-based networking?",
+    "alternativas": [
+      "It serves as the centralized management point of an SDN architecture",
+      "It is a pair of core routers that maintain all routing decisions for a campus",
+      "It centralizes the data plane for the network",
+      "It is the card on a core router that maintains all routing decisions for a campus."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 54,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How do TCP and UDP t into a query-responsible model?",
+    "alternativas": [
+      "TCP avoids using sequencing and UDP avoids using acknowledgments",
+      "TCP establishes a connection prior to sending data, and UDP sends immediately",
+      "TCP encourages out-of-order packet delivery, and UDP prevents re-ordering",
+      "TCP uses error detection for packets, and UDP uses error recovery."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 55,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What provides centralized control of authentication and roaming in an enterprise network?",
+    "alternativas": [
+      "a lightweight access point",
+      "a wireless LAN controller",
+      "a rewall",
+      "a LAN switch"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 56,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which set of 2 4 GHz nonoverlapping wireless channels is standard in the United States?",
+    "alternativas": [
+      "channels 1, 6, 11, and 14",
+      "channels 2, 7, 9, and 11",
+      "channels 2, 7, and 11",
+      "channels 1, 6, and 11"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 57,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network engineer is installing an IPv6-only capable device. The client has requested that the device IP address be reachable only from theinternal network.Which type of IPv6 address must the engineer assign?",
+    "alternativas": [
+      "IPv4-compatible IPv6 address",
+      "unique local address",
+      "link-local address",
+      "aggregatable global address"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 58,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a requirement for nonoverlapping Wi-Fi channels?",
+    "alternativas": [
+      "different security settings",
+      "discontinuous frequency ranges",
+      "unique SSIDs",
+      "different transmission speeds"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 59,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network engineer must implement an IPv6 conguration on the vlan 2000 interface to create a routable locally-unique unicast address that isblocked from being advertised to the internet. Which conguration must the engineer apply?",
+    "alternativas": [
+      "interface vlan 2000 ipv6 address ff00:0000:aaaa::1234:2343/64",
+      "interface vlan 2000 ipv6 address fd00::1234:2343/64",
+      "interface vlan 2000 ipv6 address fe80:0000:aaaa::1234:2343/64",
+      "interface vlan 2000 ipv6 address fc00:0000:aaaa::a15d:1234:2343:8aca/64"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 60,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "When a switch receives a frame for a known destination MAC address, how is the frame handled?",
+    "alternativas": [
+      "ooded to all ports except the one from which it originated",
+      "forwarded to the rst available port",
+      "sent to the port identied for the known MAC address",
+      "broadcast to all ports"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 61,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the collapsed layer in collapsed core architectures?",
+    "alternativas": [
+      "Core and distribution",
+      "access and WAN",
+      "distribution and access",
+      "core and WAN"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 62,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of a SOHO network?",
+    "alternativas": [
+      "includes at least three tiers of devices to provide load balancing and redundancy",
+      "connects each switch to every other switch in the network",
+      "enables multiple users to share a single broadband connection",
+      "provides high throughput access for 1000 or more users"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 63,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the role of disaggregation in controller-based networking?",
+    "alternativas": [
+      "It divides the control-plane and data-plane functions.",
+      "It streamlines trac handling by assigning individual devices to perform either Layer 2 or Layer 3 functions",
+      "It summarizes the routes between the core and distribution layers of the network topology",
+      "It enables a network topology to quickly adjust from a ring network to a star network"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 64,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function performed by a web server?",
+    "alternativas": [
+      "send and retrieve email from client devices",
+      "securely store les for FTP access",
+      "authenticate and authorize a user's identity",
+      "provide an application that is transmitted over HTTP"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 65,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which protocol uses the SSL?",
+    "alternativas": [
+      "SSH",
+      "HTTPS",
+      "HTTP",
+      "Telnet"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 66,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which PoE mode enables powered-devices detection and guarantees power when the device detected?",
+    "alternativas": [
+      "auto",
+      "static",
+      "dynamic",
+      "active"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 67,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How is RFC 1918 addressing used in a network?",
+    "alternativas": [
+      "They are used to access the Internet from the internal network without conversion.",
+      "They are used in place of public addresses for Increased security.",
+      "They are used with NAT to preserve public IPv4 addresses.",
+      "They are used by Internet Service Providers to route over the Internet."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 68,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which WAN topology has the highest degree of reliability?",
+    "alternativas": [
+      "point-to-point",
+      "router-on-a-stick",
+      "full mesh",
+      "hub-and-spoke"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 69,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What causes a port to be placed in the err-disabled state?",
+    "alternativas": [
+      "nothing plugged into the port",
+      "link apping",
+      "latency",
+      "shutdown command issued on the port"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 70,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network engineer must congure an interface with IP address 10.10.10.145 and a subnet mask equivalent to11111111.11111111.11111111.11111000. Which subnet mask must the engineer use?",
+    "alternativas": [
+      "/29",
+      "/30",
+      "/27",
+      "/28"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 71,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which property is shared by 10GBase-SR and 10GBase-LR interfaces?",
+    "alternativas": [
+      "Both use the single-mode ber type.",
+      "Both require UTP cable media for transmission.",
+      "Both require ber cable media for transmission.",
+      "Both use the multimode ber type."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 72,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which device permits or denies network trac based on a set of rules?",
+    "alternativas": [
+      "switch",
+      "rewall",
+      "wireless controller",
+      "access point"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 73,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the role of a rewall in an enterprise network?",
+    "alternativas": [
+      "determines which packets are allowed to cross from unsecured to secured networks",
+      "processes unauthorized packets and allows passage to less secure segments of the network",
+      "forwards packets based on stateless packet inspection",
+      "explicitly denies all packets from entering an administrative domain"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 74,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which action is taken by a switch port enabled for PoE power classication override?",
+    "alternativas": [
+      "As power usage on a PoE switch port is checked data ow to the connected device is temporarily paused",
+      "When a powered device begins drawing power from a PoE switch port, a syslog message is generated",
+      "If a switch determines that a device is using less than the minimum congured power, it assumes the device has failed and disconnects it",
+      "Should a monitored port exceed the maximum administrative value for power, the port is shut down and err-disabled"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 75,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function spine-and-leaf architecture?",
+    "alternativas": [
+      "Offers predictable latency of the trac path between end devices.",
+      "Exclusively sends multicast trac between servers that are directly connected to the spine.",
+      "Mitigates oversubscription by adding a layer of leaf switches.",
+      "Limits payload size of trac within the leaf layer."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 76,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which action is taken by the data plane within a network device?",
+    "alternativas": [
+      "Constructs a routing table based on a routing protocol.",
+      "Forwards trac to the next hop.",
+      "Looks up an egress interface in the forwarding information base.",
+      "Provides CLI access to the network device."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 77,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the function of the control plane?",
+    "alternativas": [
+      "It exchanges routing table information.",
+      "It provides CLI access to the network device.",
+      "It looks up an egress interface in the forwarding information base.",
+      "It forwards trac to the next hop."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 78,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which two cable types must be used to connect an access point to the WLC when 2.5-Gbps and 5-Gbps upload speeds are required? (Choosetwo.)",
+    "alternativas": [
+      "10GBASE-T",
+      "1000BASE-LX/LH",
+      "Cat 5e",
+      "Cat 5E. Cat 3"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 79,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a benet for external users who consume public cloud resources?",
+    "alternativas": [
+      "Implemented over a dedicated WAN",
+      "All hosted on physical servers",
+      "Accessed over the Internet",
+      "Located in the same data center as the users"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 80,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer must update the conguration on two PCs in two different subnets to communicate locally with each other. One PC is congured withIP address192.168.25.128/25 and the other with 192.168.25.100/25. Which network mask must the engineer congure on both PCs to enable thecommunication?",
+    "alternativas": [
+      "255.255.255.248",
+      "255.255.255.224",
+      "255.255.255.0",
+      "255.255.255.252"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 81,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which key function is provided by the data plane?",
+    "alternativas": [
+      "Originating packets",
+      "Exchanging routing table data",
+      "Making routing decisions",
+      "Forwarding trac to the next hop"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 82,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "When should an engineer implement a collapsed-core architecture?",
+    "alternativas": [
+      "Only when using VSS technology",
+      "For small networks with minimal need for growth",
+      "For large networks that are connected to multiple remote sites",
+      "The access and distribution layers must be on the same device"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 83,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A client experiences slow throughput from a server that is directly connected to the core switch in a data center. A network engineer nds minimallatency on connections to the server, but data transfers are unreliable, and the output of the show interfaces counters errors command shows ahigh FCS-Err count on the interface that is connected to the server. What is the cause of the throughput issue?",
+    "alternativas": [
+      "a physical cable fault",
+      "a speed mismatch",
+      "high bandwidth usage",
+      "a cable that is too long"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 84,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the difference between 1000BASE-LX/LH and 1000BASE-ZX interfaces?",
+    "alternativas": [
+      "1000BASE-LX/LH interoperates with multimode and single-mode ber, and 1000BASE-ZX needs a conditioning patch cable with multimode.",
+      "1000BASE-ZX interoperates with dual-rate 100M/1G 10Km SFP over multimode ber, and 1000BASE-LX/LH supports only single-rate",
+      "1000BASE-ZX is supported on links up to 1000km, and 1000BASE-LX/LH operates over links up to 70 km",
+      "1000BASE- LX/LH is supported on links up to 10km, and 1000Base-ZX operates over links up to 70 km"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 85,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which concern is addressed with the use of private IPv4 addressing?",
+    "alternativas": [
+      "Lack of routing protocol support for CIDR and VLSM",
+      "Lack of security protocols at the network perimeter",
+      "Lack of available TCP/UDP ports per IPv5 address",
+      "Lack of available publicly routable unique IPv4 address"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 86,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the path for trac sent from one user workstation to another workstation on a separate switch in a three-tier architecture model?",
+    "alternativas": [
+      "access \"\" core \"\" access",
+      "access \"\" distribution \"\" distribution \"\" access",
+      "access \"\" core \"\" distribution \"\" access",
+      "access \"\" distribution \"\" core \"\" distribution \"\" access"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 87,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the difference between IPv6 unicast and anycast addressing?",
+    "alternativas": [
+      "An individual IPv6 unicast address is supported on a single interface on one node, but an IPv6 anycast address is assigned to a group ofinterfaces on multiple nodes.",
+      "IPv6 anycast nodes must be explicitly congured to recognize the anycast address, but IPv6 unicast nodes require no special conguration.",
+      "IPv6 unicast nodes must be explicitly congured to recognize the unicast address, but IPv6 anycast nodes require no special conguration.",
+      "Unlike an IPv6 anycast address, an IPv6 unicast address is assigned to a group of interfaces on multiple nodes."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 88,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which WAN topology provides a combination of simplicity quality, and availability?",
+    "alternativas": [
+      "partial mesh",
+      "full mesh",
+      "point-to-point",
+      "hub-and-spoke"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 89,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How are the switches in a spine-and-leaf topology interconnected?",
+    "alternativas": [
+      "Each leaf switch is connected to one of the spine switches",
+      "Each leaf switch is connected to each spine switch.",
+      "Each leaf switch is connected to two spine switches, making a loop.",
+      "Each leaf switch is connected to a central leaf switch, then uplinked to a core spine switch."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 90,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the primary effect of the spanning-tree portfast command?",
+    "alternativas": [
+      "It immediately enables the port in the listening state.",
+      "It immediately puts the port into the forwarding state when the switch is reloade",
+      "C. It enables BPDU messages.",
+      "It minimizes spanning-tree convergence time."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  }
+]

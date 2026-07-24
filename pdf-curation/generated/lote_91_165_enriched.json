@@ -1,0 +1,1506 @@
+[
+  {
+    "source_id": 91,
+    "traditional": {
+      "id": 91,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What occurs when PortFast is enabled on an interface that is connected to another switch?",
+      "alternativas": [
+        "Root port choice and spanning-tree recalculation are accelerated when a switch link goes down.",
+        "After spanning-tree converges, PortFast shuts down any port that receives BPDUs.",
+        "VTP is allowed to propagate VLAN configuration information from switch to switch automatically.",
+        "Spanning-tree fails to detect a switching loop increasing the likelihood of broadcast storms."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "PortFast is intended for edge ports connected to end hosts. If enabled toward another switch, the port skips listening/learning and goes straight to forwarding. A switching loop can form before STP detects it via BPDUs, raising the risk of broadcast storms. PortFast does not accelerate root-port recalculation like UplinkFast/BackboneFast, does not shut ports on BPDU by itself (that is BPDU Guard), and is unrelated to VTP propagation."
+    },
+    "ticket": {
+      "id": 91,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8091 — Porta Gi1/0/24 entre SW-ACCESS e SW-DIST foi configurada com PortFast “para acelerar o link”. Após um recabo, usuários reportam lentidão extrema e loops intermitentes na VLAN 10. Broadcasts disparam CPU no access.",
+      "cli_output": "SW-ACCESS# show spanning-tree interface gi1/0/24 detail\nPort 24 (GigabitEthernet1/0/24) of VLAN0010 is designated forwarding\n   Port path cost 4, Port priority 128, Port Identifier 128.24.\n   Designated root has priority 32768, address 0011.2233.4455\n   The port is in the portfast edge mode\n   Link type is point-to-point by default\n   BPDU: sent 120, received 340\n\nSW-ACCESS# show running-config interface gi1/0/24\ninterface GigabitEthernet1/0/24\n description UPLINK-TO-DIST\n switchport mode trunk\n spanning-tree portfast\n! (sem bpduguard)\n\nSW-DIST# show spanning-tree vlan 10 | include blocked|BLK|Altn\nGi1/0/1            Altn BLK 4         128.1    P2p",
+      "alternativas": [
+        "PortFast em uplink para outro switch coloca a porta em forwarding cedo demais; STP atrasa a detecção do loop e aumenta risco de broadcast storm.",
+        "PortFast em trunk sempre desliga VTP e por isso a VLAN 10 oscila.",
+        "O problema é apenas hello-time alto; PortFast em switch-switch é best practice Cisco.",
+        "BPDU received prova que PortFast bloqueia automaticamente qualquer loop sem risco."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "PortFast (edge) assume host final. Em link switch-switch, a porta vai a forwarding antes da convergência completa; se houver caminho alternativo, frames podem loopar até STP reagir. O output mostra portfast edge em uplink com BPDUs recebidos — sinal claro de vizinho STP. Correção: remover PortFast do uplink e usar uplink/trunk normal; se PortFast for mantido por engano, ao menos BPDU Guard err-disable a porta ao ver BPDU. VTP e hello-time não explicam o sintoma principal."
+    }
+  },
+  {
+    "source_id": 92,
+    "traditional": {
+      "id": 92,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer needs to configure LLDP to send the port description type length value (TLV). Which command sequence must be implemented?",
+      "alternativas": [
+        "switch(config-if)#lldp port-description",
+        "switch#lldp port-description",
+        "switch(config-line)#lldp port-description",
+        "switch(config)#lldp port-description"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "The LLDP port-description TLV is controlled with the global command lldp port-description (or via tlv-select depending on platform family). It is not an interface-only proprietary subcommand in the form shown for option A on classic IOS, nor a line-configuration or privileged-exec-only setting. Global configuration mode is required so the TLV is included in LLDP advertisements system-wide."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 93,
+    "traditional": {
+      "id": 93,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which configuration ensures that the switch is always the root for VLAN 750?",
+      "alternativas": [
+        "Switch(config)#spanning-tree vlan 750 priority 38418607",
+        "Switch(config)#spanning-tree vlan 750 priority 0",
+        "Switch(config)#spanning-tree vlan 750 root primary",
+        "Switch(config)#spanning-tree vlan 750 priority 614440"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "spanning-tree vlan 750 root primary is the recommended macro that sets a low priority (typically 24576, or lower if needed) so the switch becomes root for that VLAN without manually picking an invalid priority value. Priority 0 also forces root but is not the option marked here. Priorities must be multiples of 4096; values like 38418607 or 614440 are invalid/not guaranteed. root primary is the operational best-practice answer in this item."
+    },
+    "ticket": {
+      "id": 93,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8093 — A gerência exige que SW-CORE1 seja sempre root da VLAN 750. Após manutenção, SW-CORE2 (priority default) tornou-se root e o uplink preferencial ficou Alternate/Blocking.",
+      "cli_output": "SW-CORE1# show spanning-tree vlan 750\nVLAN0750\n  Spanning tree enabled protocol rstp\n  Root ID    Priority    32768\n             Address     00aa.bbcc.0002\n  Bridge ID  Priority    32768  (priority 32768 sys-id-ext 750)\n             Address     00aa.bbcc.0001\n\nSW-CORE2# show spanning-tree vlan 750 bridge\nVlan             Bridge ID\nVLAN750       32768 00aa.bbcc.0002\n\nSW-CORE1# show running-config | include spanning-tree vlan 750\n! (nenhum comando de root/priority)",
+      "alternativas": [
+        "Aplicar spanning-tree vlan 750 root primary em SW-CORE1 para forçar prioridade baixa e reassumir o root.",
+        "Configurar priority 38418607 em SW-CORE1; qualquer número alto garante root.",
+        "Root é eleito só por MAC; comandos de priority são ignorados em RSTP.",
+        "Basta PortFast global para eleger root da VLAN 750."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Com priorities iguais (32768), vence o menor MAC — SW-CORE2. root primary ajusta a priority para um valor baixo (tipicamente 24576) garantindo SW-CORE1 como root. Priorities inválidas/altas não ajudam. PortFast não elege root."
+    }
+  },
+  {
+    "source_id": 94,
+    "traditional": {
+      "id": 94,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which mode allows access points to be managed by Cisco Wireless LAN Controllers?",
+      "alternativas": [
+        "bridge",
+        "lightweight",
+        "mobility express",
+        "autonomous"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Lightweight mode APs join a WLC via CAPWAP and are centrally managed (SSIDs, RF, security). Autonomous APs are standalone. Bridge mode is for wireless bridging/mesh roles. Mobility Express is a virtual controller on an AP, not the AP operating mode that defines WLC management of classic lightweight APs."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 95,
+    "traditional": {
+      "id": 95,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command is used to specify the delay time in seconds for LLDP to initialize on any interface?",
+      "alternativas": [
+        "lldp timer",
+        "lldp tlv-select",
+        "lldp reinit",
+        "lldp holdtime"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "lldp reinit sets the delay (in seconds) before LLDP initializes on an interface after a status change. lldp timer sets the transmit interval of LLDP frames. lldp holdtime sets the TTL/hold multiplier advertised to neighbors. lldp tlv-select chooses which TLVs are sent, not initialization delay."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 96,
+    "traditional": {
+      "id": 96,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Two switches are connected and using Cisco Dynamic Trunking Protocol. SW1 is set to Dynamic Auto and SW2 is set to Dynamic Desirable. What is the result of this configuration?",
+      "alternativas": [
+        "The link becomes an access port.",
+        "The link is in an error disabled state.",
+        "The link is in a down state.",
+        "The link becomes a trunk port."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "DTP: dynamic desirable actively tries to trunk; dynamic auto waits passively. Desirable + Auto results in an operational trunk. Auto+Auto stays access. The link does not error-disable or go down solely from this DTP pair."
+    },
+    "ticket": {
+      "id": 96,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8096 — Time de campus migrou DTP: SW1 Gi1/0/1 em dynamic auto e SW2 Gi1/0/1 em dynamic desirable. Precisam confirmar se o link vira trunk ou access antes de liberar VLANs 20–40.",
+      "cli_output": "SW1# show interfaces gi1/0/1 switchport\nName: Gi1/0/1\nAdministrative Mode: dynamic auto\nOperational Mode: trunk\nAdministrative Trunking Encapsulation: dot1q\nOperational Trunking Encapsulation: dot1q\nNegotiation of Trunking: On\n\nSW2# show interfaces gi1/0/1 switchport\nName: Gi1/0/1\nAdministrative Mode: dynamic desirable\nOperational Mode: trunk\nNegotiation of Trunking: On\n\nSW1# show interfaces trunk\nPort        Mode             Encapsulation  Status        Native vlan\nGi1/0/1     desirable        802.1q         trunking      1",
+      "alternativas": [
+        "Auto + Desirable forma trunk via DTP; Operational Mode trunk confirma o resultado.",
+        "Auto + Desirable sempre resulta em access port.",
+        "A combinação coloca ambos em err-disabled.",
+        "DTP com desirable derruba o link (down/down)."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Dynamic desirable inicia negociação DTP; dynamic auto aceita. Resultado operacional: trunk. O show switchport confirma Operational Mode: trunk. Não há err-disable nem down por essa matriz DTP."
+    }
+  },
+  {
+    "source_id": 97,
+    "traditional": {
+      "id": 97,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which design element is a best practice when deploying an 802.11b wireless infrastructure?",
+      "alternativas": [
+        "allocating nonoverlapping channels to access points that are in close physical proximity to one another",
+        "disabling TCP so that access points can negotiate signal levels with their attached wireless devices",
+        "configuring access points to provide clients with a maximum of 5 Mbps",
+        "setting the maximum data rate to 54 Mbps on the Cisco Wireless LAN Controller"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "802.11b (2.4 GHz) has only three nonoverlapping channels (1, 6, 11 in most regions). Best practice is to assign nonoverlapping channels to nearby APs to reduce co-channel interference. Disabling TCP is nonsense for RF design. Capping clients at 5 Mbps or forcing 54 Mbps is not an 802.11b best practice (802.11b max is 11 Mbps)."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 98,
+    "traditional": {
+      "id": 98,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which two command sequences must be configured on a switch to establish a Layer 3 EtherChannel with an open-standard protocol? (Choose two.)",
+      "alternativas": [
+        "interface GigabitEthernet0/0/1\nchannel-group 10 mode auto",
+        "interface GigabitEthernet0/0/1\nchannel-group 10 mode on",
+        "interface port-channel 10\nno switchport\nip address 172.16.0.1 255.255.255.0",
+        "interface GigabitEthernet0/0/1\nchannel-group 10 mode active"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Layer 3 EtherChannel with an open standard uses LACP (channel-group mode active or passive) plus a routed port-channel (no switchport and an IP address). Mode auto is PAgP (Cisco proprietary). Mode on is static EtherChannel without negotiation. The two required pieces in this cleaned set are: port-channel L3 config and member interfaces in mode active (LACP)."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 99,
+    "traditional": {
+      "id": 99,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command is used to enable LLDP globally on a Cisco IOS ISR?",
+      "alternativas": [
+        "lldp run",
+        "lldp enable",
+        "lldp transmit",
+        "cdp run"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "On Cisco IOS ISR, LLDP is enabled globally with lldp run. There is no global lldp enable as the primary enable command. lldp transmit is interface-level. cdp run enables CDP, a different protocol."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 100,
+    "traditional": {
+      "id": 100,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command should you enter to configure an LLDP delay time of 5 seconds?",
+      "alternativas": [
+        "lldp timer 5000",
+        "lldp holdtime 5",
+        "lldp reinit 5000",
+        "lldp reinit 5"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "lldp reinit <seconds> configures the initialization delay; lldp reinit 5 sets 5 seconds. Values are in seconds, not milliseconds, so 5000 is wrong. lldp timer is the advertisement interval; lldp holdtime is neighbor hold time."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 101,
+    "traditional": {
+      "id": 101,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How does STP prevent forwarding loops at OSI Layer 2?",
+      "alternativas": [
+        "TTL",
+        "MAC address forwarding",
+        "Collision avoidance",
+        "Port blocking"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "STP prevents Layer-2 loops by electing a loop-free active topology and placing redundant ports in Blocking/Discarding so frames are not forwarded in both directions around a loop. TTL is Layer 3. MAC learning alone does not break loops. Collision avoidance is CSMA/CD (legacy half-duplex), not STP."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 102,
+    "traditional": {
+      "id": 102,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type does a port become when it receives the best BPDU on a bridge?",
+      "alternativas": [
+        "The designated port",
+        "The backup port",
+        "The alternate port",
+        "The root port"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "The root port on a non-root bridge is the port that receives the best BPDU (lowest path cost to the root, with tie-breakers). Designated ports send the best BPDU on a segment. Alternate/backup are RSTP roles for discarded redundant paths, not the port that hears the best BPDU toward the root."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 103,
+    "traditional": {
+      "id": 103,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which value can you modify to configure a specific interface as the preferred forwarding interface?",
+      "alternativas": [
+        "The interface number",
+        "The port priority",
+        "The VLAN priority",
+        "The hello time"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "When multiple ports could become root or designated, STP uses port priority (and port ID) as a tie-breaker. Lower port priority makes an interface preferred. Interface number alone is not a configurable preference knob beyond its contribution to Port ID. VLAN priority is bridge priority. Hello time is a timer, not a forwarding preference."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 104,
+    "traditional": {
+      "id": 104,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which statement about Cisco Discovery Protocol is true?",
+      "alternativas": [
+        "It is a Cisco-proprietary protocol.",
+        "It runs on the network layer.",
+        "It can discover information from routers, fifififirewalls, and switches.",
+        "It runs on the physical layer and the data link layer."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "CDP is Cisco-proprietary Layer-2 neighbor discovery. It does not run at the network layer as a routed protocol, and while it can learn about Cisco devices including some security platforms, the defining true statement among the options is that it is Cisco proprietary. It operates over the data link (not physical+network as stated)."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 105,
+    "traditional": {
+      "id": 105,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "On a corporate network, hosts on the same VLAN can communicate with each other, but they are unable to communicate with hosts on different VLANs. What is needed to allow communication between the VLANs?",
+      "alternativas": [
+        "a router with subinterfaces configured on the physical interface that is connected to the switch",
+        "a router with an IP address on the physical interface connected to the switch",
+        "a switch with an access link that is configured between the switches",
+        "a switch with a trunk link that is configured between the switches"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Inter-VLAN communication requires a Layer-3 device. Router-on-a-stick uses subinterfaces (802.1Q tags) on one physical link to the switch. A single IP on the physical interface only serves one subnet/VLAN. Access links and trunks between switches extend VLANs at Layer 2 but do not route between them."
+    },
+    "ticket": {
+      "id": 105,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8105 — Hosts na VLAN 10 pingam entre si; hosts na VLAN 20 pingam entre si; não há tráfego inter-VLAN. Existe apenas L2 entre access e um roteador R1 com um único cabo no switch (Gi0/1).",
+      "cli_output": "SW1# show vlan brief\nVLAN Name       Status    Ports\n10   USERS      active    Gi1/0/2, Gi1/0/3\n20   VOICE      active    Gi1/0/4, Gi1/0/5\n\nSW1# show interfaces gi1/0/1 switchport\nAdministrative Mode: static access\nAccess Mode VLAN: 10 (USERS)\n\nR1# show ip interface brief\nInterface     IP-Address      Status\nGi0/1         10.10.10.1      up\n\nR1# show vlan\n% Ambiguous command / sem subinterfaces 802.1Q",
+      "alternativas": [
+        "Falta router-on-a-stick: subinterfaces 802.1Q no roteador + trunk no switch para rotear entre VLANs.",
+        "Basta outro access link entre dois switches para rotear VLAN 10↔20.",
+        "Um único IP no physical do roteador na VLAN 10 já roteia todas as VLANs.",
+        "STP bloqueia inter-VLAN por padrão até root primary."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "VLANs são broadcast domains separados; só um dispositivo L3 interliga. Com um cabo, o padrão é trunk no switch + subinterfaces no roteador (encapsulation dot1Q 10/20 e IPs de gateway). Access na VLAN 10 + um IP só atende a VLAN 10. Trunk entre switches não roteia. STP não substitui roteamento inter-VLAN."
+    }
+  },
+  {
+    "source_id": 106,
+    "traditional": {
+      "id": 106,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which statement about LLDP is true?",
+      "alternativas": [
+        "It is a Cisco proprietary protocol.",
+        "It is configured in global configuration mode.",
+        "The LLDP update frequency is a fixed value.",
+        "It runs over the transport layer."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "LLDP (IEEE 802.1AB) is open-standard and is enabled/configured in global configuration mode (lldp run). It is not Cisco-proprietary (that is CDP). Timers such as reinit/timer/holdtime are configurable, not fixed. It runs at the data-link layer, not the transport layer."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 107,
+    "traditional": {
+      "id": 107,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which technology is used to improve web traffic performance by proxy caching?",
+      "alternativas": [
+        "WSA",
+        "Firepower",
+        "ASA",
+        "FireSIGHT"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Cisco WSA (Web Security Appliance) provides web proxy, URL filtering, and caching to improve and control web traffic. Firepower/ASA/FireSIGHT are NGFW/IPS/management platforms, not the primary proxy-caching web security product in this list."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 108,
+    "traditional": {
+      "id": 108,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What criteria is used first during the root port selection process?",
+      "alternativas": [
+        "local port ID",
+        "lowest path cost to the root bridge",
+        "lowest neighbor's bridge ID",
+        "lowest neighbor's port ID"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Root port selection order: (1) lowest root path cost, then (2) lowest neighbor bridge ID, (3) lowest neighbor port ID, (4) lowest local port ID. Therefore the first criterion is lowest path cost to the root bridge."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 109,
+    "traditional": {
+      "id": 109,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which statement about VLAN configuration is true?",
+      "alternativas": [
+        "The switch must be in VTP server or transparent mode before you can configure a VLAN",
+        "The switch must be in config-vlan mode before you configure an extended VLAN",
+        "Dynamic inter-VLAN routing is supported on VLAN2 through VLAN 4064",
+        "A switch in VTP transparent mode save the VLAN databases to the running configuration only"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "On VTP-aware Catalyst platforms, VLAN creation requires VTP server or transparent mode; client mode cannot create VLANs. Extended VLAN nuances and transparent save behavior are secondary and partially imprecise in the distractors. Dynamic inter-VLAN routing is not defined as VLAN2–4064 in that form."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 110,
+    "traditional": {
+      "id": 110,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network engineer must create a diagram of a multivendor network. Which command must be configured on the Cisco devices so that the topology of the network is allowed to be mapped?",
+      "alternativas": [
+        "Device(config)#lldp run",
+        "Device(config)#cdp run",
+        "Device(config-if)#cdp enable",
+        "Device(config)#flflow-sampler-map topology"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Multivendor neighbor discovery uses LLDP (IEEE 802.1AB). lldp run enables it globally on Cisco devices so third-party gear can be mapped. CDP is Cisco-proprietary and may not be understood by non-Cisco nodes. Interface cdp enable only affects CDP. flow-sampler-map is NetFlow-related, not topology discovery."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 111,
+    "traditional": {
+      "id": 111,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How do AAA operations compare regarding user identification, user services, and access control?",
+      "alternativas": [
+        "Authorization provides access control, and authentication trafficks user services",
+        "Authentication identifies users, and accounting trafficks user services",
+        "Accounting trafficks user services, and authentication provides access control",
+        "Authorization identifies users, and authentication provides access control"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "AAA: Authentication identifies/validates users; Authorization determines access rights; Accounting tracks services/commands/time. The correct pairing is authentication identifies users and accounting tracks user services."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 112,
+    "traditional": {
+      "id": 112,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the difference between RADIUS and TACACS+?",
+      "alternativas": [
+        "RADIUS logs all commands that are entered by the administrator, but TACACS+ logs only start, stop, and interim commands.",
+        "TACACS+ separates authentication and authorization, and RADIUS merges them.",
+        "TACACS+ encrypts only password information, and RADIUS encrypts the entire payload.",
+        "RADIUS is most appropriate for dial authentication, but TACACS+ can be used for multiple types of authentication."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "TACACS+ separates authentication, authorization, and accounting and can authorize commands granularly. RADIUS typically combines authentication and authorization and is UDP-based. RADIUS encrypts only the password (not the full payload); TACACS+ encrypts the TACACS body. The reverse encryption statement is a common trap."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 113,
+    "traditional": {
+      "id": 113,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a difference between local AP mode and FlexConnect AP mode?",
+      "alternativas": [
+        "Local AP mode creates two CAPWAP tunnels per AP to the WLC",
+        "Local AP mode causes the AP to behave as if it were an autonomous AP",
+        "FlexConnect AP mode fails to function if the AP loses connectivity with the WLC",
+        "FlexConnect AP mode bridges the traffic from the AP to the WLC when local switching is configured"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "In local (centralized) mode, an AP builds CAPWAP tunnels to the WLC (control and data) so user traffic is often centrally switched. FlexConnect can locally switch traffic at the AP when configured and can still serve clients if WLC connectivity is lost (with caveats). Autonomous behavior is not local mode. Saying FlexConnect always fails without WLC is false for local switching."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 114,
+    "traditional": {
+      "id": 114,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which state does the switch port move to when PortFast is enabled?",
+      "alternativas": [
+        "blocking",
+        "listening",
+        "learning",
+        "forwarding"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "PortFast moves an edge port immediately to the forwarding state, skipping listening and learning delays of classic STP. It does not place the port in blocking/listening/learning as the steady end state for an edge host port."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 115,
+    "traditional": {
+      "id": 115,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which protocol prompts the Wireless LAN Controller to generate its own local web administration SSL certicate for GUI access?",
+      "alternativas": [
+        "RADIUS",
+        "HTTPS",
+        "TACACS+",
+        "HTTP"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "When administrators access the WLC GUI via HTTPS, the controller presents (and can generate) a local web administration SSL certificate for that secure HTTP session. RADIUS/TACACS+ are AAA backends. Plain HTTP is not the protocol that drives SSL cert generation for secure GUI access."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 116,
+    "traditional": {
+      "id": 116,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer must configure interswitch VLAN communication between a Cisco switch and a third-party switch. Which action should be taken?",
+      "alternativas": [
+        "configure DSCP",
+        "configure IEEE 802.1q",
+        "configure ISL",
+        "configure IEEE 802.1p"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Interoperable VLAN trunking with third-party switches uses IEEE 802.1Q. ISL is Cisco-proprietary and obsolete for multivendor links. DSCP is L3 QoS marking. 802.1p refers to CoS bits within 802.1Q, not the trunk encapsulation choice itself."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 117,
+    "traditional": {
+      "id": 117,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer requires a switch interface to actively attempt to establish a trunk link with a neighbor switch. What command must be configured?",
+      "alternativas": [
+        "switchport mode trunk",
+        "switchport mode dynamic desirable",
+        "switchport nonegotiate",
+        "switchport mode dynamic auto"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "switchport mode dynamic desirable makes the interface actively send DTP to form a trunk. dynamic auto is passive. mode trunk forces trunk without relying on desirable negotiation behavior as asked. nonegotiate disables DTP."
+    },
+    "ticket": {
+      "id": 117,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8117 — Link entre SW-A e SW-B permanece access. SW-B está em dynamic auto. O engenheiro precisa que SW-A tente ativamente formar trunk.",
+      "cli_output": "SW-A# show interfaces gi1/0/1 switchport\nAdministrative Mode: dynamic auto\nOperational Mode: static access\nNegotiation of Trunking: On\n\nSW-B# show interfaces gi1/0/1 switchport\nAdministrative Mode: dynamic auto\nOperational Mode: static access",
+      "alternativas": [
+        "Configurar switchport mode dynamic desirable em SW-A para iniciar DTP e formar trunk com auto.",
+        "Configurar switchport nonegotiate para forçar DTP ativo.",
+        "dynamic auto em ambos já forma trunk automaticamente.",
+        "Somente lldp run cria trunk 802.1Q."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Auto+Auto não inicia trunk. Desirable envia DTP e combina com auto → trunk. nonegotiate desliga DTP. LLDP não negocia encapsulamento de trunk."
+    }
+  },
+  {
+    "source_id": 118,
+    "traditional": {
+      "id": 118,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer must establish a trunk link between two switches. The neighboring switch is set to trunk or desirable mode. What action should betaken?",
+      "alternativas": [
+        "configure switchport nonegotiate",
+        "configure switchport mode dynamic desirable",
+        "configure switchport mode dynamic auto",
+        "configure switchport trunk dynamic desirable"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "If the neighbor is trunk or desirable, setting this side to dynamic auto still forms a trunk (auto+desirable or auto+trunk operationally yields trunk in classic DTP matrices when the other side initiates/forces). The curated answer per source is dynamic auto. nonegotiate would break DTP; desirable also works but is not the keyed option."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 119,
+    "traditional": {
+      "id": 119,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which spanning-tree enhancement avoids the learning and listening states and immediately places ports in the forwarding state?",
+      "alternativas": [
+        "BPDU filter",
+        "PortFast",
+        "BackboneFast",
+        "BPDU guard"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "PortFast bypasses listening/learning and goes to forwarding on edge ports. BPDU Guard err-disables on BPDU. BPDU Filter stops BPDU send/receive. BackboneFast optimizes indirect link failure recovery."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 120,
+    "traditional": {
+      "id": 120,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How does the dynamically-learned MAC address feature function?",
+      "alternativas": [
+        "The CAM table is empty until ingress traffic arrives at each port",
+        "Switches dynamically learn MAC addresses of each connecting CAM table.",
+        "The ports are restricted and learn up to a maximum of 10 dynamically-learned addresses",
+        "It requires a minimum number of secure MAC addresses to be fifilled dynamically"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Switches learn source MACs from ingress frames and populate the CAM/MAC table. Until traffic arrives, dynamic entries for those hosts are absent. Switches do not learn by reading another switch’s CAM wholesale. The other options confuse port security limits with ordinary dynamic learning."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 121,
+    "traditional": {
+      "id": 121,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When using Rapid PVST+, which command guarantees the switch is always the root bridge for VLAN 200?",
+      "alternativas": [
+        "spanning-tree vlan 200 priority 614440",
+        "spanning-tree vlan 200 priority 0",
+        "spanning-tree vlan 200 root primary",
+        "spanning-tree vlan 200 priority 38813258"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Priority 0 is the lowest bridge priority and guarantees this switch wins root election for VLAN 200 (assuming unique MAC tie-break). root primary sets a low priority but not absolute 0. Invalid large priorities are rejected or ineffective. For “always the root,” priority 0 is the keyed answer here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 122,
+    "traditional": {
+      "id": 122,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer needs to add an old switch back into a network. To prevent the switch from corrupting the VLAN database, what action must be taken?",
+      "alternativas": [
+        "Add the switch in the VTP domain with a lower revision number.",
+        "Add the switch in the VTP domain with a higher revision number.",
+        "Add the switch with DTP set to dynamic desirable.",
+        "Add the switch with DTP set to desirable."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "VTP: a switch with a higher revision can overwrite the domain VLAN database. Before inserting an old switch, ensure its revision is lower (e.g., change domain temporarily, set transparent, etc.). Higher revision is dangerous. DTP modes do not protect the VLAN database from VTP sync."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 123,
+    "traditional": {
+      "id": 123,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which technology prevents client devices from arbitrarily connecting to the network without state remediation?",
+      "alternativas": [
+        "802.11n",
+        "802.1x",
+        "MAC Authentication Bypass",
+        "IP Source Guard"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "802.1X provides identity-based network access control and can force authentication/posture before full access. 802.11n is a Wi-Fi PHY. MAB authenticates by MAC without user credentials. IPSG filters IP/MAC bindings but is not the primary identity onboarding framework."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 124,
+    "traditional": {
+      "id": 124,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which protocol does an access point use to draw power from a connected switch?",
+      "alternativas": [
+        "Internet Group Management Protocol",
+        "Cisco Discovery Protocol",
+        "Adaptive Wireless Path Protocol",
+        "Neighbor Discovery Protocol"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Cisco APs and many PoE endpoints use CDP (and/or LLDP) TLVs so the switch can apply the correct PoE power class/allocation. IGMP is multicast. AWPP is outdoor mesh. NDP is IPv6 neighbor discovery."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 125,
+    "traditional": {
+      "id": 125,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An administrator must secure the WLC from receiving spoofed association requests. Which steps must be taken to configure the WLC to restrictthe requests and force the user to wait 10 ms to retry an association request?",
+      "alternativas": [
+        "Enable MAC ltering and set the SA Query timeout to 10.",
+        "Enable 802.1x Layer 2 security and set the Comeback timer to 10.",
+        "Enable Security Association Teardown Protection and set the SA Query timeout to 10.",
+        "Enable the Protected Management Frame service and set the Comeback timer to 10."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "SA Query / Security Association teardown protection mitigates spoofed association floods by requiring SA Query exchanges and applying a timeout/comeback behavior. The distractors misuse MAC filtering, plain 802.1X timers, or PMF comeback without the SA Query protection pairing described."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 126,
+    "traditional": {
+      "id": 126,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer must configure traffic for a VLAN that is untagged by the switch as it crosses a trunk link. Which command should be used?",
+      "alternativas": [
+        "switchport trunk encapsulation dot1q",
+        "switchport trunk allowed vlan 10",
+        "switchport mode trunk",
+        "switchport trunk native vlan 10"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "The native VLAN carries untagged frames on an 802.1Q trunk. switchport trunk native vlan 10 sets VLAN 10 as untagged. encapsulation/mode trunk enable tagging capability; allowed vlan only filters VLANs."
+    },
+    "ticket": {
+      "id": 126,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8126 — Frames da VLAN 10 precisam cruzar o trunk untagged (nativa). Hosts na VLAN 10 perdem conectividade inter-switch; VLANs tagged 20/30 ok.",
+      "cli_output": "SW1# show interfaces trunk\nPort        Mode         Encapsulation  Status        Native vlan\nGi1/0/24    on           802.1q         trunking      1\n\nPort        Vlans allowed on trunk\nGi1/0/24    1,10,20,30\n\nSW1# show running-config interface gi1/0/24\ninterface GigabitEthernet1/0/24\n switchport mode trunk\n switchport trunk allowed vlan 1,10,20,30\n! (native default 1)",
+      "alternativas": [
+        "Configurar switchport trunk native vlan 10 para enviar/receber VLAN 10 untagged no trunk.",
+        "switchport trunk allowed vlan 10 remove o tag mas mantém native 1 sem impacto.",
+        "switchport mode access é obrigatório para untagged multi-VLAN.",
+        "Apenas switchport trunk encapsulation dot1q muda a native para 10."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "No 802.1Q, a native VLAN é untagged. Com native 1, frames da VLAN 10 saem tagged e podem quebrar desenhos que esperam untagged-10. native vlan 10 alinha o comportamento. allowed vlan só filtra; mode access não é trunk; encapsulation não define native sozinha."
+    }
+  },
+  {
+    "source_id": 127,
+    "traditional": {
+      "id": 127,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the benefit of configuring PortFast on an interface?",
+      "alternativas": [
+        "The frames entering the interface are marked with the higher priority and then processed faster by a switch.",
+        "After the cable is connected, the interface is available faster to send and receive user data.",
+        "Real-time voice and video frames entering the interface are processed faster.",
+        "After the cable is connected, the interface uses the fastest speed setting available for that cable type."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "PortFast shortens STP convergence on access/edge ports so the link forwards user data almost immediately after link-up. It is not a CoS remarking feature, not a voice accelerator by itself, and does not change Ethernet speed negotiation."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 128,
+    "traditional": {
+      "id": 128,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Why does a switch flood a frame to all ports?",
+      "alternativas": [
+        "The frame has zero destination MAC addresses.",
+        "The destination MAC address of the frame is unknown.",
+        "The source MAC address of the frame is unknown",
+        "The source and destination MAC addresses of the frame are the same."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Unknown unicast flooding occurs when the destination MAC is not in the MAC table; the frame is flooded within the VLAN (except ingress port). Unknown source addresses are learned, not flooded for that reason. Zero or identical MACs are not the standard flood trigger described."
+    },
+    "ticket": {
+      "id": 128,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8128 — Captura na VLAN 40 mostra o mesmo unicast replicado em várias portas. Destino 0050.56de.ad01 não está na CAM.",
+      "cli_output": "SW1# show mac address-table address 0050.56de.ad01\n% Unicast MAC address not found in MAC address table\n\nSW1# show mac address-table dynamic vlan 40\nVlan    Mac Address       Type        Ports\n40      0050.56aa.0001    DYNAMIC     Gi1/0/2\n40      0050.56aa.0002    DYNAMIC     Gi1/0/3",
+      "alternativas": [
+        "Destino desconhecido → flooding do frame nas portas da VLAN (exceto origem).",
+        "Fonte desconhecida causa flood do frame de dados.",
+        "Switch altera FCS para invalidar o frame quando MAC falta.",
+        "Flood só ocorre se source=destination MAC."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Unknown unicast: sem entrada CAM para o destino, o switch flooda na VLAN. A aprendizagem é pelo source MAC. Não se corrompe FCS nem se exige source=destination."
+    }
+  },
+  {
+    "source_id": 129,
+    "traditional": {
+      "id": 129,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which access point mode relies on a centralized controller for management, roaming, and SSID configuration?",
+      "alternativas": [
+        "lightweight mode",
+        "autonomous mode",
+        "bridge mode",
+        "repeater mode"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Lightweight mode depends on a WLC for configuration, roaming coordination, and SSID push via CAPWAP. Autonomous is self-contained. Bridge/repeater are specialized RF roles."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 130,
+    "traditional": {
+      "id": 130,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which access layer threat-mitigation technique provides security based on identity?",
+      "alternativas": [
+        "Dynamic ARP Inspection",
+        "DHCP snooping",
+        "802.1x",
+        "using a non-default native VLAN"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "802.1X authenticates users/devices by identity (credentials/certificates) at the access edge. DAI and DHCP snooping mitigate spoofing but are not identity frameworks. Non-default native VLAN is a best practice against VLAN hopping, not identity."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 131,
+    "traditional": {
+      "id": 131,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which interface mode must be configured to connect the lightweight APs in a centralized architecture?",
+      "alternativas": [
+        "WLAN dynamic",
+        "trunk",
+        "access",
+        "management"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "In centralized local-mode designs, lightweight APs typically connect via access ports in the AP management VLAN; user VLANs are tunneled in CAPWAP. Trunks are used in some FlexConnect/local-switching designs, but the standard centralized answer is access mode."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 132,
+    "traditional": {
+      "id": 132,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which switching concept is used to create separate broadcast domains?",
+      "alternativas": [
+        "STP",
+        "VTP",
+        "VLAN",
+        "CSMA/CD"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "VLANs segment a switch into separate broadcast domains. STP breaks loops within a broadcast domain. VTP propagates VLAN metadata. CSMA/CD is media access for half-duplex Ethernet."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 133,
+    "traditional": {
+      "id": 133,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a requirement when configuring or removing LAG on a WLC?",
+      "alternativas": [
+        "The incoming and outgoing ports for traffic flow must be specified if LAG is enabled.",
+        "The management interface must be reassigned if LAG is disabled.",
+        "The controller must be rebooted after enabling or reconfiguring LAG.",
+        "Multiple untagged interfaces on the same port must be supported."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "On AireOS WLCs, enabling/changing/removing LAG requires a controller reboot for the port-channel membership to apply cleanly. Distractors about specifying in/out ports or mandatory untagged multiples are incorrect. (If a dump keys management reassignment, still the operational hard requirement is reboot—see answer fix log if applied.)"
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 134,
+    "traditional": {
+      "id": 134,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of port is used to connect the wired network when an autonomous AP maps two VLANs to its WLANs?",
+      "alternativas": [
+        "access",
+        "LAG",
+        "trunk",
+        "EtherChannel"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "When an autonomous AP maps multiple WLANs to multiple VLANs, the wired uplink must be a trunk carrying those VLAN tags. A single access port carries one VLAN only. LAG/EtherChannel may bundle links but do not replace the need for trunk encapsulation of multiple VLANs."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 135,
+    "traditional": {
+      "id": 135,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network administrator needs to aggregate 4 ports into a single logical link which must negotiate layer 2 connectivity to ports on another switch.What must be configured when using active mode on both sides of the connection?",
+      "alternativas": [
+        "LLDP",
+        "LACP",
+        "Cisco vPC",
+        "802.1q trunks"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "channel-group mode active uses LACP (IEEE 802.3ad), the open standard. LLDP is discovery. vPC is Nexus multi-chassis. 802.1Q is VLAN tagging, not the bundling negotiation protocol."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 136,
+    "traditional": {
+      "id": 136,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer is configuring data and voice services to pass through the same port. The designated switch interface fastethernet0/1 must transmitpackets using the same priority for data when they are received from the access port of the IP phone. Which configuration must be used?",
+      "alternativas": [
+        "interface fastethernet0/1 switchport voice vlan dot1p",
+        "interface fastethernet0/1 switchport priority extend cos 7",
+        "interface fastethernet0/1 switchport voice vlan untagged",
+        "interface fastethernet0/1 switchport priority extend trust"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "switchport priority extend trust makes the phone trust the CoS of frames received from the PC so the switch processes PC traffic with the priority the phone presents (trusted). Setting a fixed CoS 7 overrides. voice vlan dot1p/untagged change voice tagging behavior, not PC priority trust."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 137,
+    "traditional": {
+      "id": 137,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which protocol must be implemented to support separate authorization and authentication solutions for wireless APs?",
+      "alternativas": [
+        "RADIUS",
+        "TACACS+",
+        "802.1X",
+        "Kerberos"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "TACACS+ separates authentication and authorization (and accounting), enabling distinct policy handling. RADIUS generally combines authN/authZ. 802.1X is a port framework that can use either AAA backend. Kerberos is not the standard AP management AAA split described here. (Answer corrected when source keyed RADIUS incorrectly.)"
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 138,
+    "traditional": {
+      "id": 138,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which port type supports the spanning-tree portfast command without additional configuration?",
+      "alternativas": [
+        "trunk ports",
+        "Layer 3 subinterfaces",
+        "Layer 3 main interfaces",
+        "access ports"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "spanning-tree portfast (without trunk keyword) applies to access ports. Trunk edge needs spanning-tree portfast trunk. L3 interfaces are not classic STP access edge ports for this command form."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 139,
+    "traditional": {
+      "id": 139,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A Cisco engineer must configure a single switch interface to meet these requirements:✑ Accept untagged frames and place them in VLAN 20Accept tagged frames in VLAN 30 when CDP detects a Cisco IP phoneWhich command set must the engineer apply?",
+      "alternativas": [
+        "switchport mode dynamic desirable switchport access vlan 20 switchport trunk allowed vlan 30 switchport voice vlan 30",
+        "switchport mode access switchport access vlan 20 switchport voice vlan 30",
+        "switchport mode dynamic auto switchport trunk native vlan 20 switchport trunk allowed vlan 30 switchport voice vlan 30",
+        "switchport mode trunk switchport access vlan 20 switchport voice vlan 30"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Standard IP phone + PC design: access port in data VLAN 20 with voice VLAN 30 so untagged PC traffic is VLAN 20 and tagged voice is VLAN 30 when CDP detects the phone. Trunking the interface as a full trunk is unnecessary and not the clean requirement set. (Corrected to access+voice when source keyed trunk incorrectly.)"
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 140,
+    "traditional": {
+      "id": 140,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What does a switch use to build its MAC address table?",
+      "alternativas": [
+        "VTP",
+        "DTP",
+        "ingress traffic",
+        "egress traffic"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "The MAC address table is built from source MAC addresses of ingress frames on each port. VTP/DTP do not populate unicast CAM entries. Egress traffic is not the learning direction."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 141,
+    "traditional": {
+      "id": 141,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command entered on a switch configured with Rapid PVST+ listens and learns for a specific time period?",
+      "alternativas": [
+        "switch(config)#spanning-tree vlan 1 priority 4096",
+        "switch(config)#spanning-tree vlan 1 hello-time 10",
+        "switch(config)#spanning-tree vlan 1 max-age 6",
+        "switch(config)#spanning-tree vlan 1 forward-time 20"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "spanning-tree vlan <id> forward-time sets the listening and learning duration (forward delay) used by timers in PVST/Rapid PVST compatibility modes. priority elects root. hello-time is BPDU interval. max-age is BPDU aging. Only forward-time matches “listens and learns for a specific time period.”"
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 142,
+    "traditional": {
+      "id": 142,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What must a network administrator consider when deciding whether to configure a new wireless network with APs in autonomous mode or APs running in cloud-based mode?",
+      "alternativas": [
+        "Autonomous mode APs are less dependent on an underlay but more complex to maintain than APs in cloud-based mode.",
+        "Cloud-based mode APs rely on underlays and are more complex to maintain than APs in autonomous mode.",
+        "Cloud-based mode APs are easy to deploy but harder to automate than APs in autonomous mode.",
+        "Autonomous mode APs are easy to deploy and automate than APs in cloud-based mode."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Autonomous APs do not depend on a cloud/controller underlay for basic operation but are harder to maintain at scale. Cloud-managed APs need connectivity to the management service and are usually easier to maintain centrally. The other statements reverse complexity or automation facts."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 143,
+    "traditional": {
+      "id": 143,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which state is bypassed in Rapid PVST+ when PortFast is enabled on a port?",
+      "alternativas": [
+        "blocking",
+        "forwarding",
+        "learning",
+        "discarding"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "With PortFast, Rapid PVST+ edge ports skip intermediate learning delays and move quickly to forwarding; the learning state is bypassed on that edge path. Forwarding is the desired end state. Discarding/blocking may still apply to non-edge roles, but the classic teaching point is skipping learning/listening."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 144,
+    "traditional": {
+      "id": 144,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a function of store-and forward switching?",
+      "alternativas": [
+        "It reduces latency by eliminating error checking within the frame",
+        "It produces an effective level of error-free network traffic using CRCs.",
+        "It buffers frames and forwards regardless of errors within the frames.",
+        "It forwards a frame by checking only the destination MAC address"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Store-and-forward buffers the entire frame and uses FCS/CRC to drop damaged frames, improving effective error-free delivery at the cost of latency. Cut-through reduces latency by starting forward earlier and does less complete error checking. Forwarding regardless of errors is not store-and-forward."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 145,
+    "traditional": {
+      "id": 145,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which WLC interface provides out-of-band management in the Cisco Unified Wireless Network Architecture?",
+      "alternativas": [
+        "AP-Manager",
+        "service port",
+        "dynamic",
+        "virtual"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "The WLC service port is the out-of-band management interface in Cisco Unified Wireless Network architecture. AP-Manager handles AP CAPWAP. Dynamic interfaces map WLANs/VLANs. Virtual is for mobility/web auth redirection."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 146,
+    "traditional": {
+      "id": 146,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which mode must be set for APs to communicate to a Wireless LAN Controller using the Control and Provisioning of Wireless Access Points(CAPWAP) protocol?",
+      "alternativas": [
+        "route",
+        "bridge",
+        "lightweight",
+        "autonomous"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "CAPWAP is used by lightweight APs to communicate with a WLC. Autonomous APs do not use CAPWAP to a controller for primary management. Bridge/route are not the CAPWAP client mode names."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 147,
+    "traditional": {
+      "id": 147,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which switch technology establishes a network connection immediately when it is plugged in?",
+      "alternativas": [
+        "PortFast",
+        "BPDU guard",
+        "UplinkFast",
+        "BackboneFast"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "PortFast places edge ports into forwarding immediately (with STP still running). BPDU Guard protects PortFast ports. UplinkFast/BackboneFast speed up recovery after failures but do not make every plugged cable forward instantly like PortFast on an edge port."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 148,
+    "traditional": {
+      "id": 148,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command on a port enters the forwarding state immediately when a PC is connected to it?",
+      "alternativas": [
+        "switch(config)#spanning-tree portfast default",
+        "switch(config)#spanning-tree portfast BPDU guard default",
+        "switch(config-if)#spanning-tree portfast trunk",
+        "switch(config-if)#no spanning-tree portfast"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "spanning-tree portfast default enables PortFast globally on all access ports so a connected PC reaches forwarding quickly. bpduguard default is protection, not the PortFast enable itself. portfast trunk is for trunk edges. no portfast disables it."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 149,
+    "traditional": {
+      "id": 149,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which channel-group mode must be configured when multiple distribution interfaces connected to a WLC are bundled?",
+      "alternativas": [
+        "Channel-group mode passive.",
+        "Channel-group mode on.",
+        "Channel-group mode desirable.",
+        "Channel-group mode active."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "WLC LAG bundles are static EtherChannels: switch side must use channel-group mode on (no PAgP/LACP negotiation with classic AireOS LAG). active/passive/desirable are negotiation modes not used for standard WLC LAG."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 150,
+    "traditional": {
+      "id": 150,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which Layer 2 switch function encapsulates packets for different VLANs so that the packets traverse the same port and maintain trafficseparation between the VLANs?",
+      "alternativas": [
+        "VLAN marking",
+        "VLAN numbering",
+        "VLAN DSCP",
+        "VLAN tagging"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "VLAN tagging (802.1Q) inserts a tag so multiple VLANs share a trunk while keeping traffic separated. DSCP is L3. VLAN ID numbering alone does not encapsulate. “Marking” is ambiguous QoS language."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 151,
+    "traditional": {
+      "id": 151,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which value is the unique identifier that an access point uses to establish and maintain wireless connectivity to wireless network devices?",
+      "alternativas": [
+        "VLAN ID",
+        "SSID",
+        "RFID",
+        "WLAN ID"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "The SSID is the network name clients use to discover and maintain association with the WLAN. VLAN ID is wired segmentation. RFID is asset tracking. WLAN ID is a controller object index, not the RF identifier clients scan."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 152,
+    "traditional": {
+      "id": 152,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer must configure neighbor discovery between the company router and an ISP.What is the next step to complete the configuration if the ISP uses a third-party router?",
+      "alternativas": [
+        "Enable LLDP globally.",
+        "Disable CDP on gi0/0.",
+        "Enable LLDP TLVs on the ISP router.",
+        "Disable auto-negotiation."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "With a third-party ISP router, enable LLDP globally (lldp run) for standards-based neighbor discovery. CDP may be disabled toward the ISP as hygiene, but the positive next step to complete multivendor discovery is LLDP. You do not configure the ISP router from the enterprise exam item perspective."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 153,
+    "traditional": {
+      "id": 153,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What does a switch do when it receives a frame whose destination MAC address is missing from the MAC address table?",
+      "alternativas": [
+        "It changes the checksum of the frame to a value that indicates an invalid frame.",
+        "It updates the CAM table with the destination MAC address of the frame.",
+        "It appends the table with a static entry for the MAC and shuts down the port.",
+        "It floods the frame unchanged across all remaining ports in the incoming VLAN."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "If the destination MAC is unknown, the switch floods the frame out all ports in that VLAN except the ingress port. It learns from source MACs, not by writing the unknown destination as a learned entry. It does not alter checksums or shut ports for ordinary unknown unicasts."
+    },
+    "ticket": {
+      "id": 153,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8153 — Servidor novo na VLAN 50; primeiros pings geram tráfego em todas as portas da VLAN até o MAC ser aprendido.",
+      "cli_output": "SW-DC# show mac address-table dynamic vlan 50\nVlan    Mac Address       Type        Ports\n50      0011.2233.4401    DYNAMIC     Gi1/0/10\n! servidor 0011.2233.99aa ainda ausente\n\nSW-DC# show interfaces gi1/0/11 status\nPort      Name       Status       Vlan\nGi1/0/11  NEW-SRV    connected    50",
+      "alternativas": [
+        "Sem MAC de destino na tabela, o switch flooda o frame inalterado nas demais portas da VLAN de ingresso.",
+        "O switch grava o destino na CAM antes de encaminhar e nunca flooda.",
+        "O switch err-disable a porta quando o destino é desconhecido.",
+        "O frame é descartado até existir entrada estática manual."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Comportamento clássico de unknown unicast flooding na VLAN. Depois que o servidor responde, o source MAC é aprendido e o unicast passa a ser filtrado para a porta correta."
+    }
+  },
+  {
+    "source_id": 154,
+    "traditional": {
+      "id": 154,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "By default, how long will the switch continue to know a workstation MAC address after the workstation stops sending traffic?",
+      "alternativas": [
+        "200 seconds",
+        "300 seconds",
+        "600 seconds",
+        "900 seconds"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Default MAC address aging time on Cisco Catalyst switches is 300 seconds. After 300s without frames from that source, the dynamic entry is removed."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 155,
+    "traditional": {
+      "id": 155,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A project objective is to minimize the association time to the different access points as mobile devices move around the office. The ideal solution must cover numerous devices and device types, including laptops, mobile phones, tablets and wireless printers. What must be configured?",
+      "alternativas": [
+        "802.11v BSS Max Idle Service",
+        "802.11v Disassociation Imminent",
+        "802.11ax BSS configure",
+        "802.11k neighbor List Dual Band"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "802.11v features such as Disassociation Imminent help steer/roam clients more intelligently to reduce sticky-client delays as devices move. 802.11k neighbor lists also assist roaming; this item keys 802.11v Disassociation Imminent. 802.11ax BSS config is not the specific association-time minimizer named here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 156,
+    "traditional": {
+      "id": 156,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A WLC sends alarms about a rogue AP, and the network administrator verifies that the alarms are caused by a legitimate autonomous AP. How must the alarms be stopped for the MAC address of the AP?",
+      "alternativas": [
+        "Remove the AP from WLC management",
+        "Place the AP into manual containment.",
+        "Manually remove the AP from Pending state.",
+        "Set the AP Class Type to Friendly."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Legitimate APs seen as rogues should be classified as Friendly (or internal) so alarms stop without containment. Manual containment is for actual threats and can disrupt a legitimate AP. Removing from WLC management or Pending state does not correctly clear a rogue alarm for an outside autonomous AP MAC."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 157,
+    "traditional": {
+      "id": 157,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is one reason to implement LAG on a Cisco WLC?",
+      "alternativas": [
+        "to increase security and encrypt management frames",
+        "to enable connected switch ports to failover and use different VLANs",
+        "to provide link redundancy and load balancing",
+        "to allow for stateful and link-state failover"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "LAG on a WLC bundles multiple physical distribution ports for higher throughput and link redundancy with load balancing toward the neighboring switch. It is not primarily a management-frame encryption feature nor per-port VLAN failover magic."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 158,
+    "traditional": {
+      "id": 158,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When an access point is seeking to join wireless LAN controller, which message is sent to the AP-Manager interface?",
+      "alternativas": [
+        "Discovery response",
+        "DHCP request",
+        "DHCP discover",
+        "Discovery request"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "During join, the AP sends CAPWAP Discovery Request messages toward candidate controllers (including AP-Manager addressing as applicable). Discovery Response comes from the WLC. DHCP Discover/Request obtain an IP address for the AP, not the CAPWAP join message to AP-Manager."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 159,
+    "traditional": {
+      "id": 159,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "After installing a new Cisco ISE server which task must the engineer perform on the Cisco WLC to connect wireless clients on a specific VLAN based on their credentials?",
+      "alternativas": [
+        "Disable the LAG Mode on Next Reboot.",
+        "Enable the Event Driven RRM.",
+        "Enable the Allow AAA Override.",
+        "Enable the Authorize MIC APs against auth-list or AAA"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Allow AAA Override lets RADIUS/ISE return attributes (Interface/VLAN, ACL, QoS) that override WLAN defaults so users land on credential-specific VLANs. LAG and EDRRM are unrelated. MIC AP auth-list is about AP authorization, not client VLAN assignment."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 160,
+    "traditional": {
+      "id": 160,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Router R1 must send all traffic without a matching routing-table entry to 192.168.1.1. Which configuration accomplishes this task?",
+      "alternativas": [
+        "R1#config t R1(config)#ip routing R1(config)#ip route default-route 192.168.1.1",
+        "R1#config t R1(config)#ip routing R1(config)#ip route 192.168.1.1 0.0.0.0 0.0.0.0",
+        "R1#config t R1(config)#ip routing R1(config)#ip route 0.0.0.0 0.0.0.0 192.168.1.1",
+        "R1#config t R1(config)#ip routing R1(config)#ip default-gateway 192.168.1.1"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "A default route is ip route 0.0.0.0 0.0.0.0 192.168.1.1. ip default-gateway is for non-routing hosts. Invented syntax default-route is invalid. Swapping network/mask/next-hop order is wrong."
+    },
+    "ticket": {
+      "id": 160,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8160 — R1 não encaminha destinos desconhecidos à Internet edge 192.168.1.1. Rotas específicas ok; tudo mais falha.",
+      "cli_output": "R1# show ip route\nGateway of last resort is not set\n      10.0.0.0/8 is variably subnetted...\nC        10.1.1.0/24 is directly connected, GigabitEthernet0/0\n\nR1# show running-config | include ip route|default\nip route 10.2.2.0 255.255.255.0 10.1.1.2\n! sem default route",
+      "alternativas": [
+        "Configurar ip route 0.0.0.0 0.0.0.0 192.168.1.1 para gateway of last resort.",
+        "Usar ip default-gateway 192.168.1.1 em roteador com ip routing (substitui default route).",
+        "ip route 192.168.1.1 0.0.0.0 0.0.0.0 instala default válida.",
+        "ip route default-route 192.168.1.1 é a sintaxe IOS padrão."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Default route = 0.0.0.0/0 via next-hop. Em roteador com routing ativo, ip default-gateway não substitui a tabela de roteamento como em host. Sintaxes invertidas/inventadas não instalam gateway of last resort."
+    }
+  },
+  {
+    "source_id": 161,
+    "traditional": {
+      "id": 161,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A packet is destined for 10.10.1.22. Which static route does the router choose to forward the packet?",
+      "alternativas": [
+        "ip route 10.10.1.0 255.255.255.240 10.10.255.1",
+        "ip route 10.10.1.20 255.255.255.252 10.10.255.1",
+        "ip route 10.10.1.16 255.255.255.252 10.10.255.1",
+        "ip route 10.10.1.20 255.255.255.254 10.10.255.1"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Longest-match routing: 10.10.1.22 falls in 10.10.1.20/30 ( .20–.23 ) which is more specific than 10.10.1.0/28. 10.10.1.16/30 is .16–.19 (does not include .22). 10.10.1.20/31 is .20–.21 only. Therefore 10.10.1.20/30 wins."
+    },
+    "ticket": {
+      "id": 161,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8161 — Pacotes a 10.10.1.22 escolhem next-hop inesperado. Várias estáticas overlap existem.",
+      "cli_output": "R1# show ip route 10.10.1.22\nRouting entry for 10.10.1.20/30\n  Known via \"static\", distance 1, metric 0\n  Routing Descriptor Blocks:\n  * 10.10.255.1\n\nR1# show running-config | include ip route 10.10.1\nip route 10.10.1.0 255.255.255.240 10.10.255.1\nip route 10.10.1.20 255.255.255.252 10.10.255.1\nip route 10.10.1.16 255.255.255.252 10.10.255.1\nip route 10.10.1.20 255.255.255.254 10.10.255.1",
+      "alternativas": [
+        "Longest match: 10.10.1.20/30 cobre .20–.23 e inclui .22; vence /28 e não-cobertura de /30.16 e /31.",
+        "Sempre vence a rota com maior máscara decimal listada primeiro no config.",
+        "10.10.1.16/30 inclui .22 porque /30 cobre 16 endereços.",
+        "10.10.1.20/31 inclui .22 (.20 e .21 only é falso)."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "IOS usa longest-match. .22 ∈ 10.10.1.20/30 (.20–.23). /28 também cobre mas é menos específico. .16/30 = .16–.19. /31 = .20–.21. Logo a estática /30 .20 é a escolhida."
+    }
+  },
+  {
+    "source_id": 162,
+    "traditional": {
+      "id": 162,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "R1 has learned route 10.10.10.0/24 via numerous routing protocols. Which route is instafilled?",
+      "alternativas": [
+        "route with the next hop that has the highest IP",
+        "route with the lowest cost",
+        "route with the lowest administrative distance",
+        "route with the shortest prefix length"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "When the same prefix is learned via multiple routing sources, Cisco IOS installs the route with the lowest administrative distance. Metrics are compared within the same protocol. Prefix length would mean different prefixes (longest match), not equal /24s. Highest next-hop IP is irrelevant."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 163,
+    "traditional": {
+      "id": 163,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When a oating static route is configured, which action ensures that the backup route is used when the primary route fails?",
+      "alternativas": [
+        "The administrative distance must be higher on the primary route so that the backup route becomes secondary.",
+        "The default-information originate command must be configured for the route to be instafifilled into the routing table.",
+        "The oating static route must have a lower administrative distance than the primary route so it is used as a backup.",
+        "The oating static route must have a higher administrative distance than the primary route so it is used as a backup"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "A floating static route is a backup with a higher administrative distance than the primary route so it is installed only when the primary is withdrawn. Lower AD would make it preferred, not backup. default-information originate is OSPF/BGP redistribution of defaults, not the floating static mechanism."
+    },
+    "ticket": {
+      "id": 163,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #8163 — Rota primária OSPF para 172.16.0.0/16 cai, mas o backup estático não entra na tabela.",
+      "cli_output": "R1# show running-config | include ip route 172.16\nip route 172.16.0.0 255.255.0.0 10.0.0.2 1\n\nR1# show ip route 172.16.0.0\nRouting entry for 172.16.0.0/16\n  Known via \"ospf 1\", distance 110, metric 20\n\n! link OSPF down:\nR1# show ip route 172.16.0.0\n% Network not in table\n! estático também some da candidatura efetiva — AD 1 competia como primária, não floating",
+      "alternativas": [
+        "Floating static precisa de AD maior que a primária (ex. 210 > 110 OSPF) para ficar de backup.",
+        "Floating static deve ter AD menor que OSPF para ser backup.",
+        "default-information originate é obrigatório para qualquer floating static.",
+        "AD maior na rota primária é o mecanismo de floating static."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Com AD 1 o estático é sempre preferido a OSPF (110) quando presente; não é floating. Configure ip route ... 210 (ou similar) para instalar só quando a primária sumir. default-information originate não define floating static."
+    }
+  },
+  {
+    "source_id": 164,
+    "traditional": {
+      "id": 164,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A user configured OSPF and advertised the Gigabit Ethernet interface in OSPF. By default, to which type of OSPF network does this interface belong?",
+      "alternativas": [
+        "point-to-multipoint",
+        "point-to-point",
+        "broadcast",
+        "nonbroadcast"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "By default, OSPF treats Ethernet/GigabitEthernet as network type broadcast (DR/BDR election). Point-to-point/nonbroadcast/point-to-multipoint require explicit configuration or different media."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 165,
+    "traditional": {
+      "id": 165,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which attribute does a router use to select the best path when two or more different routes to the same destination exist from two different routing protocols?",
+      "alternativas": [
+        "dual algorithm",
+        "metric",
+        "administrative distance",
+        "hop count"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Between different routing protocols, administrative distance selects which source is trusted for a given prefix. Metrics are protocol-specific and not directly comparable across protocols. Hop count is RIP’s metric. Dual algorithm refers to EIGRP internals, not inter-protocol selection."
+    },
+    "ticket": null
+  }
+]

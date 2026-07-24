@@ -1,0 +1,342 @@
+[
+  {
+    "source_id": 1,
+    "traditional": {
+      "id": 1,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How do TCP and UDP differ in the way that they establish a connection between two endpoints?",
+      "alternativas": [
+        "TCP uses the three-way handshake, and UDP does not guarantee message delivery.",
+        "TCP uses synchronization packets, and UDP uses acknowledgment packets.",
+        "UDP provides reliable message transfer, and TCP is a connectionless protocol.",
+        "UDP uses SYN, SYN ACK, and FIN bits in the frame header while TCP uses SYN, SYN ACK, and ACK bits."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "TCP is connection-oriented: before data transfer it completes a three-way handshake (SYN → SYN-ACK → ACK) so both endpoints agree on sequence numbers and readiness. UDP is connectionless and sends datagrams without a setup phase or delivery guarantee. Option B is incomplete and misleading — UDP does not use ACK packets for transport reliability. Option C reverses the roles: UDP is unreliable/connectionless; TCP is reliable/connection-oriented. Option D confuses layers and protocols: SYN/FIN/ACK are TCP segment flags in the transport header, not UDP frame bits, and UDP does not implement that handshake."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 2,
+    "traditional": {
+      "id": 2,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "In which way does a spine-and-leaf architecture allow for scalability in a network when additional access ports are required?",
+      "alternativas": [
+        "A spine switch and a leaf switch can be added with redundant connections between them.",
+        "A spine switch can be added with at least 40 GB uplinks.",
+        "A leaf switch can be added with connections to every spine switch.",
+        "A leaf switch can be added with a single connection to a core spine switch."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "In a spine-and-leaf fabric, every leaf connects to every spine. To add access ports you deploy a new leaf and uplink it to all spines, preserving equal-cost multipath and predictable east-west latency. Adding only a spine does not by itself create new access ports for endpoints. A single uplink from leaf to one spine breaks the full-mesh leaf-to-spine design and creates a bottleneck/single path. Fixed uplink speeds (e.g. 40 Gbps) are a capacity choice, not the scalability mechanism when you need more edge ports."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 3,
+    "traditional": {
+      "id": 3,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What identifies the functionality of virtual machines?",
+      "alternativas": [
+        "The hypervisor communicates on Layer 3 without the need for additional resources.",
+        "Each hypervisor supports a single virtual machine and a single software switch.",
+        "The hypervisor virtualizes physical components including CPU, memory, and storage.",
+        "Virtualized servers run efficiently when physically connected to a switch that is separate from the hypervisor."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "A hypervisor abstracts physical hardware and presents virtual CPU, memory, storage, and often virtual NICs to guest VMs so multiple OS instances share one host. It is not limited to a single VM or a single vSwitch. Hypervisors are not defined by exclusive Layer-3-only communication without resources. VMs typically use virtual switches inside the host (or distributed vSwitches) rather than requiring a physically separate external switch for efficiency of virtualization itself."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 4,
+    "traditional": {
+      "id": 4,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command automatically generates an IPv6 address from a specified IPv6 prefix and MAC address of an interface?",
+      "alternativas": [
+        "ipv6 address dhcp",
+        "ipv6 address 2001:DB8:5:112::/64 eui-64",
+        "ipv6 address autoconfig",
+        "ipv6 address 2001:DB8:5:112::2/64 link-local"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "The eui-64 keyword with a configured /64 prefix tells IOS to build the 64-bit interface identifier from the interface MAC (EUI-64) and concatenate it with the specified prefix — exactly what the question asks. ipv6 address dhcp obtains addressing via DHCPv6, not from a prefix+MAC you specify on the CLI. ipv6 address autoconfig enables SLAAC based on Router Advertisement prefixes, not a prefix typed in that command. The last option assigns a full address and misuses link-local semantics; it does not auto-derive from the MAC via EUI-64."
+    },
+    "ticket": {
+      "id": 4,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #7104 — O servidor de monitoramento em R1 Gi0/1 deveria receber um GUA IPv6 derivado do prefixo 2001:DB8:5:112::/64 e do MAC da interface (EUI-64). O link-local sobe, mas o endereço global esperado (baseado no MAC) não aparece. A equipe colou um endereço estático incompleto e pede o comando correto para gerar o IID automaticamente a partir do prefixo e do MAC.",
+      "cli_output": "R1# show ipv6 interface gi0/1\nGigabitEthernet0/1 is up, line protocol is up\n  IPv6 is enabled, link-local address is FE80::C801:1AFF:FE23:4501\n  No global unicast address is configured\n  ND reachable time is 30000 milliseconds\n  ND advertised reachable time is 0 milliseconds\n\nR1# show running-config interface gi0/1\ninterface GigabitEthernet0/1\n description MONITOR-SRV\n ipv6 enable\n ! (sem ipv6 address ... eui-64)\n\nR1# show interfaces gi0/1\nGigabitEthernet0/1 is up, line protocol is up\n  Hardware is CSR vNIC, address is c801.1a23.4501 (bia c801.1a23.4501)",
+      "alternativas": [
+        "Configurar ipv6 address 2001:DB8:5:112::/64 eui-64 na Gi0/1 para gerar o IID a partir do MAC com o prefixo especificado.",
+        "Configurar apenas ipv6 address dhcp e esperar que o MAC seja enviado como prefixo pelo servidor.",
+        "Configurar ipv6 address 2001:DB8:5:112::2/64 link-local para forçar o GUA a partir do MAC.",
+        "Manter só ipv6 enable; o GUA EUI-64 é criado automaticamente sem prefixo configurado."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Com apenas ipv6 enable, a interface obtém link-local (FE80::/10) mas não instala GUA. Para um endereço global a partir de um prefixo que você especifica e do MAC da interface, o comando correto é ipv6 address 2001:DB8:5:112::/64 eui-64 — o IOS monta o interface ID no formato EUI-64 a partir do MAC c801.1a23.4501. DHCPv6 não usa o prefixo+MAC da forma pedida. Marcar um /64 como link-local está semanticamente errado (link-local é FE80::/10). Sem anunciar/configurar prefixo, EUI-64 sozinho não materializa GUA."
+    }
+  },
+  {
+    "source_id": 5,
+    "traditional": {
+      "id": 5,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer must configure a /30 subnet between two routers. Which usable IP address and subnet mask combination meets this criteria?",
+      "alternativas": [
+        "interface e0/0\ndescription to XX-AXXX:XXXXX\nip address 10.2.1.3 255.255.255.252",
+        "interface e0/0\ndescription to XX-AXXX:XXXXX\nip address 192.168.1.1 255.255.255.248",
+        "interface e0/0\ndescription to XX-AXXX:XXXXX\nip address 172.16.1.4 255.255.255.248",
+        "interface e0/0\ndescription to XX-AXXX:XXXXX\nip address 209.165.201.2 255.255.255.252"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "A /30 mask is 255.255.255.252 (two usable host addresses). In 209.165.201.0/30 the usable hosts are .1 and .2; therefore 209.165.201.2/30 is valid. 10.2.1.3 with /30 is the broadcast of 10.2.1.0/30 (network .0, hosts .1–.2, broadcast .3), so it is not a usable host. 255.255.255.248 is /29, not /30. 172.16.1.4/29 is also the wrong mask length for a point-to-point /30 link design."
+    },
+    "ticket": {
+      "id": 5,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #7112 — Link ponto a ponto entre R-CORE e R-EDGE deveria usar um /30. Após a mudança, o ping entre os peers falha intermitentemente e a equipe de WAN reporta máscara inconsistente. R-CORE ficou com 209.165.201.1; precisam validar qual combinação de IP utilizável + máscara /30 está correta no peer.",
+      "cli_output": "R-EDGE# show running-config interface gi0/0\ninterface GigabitEthernet0/0\n description to R-CORE\n ip address 209.165.201.2 255.255.255.248\n!\nR-EDGE# show ip interface brief\nInterface              IP-Address      OK? Method Status                Protocol\nGigabitEthernet0/0     209.165.201.2   YES NVRAM  up                    up\n\nR-CORE# show running-config interface gi0/0\ninterface GigabitEthernet0/0\n description to R-EDGE\n ip address 209.165.201.1 255.255.255.252\n!\nR-EDGE# show ip route 209.165.201.1\n% Network not in table\n\nR-EDGE# ping 209.165.201.1\nSending 5, 100-byte ICMP Echos to 209.165.201.1, timeout is 2 seconds:\n.....\nSuccess rate is 0 percent (0/5)",
+      "alternativas": [
+        "Corrigir R-EDGE para ip address 209.165.201.2 255.255.255.252 (/30); a máscara /29 atual coloca o peer fora da mesma sub-rede utilizável.",
+        "Usar 10.2.1.3 255.255.255.252 em R-EDGE; .3/30 é sempre o melhor host em qualquer /30.",
+        "Manter 255.255.255.248 e mudar só o IP para 172.16.1.4, que já é um /30 válido.",
+        "Trocar ambos para 192.168.1.1 255.255.255.248; /29 é o padrão Cisco para links serial ponto a ponto."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "R-CORE está em 209.165.201.1/30 (máscara 255.255.255.252). R-EDGE está em .2 com 255.255.255.248 (/29), então o cálculo de rede/broadcast diverge e o peer deixa de ser tratado como on-link corretamente. A combinação utilizável /30 correta no peer é 209.165.201.2 255.255.255.252. 10.2.1.3/30 é broadcast da rede 10.2.1.0/30. 172.16.1.4 com /29 não atende o requisito /30. /29 não é o padrão obrigatório para P2P — o desenho pedido é /30."
+    }
+  },
+  {
+    "source_id": 6,
+    "traditional": {
+      "id": 6,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which network allows devices to communicate without the need to access the Internet?",
+      "alternativas": [
+        "172.9.0.0/16",
+        "172.28.0.0/16",
+        "192.0.0.0/8",
+        "209.165.201.0/24"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "RFC 1918 private ranges include 10.0.0.0/8, 172.16.0.0/12 (172.16.0.0–172.31.255.255), and 192.168.0.0/16. 172.28.0.0/16 falls inside 172.16.0.0/12, so hosts can communicate privately without public Internet routing. 172.9.0.0/16 is public (outside 172.16/12). 192.0.0.0/8 is not the private 192.168.0.0/16 block. 209.165.201.0/24 is a public documentation/test range often seen in Cisco examples, not RFC 1918 private space for internal-only communication by definition."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 7,
+    "traditional": {
+      "id": 7,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which IPv6 address block sends packets to a group address rather than a single address?",
+      "alternativas": [
+        "2000::/3",
+        "FC00::/7",
+        "FE80::/10",
+        "FF00::/8"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "IPv6 multicast addresses are in FF00::/8 (binary prefix 1111 1111). Traffic to a multicast group is delivered to all receivers that joined that group, not to a single unicast destination. 2000::/3 covers global unicast. FC00::/7 is unique local (ULA). FE80::/10 is link-local unicast. Only FF00::/8 matches “group address” multicast semantics."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 8,
+    "traditional": {
+      "id": 8,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a benefit of using a Cisco Wireless LAN Controller?",
+      "alternativas": [
+        "It eliminates the need to configure each access point individually.",
+        "Central AP management requires more complex configurations.",
+        "Unique SSIDs cannot use the same authentication method.",
+        "It supports autonomous and lightweight APs."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "With a WLC, lightweight APs are centrally provisioned: SSIDs, security, RF policies, and firmware are pushed from the controller instead of per-AP CLI. That is the main operational benefit. Central management simplifies, not increases, day-2 configuration burden relative to many autonomous APs. Multiple SSIDs can share the same authentication method. A classic WLC architecture is for lightweight/CAPWAP APs; autonomous APs are managed individually and are not the primary WLC benefit described here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 9,
+    "traditional": {
+      "id": 9,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What occurs to frames during the process of frame flooding?",
+      "alternativas": [
+        "Frames are sent to all ports, including those that are assigned to other VLANs.",
+        "Frames are sent to every port on the switch that has a matching entry in MAC address table.",
+        "Frames are sent to every port on the switch in the same VLAN except from the originating port.",
+        "Frames are sent to every port on the switch in the same VLAN."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Unknown unicast, broadcast, and (typically) multicast flooding replicates a frame out all ports in the same VLAN/broadcast domain except the ingress port. Flooding does not cross into other VLANs (that would break isolation). If the destination MAC already has a matching CAM entry, the switch forwards to that port only — that is filtering, not flooding. Option D is almost right but omits exclusion of the originating port, which would create a useless hairpin of the frame back to the source port."
+    },
+    "ticket": {
+      "id": 9,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #7120 — Usuários na VLAN 40 relatam picos de CPU no access switch e captura mostra o mesmo unicast desconhecido saindo em dezenas de portas da VLAN 40. O destino 0050.56aa.bb01 não está estável na tabela MAC. A equipe pergunta o comportamento esperado de frame flooding nesse cenário.",
+      "cli_output": "SW-A1# show mac address-table dynamic vlan 40\n          Mac Address Table\n-------------------------------------------\nVlan    Mac Address       Type        Ports\n----    -----------       --------    -----\n  40    0050.56aa.1001    DYNAMIC     Gi1/0/3\n  40    0050.56aa.1002    DYNAMIC     Gi1/0/4\n! (0050.56aa.bb01 NÃO aparece)\n\nSW-A1# show interfaces gi1/0/10 switchport\nName: Gi1/0/10\nSwitchport: Enabled\nAdministrative Mode: static access\nOperational Mode: static access\nAccess Mode VLAN: 40 (USERS)\n\nSW-A1# show mac address-table address 0050.56aa.bb01\n% Unicast MAC address not found in MAC address table\n\n! SPAN na VLAN 40: frame destinated to 0050.56aa.bb01 visto em Gi1/0/3, Gi1/0/4, Gi1/0/5... (todas access VLAN 40) exceto a porta de origem Gi1/0/10",
+      "alternativas": [
+        "Com MAC de destino desconhecido, o switch faz flooding: envia o frame a todas as portas da mesma VLAN, exceto a porta de origem.",
+        "O switch envia o frame a todas as portas de todas as VLANs porque unknown unicast ignora VLAN.",
+        "O switch só encaminha para portas que já têm a entrada CAM correspondente ao destino.",
+        "O frame é replicado inclusive de volta pela porta de origem para revalidar o MAC do host."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Sem entrada CAM para 0050.56aa.bb01, o unicast é unknown: flooding na VLAN 40 para todas as portas ativas da VLAN, menos a origem (Gi1/0/10). O SPAN confirma réplicas só em portas da VLAN 40. Flooding não atravessa outras VLANs. Se houvesse match na MAC table, haveria unicast filter para uma única porta. Reenviar pela porta de origem não é o comportamento padrão de flooding e desperdiçaria o frame no host que já o originou."
+    }
+  },
+  {
+    "source_id": 10,
+    "traditional": {
+      "id": 10,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which function does the range of private IPv4 addresses perform?",
+      "alternativas": [
+        "allows multiple companies to each use the same addresses without conflicts",
+        "provides a direct connection for hosts from outside of the enterprise network",
+        "ensures that NAT is not required to reach the Internet with private range addressing",
+        "enables secure communications to the Internet for all external hosts"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Private IPv4 ranges (RFC 1918) are not globally unique on the public Internet; many organizations can reuse 10/8, 172.16/12, and 192.168/16 internally without conflicting with each other on the public routing table. They do not provide inbound direct reachability from outside by themselves. Reaching the Internet from private space typically requires NAT/PAT or a proxy, so saying NAT is not required is false. Private addressing alone does not encrypt or secure traffic for external hosts."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 11,
+    "traditional": {
+      "id": 11,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which action must be taken to assign a global unicast IPv6 address on an interface that is derived from the MAC address of that interface?",
+      "alternativas": [
+        "explicitly assign a link-local address",
+        "disable the EUI-64 bit process",
+        "enable SLAAC on an interface",
+        "configure a stateful DHCPv6 server on the network"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "SLAAC (Stateless Address Autoconfiguration) lets a host form a global unicast address from an RA-advertised /64 prefix plus an interface identifier commonly derived from the MAC (EUI-64) or a privacy extension. Enabling SLAAC/autoconfig on the interface is the action that yields a MAC-derived GUA when RAs supply a prefix. Manually setting only a link-local does not create a GUA. Disabling EUI-64 works against MAC-derived IIDs. Stateful DHCPv6 can assign addresses, but that is server-assigned addressing, not the classic “derived from the MAC” SLAAC model the question targets."
+    },
+    "ticket": {
+      "id": 11,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #7128 — Hosts na VLAN 60 deveriam obter GUA IPv6 automaticamente derivados do MAC (SLAAC), mas só aparecem link-locals. O roteador de primeiro salto anuncia o prefixo 2001:DB8:60:1::/64. A interface LAN do R1 está com IPv6 habilitado, porém sem autoconfig/SLAAC no lado do cliente de teste (router-on-a-stick lab) e os hosts reportam “no global address”.",
+      "cli_output": "R1# show ipv6 interface gi0/0.60\nGigabitEthernet0/0.60 is up, line protocol is up\n  IPv6 is enabled, link-local address is FE80::1\n  Global unicast address(es):\n    2001:DB8:60:1::1, subnet is 2001:DB8:60:1::/64\n  ND advertised reachable time is 0 milliseconds\n  ND advertised retransmit interval is 0 milliseconds\n  ND router advertisements are sent every 200 seconds\n  Hosts use stateless autoconfig for addresses.\n\nPC1# (simulado) show ipv6 interface brief\nEthernet0/0  [up/up]\n    FE80::A8BB:CCFF:FE00:100\n    ! nenhum GUA\n\n! Host com autoconfig desabilitado / stack IPv6 sem SLAAC\n! RA do R1 visível em captura: prefix 2001:DB8:60:1::/64 A-flag=1",
+      "alternativas": [
+        "Habilitar SLAAC/autoconfig na interface do host para formar o GUA a partir do prefixo do RA e do identificador derivado do MAC.",
+        "Desabilitar o processo EUI-64 no host para forçar o uso exclusivo do link-local como GUA.",
+        "Atribuir manualmente apenas um link-local adicional; isso instala automaticamente o GUA global.",
+        "Remover o prefixo do RA e depender só de DHCPv6 stateful sem flag A, o que ainda gera IID pelo MAC via SLAAC."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "O RA de R1 já anuncia 2001:DB8:60:1::/64 com comportamento de SLAAC (A-flag). Sem SLAAC/autoconfig no host, só o link-local localmente gerado aparece. Habilitar SLAAC permite concatenar prefixo do RA + IID (EUI-64/MAC ou privacy) e obter GUA. Desabilitar EUI-64 não cria GUA. Link-local extra não vira global unicast. DHCPv6 stateful é outro modelo; e sem prefixo/A-flag o host não faz SLAAC clássico baseado em MAC+prefixo anunciado."
+    }
+  },
+  {
+    "source_id": 12,
+    "traditional": {
+      "id": 12,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Several new coverage cells are required to improve the Wi-Fi network of an organization. Which two standard designs are recommended? (Choose two.)",
+      "alternativas": [
+        "5 GHz provides increased network capacity with up to 23 nonoverlapping channels.",
+        "5 GHz channel selection requires an autonomous access point.",
+        "Cells that overlap one another are configured to use nonoverlapping channels.",
+        "Adjacent cells with overlapping channels use a repeater access point."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Best-practice RF design uses nonoverlapping channels on cells that cover the same area so co-channel interference stays controlled (e.g. 1/6/11 in 2.4 GHz; many more nonoverlapping choices in 5 GHz). 5 GHz also offers far more nonoverlapping channels and higher capacity than 2.4 GHz — another recommended design point (paired with proper channel planning). Channel planning does not require autonomous APs; WLCs commonly assign channels. Using repeaters with overlapping channels is not a recommended standard design for capacity and interference. Note: official items often mark both the 5 GHz capacity statement and the nonoverlapping-overlap rule; this bank stores a single index, and the nonoverlapping-cell rule is the clearest required design control."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 13,
+    "traditional": {
+      "id": 13,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How do TCP and UDP differ in the way they provide reliability for delivery of packets?",
+      "alternativas": [
+        "TCP does not guarantee delivery or error checking to ensure that there is no corruption of data, UDP provides message acknowledgement and retransmits data if lost.",
+        "TCP provides flow control to avoid overwhelming a receiver by sending too many packets at once, UDP sends packets to the receiver in a continuous stream without checking.",
+        "TCP is a connectionless protocol that does not provide reliable delivery of data; UDP is a connection-oriented protocol that uses sequencing to provide reliable delivery.",
+        "TCP uses windowing to deliver packets reliably; UDP provides reliable message transfer between hosts by establishing a three-way handshake."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "TCP implements reliability and congestion/flow control (including sliding window) so a fast sender cannot overrun a slower receiver. UDP offers a best-effort datagram service with no built-in flow control, acknowledgements, or retransmission. Option A reverses TCP and UDP. Option C also reverses connection-oriented vs connectionless roles. Option D correctly mentions TCP windowing for reliable delivery but wrongly claims UDP uses a three-way handshake and reliable transfer — that is TCP behavior."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 14,
+    "traditional": {
+      "id": 14,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How does CAPWAP communicate between an access point in local mode and a WLC?",
+      "alternativas": [
+        "The access point must not be connected to the wired network, as it would create a loop",
+        "The access point must be connected to the same switch as the WLC",
+        "The access point must directly connect to the WLC using a copper cable",
+        "The access point has the ability to link to any switch in the network, assuming connectivity to the WLC"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "CAPWAP tunnels control and data (depending on mode) between a lightweight AP and the WLC over IP. The AP only needs IP reachability to the WLC (often via DHCP option 43, DNS, or L2 discovery) — it can sit on any appropriate access/management VLAN and switch in the campus. It must be on the wired network; that does not create a switching loop by itself. Same-switch adjacency and a direct copper cable to the WLC are not requirements."
+    },
+    "ticket": {
+      "id": 14,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #7135 — AP-ANDAR4-02 em local mode fica em discovery loop e não registra na WLC. O AP está em access VLAN 99 (mgmt APs). A WLC (10.99.0.5) está em outro prédio. Ping do gateway da VLAN 99 até a WLC funciona. A equipe achava que o AP precisava estar no mesmo switch da WLC ou em cabo direto.",
+      "cli_output": "AP-ANDAR4-02# show capwap client rcb\nAdminState                         : ADMIN_ENABLED\nName                               : AP-ANDAR4-02\nLocation                           : default location\nPrimary controller name            : \nPrimary controller IP              : 0.0.0.0\nSecondary controller IP            : 0.0.0.0\nDiscovery status                   : Discovering\n\nSW-FL4# show running-config interface gi1/0/12\ninterface GigabitEthernet1/0/12\n description AP-ANDAR4-02\n switchport mode access\n switchport access vlan 99\n spanning-tree portfast\n\nSW-L3# show ip route 10.99.0.5\nRouting entry for 10.99.0.0/24\n  Known via \"static\", distance 1, metric 0\n  Routing Descriptor Blocks:\n  * 10.10.0.1\n\n! DHCP scope VLAN 99: option 43 / DNS CISCO-CAPWAP-CONTROLLER ainda NÃO configurados\n! WLC management: 10.99.0.5 — alcançável via L3 a partir da VLAN 99",
+      "alternativas": [
+        "O AP pode estar em qualquer switch com reachability IP à WLC; falta mecanismo de discovery (Option 43/DNS/priming) — CAPWAP não exige mesmo switch nem cabo direto.",
+        "O AP não pode estar no cabeamento copper/wired ou formará loop com a WLC.",
+        "CAPWAP em local mode exige que o AP e a WLC compartilhem o mesmo switch de acesso.",
+        "É obrigatório um cabo copper dedicado AP—WLC; roteamento L3 entre prédios impede CAPWAP."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "CAPWAP é IP-based: o AP em local mode precisa descobrir e alcançar a WLC (UDP 5246/5247), não colocation L2 no mesmo switch. Aqui a rota até 10.99.0.5 existe, mas Primary controller IP está 0.0.0.0 e discovery continua — típico de ausência de DHCP option 43, DNS CISCO-CAPWAP-CONTROLLER ou controller name pré-configurado. Correção: option 43/DNS/prime com 10.99.0.5 e liberar firewall CAPWAP. AP wired na VLAN de mgmt é o desenho normal; cabo direto ou mesmo switch não são requisitos."
+    }
+  },
+  {
+    "source_id": 15,
+    "traditional": {
+      "id": 15,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which IPv6 address block forwards packets to a multicast address rather than a unicast address?",
+      "alternativas": [
+        "2000::/3",
+        "FC00::/7",
+        "FE80::/10",
+        "FF00::/12"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Multicast delivery uses the IPv6 multicast space beginning at FF00::/8; exam items often list FF00::/12 as the multicast block used in questions. Packets to those destinations target a group, not a single unicast node. 2000::/3 is global unicast. FC00::/7 is unique local. FE80::/10 is link-local unicast. Among the given choices, FF00::/12 is the multicast selection."
+    },
+    "ticket": null
+  }
+]

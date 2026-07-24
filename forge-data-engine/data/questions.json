@@ -1,0 +1,76 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "alternativas": [
+      "Get Nearest Server response (A)",
+      "General query (B)",
+      "General response (C)",
+      "Get Nearest Server request (D)"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O '0x4' indica o tipo de mensagem IOS está enviando. No contexto do SAP e IPX em Cisco Router/Switches, as respostas com '0x4' são indicativas de uma solicitação para encontrar um servidor mais próximo (Get Nearest Server request). As outras alternativas incorretamente sugerem tipos diferentes ou ações que não estão relacionadas ao contexto específico da mensagem IOS. Por exemplo, 'General query' e 'General response' são termos genéricos para qualquer tipo de solicitação/resposta sem um destino claro no IPX protocolo.",
+    "sintoma": "Cliente relata que não consegue se conectar ao servidor de proximidade.",
+    "cli_output": "debug ip context sap; debug ipx sap; show protocols detail"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "alternativas": [
+      "debug routing",
+      "debug ipx transaction",
+      "debug ipx routing activity",
+      "debug ipx events"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Para monitorar o tráfego IPX e visualizar as atualizações de roteamento em um dispositivo Cisco, é necessário usar a opção 'debug ipx routing activity'. Esta alternativa especificamente permite que você veja os pacotes relacionados às atualizações de roteo IPX. A resposta correta não pode ser alterada sem mudar o conteúdo técnico da questão original, pois ela se refere diretamente ao tráfego e atualizações específicos do protocolo IPX em dispositivos Cisco.",
+    "sintoma": "Cliente relata que não consegue monitorar os pacotes de tráfego IPX e está procurando por uma maneira para visualizar as atualizações de roteamento.",
+    "cli_output": "debug ipx routing activity"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "alternativas": [
+      "debug ipx transaction",
+      "show ipx traffic",
+      "show ipx events",
+      "display ipx traffic"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A resposta correta é 'show ipx traffic' porque este comando fornece uma visão geral da atividade IPX em execuрядodas no momento do pedido. As outras opções não são comandos padrão que mostram a tráfego IPX ou ocorreram eventos relacionados ao IPX.",
+    "sintoma": "[SYS] Ticket #98765: O cliente relatou que há atrasos na comunicação de pacotes IPX.",
+    "cli_output": "['show ipx traffic']"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "alternativas": [
+      "interfaceteethernet0.1ixencapsulamentoNovelletherixnetwork9einterfaceethernet0\nipxencapsulamentoNovelletheriplink6c",
+      "interface ethernet 0 ipx encapsulation Novell-ether ipx network 9e interface ethernet 0 ipx encapsulation sap ipx network 6c",
+      "interface ethernet 0.1 ipx\nencapsulation Novell-etheriplink9einterfaceethernet\n0.2 ipx encapsulation sap\nipxnetwork6c",
+      "interface ethernet 0.1 ipx\nencapsulation Novell-ether\nipx network 9e interface ethernet §0.2 ipx\nencapsulation sap\nipx network 6c"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A alternativa correta D configura corretamente a interface Ethernet com encapsulação IPX Novell e associa-a ao gateway IPX (9e) para conexões IPX. As outras opções misturam comandos ou não posicionam as interfaces adequadamente, resultando em uma comunicação inadequada entre o cliente e os sistemas SAP/Novell.",
+    "sintoma": "O sistema cliente relatou que a conexão com o servidor SAP e Novell Ethernet falha.",
+    "cli_output": "interface ethernet 0.1\nipx encapsulation Novell-ether ipx network 9e"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": true,
+    "alternativas": [
+      "It enables load sharing on 2 paths if the paths are equal metric\npaths.",
+      "It sets up routing to go to network 2.",
+      "It is the default for Cisco IPX load sharing.",
+      "It enables load sharing on 2 paths if the paths are\nunequal metric paths."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A alternativa correta A está certa porque o comando 'IPX maximum-paths 2' é especificamente usado para configurar máximas de caminhos IPX em um dispositivo Cisco. Quando esse comando é aplicado, ele permite que múltiplos caminhos sejam considerados simultaneamente pelo roteador ou switch da rede como alternativas para o tráfego entrar e sair do mesmo destino IPX. A especificação '2' indica quantos desses máximas de caminho devem ser configuradas no dispositivo, que neste caso é dois. O roteador irá então escolher automaticamente entre esses caminhos com base em seu desempenho (por exemplo, atraso ou uso da largura do pacote) para carregar o tráfego de forma eficiente quando ambos os caminhos têm métricas iguais. Isso é conhecido como 'load sharing'. Portanto, a alternativa A está correta porque especificamente descreve esse comportamento em que múltiplos caminhos com métricas idênticas são considerados para carregar o tráfego de forma eficiente. As outras opções estão incorretas por várias razões: B está errada porque 'IPX maximum-paths 2' não configura diretamente como a rota, mas sim quanto máxima desempenho pode ser obtido em múltiplos caminhos para um determinado destino. C também é incorreta pois o load sharing IPX por padrão depende do número de caminhos disponíinfls dos mecanismos internos da rede e não necessariamente está relacionado ao comando 'IPX maximum-paths'. Por fim, D está errada porque a máxima desempenho é alcançada quando os caminhos têm métricas iguais; se eles forem diferentes, o roteador irá escolher automaticamente o melhor (menor métrica) para carregar o tráfego.",
+    "enunciado": "What does the \"IPX maximum-paths 2\" command accomplish?"
+  }
+]

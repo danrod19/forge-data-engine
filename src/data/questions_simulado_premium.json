@@ -1,0 +1,2592 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which command automatically generates an IPv6 address from a specified IPv6 prefix and MAC address of an interface?",
+    "alternativas": [
+      "ipv6 address dhcp",
+      "ipv6 address 2001:DB8:5:112::/64 eui-64",
+      "ipv6 address autoconfig",
+      "ipv6 address 2001:DB8:5:112::2/64 link-local"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which action must be taken to assign a global unicast IPv6 address on an interface that is derived from the MAC address of that interface?",
+    "alternativas": [
+      "explicitly assign a link-local address",
+      "disable the EUI-64 bit process",
+      "enable SLAAC on an interface",
+      "configure a stateful DHCPv6 server on the network"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network engineer must implement an IPv6 configuration on the vlan 2000 interface to create a routable locally-unique unicast address that isblocked from being advertised to the internet. Which configuration must the engineer apply?",
+    "alternativas": [
+      "interface vlan 2000 ipv6 address ff00:0000:aaaa::1234:2343/64",
+      "interface vlan 2000 ipv6 address fd00::1234:2343/64",
+      "interface vlan 2000 ipv6 address fe80:0000:aaaa::1234:2343/64",
+      "interface vlan 2000 ipv6 address fc00:0000:aaaa:: a15d:1234:2343:8aca/64"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What occurs when Port Fast is enabled on an interface that is connected to another switch?",
+    "alternativas": [
+      "Root port choice and spanning-tree recalculation are accelerated when a switch link goes down.",
+      "After spanning-tree converges, Port Fast shuts down any port that receives BPDUs.",
+      "VTP is allowed to propagate VLAN configuration information from switch to switch automatically.",
+      "Spanning-tree fails to detect a switching loop increasing the likelihood of broadcast storms."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which two command sequences must be configured on a switch to establish a Layer 3 Ether Channel with an open-standard protocol? (Choosetwo.)",
+    "alternativas": [
+      "interface Gigabit Ethernet0/0/1 channel-group 10 mode auto",
+      "interface Gigabit Ethernet0/0/1 channel-group 10 mode on",
+      "interface port-channel 10 no switchport ip address 172.16.0.1 255.255.255.0",
+      "interface Gigabit Ethernet0/0/1 channel-group 10 mode activeE. interface port-channel 10 switchport switchport mode trunk"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "On a corporate network, hosts on the same VLAN can communicate with each other, but they are unable to communicate with hosts on differentVLANs. What is needed to allow communication between the VLANs?",
+    "alternativas": [
+      "a router with subinterfaces configured on the physical interface that is connected to the switch",
+      "a router with an IP address on the physical interface connected to the switch",
+      "a switch with an access link that is configured between the switches",
+      "a switch with a trunk link that is configured between the switches"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer requires a switch interface to actively attempt to establish a trunk link with a neighbor switch. What command must be configured?",
+    "alternativas": [
+      "switchport mode trunk",
+      "switchport mode dynamic desirable",
+      "switchport nonegotiate",
+      "switchport mode dynamic auto"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer must establish a trunk link between two switches. The neighboring switch is set to trunk or desirable mode. What action should be taken?",
+    "alternativas": [
+      "configure switchport nonegotiate",
+      "configure switchport mode dynamic desirable",
+      "configure switchport mode dynamic auto",
+      "configure switchport trunk dynamic desirable"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which protocol does an access point use to draw power from a connected switch?",
+    "alternativas": [
+      "Internet Group Management Protocol",
+      "Cisco Discovery Protocol",
+      "Adaptive Wireless Path Protocol",
+      "Neighbor Discovery Protocol"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An administrator must secure the WLC from receiving spoofed association requests. Which steps must be taken to configure the WLC to restrictthe requests and force the user to wait 10 ms to retry an association request?",
+    "alternativas": [
+      "Enable MAC ltering and set the SA Query timeout to 10.",
+      "Enable 802.1x Layer 2 security and set the Comeback timer to 10.",
+      "Enable Security Association Teardown Protection and set the SA Query timeout to 10.",
+      "Enable the Protected Management Frame service and set the Comeback timer to 10."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer is configuring data and voice services to pass through the same port. The designated switch interface fastethernet0/1 must transmitpackets using the same priority for data when they are received from the access port of the IP phone. Which configuration must be used?",
+    "alternativas": [
+      "interface fastethernet0/1 switchport voice vlan dot1p",
+      "interface fastethernet0/1 switchport priority extend cos 7",
+      "interface fastethernet0/1 switchport voice vlan untagged",
+      "interface fastethernet0/1 switchport priority extend trust"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer must configure neighbor discovery between the company router and an ISP. What is the next step to complete the configuration if the ISP uses a third-party router?",
+    "alternativas": [
+      "Enable LLDP globally.",
+      "Disable CDP on gi0/0.",
+      "Enable LLDP TLVs on the ISP router.",
+      "Disable auto-negotiation."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "If all OSPF routers in a single area are configured with the same priority value, what value does a router use for the OSPF router ID in the absenceof a loopback interface?",
+    "alternativas": [
+      "the IP address of the rst Fast Ethernet interface",
+      "the IP address of the console management interface",
+      "the highest IP address among its active interfaces",
+      "the lowest IP address among its active interfacesE. the priority value until a loopback interface is configured"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer is configuring router R1 with an IPv6 static route for prefix 2019: C15C:0CAF: E001::/64. The next hop must be2019: C15C:0CAF: E002::1. The route must be reachable via the R1 Gigabit 0/0 interface. Which command configures the designated route?",
+    "alternativas": [
+      "R1(config-if)#ip route 2019:C15C:0CAF:E001::/64 Gigabit Ethernet 0/0",
+      "R1(config)#ip route 2019:C15C:0CAF:E001::/64 Gigabit Ethernet 0/0",
+      "R1(config-if)#ipv6 route 2019:C15C:0CAF:E001::/64 2019:C15C:0CAF:E002::1",
+      "R1(config)#ipv6 route 2019:C15C:0CAF:E001::/64 2019:C15C:0CAF:E002::1"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which command is used to verify the DHCP relay agent address that has been set up on your Cisco IOS router?",
+    "alternativas": [
+      "show ip interface brief",
+      "show ip dhcp bindings",
+      "show ip route",
+      "show ip interfaceE. show interfaceF. show ip dhcp pool"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which Cisco IOS command will indicate that interface Gigabit Ethernet 0/0 is configured via DHCP?",
+    "alternativas": [
+      "show ip interface Gigabit Ethernet 0/0 dhcp",
+      "show interface Gigabit Ethernet 0/0",
+      "show ip interface dhcp",
+      "show ip interface Gigabit Ethernet 0/0E. show ip interface Gigabit Ethernet 0/0 brief"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What event has occurred if a router sends a notice level message to a syslog server?",
+    "alternativas": [
+      "A certificate has expired",
+      "An interface line has changed status",
+      "A TCP connection has been torn down",
+      "An ICMP connection has been built"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Where does the configuration reside when a helper address is configured lo support DHCP?",
+    "alternativas": [
+      "on the router closest to the server",
+      "on the router closest to the client",
+      "on every router along the path",
+      "on the switch trunk interface"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network engineer is configuring a switch so that it is remotely reachable via SSH. The engineer has already configured the host name on therouter. Which additional command must the engineer configure before entering the command to generate the RSA key?",
+    "alternativas": [
+      "password password",
+      "ip ssh authentication-retries 2",
+      "ip domain-name domain",
+      "crypto key generate rsa modulus 1024"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network administrator enabled port security on a switch interface connected to a printer. What is the next configuration action in order to allowthe port to learn the MAC address of the printer and insert it into the table automatically?",
+    "alternativas": [
+      "enable dynamic MAC address learning",
+      "implement static MAC addressing",
+      "enable sticky MAC addressing",
+      "implement auto MAC address learning"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network engineer is asked to configure VLANS 2, 3, and 4 for a new implementation. Some ports must be assigned to the new VLANS withunused ports remaining. Which action should be taken for the unused ports?",
+    "alternativas": [
+      "configure in a nondefault native VLAN",
+      "configure ports in the native VLAN",
+      "configure ports in a black hole VLAN",
+      "configure ports as access ports"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "When a switch receives a frame from an unknown source MAC address, which action does the switch take with the frame?",
+    "alternativas": [
+      "It sends the frame to ports within the CAM table identified with an unknown source MAC address.",
+      "It floods the frame out all interfaces, including the interface it was received on.",
+      "It associates the source MAC address with the LAN port on which it was received and saves it to the MAC address table.",
+      "It attempts to send the frame back to the source to ensure that the source MAC address is still available for transmissions."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network engineer starts to implement a new wireless LAN by configuring the authentication server and creating the dynamic interface. Whatmust be performed next to complete the basic configuration?",
+    "alternativas": [
+      "Create the new WLAN and bind the dynamic interface to it.",
+      "Configure high availability and redundancy for the access points.",
+      "Enable Telnet and RADIUS access on the managoment interface.",
+      "Install the management interface and add the management IP."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a reason to configure a trunk port that connects to a WLC distribution port?",
+    "alternativas": [
+      "Provide redundancy if there is a link failure for out-of-band management.",
+      "Allow multiple VLANs to be used in the data path.",
+      "Permit multiple VLANs to provide out-of-band management.",
+      "Eliminate redundancy with a link failure in the data path."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which configuration is needed to generate an RSA key for SSH on a router?",
+    "alternativas": [
+      "Configure the version of SSH",
+      "Configure VTY access.",
+      "Create a user with a password",
+      "Assign a DNS domain name"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "what event has occurred if a router sends a notice level message to a syslog server?",
+    "alternativas": [
+      "An interface line has changed status",
+      "An ICMP connection has been built",
+      "A certificate has expired",
+      "A TCP connection has been torn down"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which result occurs when Port Fast is enabled on an interface that is connected to another switch?",
+    "alternativas": [
+      "Spanning tree may fail to detect a switching loop in the network that causes broadcast storms",
+      "VTP is allowed to propagate VLAN configuration information from switch to switch automatically",
+      "Root port choice and spanning tree recalculation are accelerated when a switch link goes down",
+      "After spanning tree converges Port Fast shuts down any port that receives BPDUs."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network administrator enabled port security on a switch interface connected to a printer. What is the next configuration action in order to allow the port to learnthe MAC address of the printer and insert it into the table automatically?",
+    "alternativas": [
+      "enable dynamic MAC address learning",
+      "implement static MAC addressing.",
+      "enable sticky MAC addressing",
+      "implement auto MAC address learning"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer requires a scratch interface to actively attempt to establish a trunk link with a neighbor switch. What command must be configured?",
+    "alternativas": [
+      "switchport mode trunk",
+      "switchport mode dynamic desirable",
+      "switchport mode dynamic auto",
+      "switchport nonegotiate"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer must configure traffic for a VLAN that is untagged by the switch as it crosses a trunk link. Which command should be used?",
+    "alternativas": [
+      "switchport trunk allowed vlan 10",
+      "switchport trunk native vlan 10",
+      "switchport mode trunk",
+      "switchport trunk encapsulation dot1q"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 31,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "How does a Cisco Unified Wireless network respond to Wi-Fi channel overlap?",
+    "alternativas": [
+      "It alternates automatically between 2.4 GHz and 5 GHz on adjacent access points",
+      "It allows the administrator to assign channels on a per-device or per-interface basis.",
+      "It segregates devices from different manufacturers onto different channels.",
+      "It analyzes client load and background noise and dynamically assigns a channel."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 32,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which protocol does an access point use to draw power from a connected switch?",
+    "alternativas": [
+      "Internet Group Management Protocol",
+      "Adaptive Wireless Path Protocol",
+      "Cisco Discovery Protocol",
+      "Neighbor Discovery Protocol"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 33,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network administrator is asked to configure VLANS 2, 3 and 4 for a new implementation. Some ports must be assigned to the newVLANS with unused remaining. Which action should be taken for the unused ports?",
+    "alternativas": [
+      "configure port in the native VLAN",
+      "configure ports in a black hole VLAN",
+      "configure in a nondefault native VLAN",
+      "configure ports as access ports"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 34,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer must establish a trunk link between two switches. The neighboring switch is set to trunk or desirable mode. What action should be taken?",
+    "alternativas": [
+      "configure switchport nonegotiate",
+      "configure switchport mode dynamic desirable",
+      "configure switchport mode dynamic auto",
+      "configure switchport trunk dynamic desirable"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 35,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network engineer is configuring a switch so that it is remotely reachable via SSH. The engineer has already configured the host name on the router. Whichadditional command must the engineer configure before entering the command to generate the RSA key?",
+    "alternativas": [
+      "password password",
+      "crypto key generate rsa modulus 1024",
+      "ip domain-name domain",
+      "ip ssh authentication-retries 2"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 36,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer is configuring router R1 with an IPv6 static route for prefix 2019: C15C:0CAF:001::/64. The next hop must be 2019: C15C:0CAF: E002:1. The routemust be reachable via the R1 Gigabit 0/0 interface. Which command configures the designated route?",
+    "alternativas": [
+      "R1(config-if)#ipv6 route 2019:C15C:0CAF:E001::/64 2019:C15C:0CAF:E002:1",
+      "R1(configif)#ip route 2019:C15C:0CAF:E001::/64 Gigabit Ethernet 0/0",
+      "R1(config)#ipv6 route 2019:C1 5C:0CAF:E001::/64 2019:C15C:0CAF:E002::1",
+      "R1(confg)#ip route 2019:C15C:0CAF:E001::/64 Gigabit Ethernet 0/0"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 37,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "When OSPF learns multiple paths to a network, how does it select a route?",
+    "alternativas": [
+      "It multiple the active K value by 256 to calculate the route with the lowest metri",
+      "For each existing interface, it adds the metric from the source router to the destination to calculate the route with the lowestbandwidth.",
+      "It divides a reference bandwidth of 100 Mbps by the actual bandwidth of the existing interface to calculate the router with the lowestcost.",
+      "It count the umber of hops between the source router and the destination to determine the router with the lowest metric"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 38,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which configuration is needed to generate an RSA key for SSH on a router?",
+    "alternativas": [
+      "Configure the version of SSH",
+      "Configure VTY access.",
+      "Create a user with a passwor",
+      "Assign a DNS domain name"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 39,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the effect when loopback interfaces and the configured router ID are absent during the OSPF Process configuration?",
+    "alternativas": [
+      "No router ID is set, and the OSPF protocol does not run.",
+      "The highest up/up physical interface IP address is selected as the router I",
+      "The lowest IP address is incremented by 1 and selected as the router I",
+      "The router ID 0.0.0.0 is selected and placed in the OSPF process."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 40,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer must configure a /30 subnet between two routes. Which usable IP address and subnet mask combination meets this criteria?",
+    "alternativas": [
+      "interface e0/0 description to XX-AXXX: XXXXX ip address 10.2.1.3 255.255.255.252",
+      "interface e0/0 description to XX-AXXX: XXXXX ip address 192.168.1.1 255.255.255.248",
+      "interface e0/0 description to XX-AXXX: XXXXX ip address 172.16.1.4 255.255.255.248",
+      "interface e0/0 description to XX-AXXX: XXXXX ip address 209.165.201.2 225.255.255.252"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 41,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the expected outcome when an EUI-64 address is generated?",
+    "alternativas": [
+      "The interface ID is configured as a random 64-bit value",
+      "The characters FE80 are inserted at the beginning of the MAC address of the interface",
+      "The seventh bit of the original MAC address of the interface is inverted",
+      "The MAC address of the interface is used as the interface ID without modification"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 42,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "You are configuring your edge routers interface with a public IP address for Internet connectivity. The router needs to obtain the IP address fromthe service provider dynamically. Which command is needed on interface Fast Ethernet 0/0 to accomplish this?",
+    "alternativas": [
+      "ip default-gateway",
+      "ip route",
+      "ip default-network",
+      "ip address dhcpE. ip address dynamic"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 43,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer needs to configure LLDP to send the port description type length value (TLV). Which command sequence must be implemented?",
+    "alternativas": [
+      "switch(config-if)#lldp port-description",
+      "switch#lldp port-description",
+      "switch(config-line)#lldp port-description",
+      "switch(config)#lldp port-description"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 44,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What criteria is used rst during the root port selection process?",
+    "alternativas": [
+      "local port ID",
+      "lowest path cost to the toot bridge",
+      "lowest neighbor's bridge ID",
+      "lowest neighbor's port ID"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 45,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What must a network administrator consider when deciding whether to configure a new wireless network with APs in autonomous mode or APsrunning in cloud- based mode?",
+    "alternativas": [
+      "Autonomous mode APs are less dependent on an underlay but more complex to maintain than APs in cloud-based mode.",
+      "Cloud-based mode APs relay on underlays and are more complex to maintain than APs in autonomous mode.",
+      "Cloud-based mode APs are easy to deploy but harder to automate than APs in autonomous mode.",
+      "Autonomous mode APs are easy to deploy and automate than APs in cloud-based mode."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 46,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A project objective is to minimize the association time to the different access points as mobile devices move around the office. The ideal solutionmust cover numerous devices and device types, including laptops, mobile phones, tablets and wireless printers. What must be configured?",
+    "alternativas": [
+      "802.11v BSS Max Idle Service",
+      "802.11v Disassociation Imminent",
+      "802.11ax BSS configure",
+      "802.11k neighbor List Dual Band"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 47,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "When an access point is seeking to join wireless LAN controller, which message is sent to the AP-Manager interface?",
+    "alternativas": [
+      "Discovery response",
+      "DHCP request",
+      "DHCP discover",
+      "Discovery request"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 48,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What does the implementation of a rst-hop redundancy protocol protect against on a network?",
+    "alternativas": [
+      "default gateway failure",
+      "BGP neighbor apping",
+      "spanning-tree loops",
+      "root-bridge loss"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 49,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What will happen if you configure the logging trap debug command on a router?",
+    "alternativas": [
+      "It causes the router to send messages with lower severity levels to the syslog server",
+      "It causes the router to send all messages with the severity levels Warning, Error, Critical, and Emergency to the syslog server",
+      "It causes the router to send all messages to the syslog server",
+      "It causes the router to stop sending all messages to the syslog server"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 50,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer is configuring switch SW1 to act as an NTP server when all upstream NTP server connectivity fails. Which configuration must be used?",
+    "alternativas": [
+      "SW1# config t SW1(config)#ntp peer 192.168.1.1 SW1(config)#ntp access-group peer accesslist1",
+      "SW1# config t SW1(config)#ntp master SW1(config)#ntp server192.168.1.1",
+      "SW1# config t SW1(config)#ntp backup SW1(config)#ntp server192.168.1.1",
+      "SW1# config t SW1(config)#ntp server192.168.1.1 SW1(config)#ntp access-group peer accesslist1"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 51,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A Cisco engineer notices that two OSPF neighbors are connected using a crossover Ethernet cable. The neighbors are taking too long to be comefully adjacent. Which command must be issued under the interface configuration on each router to reduce the time required for the adjacency toreach the FULL state?",
+    "alternativas": [
+      "ip ospf dead-interval 40",
+      "ip ospf network broadcast",
+      "ip ospf priority 0",
+      "ip ospf network point-to-point"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 52,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer must configure the IPv6 address 2001:0db8:0000:0000:0700:0003:400F:572B on the serial0/0 interface of the HQ router and wants tocompress it for easier configuration. Which command must be issued on the router interface?",
+    "alternativas": [
+      "ipv6 address 2001:db8::700:3:400F:572B",
+      "ipv6 address 2001:db8:0::700:3:4F:572B",
+      "ipv6 address 2001:: db8:0000::700:3:400F:572B",
+      "ipv6 address 2001:0db8::7:3:4F:572B"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 53,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer must configure a core router with a floating static default route to the backup router at 10.200.0.2. Which command meets therequirements?",
+    "alternativas": [
+      "ip route 0.0.0.0 0.0.0.0 10.200.0.2 1",
+      "ip route 0.0.0.0 0.0.0.0 10.200.0.2 10",
+      "ip route 0.0.0.0 0.0.0.0 10.200.0.2",
+      "ip route 0.0.0.0 0.0.0.0 10.200.0.2 floating"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 54,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer must configure R1 for a new user account. The account must meet these requirements:• It must be configured in the local database.• The username is engineer2.• It must use the strongest password congurable. Which command must the engineer configure on the router?",
+    "alternativas": [
+      "R1(config)# username engineer2 privilege 1 password 7 test2021",
+      "R1(config)# username engineer2 secret 4 $1$b1Ju$kZbBS1Pyh4QzwXyZ",
+      "R1(config)# username engineer2 algorithm-type scrypt secret test2021",
+      "R1(config)# username engineer2 secret 5 password $1$b1Ju$kZbBS1Pyh4QzwXyZ"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 55,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which interface or port on the WLC is the default for in-band device administration and communications between the controller and accesspoints?",
+    "alternativas": [
+      "console port",
+      "management interface",
+      "virtual interface",
+      "service port"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 56,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "what is the expected outcome when an EUI-64 address is generated?",
+    "alternativas": [
+      "The seventh bit of original MAC address of the interface is inverted",
+      "The interface ID is configured as a random 64-bit value",
+      "The characters FE80 are inserted at the beginning of the MAC address of the interface",
+      "The MAC address of the interface is used as the interface ID without modification"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 57,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "If a notice-level messaging is sent to a syslog server, which event has occurred?",
+    "alternativas": [
+      "A network device has restarted",
+      "An ARP inspection has failed",
+      "A routing instance has flapped",
+      "A debug operation is running"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 58,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer needs to configure LLDP to send the port description time length value (TLV). What command sequence must be implemented?",
+    "alternativas": [
+      "switch#lldp port-description",
+      "switch(config)#lldp port-description",
+      "switch(config-line}#lldp port-description",
+      "switch(config-if)#lldp port-description"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 59,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What criteria is used first during the root port selection process?",
+    "alternativas": [
+      "local port ID",
+      "lowest path cost to the root bridge",
+      "lowest neighbor's bridge ID",
+      "lowest neighbor's port ID"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 60,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer must configure the IPv6 address 2001:0db8:0000:0000:0700:0003:400F:572B on the serial0/0 interface of the HQ routerand wants to compress it for easier configuration. Which command must be issued on the router interface?",
+    "alternativas": [
+      "ipv6 address 2001:db8::700:3:400F:572B",
+      "ipv6 address 2001:db8:0::700:3:4F:572B",
+      "ipv6 address 2001:0db8::7:3:4F:572B",
+      "ipv6 address 2001:: db8:0000::700:3:400F:572B"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 61,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the benefit of configuring Port Fast on an interface?",
+    "alternativas": [
+      "After the cable is connected, the interface uses the fastest speed setting available for that cable type",
+      "After the cable is connected, the interface is available faster to send and receive user data",
+      "The frames entering the interface are marked with higher priority and then processed faster by a switch.",
+      "Real-time voice and video frames entering the interface are processed faster"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 62,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "efer to the exhibit. R1 has taken the DROTHER role in the OSPF DR/BDR election process. Which configuration must an engineer implement so that R1 is electedas the DR?",
+    "alternativas": [
+      "R2(config)#interface Fast Ethernet 0/2R2(config-if)#ip ospf priority 1R2#clear ip ospf process",
+      "R1(config)#interface Fast Ethernet 0/0R1(config-if)#ip ospf priority 200R1#clear ip ospf process",
+      "R3(config)#interface Fast Ethernet 0/1R3(config-if)#ip ospf priority 200R3#clear ip ospf process",
+      "R1(config)#interface Fast Ethernet 0/0R1(config-if)#ip ospf priority 1R1#clear ip ospf process"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 63,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer must configure R1 for a new user account. The account must meet these requirements: It must be configured in the local database. The username is engineer. It must use the strongest password configurable. Which command must the engineer configure on the router?",
+    "alternativas": [
+      "R1 (config)# username engineer2 algorithm-type scrypt secret test2021",
+      "R1(config)# username engineer2 secret 5. password S1$b1Ju$kZbBS1Pyh4QzwXyZ",
+      "R1(config)# username engineer2 privilege 1 password 7 test2021",
+      "R1(config)# username englneer2 secret 4 S1Sb1Ju$kZbBS1Pyh4QzwXyZ"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 64,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which action is taken by the data plane within a network device?",
+    "alternativas": [
+      "forwards traffic to the next hop",
+      "constructs a routing table based on a routing protocol",
+      "provides CLI access to the network device",
+      "looks up an egress interface in the forwarding information base"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 65,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Refer to the. exhibit. Routers R1 and R2 are configured with RIP as the dynamic routing protocol. A network engineer must configure R1 with a floating static routeto serve as a backup route to network 192.168.23. Which command must the engineer configure on R1?",
+    "alternativas": [
+      "ip route 192.168.23.0 255.255.255.255 192.168.13.3 121",
+      "ip route 192.168.23.0 255.255.255.0 192.168.13.3",
+      "ip route 192.168.23.0 255.255.255.0 192.168.13.3 121",
+      "ip route 192.168.23.0 255.255.255.0 192.168.13.3 100"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 66,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "How do TCP and UDP differ in the way that they establish a connection between two endpoints?",
+    "alternativas": [
+      "TCP uses the three-way handshake, and UDP does not guarantee message delivery.",
+      "TCP uses synchronization packets, and UDP uses acknowledgment packets.",
+      "UDP provides reliable message transfer, and TCP is a connectionless protocol.",
+      "UDP uses SYN, SYN ACK, and FIN bits in the frame header while TCP uses SYN, SYN ACK, and ACK bits."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 67,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "In which way does a spine-and-leaf architecture allow for scalability in a network when additional access ports are required?",
+    "alternativas": [
+      "A spine switch and a leaf switch can be added with redundant connections between them.",
+      "A spine switch can be added with at least 40 GB uplinks.",
+      "A leaf switch can be added with connections to every spine switch.",
+      "A leaf switch can be added with a single connection to a core spine switch."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 68,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "How do TCP and UDP differ in the way they provide reliability for delivery of packets?",
+    "alternativas": [
+      "TCP does not guarantee delivery or error checking to ensure that there is no corruption of data, UDP provides message acknowledgementand retransmits data if lost.",
+      "TCP provides ow control to avoid overwhelming a receiver by sending too many packets at once, UDP sends packets to the receiver in acontinuous stream without checking.",
+      "TCP is a connectionless protocol that does not provide reliable delivery of data; UDP is a connection-oriented protocol that usessequencing to provide reliable delivery.",
+      "TCP uses windowing to deliver packets reliably; UDP provides reliable message transfer between hosts by establishing a three-wayhandshake."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 69,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "For what two purposes does the Ethernet protocol use physical addresses?",
+    "alternativas": [
+      "to uniquely identify devices at Layer 2",
+      "to allow communication with devices on a different network",
+      "to differentiate a Layer 2 frame from a Layer 3 packet",
+      "to establish a priority system to determine which device gets to transmit rstE. to allow communication between different devices on the same networkF. to allow detection of a remote device when its physical address is unknown"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 70,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which WAN access technology is preferred for a small office / home office architecture?",
+    "alternativas": [
+      "broadband cable access",
+      "frame-relay packet switching",
+      "dedicated point-to-point leased line",
+      "Integrated Services Digital Network switching"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 71,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "When a switch receives a frame for a known destination MAC address, how is the frame handled?",
+    "alternativas": [
+      "flooded to all ports except the one from which it originated",
+      "forwarded to the rst available port",
+      "sent to the port identified for the known MAC address",
+      "broadcast to all ports"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 72,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which concern is addressed with the use of private IPv4 addressing?",
+    "alternativas": [
+      "Lack of routing protocol support for CIDR and VLSM",
+      "Lack of security protocols at the network perimeter",
+      "Lack of available TCP/UDP ports per IPv5 address",
+      "Lack of available publicly routable unique IPv4 address"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 73,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which design element is a best practice when deploying an 802.11b wireless infrastructure?",
+    "alternativas": [
+      "allocating nonoverlapping channels to access points that are in close physical proximity to one another",
+      "disabling TCP so that access points can negotiate signal levels with their attached wireless devices",
+      "configuring access points to provide clients with a maximum of 5 Mbps",
+      "setting the maximum data rate to 54 Mbps on the Cisco Wireless LAN Controller"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 74,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "When using Rapid PVST+, which command guarantees the switch is always the root bridge for VLAN 200?",
+    "alternativas": [
+      "spanning-tree vlan 200 priority 614440",
+      "spanning-tree vlan 200 priority 0",
+      "spanning-tree vlan 200 root primary",
+      "spanning-tree vlan 200 priority 38813258"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 75,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer needs to add an old switch back into a network. To prevent the switch from corrupting the VLAN database, with action must be taken?",
+    "alternativas": [
+      "Add the switch in the VTP domain with a lower revision number.",
+      "Add the switch in the VTP domain with a higher revision number.",
+      "Add the switch with DTP set to dynamic desirable.",
+      "Add the switch with DTP set to desirable."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 76,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the benefit of configuring Port Fast on an interface?",
+    "alternativas": [
+      "The frames entering the interface are marked with the higher priority and then processed faster by a switch.",
+      "After the cable is connected, the interface is available faster to send and receive user dat",
+      "Real-time voice and video frames entering the interface are processed faster.",
+      "After the cable is connected, the interface uses the fastest speed setting available for that cable type."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 77,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which command entered on a switch configured with Rapid PVST+ listens and learns for a specific time period?",
+    "alternativas": [
+      "switch(config)#spanning-tree vlan 1 priority 4096",
+      "switch(config)#spanning-tree vlan 1 hello-time 10",
+      "switch(config)#spanning-tree vlan 1 max-age 6",
+      "switch(config)#spanning-tree vlan 1 forward-time 20"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 78,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What does a switch do when it receives a frame whose destination MAC address is missing from the MAC address table?",
+    "alternativas": [
+      "It changes the checksum of the frame to a value that indicates an invalid frame.",
+      "It updates the CAM table with the destination MAC address of the frame.",
+      "It appends the table with a static entry for the MAC and shuts down the port.",
+      "It floods the frame unchanged across all remaining ports in the incoming VLAN."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 79,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Why would VRRP be implemented when configuring a new subnet in a multivendor environment?",
+    "alternativas": [
+      "when a gateway protocol is required that supports more than two Cisco devices for redundancy",
+      "to interoperate normally with all vendors and provide additional security features for Cisco devices",
+      "to ensure that the spanning-tree forwarding path to the gateway is loop-free",
+      "to enable normal operations to continue after a member failure without requiring a change in a host ARP cache"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 80,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the primary purpose of a First Hop Redundancy Protocol?",
+    "alternativas": [
+      "It allows directly connected neighbors to share configuration information",
+      "It reduces routing failures by allowing Layer 3 load balancing between OSPF neighbors that have the same link metric",
+      "It allows a router to use bridge priorities to create multiple loop-free paths to a single destination",
+      "It reduces routing failures by allowing more than one router to represent itself as the default gateway of a network"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 81,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "The service password-encryption command is entered on a router. What is the effect of this configuration?",
+    "alternativas": [
+      "restricts unauthorized users from viewing clear-text passwords in the running configuration",
+      "prevents network administrators from configuring clear-text passwords",
+      "protects the VLAN database from unauthorized PC connections on the switch",
+      "encrypts the password exchange when a VPN tunnel is established"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 82,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which action implements physical access control as part of the security program of an organization?",
+    "alternativas": [
+      "setting up IP cameras to monitor key infrastructure",
+      "configuring a password for the console port",
+      "backing up syslogs at a remote location",
+      "configuring enable passwords on network devices"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 83,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "When a site-to-site VPN is configured which IPsec mode provides encapsulation and encryption of the entire original IP packet?",
+    "alternativas": [
+      "IPsec transport mode with AH",
+      "IPsec tunnel mode with AH",
+      "IPsec transport mode with ESP",
+      "IPsec tunnel mode with ESP"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 84,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which protocol is used in Software Defined Access (SDA) to provide a tunnel between two edge nodes in different fabrics?",
+    "alternativas": [
+      "Generic Router Encapsulation (GRE)",
+      "Virtual Local Area Network (VLAN)",
+      "Virtual Extensible LAN (VXLAN)",
+      "Point-to-Point Protocol (PPP)"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 85,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the function of the controller in a software-defined network?",
+    "alternativas": [
+      "forwarding packets",
+      "multicast replication at the hardware level",
+      "making routing decisions",
+      "fragmenting and reassembling packets"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 86,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the function of `off-the-shelf` switches in a controller-based network?",
+    "alternativas": [
+      "setting packet-handling policies",
+      "forwarding packets",
+      "providing a central view of the deployed network",
+      "making routing decisions"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 87,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "With REST API, which standard HTTP header tells a server which media type is expected by the client?",
+    "alternativas": [
+      "Accept-Encoding: gzip. deate",
+      "Accept-Patch: text/example; charset=utf-8",
+      "Content-Type:application/json; charset=utf-8",
+      "Accept: application/json"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 88,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which statement identifies the functionality of virtual machines?",
+    "alternativas": [
+      "Virtualized servers run most efficiently when they are physically connected to a switch that is separate from the hypervisor",
+      "The hypervisor can virtualize physical components including CPU, memory, and storage",
+      "Each hypervisor can support a single virtual machine and a single software switch",
+      "The hypervisor communicates on Layer 3 without the need for additional resources"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 89,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a function of the core and distribution layers in a collapsed-core architecture?",
+    "alternativas": [
+      "The router can support HSRP for Layer 2 redundancy in an IPv6 network.",
+      "The core and distribution layers are deployed on two different devices to enable failover.",
+      "The router operates on a single device or a redundant pair.",
+      "The router must use IPv4 and IPv6 addresses at Layer 3."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 90,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "How does Rapid PVST+ create a fast loop-free network topology?",
+    "alternativas": [
+      "It uses multiple active paths between end stations.",
+      "It requires multiple links between core switches.",
+      "It maps multiple VLANs into the same spanning-tree instance.",
+      "It generates one spanning-tree instance for each VLAN."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 91,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "The clients and DHCP server reside on different subnets. Which command must be used to forward requests and replies between clients on the10.10.0.1/24 subnet and the DHCP server at 192.168.10.1?",
+    "alternativas": [
+      "ip route 192.168.10.1",
+      "ip dhcp address 192.168.10.1",
+      "ip default-gateway 192.168.10.1",
+      "ip helper-address 192.168.10.1"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 92,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A DHCP pool has been created with the name CONTROL. The pool uses the next to last usable IP address as the default gateway for the DHCPclients. The server is located at 172.16.32.15. What is the next step in the process for clients on the 192.168.52.0/24 subnet to reach the DHCPserver?",
+    "alternativas": [
+      "ip helper-address 172.16.32.15",
+      "ip default-gateway 192.168.52.253",
+      "ip forward-protocol udp 137",
+      "ip detault-network 192.168.52.253"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 93,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which benefit does Cisco DNA Center provide over traditional campus management?",
+    "alternativas": [
+      "Cisco DNA Center automates HTTPS for secure web access, and traditional campus management uses HTTP.",
+      "Cisco DNA Center leverages SNMPv3 for encrypted management, and traditional campus management uses SNMPv2.",
+      "Cisco DNA Center leverages APIs, and traditional campus management requires manual data gathering.",
+      "Cisco DNA Center automates SSH access for encrypted entry, and SSH is absent from traditional campus management."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 94,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which function generally performed by a traditional network device is replaced by a software-defined controller?",
+    "alternativas": [
+      "building route tables and updating the forwarding table",
+      "encapsulation and decapsulation of packets in a data-link frame",
+      "changing the source or destination address during NAT operations",
+      "encryption and decryption for VPN link processing"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 95,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a characteristic of encryption in wireless networks?",
+    "alternativas": [
+      "identifies an access point on a WLAN",
+      "uses the password to connect to an access point",
+      "uses integrity checks to identify forgery attacks in the frame",
+      "uses authentication protocols to secure a network"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 96,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "How do TCP and UDP differ in the way that they establish a connection between two endpoints？",
+    "alternativas": [
+      "TCP use the three-way handshake, and UDP dose no guarantee message delivery",
+      "TCP use synchronization packets, and UDP uses acknowledgement packets",
+      "UDP provides reliable message transfer, and TCP is a connectionless protocol.",
+      "UDP use SYN, SYN ACK, and FIN bits in the frame header while TCP uses SYN, SYN ACK, and ACK bis."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 97,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "what is the default behavior of a layer 2 switch when a frame with an unknown destination MAC address is received?",
+    "alternativas": [
+      "The Layer 2 switch forwards the packet and adds the destination MAC address to its MAC address table",
+      "The Layer 2 switch sends a copy of a packet to CPU for destination MAC address learning",
+      "The Layer 2 switch floods packets to all ports except the receiving port in the given VLAN",
+      "The Layer 2 switch dorps the received frame"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 98,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "How do TCP and UDP differ in the way they provide reliability for delivery of packets?",
+    "alternativas": [
+      "TCP does not guarantee delivery or error checking to ensure that there is no corruption of data; UDP provides message acknowledgement and retransmitsdata if lost.",
+      "TCP provides flow control to avoid overwhelming a receiver by sending too many packets at once; UDP sends packets to the receiver in a continuous streamwithout checking for sequencing.",
+      "TCP uses windowing to deliver packets reliably; UDP provides reliable message transfer between hosts by establishing a three-way handshake",
+      "TCP is a connectionless protocol that does not provide reliable delivery of data; UDP is a connection-oriented protocol that uses sequencing to provide reliabledelivery."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 99,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Refer to Exhibit. Which action do the switches take on the trunk link?",
+    "alternativas": [
+      "The trunk does not form and the ports go into an err-disabled status.",
+      "The trunk forms but the mismatched native VLANs are merged into a single broadcast domain.",
+      "The trunk does not form, but VLAN 99 and VLAN 999 are allowed to traverse the link.",
+      "The trunk forms but VLAN 99 and VLAN 999 are in a shutdown state."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 100,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which WAN access technology is preferred for a small office / home office architecture?",
+    "alternativas": [
+      "broadband cable access",
+      "frame-relay packet switching",
+      "dedicated point-to-point leased line",
+      "Integrated Services Digital Network switching."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 101,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A port security violation has occurred on a switch port due to the maximum MAC address count being exceeded, which command must be configured to increment the security-violation count and forward an SNMP trap?",
+    "alternativas": [
+      "switchport port-security violation access",
+      "switchport port-security violation protect",
+      "switchport port-security violation restrict",
+      "switchport port-security violation shutdown"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 102,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "In which situation is private IPv4 addressing appropriate for a new subnet on the network of an organization?",
+    "alternativas": [
+      "There is limited unique address space, and traffic on the new subnet will stay local within the organization.",
+      "The network has multiple endpoint listeners, and it is desired to limit the number of broadcasts.",
+      "Traffic on the subnet must traverse a site-to-site VPN to an outside organization.",
+      "The ISP requires the new subnet to be advertised to the internet for web services."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 103,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "With REST API, which standard HTTP header tells a server which media type is expected by the client?",
+    "alternativas": [
+      "Accept-Encoding: gzip. deflate",
+      "Accept-Patch: text/example; charset=utf-8",
+      "Content-Type:application/json; charset=utf-8",
+      "Accept: application/json"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 104,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer needs to add an old switch back into a network. To prevent the switch from corrupting the VLAN database which actionmust be taken?",
+    "alternativas": [
+      "Add the switch in the VTP domain with a lower revision number",
+      "Add the switch with DTP set to dynamic desirable",
+      "Add the switch in the VTP domain with a higher revision number",
+      "Add the switch with DTP set to desirable"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 105,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the purpose of using First Hop Redundancy Protocol in a specific subnet?",
+    "alternativas": [
+      "Filter traffic based on destination IP addressing",
+      "Sends the default route to the hosts on a network",
+      "ensures a loop-free physical topology",
+      "forwards multicast hello messages between routers"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 106,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "When a switch receives a frame for a known destination MAC address, how is the frame handed?",
+    "alternativas": [
+      "sent to the port identified for the known MAC address",
+      "broadcast to all ports",
+      "forwarded to the first available port",
+      "flooded to all ports except the one from which it originated"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 107,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which communication interaction takes place when a southbound API Is used?",
+    "alternativas": [
+      "between the SDN controller and PCs on the network",
+      "between the SON controller and switches and routers on the network",
+      "between the SON controller and services and applications on the network",
+      "between network applications and switches and routers on the network"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 108,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which action implements physical access control as part of the security program of an organization?",
+    "alternativas": [
+      "backing up syslogs at a remote location",
+      "setting up IP cameras to monitor key infrastnscture",
+      "configuring a password for the console port",
+      "configuring enable passwords on network devices"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 109,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "How does Rapid PVST+ create a fast loop-free network topology?",
+    "alternativas": [
+      "lt requires multiple links between core switches",
+      "It generates one spanning-tree instance for each VLAN",
+      "It maps multiple VLANs into the same spanning-tree instance",
+      "It uses multiple active paths between end stations."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 110,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the function of the controller in a software-defined network?",
+    "alternativas": [
+      "multicast replication at the hardware level",
+      "fragmenting and reassembling packets",
+      "making routing decisions",
+      "forwarding packets"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 111,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the primary purpose of a First Hop Redundancy Protocol?",
+    "alternativas": [
+      "It allows directly connected neighbors to share configuration information.",
+      "It allows a router to use bridge priorities to create multiple loop-free paths to a single destination.",
+      "It reduces routing failures by allowing Layer 3 load balancing between OSPF neighbors that have the same link metri",
+      "It reduces routing failures by allowing more than one router to represent itself, as the default gateway of a network."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 112,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A user configured OSPF and advertised the Gigabit Ethernet interface in OSPF. By default, to which type of OSPF network does this interfacebelong?",
+    "alternativas": [
+      "point-to-multipoint",
+      "point-to-point",
+      "broadcast",
+      "nonbroadcast"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 113,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A user configured OSPF in a single area between two routers. A serial interface connecting R1 and R2 is running encapsulation PPP. By default, which OSPF network type is seen on this interface when the user types show ip ospf interface on R1 or R2?",
+    "alternativas": [
+      "nonbroadcast",
+      "point-to-point",
+      "point-to-multipoint",
+      "broadcast"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 114,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A user configured OSPF and advertised the Gigabit Ethernet interface in OSPF By default, which type of OSPF network does thisinterface belong to?",
+    "alternativas": [
+      "point-to-multipoint",
+      "point-to-point",
+      "broadcast",
+      "nonbroadcast"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 115,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network administrator is setting up a new IPv6 network using the 64-bit address 2001:0EB8:00C1:2200:0001:0000:0000:0331/64. To simplifythe configuration, the administrator has decided to compress the address. Which IP address must the administrator configure?",
+    "alternativas": [
+      "ipv6 address 2001:EB8:C1:22:1::331/64",
+      "ipv6 address 21:EB8:C1:2200:1::331/64",
+      "ipv6 address 2001:EB8:C1:2200:1:0000:331/64",
+      "ipv6 address 2001:EB8:C1:2200:1::331/64"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 116,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which command is used to specify the delay time in seconds for LLDP to initialize on any interface?",
+    "alternativas": [
+      "lldp timer",
+      "lldp tlv-select",
+      "lldp reinit",
+      "lldp holdtime"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 117,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which value can you modify to configure a specific interface as the preferred forwarding interface?",
+    "alternativas": [
+      "The interface number",
+      "The port priority",
+      "The VLAN priority",
+      "The hello time"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 118,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer must configure interswitch VLAN communication between a Cisco switch and a third-party switch. Which action should be taken?",
+    "alternativas": [
+      "configure DSCP",
+      "configure IEEE 802.1q",
+      "configure ISL",
+      "configure IEEE 802.1p"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 119,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A Cisco engineer must configure a single switch interface to meet these requirements:• Accept untagged frames and place them in VLAN 20Accept tagged frames in VLAN 30 when CDP detects a Cisco IP phone Which command set must the engineer apply?",
+    "alternativas": [
+      "switchport mode dynamic desirable switchport access vlan 20 switchport trunk allowed vlan 30 switchport voice vlan 30",
+      "switchport mode access switchport access vlan 20 switchport voice vlan 30",
+      "switchport mode dynamic auto switchport trunk native vlan 20 switchport trunk allowed vlan 30 switchport voice vlan 30",
+      "switchport mode trunk switchport access vlan 20 switchport voice vlan 30"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 120,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "When a floating static route is configured, which action ensures that the backup route is used when the primary route fails?",
+    "alternativas": [
+      "The administrative distance must be higher on the primary route so that the backup route becomes secondary.",
+      "The default-information originate command must be configured for the route to be installed into the routing table.",
+      "The floating static route must have a lower administrative distance than the primary route so it is used as a backup.",
+      "The floating static route must have a higher administrative distance than the primary route so it is used as a backup"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 121,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which command should you enter to verify the priority of a router in an HSRP group?",
+    "alternativas": [
+      "show hsrp",
+      "show sessions",
+      "show interfaces",
+      "show standby"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 122,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which command is used to display the collection of OSPF link states?",
+    "alternativas": [
+      "show ip ospf link-state",
+      "show ip ospf lsa database",
+      "show ip ospf neighbors",
+      "show ip ospf database"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 123,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "OSPF must be configured between routers R1 and R2. Which OSPF configuration must be applied to router R1 to avoid a DR'BDR election?",
+    "alternativas": [
+      "router ospf 1 network 192.168.1.1 0.0.0.0 area 0 interface e1/1 ip address 192.168.1.1 255.255.255.252 ip ospf cost 0",
+      "router ospf 1 network 192.168.1.1 0.0.0.0 area 0 hello interval 15 interface e1/1 ip address 192.168.1.1 255.255.255.252",
+      "router ospf 1 network 192.168.1.1 0.0.0.0 area 0 interface e1/1 ip address 192.168.1.1 255.255.255.252 ip ospf network broadcast",
+      "router ospf 1 network 192.168.1.1 0.0.0.0 area 0 interface e1/1 ip address 192.168.1.1 255.255.255.252 ip ospf network point-to-point"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 124,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "R1 as an NTP server must have:• NTP authentication enabled• NTP packets sourced from Interface loopback 0• NTP stratum 2• NTP packets only permitted to client IP 209.165.200.225How should R1 be configured?",
+    "alternativas": [
+      "ntp authenticate ntp authentication-key 2 sha1 CISCO123 ntp source Loopback0 ntp access-group server-only 10 ntp master 2! access-list10 permit udp host 209.165.200.225 any eq 123",
+      "ntp authenticate ntp authentication-key 2 md5 CISCO123 ntp interface Loopback0 ntp access-group server-only 10 ntp stratum 2! access-list 10 permit 209.165.200.225",
+      "ntp authenticate ntp authentication-key 2 md5 CISCO123 ntp source Loopback0 ntp access-group server-only 10 ntp master 2! access-list10 permit 209.165.200.225",
+      "ntp authenticate ntp authentication-key 2 md5 CISCO123 ntp source Loopback0 ntp access-group server-only 10 ntp stratum 2! access-list10 permit udp host 209.165.200.225 any eq 123"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 125,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A Cisco engineer is configuring a factory-default router with these three passwords:• The user EXEC password for console access is p4ssw0rd1.• The user EXEC password for Telnet access is s3cr3t2.• The password for privileged EXEC mode is priv4t3p4ss. Which command sequence must the engineer configure?",
+    "alternativas": [
+      "enable secret priv4t3p4ss! line con 0 password p4ssw0rd1! line vty 0 15 password s3cr3t2",
+      "enable secret priv4t3p4ss! line con 0 password p4ssw0rd1 login! line vty 0 15 password s3cr3t2 login",
+      "enable secret priv4t3p4ss! line con 0 password login p4ssw0rd1! line vty 0 15 password login s3cr3t2 login",
+      "enable secret privilege 15 priv4t3p4ss! line con 0 password p4ssw0rd1 login! line vty 0 15 password s3cr3t2 login"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 126,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What describes a northbound REST API for SDN?",
+    "alternativas": [
+      "network-element-facing interface for GET, POST, PUT, and DELETE methods",
+      "application-facing interface for SNMP GET requests",
+      "application-facing interface for GET, POST, PUT, and DELETE methods",
+      "network-element-facing interface for the control and data planes"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 127,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network architect is considering whether to implement Cisco DNA Center to deploy devices on a new network. The organization is focused onreducing the time it currently takes to deploy devices in a traditional campus design. For which reason would Cisco DNA Center be moreappropriate than traditional management options?",
+    "alternativas": [
+      "Cisco DNA Center supports deployment with a single pane of glass.",
+      "Cisco DNA Center provides zero-touch provisioning to third-party devices.",
+      "Cisco DNA Center reduces the need for analytics on third-party access points and devices.",
+      "Cisco DNA Center minimizes the level of syslog output when reporting on Cisco devices."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 128,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which interface enables communication between a program on the controller and a program on the networking device?",
+    "alternativas": [
+      "software virtual interface",
+      "tunnel interface",
+      "northbound interface",
+      "southbound interface"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 129,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which interface type enables an application running on a client to send data over an IP network to a server?",
+    "alternativas": [
+      "northbound interface",
+      "application programming interface",
+      "southbound interface",
+      "Representational State Transfer application programming interface"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 130,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "How does frame switching function on a switch?",
+    "alternativas": [
+      "rewrites the source and destination MAC address",
+      "forwards frames to a neighbor port using CDP",
+      "forwards known destinations to the destination port",
+      "is disabled by default on all interfaces and VLANs"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 131,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a benefit of using a Cisco Wireless LAN Controller?",
+    "alternativas": [
+      "Central AP management requires more complex configurations",
+      "Unique SSIDs cannot use the same authentication method",
+      "It supports autonomous and lightweight APs",
+      "It eliminates the need to configure each access point individually"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 132,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which command is used to specify the delay time in seconds for LLDP to initialize on any interface?",
+    "alternativas": [
+      "lldp timer",
+      "lldp holdtime",
+      "lldp reinit",
+      "lldp tlv-select"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 133,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer must configure Interswitch VLAN communication between a Cisco switch and a third-party switch. Which action should be taken?",
+    "alternativas": [
+      "configure IEEE 802.1p",
+      "configure IEEE 802.1q",
+      "configure ISL",
+      "configure DSCP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 134,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is an appropriate use for private IPv4 addressing?",
+    "alternativas": [
+      "on the public-facing interface of a firewall",
+      "to allow hosts inside to communicate in both directions with hosts outside the organization",
+      "on internal hosts that stream data solely to external resources",
+      "on hosts that communicates only with other internal hosts"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 135,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which action does the router take as rt forwards a packet through the network?",
+    "alternativas": [
+      "The router replaces the source and destination labels with the sending router interface label as a source and the next hop router label as a destination",
+      "The router encapsulates the source and destination IP addresses with the sending router P address as the source and the neighbor IP address as thedestination",
+      "The router replaces the original source and destination MAC addresses with the sending router MAC address as the source and neighbor MAC address as thedestination",
+      "The router encapsulates the original packet and then includes a tag that identifies the source router MAC address and transmit transparently to the destination"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 136,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network administrator is setting up a new IPv6 network using the 64-bit address 2001 0EB8 00C1 2200:0001 0000 0000 0331/64 To simplify the configurationthe administrator has decided to compress the address Which IP address must the administrator configure?",
+    "alternativas": [
+      "ipv6 address 21:EB8:C1:2200:1::331/64",
+      "ipv6 address 2001:EB8:C1:22:1::331/64",
+      "ipv6 address 2001:EB8:C 1:2200.1::331-64",
+      "ipv6 address 2001:EB8:C1:2200:1:0000:331/64"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 137,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a benefit of using a Cisco Wireless LAN Controller?",
+    "alternativas": [
+      "It eliminates the need to configure each access point individually.",
+      "Central AP management requires more complex configurations.",
+      "Unique SSIDs cannot use the same authentication metho",
+      "It supports autonomous and lightweight APs."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 138,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which function does the range of private IPv4 addresses perform?",
+    "alternativas": [
+      "allows multiple companies to each use the same addresses without conicts",
+      "provides a direct connection for hosts from outside of the enterprise network",
+      "ensures that NAT is not required to reach the Internet with private range addressing",
+      "enables secure communications to the Internet for all external hosts"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 139,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A corporate office uses four floors in a building.• Floor 1 has 24 users.• Floor 2 has 29 users. Floor 3 has 28 users.• Floor 4 has 22 users. Which subnet summarizes and gives the most efficient distribution of IP addresses for the router configuration?",
+    "alternativas": [
+      "192.168.0.0/24 as summary and 192.168.0.0/28 for each floor",
+      "192.168.0.0/23 as summary and 192.168.0.0/25 for each floor",
+      "192.168.0.0/25 as summary and 192.168.0.0/27 for each floor",
+      "192.168.0.0/26 as summary and 192.168.0.0/29 for each floor"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 140,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the same for both copper and ber interfaces when using SFP modules?",
+    "alternativas": [
+      "They support an inline optical attenuator to enhance signal strength",
+      "They accommodate single-mode and multi-mode in a single module",
+      "They provide minimal interruption to services by being hot-swappable",
+      "They offer reliable bandwidth up to 100 Mbps in half duplex mode"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 141,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which function forwards frames to ports that have a matching destination MAC address?",
+    "alternativas": [
+      "frame flooding",
+      "frame ltering",
+      "frame pushing",
+      "frame switching"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 142,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the function of a controller in controller-based networking?",
+    "alternativas": [
+      "It serves as the centralized management point of an SDN architecture",
+      "It is a pair of core routers that maintain all routing decisions for a campus",
+      "It centralizes the data plane for the network",
+      "It is the card on a core router that maintains all routing decisions for a campus."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 143,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which action is taken by a switch port enabled for PoE power classification override?",
+    "alternativas": [
+      "As power usage on a PoE switch port is checked data ow to the connected device is temporarily paused",
+      "When a powered device begins drawing power from a PoE switch port, a syslog message is generated",
+      "If a switch determines that a device is using less than the minimum configured power, it assumes the device has failed and disconnects it",
+      "Should a monitored port exceed the maximum administrative value for power, the port is shut down and err-disabled"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 144,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the difference between 1000BASE-LX/LH and 1000BASE-ZX interfaces?",
+    "alternativas": [
+      "1000BASE-LX/LH interoperates with multimode and single-mode ber, and 1000BASE-ZX needs a conditioning patch cable with multimode.",
+      "1000BASE-ZX interoperates with dual-rate 100M/1G 10Km SFP over multimode ber, and 1000BASE-LX/LH supports only single-rate",
+      "1000BASE-ZX is supported on links up to 1000km, and 1000BASE-LX/LH operates over links up to 70 km",
+      "1000BASE- LX/LH is supported on links up to 10km, and 1000Base-ZX operates over links up to 70 km"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 145,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "How are the switches in a spine-and-leaf topology interconnected?",
+    "alternativas": [
+      "Each leaf switch is connected to one of the spine switches",
+      "Each leaf switch is connected to each spine switch.",
+      "Each leaf switch is connected to two spine switches, making a loop.",
+      "Each leaf switch is connected to a central leaf switch, then uplinked to a core spine switch."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 146,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which configuration ensures that the switch is always the root for VLAN 750?",
+    "alternativas": [
+      "Switch(config)#spanning-tree vlan 750 priority 38418607",
+      "Switch(config)#spanning-tree vlan 750 priority 0",
+      "Switch(config)#spanning-tree vlan 750 root primary",
+      "Switch(config)#spanning-tree vlan 750 priority 614440"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 147,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Two switches are connected and using Cisco Dynamic Trunking Protocol. SW1 is set to Dynamic Auto and SW2 is set to Dynamic Desirable. Whatis the result of this configuration?",
+    "alternativas": [
+      "The link becomes an access port.",
+      "The link is in an error disabled state.",
+      "The link is in a down state.",
+      "The link becomes a trunk port."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 148,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network engineer must create a diagram of a multivendor network. Which command must be configured on the Cisco devices so that thetopology of the network is allowed to be mapped?",
+    "alternativas": [
+      "Device(config)#lldp run",
+      "Device(config)#cdp run",
+      "Device(config-if)#cdp enable",
+      "Device(config)#ow-sampler-map topology"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 149,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "How do AAA operations compare regarding user identication, user services, and access control?",
+    "alternativas": [
+      "Authorization provides access control, and authentication tracks user services",
+      "Authentication identifies users, and accounting tracks user services",
+      "Accounting tracks user services, and authentication provides access control",
+      "Authorization identifies users, and authentication provides access control"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 150,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which access layer threat-mitigation technique provides security based on identity?",
+    "alternativas": [
+      "Dynamic ARP Inspection",
+      "DHCP snooping",
+      "802.1x",
+      "using a non-default native VLAN"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 151,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which command on a port enters the forwarding state immediately when a PC is connected to it?",
+    "alternativas": [
+      "switch(config)#spanning-tree portfast default",
+      "switch(config)#spanning-tree portfast bpduguard default",
+      "switch(config-if)#spanning-tree portfast trunk",
+      "switch(config-if)#no spanning-tree portfast"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 152,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "After installing a new Cisco ISE server which task must the engineer perform on the Cisco WLC to connect wireless clients on a specific VLANbased on their credentials?",
+    "alternativas": [
+      "Disable the LAG Mode on Next Reboot.",
+      "Enable the Event Driven RRM.",
+      "Enable the Allow AAA Override.",
+      "Enable the Authorize MIC APs against auth-list or AAA"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 153,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "R1 has learned route 10.10.10.0/24 via numerous routing protocols. Which route is installed?",
+    "alternativas": [
+      "route with the next hop that has the highest IP",
+      "route with the lowest cost",
+      "route with the lowest administrative distance",
+      "route with the shortest prefix length"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 154,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "An engineer just installed network 10.120.10.0/24. Which configuration must be applied to the R14 router to add the new network to its OSPFrouting table?",
+    "alternativas": [
+      "Router ospf 100 Network 10.120.10.0 0.0.0.255 area 0",
+      "Router ospf 120 Network 10.120.10.0 255.255.255.0 area 0 Ip route 10.120.10.0 255.255.255.0 fa0/1",
+      "Router ospf 100 area 0 Network 10.120.10.0 0.0.0.255",
+      "Router ospf 100 Network 10.120.10.0 255.255.255.0 area 0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 155,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which type of address is shared by routers in a HSRP implementation and used by hosts on the subnet as their default gateway address?",
+    "alternativas": [
+      "multicast address",
+      "virtual IP address",
+      "loopback IP address",
+      "broadcast address"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 156,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which condition must be met before an NMS handles an SNMP trap from an agent?",
+    "alternativas": [
+      "The NMS must receive the same trap from two different SNMP agents to verify that it is reliable.",
+      "The NMS must receive a trap and an inform message from the SNMP agent within a configured interval.",
+      "The NMS software must be loaded with the MIB associated with the trap.",
+      "The NMS must be configured on the same router as the SNMP agent."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 157,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which command creates a static NAT binding for a PC address of 10.1.1.1 to the public routable address 209.165.200.225 assigned to the PC?",
+    "alternativas": [
+      "R1(config)#ip nat inside source static 10.1.1.1 209.165.200.225",
+      "R1(config)#ip nat outside source static 209.165.200.225 10.1.1.1",
+      "R1(config)#ip nat inside source static 209.165.200.225 10.1.1.1",
+      "R1(config)#ip nat outside source static 10.1.1.1 209.165.200.225"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 158,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which command prevents passwords from being stored in the configuration as plain text on a router or switch?",
+    "alternativas": [
+      "enable secret",
+      "enable password",
+      "service password-encryption",
+      "username cisco password encrypt"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 159,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which goal is achieved by the implementation of private IPv4 addressing on a network?",
+    "alternativas": [
+      "provides an added level of protection against Internet exposure",
+      "provides a reduction in size of the forwarding table on network routers",
+      "allows communication across the Internet to other private networks",
+      "allows servers and workstations to communicate across public network boundaries"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 160,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which eld within the access-request packet is encrypted by RADIUS?",
+    "alternativas": [
+      "authorized services",
+      "password",
+      "authenticator",
+      "username"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 161,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "In an SDN architecture, which function of a network node is centralized on a controller?",
+    "alternativas": [
+      "Creates the IP routing table",
+      "Discards a message due ltering",
+      "Makes a routing decision",
+      "Provides protocol access for remote access devices"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 162,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A customer wants to provide wireless access to contractors using a guest portal on Cisco ISE. The portal is also used by employees. A solution isimplemented, but contractors receive a certificate error when they attempt to access the portal. Employees can access the portal without anyerrors. Which change must be implemented to allow the contractors and employees to access the portal?",
+    "alternativas": [
+      "Install an Internal CA signed certificate on the Cisco ISE.",
+      "Install a trusted third-party certificate on the Cisco ISE.",
+      "Install an internal CA signed certificate on the contractor devices.",
+      "Install a trusted third-party certificate on the contractor devices."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 163,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What benefit does controller-based networking provide versus traditional networking?",
+    "alternativas": [
+      "allows configuration and monitoring of the network from one centralized point",
+      "provides an added layer of security to protect from DDoS attacks",
+      "combines control and data plane functionality on a single device to minimize latency",
+      "moves from a two-tier to a three-tier network architecture to provide maximum redundancy"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 164,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which statement compares traditional networks and controller-based networks?",
+    "alternativas": [
+      "Only controller-based networks decouple the control plane and the data plane.",
+      "Traditional and controller-based networks abstract policies from device configurations.",
+      "Only traditional networks natively support centralized management.",
+      "Only traditional networks offer a centralized control plane."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 165,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which role does a hypervisor provide for each virtual machine in server virtualization?",
+    "alternativas": [
+      "infrastructure-as-a-service",
+      "Software-as-a-service",
+      "control and distribution of physical resources",
+      "services as a hardware controller"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 166,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which definition describes JWT in regard to REST API security?",
+    "alternativas": [
+      "an encrypted JSON token that is used for authentication",
+      "an encrypted JSON token that is used for authorization",
+      "an encoded JSON token that is used to securely exchange information",
+      "an encoded JSON token that is used for authentication"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 167,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the role of nonoverlapping channels in a wireless environment?",
+    "alternativas": [
+      "to increase bandwidth",
+      "to stabilize the RF environment",
+      "to allow for channel bonding",
+      "to reduce interference"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 168,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a characteristic of a collapsed-core network topology?",
+    "alternativas": [
+      "It enables all workstations in a SOHO environment to connect on a single switch with internet access.",
+      "It enables the core and access layers to connect to one logical distribution device over an Ether Channel.",
+      "It allows wireless devices to connect directly to the core layer, which enables faster data transmission.",
+      "It allows the core and distribution layers to run as a single combined layer."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 169,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which functionality is provided by the console connection on a Cisco WLC?",
+    "alternativas": [
+      "HTTP-based GUI connectivity",
+      "secure in-band connectivity for device administration",
+      "out-of-band management",
+      "unencrypted in-band connectivity for le transfers"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 170,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the primary purpose of a console port on a Cisco WLC?",
+    "alternativas": [
+      "in-band management via an asynchronous transport",
+      "in-band management via an IP transport",
+      "out-of-band management via an asynchronous transport",
+      "out-of-band management via an IP transport"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 171,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a similarity between global and unique local IPv6 addresses?",
+    "alternativas": [
+      "They use the same process for subnetting.",
+      "They are part of the multicast IPv6 group type.",
+      "They are routable on the global internet.",
+      "They are allocated by the same organization."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 172,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the purpose of configuring different levels of syslog for different devices on the network?",
+    "alternativas": [
+      "to set the severity of syslog messages from each device",
+      "to control the number of syslog messages from different devices that are stored locally",
+      "to identify the source from which each syslog message originated",
+      "to rate-limit messages for different severity levels from each device"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 173,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which advantage does the network assurance capability of Cisco DNA Center provide over traditional campus management?",
+    "alternativas": [
+      "Cisco DNA Center leverages YANG and NETCONF to assess the status of fabric and nonfabric devices, and traditional campus managementuses CLI exclusively.",
+      "Cisco DNA Center handles management tasks at the controller to reduce the load on infrastructure devices, and traditional campusmanagement uses the data backbone.",
+      "Cisco DNA Center automatically compares security postures among network devices, and traditional campus management needs manualcomparisons.",
+      "Cisco DNA Center correlates information from different management protocols to obtain insights, and traditional campus managementrequires manual analysis."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 174,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the purpose of a southbound API in a controller-based networking architecture?",
+    "alternativas": [
+      "facilitates communication between the controller and the applications",
+      "allows application developers to interact with the network",
+      "integrates a controller with other automation and orchestration tools",
+      "facilitates communication between the controller and the networking hardware"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 175,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the advantage of separating the control plane from the data plane within an SDN network?",
+    "alternativas": [
+      "limits data queries to the control plane",
+      "reduces cost",
+      "decreases overall network complexity",
+      "ooads the creation of virtual machines to the data plane"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 176,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is a function of a northbound API in an SDN environment?",
+    "alternativas": [
+      "It relies on global provisioning and configuration.",
+      "It upgrades software and restores les.",
+      "It supports distributed processing for configuration.",
+      "It provides orchestration and network automation services."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 177,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the recommended switch load-balancing mode for Cisco WLCs?",
+    "alternativas": [
+      "source-destination IP address",
+      "destination IP address",
+      "destination MAC address",
+      "source-destination MAC address"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 178,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which command must be entered so that the default gateway is automatically distributed when DHCP is configured on a router?",
+    "alternativas": [
+      "dns-server",
+      "default-router",
+      "ip helper-address",
+      "default-gateway"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 179,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A network engineer must create a diagram of a multivendor network. which command must be configured on the Cisco devices so that the topology of the networkcan be mapped?",
+    "alternativas": [
+      "Device(config)#lldp run",
+      "Device(config)#cdp run",
+      "Device(config)# cdp enable",
+      "Device(config)# flow-sampler-map topology"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 180,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "R1 has learned route 10.10.10.0/24 via numerous routing protocols, which route is installed?",
+    "alternativas": [
+      "route with the lowest cost",
+      "route with the shortest prefix length",
+      "route with the next hop that has the highest IP",
+      "route with the lowest administrative distance"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 181,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which design element is a best practice when deploying an 802.11b wireless infrastructure?",
+    "alternativas": [
+      "disabling TPC so that access points can negotiate signal levels with their attached wireless devices.",
+      "setting the maximum data rate to 54 Mbps on the Cisco Wireless LAN Controller",
+      "allocating non overlapping channels to access points that are in close physical proximity to one another",
+      "configuring access points to provide clients with a maximum of 5 Mbps"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 182,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "which function dose the range of private IPv4 addresses perform?",
+    "alternativas": [
+      "allow multiple companies to each use the same address without conflicts",
+      "provides a direct connection for hosts from outside of the enterprise network",
+      "ensues that NAT is not required to reach the internet with private range addressing",
+      "enable secure communications to the internet for all external hosts"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 183,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Which action is taken by a switch port enabled for PoE power classification override?",
+    "alternativas": [
+      "When a powered device begins drawing power from a PoE switch port a syslog message is generated",
+      "As power usage on a PoE switch port is checked data flow to the connected device is temporarily paused",
+      "If a switch determines that a device is using less than the minimum configured power it assumes the device has failed anddisconnects",
+      "If a monitored port exceeds the maximum administrative value for power, the port is shutdown and err-disabled"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 184,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Two switches are connected and using Cisco Dynamic Trunking Protocol SW1 is set to Dynamic Desirable What is the result of thisconfiguration?",
+    "alternativas": [
+      "The link is in a downstate.",
+      "The link is in an error disables state",
+      "The link is becomes an access port.",
+      "The link becomes a trunk port."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 185,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "What is the primary different between AAA authentication and authorization?",
+    "alternativas": [
+      "Authentication verifies a username and password, and authorization handles the communication between the authentication agentand the user database",
+      "Authentication identifies a user who is attempting to access a system, and authorization validates the users password",
+      "Authentication identifies and verifies a user who is attempting to access a system, and authorization controls the tasks the user canperform.",
+      "Authentication controls the system processes a user can access and authorization logs the activities the user initiates"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  }
+]

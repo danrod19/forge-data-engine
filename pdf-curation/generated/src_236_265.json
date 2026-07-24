@@ -1,0 +1,422 @@
+[
+  {
+    "id": 236,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which per-hop trac-control feature does an ISP implement to mitigate the potential negative effects of a customer exceeding its committedbandwidth?",
+    "alternativas": [
+      "policing",
+      "queuing",
+      "marking",
+      "shaping"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 237,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which remote access protocol provides unsecured remote CLI access?",
+    "alternativas": [
+      "console",
+      "Telnet",
+      "SSH",
+      "Bash"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 238,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a syslog facility?",
+    "alternativas": [
+      "host that is congured for the system to send log messages",
+      "password that authenticates a Network Management System to receive log messages",
+      "group of log messages associated with the congured severity level",
+      "set of values that represent the processes that can generate a log message"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 239,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which QoS queuing method discards or marks packets that exceed the desired bit rate of trac ow?",
+    "alternativas": [
+      "CBWFQ",
+      "policing",
+      "LLQ",
+      "shaping"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 240,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which QoS per-hop behavior changes the value of the ToS eld in the IPv4 packet header?",
+    "alternativas": [
+      "Shaping",
+      "Policing",
+      "Classication",
+      "Marking"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 241,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the function of FTP?",
+    "alternativas": [
+      "Always operated without user connection validation",
+      "Uses block number to identify and mitigate data-transfer errors",
+      "Relies on the well-known UDO port 69 for data transfer",
+      "Uses two separate connections for control and data trac"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 242,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How does TFTP operate in a network?",
+    "alternativas": [
+      "Provides secure data transfer",
+      "Relies on the well-known TCP port 20 to transmit data",
+      "Uses block numbers to identify and mitigate data-transfer errors",
+      "Requires two separate connections for control and data trac"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 243,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How does QoS optimize voice trac?",
+    "alternativas": [
+      "by reducing bandwidth usage",
+      "by reducing packet loss",
+      "by differentiating voice and video trac",
+      "by increasing jitter"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 244,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An organization secures its network with multi-factor authentication using an authenticator app on employee smartphones. How is the applicationsecured in the case of a user's smartphone being lost or stolen?",
+    "alternativas": [
+      "The application requires the user to enter a PIN before it provides the second factor",
+      "The application requires an administrator password to reactivate after a congured interval",
+      "The application veries that the user is in a specic location before it provides the second factor",
+      "The application challenges a user by requiring an administrator password to reactivate when the smartphone is rebooted"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 245,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which device performs stateful inspection of trac?",
+    "alternativas": [
+      "switch",
+      "rewall",
+      "access point",
+      "wireless controller"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 246,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network administrator enabled port security on a switch interface connected to a printer. What is the next conguration action in order to allowthe port to learn the MAC address of the printer and insert it into the table automatically?",
+    "alternativas": [
+      "enable dynamic MAC address learning",
+      "implement static MAC addressing",
+      "enable sticky MAC addressing",
+      "implement auto MAC address learning"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 247,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which effect does the aaa new-model conguration command have?",
+    "alternativas": [
+      "It enables AAA services on the device.",
+      "It congures the device to connect to a RADIUS server for AA",
+      "C. It associates a RADIUS server to the group.",
+      "It congures a local user on the device."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 248,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which technology must be implemented to congure network device monitoring with the highest security?",
+    "alternativas": [
+      "IP SLA",
+      "syslog",
+      "NetFlow",
+      "SNMPv3"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 249,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer is asked to protect unused ports that are congured in the default VLAN on a switch. Which two steps will fulll the request? (Choosetwo.)",
+    "alternativas": [
+      "Congure the ports as trunk ports.",
+      "Enable the Cisco Discovery Protocol.",
+      "Congure the port type as access and place in VLAN 99.",
+      "Administratively shut down the ports.E. Congure the ports in an EtherChannel."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 250,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "The service password-encryption command is entered on a router. What is the effect of this conguration?",
+    "alternativas": [
+      "restricts unauthorized users from viewing clear-text passwords in the running conguration",
+      "prevents network administrators from conguring clear-text passwords",
+      "protects the VLAN database from unauthorized PC connections on the switch",
+      "encrypts the password exchange when a VPN tunnel is established"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 251,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which WPA3 enhancement protects against hackers viewing trac on the Wi-Fi network?",
+    "alternativas": [
+      "SAE encryption",
+      "TKIP encryption",
+      "scrambled encryption key",
+      "AES encryption"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 252,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which type of wireless encryption is used for WPA2 in preshared key mode?",
+    "alternativas": [
+      "AES-128",
+      "TKIP with RC4",
+      "AES-256",
+      "RC4"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 253,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which command prevents passwords from being stored in the conguration as plain text on a router or switch?",
+    "alternativas": [
+      "enable secret",
+      "enable password",
+      "service password-encryption",
+      "username cisco password encrypt"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 254,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which goal is achieved by the implementation of private IPv4 addressing on a network?",
+    "alternativas": [
+      "provides an added level of protection against Internet exposure",
+      "provides a reduction in size of the forwarding table on network routers",
+      "allows communication across the Internet to other private networks",
+      "allows servers and workstations to communicate across public network boundaries"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 255,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which type of attack is mitigated by dynamic ARP inspection?",
+    "alternativas": [
+      "DDoS",
+      "malware",
+      "man-in-the-middle",
+      "worm"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 256,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function of a remote access VPN?",
+    "alternativas": [
+      "establishes a secure tunnel between two branch sites",
+      "uses cryptographic tunneling to protect the privacy of data for multiple users simultaneously",
+      "used exclusively when a user is connected to a company's internal network",
+      "allows the users to access company internal network resources through a secure tunnel"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 257,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a practice that protects a network from VLAN hopping attacks?",
+    "alternativas": [
+      "Enable dynamic ARP inspection",
+      "Congure an ACL to prevent trac from changing VLANs",
+      "Change native VLAN to an unused VLAN ID",
+      "Implement port security on internet-facing VLANs"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 258,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Where does a switch maintain DHCP snooping information?",
+    "alternativas": [
+      "In the CAM table",
+      "In the frame forwarding database",
+      "In the MAC address table",
+      "In the binding database"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 259,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network administrator must congure SSH for remote access to router R1. The requirement is to use a public and private key pair to encryptmanagement trac to and from the connecting client. Which conguration, when applied, meets the requirements?",
+    "alternativas": [
+      "R1#enable R1#congure terminal R1(cong)#ip domain-name cisco.com R1(cong)#crypto key generate ec keysize 1024",
+      "R1#enable R1#congure terminal R1(cong)#ip domain-name cisco.com R1(cong)#crypto key generate ec keysize 2048",
+      "R1#enable R1#congure terminal R1(cong)#ip domain-name cisco.com R1(cong)#crypto key encrypt rsa name myKey",
+      "R1#enable R1#congure terminal R1(cong)#ip domain-name cisco.com R1(cong)#crypto key generate rsa modulus 1024"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 260,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "When a WLAN with WPA2 PSK is congured in the Wireless LAN Controller GUI, which format is supported?",
+    "alternativas": [
+      "decimal",
+      "ASCII",
+      "unicode",
+      "base64"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 261,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which security program element involves installing badge readers on data-center doors to allow workers to enter and exit based on their job roles?",
+    "alternativas": [
+      "physical access control",
+      "biometrics",
+      "role-based access control",
+      "multifactor authentication"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 262,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which function is performed by DHCP snooping?",
+    "alternativas": [
+      "listens to multicast trac for packet forwarding",
+      "rate-limits certain trac",
+      "propagates VLAN information between switches",
+      "provides DDoS mitigation"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 263,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which protocol is used for secure remote CLI access?",
+    "alternativas": [
+      "Telnet",
+      "HTTP",
+      "HTTPS",
+      "SSH"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 264,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which implementation provides the strongest encryption combination for the wireless environment?",
+    "alternativas": [
+      "WEP",
+      "WPA + TKIP",
+      "WPA + AES",
+      "WPA2 + AES"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 265,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What does physical access control regulate?",
+    "alternativas": [
+      "access to networking equipment and facilities",
+      "access to servers to prevent malicious activity",
+      "access to specic networks based on business function",
+      "access to computer networks and le systems"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  }
+]

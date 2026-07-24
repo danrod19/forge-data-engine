@@ -1,0 +1,1998 @@
+[
+  {
+    "source_id": 166,
+    "traditional": {
+      "id": 166,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How does HSRP provide first hop redundancy?",
+      "alternativas": [
+        "It load-balances Layer 2 traffic along the path by flflooding traffic out all interfaces configured with the same VLAN.",
+        "It uses a shared virtual MAC and a virtual IP address to a group of routers that serve as the default gateway for hosts on a LAN.",
+        "It forwards multiple packets to the same destination over different routed links in the data path.",
+        "It load-balances traffic by assigning the same metric value to more than one route to the same destination in the IP routing table."
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "HSRP provides first-hop redundancy by electing an active router that owns a virtual IP and virtual MAC shared by the HSRP group. Hosts use the VIP as default gateway; if the active fails, the standby assumes the VIP/vMAC so traffic continues. It does not flood L2 for load balancing, does not ECMP routed packets by itself, and is not equal-cost multipath in the routing table."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 167,
+    "traditional": {
+      "id": 167,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command must you enter to guarantee that an HSRP router with higher priority becomes the HSRP primary router after it is reloaded?",
+      "alternativas": [
+        "standby 10 preempt",
+        "standby 10 version 1",
+        "standby 10 priority 150",
+        "standby 10 version 2"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Higher HSRP priority alone does not reclaim the active role after reload if preemption is disabled. standby preempt allows a recovering higher-priority router to take over as active. Version and priority commands alone do not force re-election after reload without preempt."
+    },
+    "ticket": {
+      "id": 167,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9167 — R1 (priority 150) foi recarregado. R2 (priority 100) permanece Active e o tráfego não volta para R1. Ambos no grupo HSRP 10 com VIP 10.10.10.1.",
+      "cli_output": "R1# show standby brief\n                     P indicates configured to preempt.\n                     |\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nGi0/0       10   150   Standby 10.10.10.3     local           10.10.10.1\n\nR1# show running-config | include standby\nstandby 10 ip 10.10.10.1\nstandby 10 priority 150\n! (sem standby 10 preempt)\n\nR2# show standby brief\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nGi0/0       10   100   Active  local           10.10.10.2     10.10.10.1",
+      "alternativas": [
+        "Falta standby 10 preempt em R1; sem preempt a prioridade maior não retoma Active após o reload.",
+        "Trocar para standby 10 version 2 resolve sozinho a preempção.",
+        "Priority 150 é inválida; HSRP só aceita priority 100.",
+        "show interfaces confirma que HSRP ignora priority sem version 1."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "HSRP só devolve o papel Active a um router de maior prioridade se preempt estiver habilitado. O output mostra Pri 150 sem flag P e State Standby. Correção: standby 10 preempt. Version não substitui preempt; priority 150 é válida."
+    }
+  },
+  {
+    "source_id": 168,
+    "traditional": {
+      "id": 168,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command should you enter to verify the priority of a router in an HSRP group?",
+      "alternativas": [
+        "show hsrp",
+        "show sessions",
+        "show interfaces",
+        "show standby"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "show standby (or show standby brief) displays HSRP state, priority, preempt, virtual IP/MAC, and active/standby roles. show hsrp is not the classic IOS form. show sessions and show interfaces do not show HSRP priority."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 169,
+    "traditional": {
+      "id": 169,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which of the following dynamic routing protocols are Distance Vector routing protocols?",
+      "alternativas": [
+        "IS-IS",
+        "EIGRP",
+        "OSPF",
+        "RIP"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "EIGRP is an advanced distance-vector protocol (DUAL). OSPF and IS-IS are link-state. RIP is classic distance-vector (also correct in multi-select dumps). This bank stores a single index keyed to EIGRP after cleaning the mangled BGP/RIP option line."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 170,
+    "traditional": {
+      "id": 170,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command should you enter to view the error log in an EIGRP for IPv6 environment?",
+      "alternativas": [
+        "show ipv6 eigrp neighbors",
+        "show ipv6 eigrp topology",
+        "show ipv6 eigrp traffic",
+        "show ipv6 eigrp events"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "show ipv6 eigrp events displays the EIGRP event log used for troubleshooting adjacency and update issues. neighbors/topology/traffic show peer, topology table, and counters—not the event error log."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 171,
+    "traditional": {
+      "id": 171,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command is used to display the collection of OSPF link states?",
+      "alternativas": [
+        "show ip ospf link-state",
+        "show ip ospf lsa database",
+        "show ip ospf neighbors",
+        "show ip ospf database"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "show ip ospf database displays the OSPF LSDB (router, network, summary LSAs, etc.). There is no standard show ip ospf link-state / lsa database as primary. neighbors shows adjacency state only."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 172,
+    "traditional": {
+      "id": 172,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network administrator is troubleshooting the OSPF configuration of routers R1 and R2. The routers cannot establish an adjacency relationshipon their common Ethernet link.The graphic shows the output of the show ip ospf interface e0 command for routers R1 and R2. Based on the information in the graphic, what is the cause of this problem?",
+      "alternativas": [
+        "The OSPF area is not configured properly.",
+        "The priority on R1 should be set higher.",
+        "The cost on R1 should be set higher.",
+        "The hello and dead timers are not configured properly."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "OSPF adjacency requires matching hello/dead timers (among area, network type, auth, stub flags). Mismatched timers keep neighbors from reaching FULL. Priority/cost affect DR election and metrics, not basic adjacency. Process IDs need not match between routers."
+    },
+    "ticket": {
+      "id": 172,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9172 — R1 e R2 não formam adjacência OSPF no link Ethernet comum. show ip ospf neighbor vazio.",
+      "cli_output": "R1# show ip ospf interface gi0/0\nGigabitEthernet0/0 is up, line protocol is up\n  Internet Address 192.168.1.1/24, Area 0\n  Process ID 1, Router ID 1.1.1.1, Network Type BROADCAST, Cost: 1\n  Timer intervals configured, Hello 10, Dead 40, WaitInterval 5, Retransmit 5\n\nR2# show ip ospf interface gi0/0\nGigabitEthernet0/0 is up, line protocol is up\n  Internet Address 192.168.1.2/24, Area 0\n  Process ID 1, Router ID 2.2.2.2, Network Type BROADCAST, Cost: 1\n  Timer intervals configured, Hello 5, Dead 20, WaitInterval 5, Retransmit 5\n\nR1# show ip ospf neighbor\n! (empty)",
+      "alternativas": [
+        "Hello/Dead divergentes (10/40 vs 5/20) impedem adjacência OSPF.",
+        "Process ID diferente entre roteadores é obrigatório e está faltando.",
+        "É preciso elevar priority em R1 para formar vizinho.",
+        "Cost 1 em ambos bloqueia FULL por definição."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Timers Hello/Dead devem coincidir. Aqui 10/40 ≠ 5/20. Process ID pode diferir; priority/cost não explicam neighbor vazio. Alinhar ip ospf hello-interval/dead-interval."
+    }
+  },
+  {
+    "source_id": 173,
+    "traditional": {
+      "id": 173,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "If all OSPF routers in a single area are configured with the same priority value, what value does a router use for the OSPF router ID in the absenceof a loopback interface?",
+      "alternativas": [
+        "the IP address of the first Fast Ethernet interface",
+        "the IP address of the console management interface",
+        "the highest IP address among its active interfaces",
+        "the lowest IP address among its active interfaces"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Without a router-id command or loopback, OSPF chooses the highest IP among up/up interfaces as Router ID. Not console IP, not lowest IP, not priority."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 174,
+    "traditional": {
+      "id": 174,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "R1 has learned route 192.168.12.0/24 via IS-IS, OSPF, RIP, and Internal EIGRP. Under normal operating conditions, which routing protocol isinstafilled in the routing table?",
+      "alternativas": [
+        "IS-IS",
+        "Internal EIGRP",
+        "RIP",
+        "OSPF"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Administrative distance: Internal EIGRP 90, OSPF 110, IS-IS 115, RIP 120. Lowest AD wins for the same prefix, so Internal EIGRP is installed."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 175,
+    "traditional": {
+      "id": 175,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A user configured OSPF in a single area between two routers. A serial interface connecting R1 and R2 is running encapsulation PPP. By default,which OSPF network type is seen on this interface when the user types show ip ospf interface on R1 or R2?",
+      "alternativas": [
+        "nonbroadcast",
+        "point-to-point",
+        "point-to-multipoint",
+        "broadcast"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Serial PPP links default to OSPF network type point-to-point (no DR/BDR). Broadcast is Ethernet default. NBMA types need explicit config."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 176,
+    "traditional": {
+      "id": 176,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which MAC address is recognized as a VRRP virtual address?",
+      "alternativas": [
+        "0000.5E00.010a",
+        "0005.3709.8968",
+        "0000.0C07.AC99",
+        "0007.C070.AB01"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "VRRP virtual MAC format is 0000.5E00.01xx where xx is the group ID in hex. 0000.5E00.010a is group 10. 0000.0C07.ACxx is HSRP v1."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 177,
+    "traditional": {
+      "id": 177,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer configured an OSPF neighbor as a designated router. Which state verifies the designated router is in the proper mode?",
+      "alternativas": [
+        "Init",
+        "2-way",
+        "Exchange",
+        "Full"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "A DR adjacency reaches Full state with neighbors that fully exchange LSAs. Init/2-way are earlier; 2-way may be enough for non-DR pairs on multi-access, but verifying the DR is operating properly for adjacency completion is Full with its neighbors."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 178,
+    "traditional": {
+      "id": 178,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When the active router in a VRRP group fails, which router assumes the role and forwards packets?",
+      "alternativas": [
+        "forwarding",
+        "standby",
+        "backup",
+        "listening"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "In VRRP, the Backup router assumes Master when the current Master fails. HSRP uses Active/Standby terminology; VRRP uses Master/Backup."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 179,
+    "traditional": {
+      "id": 179,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which action does the router take as it forwards a packet through the network?",
+      "alternativas": [
+        "The router encapsulates the original packet and then includes a tag that identifies the source router MAC address and transmits ittransparently to the destination.",
+        "The router encapsulates the source and destination IP addresses with the sending router IP address as the source and the neighbor IPaddress as the destination.",
+        "The router replaces the original source and destination MAC addresses with the sending router MAC address as the source and neighborMAC address as the destination.",
+        "The router replaces the source and destination labels with the sending router interface label as a source and the next hop router label as adestination."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "When routing, the router rewrites L2 headers: source MAC = egress interface MAC, destination MAC = next-hop MAC; L3 addresses stay the same. It does not encapsulate by swapping to neighbor IP as L3 destination for ordinary IP routing, nor use MPLS labels unless MPLS is in use."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 180,
+    "traditional": {
+      "id": 180,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which virtual MAC address is used by VRRP group 1?",
+      "alternativas": [
+        "0504.0367.4921",
+        "0007.c061.bc01",
+        "0050.0c05.ad81",
+        "0000.5E00.0101"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "VRRP group 1 virtual MAC is 0000.5E00.0101 (base 0000.5E00.01 + group 01)."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 181,
+    "traditional": {
+      "id": 181,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the purpose of using First Hop Redundancy Protocol on a specific subnet?",
+      "alternativas": [
+        "forwards multicast hello messages between routers",
+        "sends the default route to the hosts on a network",
+        "ensures a loop-free physical topology",
+        "filters traffic based on destination IP addressing"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "FHRP provides a resilient default gateway for hosts on the subnet (virtual IP). Hosts still point to that VIP; FHRP is not STP, not ACL filtering, though hellos are used between routers for election."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 182,
+    "traditional": {
+      "id": 182,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer is configuring router R1 with an IPv6 static route for prefix 2019:C15C:0CAF:E001::/64. The next hop must be2019:C15C:0CAF:E002::1. The route must be reachable via the R1 Gigabit 0/0 interface. Which command configures the designated route?",
+      "alternativas": [
+        "R1(config-if)#ip route 2019:C15C:0CAF:E001::/64 GigabitEthernet 0/0",
+        "R1(config)#ip route 2019:C15C:0CAF:E001::/64 GigabitEthernet 0/0",
+        "R1(config-if)#ipv6 route 2019:C15C:0CAF:E001::/64 2019:C15C:0CAF:E002::1",
+        "R1(config)#ipv6 route 2019:C15C:0CAF:E001::/64 2019:C15C:0CAF:E002::1"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "IPv6 static routes use ipv6 route in global config: ipv6 route <prefix>/<len> <next-hop>. ip route is IPv4. Interface mode is wrong for standard static route commands."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 183,
+    "traditional": {
+      "id": 183,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "OSPF must be configured between routers R1 and R2. Which OSPF configuration must be applied to router R1 to avoid a DR/BDR election?",
+      "alternativas": [
+        "router ospf 1 network 192.168.1.1 0.0.0.0 area 0 interface e1/1 ip address 192.168.1.1 255.255.255.252 ip ospf cost 0",
+        "router ospf 1 network 192.168.1.1 0.0.0.0 area 0 hello interval 15 interface e1/1 ip address 192.168.1.1 255.255.255.252",
+        "router ospf 1 network 192.168.1.1 0.0.0.0 area 0 interface e1/1 ip address 192.168.1.1 255.255.255.252 ip ospf network broadcast",
+        "router ospf 1 network 192.168.1.1 0.0.0.0 area 0 interface e1/1 ip address 192.168.1.1 255.255.255.252 ip ospf network point-to-point"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "ip ospf network point-to-point avoids DR/BDR election on the link. broadcast forces DR election. Cost/hello tweaks do not remove DR election on broadcast."
+    },
+    "ticket": {
+      "id": 183,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9183 — Link /30 entre R1–R2 elege DR/BDR desnecessariamente. Engenharia quer evitar eleição DR/BDR.",
+      "cli_output": "R1# show ip ospf interface gi0/1\nGigabitEthernet0/1 is up, line protocol is up\n  Internet Address 192.168.1.1/30, Area 0\n  Network Type BROADCAST, Cost: 1\n  Transmit Delay is 1 sec, State DR, Priority 1\n  Designated Router (ID) 1.1.1.1, Interface address 192.168.1.1\n  Backup Designated router (ID) 2.2.2.2, Interface address 192.168.1.2",
+      "alternativas": [
+        "Configurar ip ospf network point-to-point no link para eliminar DR/BDR.",
+        "ip ospf network broadcast é o comando para evitar DR.",
+        "ip ospf cost 0 remove a eleição DR.",
+        "Hello 15 sozinho desativa BDR."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Network type point-to-point não elege DR/BDR — ideal em /30. Broadcast força DR. Cost/hello não removem eleição."
+    }
+  },
+  {
+    "source_id": 184,
+    "traditional": {
+      "id": 184,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which SDN plane forwards user-generated traffic?",
+      "alternativas": [
+        "Management plane",
+        "Control plane",
+        "Policy plane",
+        "Data plane"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "The data (forwarding) plane carries user traffic. Control plane builds tables (OSPF, etc.). Management plane is device admin. Policy plane is an SDN abstraction for intent/policy, not the packet-forwarding plane name here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 185,
+    "traditional": {
+      "id": 185,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A packet from a company's branch office is destined to host 172.31.0.1 at headquarters. The sending router has three possible matches in itsrouting table for the packet: prefixes 172.31.0.0/16, 172.31.0.0/24, and 172.31.0.0/25. How does the router handle the packet?",
+      "alternativas": [
+        "It sends the traffic via prefix 172.31.0.0/24.",
+        "It sends the traffic via prefix 172.31.0.0/16.",
+        "It sends the traffic via prefix 172.31.0.0/25.",
+        "It sends the traffic via the default gateway 0.0.0.0/0."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Longest prefix match: 172.31.0.1 matches /25 more specifically than /24 or /16, so the /25 route is used."
+    },
+    "ticket": {
+      "id": 185,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9185 — Pacote a 172.31.0.1 escolhe rota errada segundo a equipe. Três prefixos instalados.",
+      "cli_output": "R1# show ip route 172.31.0.1\nRouting entry for 172.31.0.0/25\n  Known via \"static\", distance 1, metric 0\n  Routing Descriptor Blocks:\n  * 10.0.0.2\n\nR1# show ip route | include 172.31\nS        172.31.0.0/16 ...\nS        172.31.0.0/24 ...\nS        172.31.0.0/25 ...",
+      "alternativas": [
+        "Longest match usa 172.31.0.0/25 para 172.31.0.1.",
+        "Sempre vence o /16 por ser mais “amplo”.",
+        "Default 0.0.0.0/0 tem prioridade sobre qualquer match.",
+        "O /24 vence o /25 por AD menor implícito."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "IOS aplica longest-prefix match. /25 é mais específico que /24 e /16 para 172.31.0.1. Default só se não houver match."
+    }
+  },
+  {
+    "source_id": 186,
+    "traditional": {
+      "id": 186,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer just instafilled network 10.120.10.0/24. Which configuration must be applied to the R14 router to add the new network to its OSPFrouting table?",
+      "alternativas": [
+        "Router ospf 100 Network 10.120.10.0 0.0.0.255 area 0",
+        "Router ospf 120 Network 10.120.10.0 255.255.255.0 area 0 Ip route 10.120.10.0 255.255.255.0 fa0/1",
+        "Router ospf 100 area 0 Network 10.120.10.0 0.0.0.255",
+        "Router ospf 100 Network 10.120.10.0 255.255.255.0 area 0"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "OSPF network statement uses wildcard mask: network 10.120.10.0 0.0.0.255 area 0 under router ospf. Using subnet mask 255.255.255.0 in network is wrong. area placement before network is invalid syntax."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 187,
+    "traditional": {
+      "id": 187,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the MAC address used with VRRP as a virtual address?",
+      "alternativas": [
+        "00-05-42-38-53-31",
+        "00-00-5E-00-01-0a",
+        "00-00-0C-07-AD-89",
+        "00-07-C0-70-AB-01"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "VRRP virtual MAC 00-00-5E-00-01-0a corresponds to group 10. HSRP uses 00-00-0C-07-ACxx."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 188,
+    "traditional": {
+      "id": 188,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Why would VRRP be implemented when configuring a new subnet in a multivendor environment?",
+      "alternativas": [
+        "when a gateway protocol is required that supports more than two Cisco devices for redundancy",
+        "to interoperate normally with all vendors and provide additional security features for Cisco devices",
+        "to ensure that the spanning-tree forwarding path to the gateway is loop-free",
+        "to enable normal operations to continue after a member failure without requiring a change in a host ARP cache"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "VRRP is an open standard, suitable in multivendor networks for gateway redundancy. Cisco-only extras are not the multivendor reason. STP is separate. ARP-cache transparency is a general FHRP benefit but the multivendor driver is standards interoperability."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 189,
+    "traditional": {
+      "id": 189,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of address is shared by routers in a HSRP implementation and used by hosts on the subnet as their default gateway address?",
+      "alternativas": [
+        "multicast address",
+        "virtual IP address",
+        "loopback IP address",
+        "broadcast address"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Hosts use the HSRP virtual IP as default gateway. Multicast is for hellos; loopback is not the LAN gateway; broadcast is not the VIP."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 190,
+    "traditional": {
+      "id": 190,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "By default, which virtual MAC address does HSRP group 14 use?",
+      "alternativas": [
+        "00:05:5e:19:0c:14",
+        "00:05:0c:07:ac:14",
+        "04:15:26:73:3c:0e",
+        "00:00:0c:07:ac:0e"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "HSRP v1 virtual MAC is 0000.0C07.ACxx with xx = group in hex. Group 14 = 0x0E → 00:00:0c:07:ac:0e."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 191,
+    "traditional": {
+      "id": 191,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A router has two static routes to the same destination network under the same OSPF process. How does the router forward packets to thedestination if the next-hop devices are different?",
+      "alternativas": [
+        "The router chooses the route with the oldest age.",
+        "The router chooses the next hop with the lowest IP address.",
+        "The router chooses the next hop with the lowest MAC address.",
+        "The router load-balances traffic over all routes to the destination."
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Equal-cost (or equal-AD equal-metric) static routes to the same prefix with different next hops are CEF load-balanced by default. Age/MAC/lowest IP are not the selection rules."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 192,
+    "traditional": {
+      "id": 192,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What does the implementation of a first-hop redundancy protocol protect against on a network?",
+      "alternativas": [
+        "default gateway failure",
+        "BGP neighbor flflapping",
+        "spanning-tree loops",
+        "root-bridge loss"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "FHRP protects against default gateway failure by providing a standby/backup forwarder for the VIP. It does not fix BGP flapping, STP loops, or root bridge loss."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 193,
+    "traditional": {
+      "id": 193,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which feature or protocol is required for an IP SLA to measure UDP jitter?",
+      "alternativas": [
+        "LLDP",
+        "EEM",
+        "CDP",
+        "NTP"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "UDP jitter IP SLA measurements need synchronized time (NTP) for accurate one-way delay/jitter calculations. LLDP/CDP/EEM are unrelated as the required feature for jitter accuracy."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 194,
+    "traditional": {
+      "id": 194,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which NAT term is defined as a group of addresses available for NAT use?",
+      "alternativas": [
+        "NAT pool",
+        "dynamic NAT",
+        "static NAT",
+        "one-way NAT"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "A NAT pool is a configured range of addresses available for dynamic translation. Dynamic/static/one-way describe methods, not the address group term."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 195,
+    "traditional": {
+      "id": 195,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command can you enter to allow Telnet to be supported in addition to SSH?",
+      "alternativas": [
+        "transport input telnet ssh",
+        "transport input telnet",
+        "no transport input telnet",
+        "privilege level 15"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "transport input telnet ssh on the VTY allows both protocols. telnet alone drops SSH; no transport input telnet removes Telnet; privilege level does not enable protocols."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 196,
+    "traditional": {
+      "id": 196,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the authoritative source for an address lookup?",
+      "alternativas": [
+        "a recursive DNS search",
+        "the operating system cache",
+        "the ISP local cache",
+        "the browser cache"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Authoritative DNS answers come from the authoritative name servers via the resolution process (recursive/iterative lookup path). Caches (OS/browser/ISP) may return non-authoritative answers."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 197,
+    "traditional": {
+      "id": 197,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command is used to verify the DHCP relay agent address that has been set up on your Cisco IOS router?",
+      "alternativas": [
+        "show ip interface brief",
+        "show ip dhcp bindings",
+        "show ip route",
+        "show ip interface"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "show ip interface displays helper-address (DHCP relay) configured on the interface. brief omits helpers; bindings/pool are server-side; route table is unrelated."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 198,
+    "traditional": {
+      "id": 198,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of information resides on a DHCP server?",
+      "alternativas": [
+        "a list of the available IP addresses in a pool",
+        "a list of public IP addresses and their corresponding names",
+        "usernames and passwords for the end users in a domain",
+        "a list of statically assigned MAC addresses"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "DHCP servers maintain address pools of available leases (plus options/bindings). DNS names, domain passwords, and static MAC lists are not the primary DHCP server data described."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 199,
+    "traditional": {
+      "id": 199,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which Cisco IOS command will indicate that interface GigabitEthernet 0/0 is configured via DHCP?",
+      "alternativas": [
+        "show ip interface GigabitEthernet 0/0 dhcp",
+        "show interface GigabitEthernet 0/0",
+        "show ip interface dhcp",
+        "show ip interface GigabitEthernet 0/0"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "show ip interface GigabitEthernet 0/0 shows Interface is up, address assignment method including DHCP when configured. The dhcp-specific show forms listed are invalid/not primary."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 200,
+    "traditional": {
+      "id": 200,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What will happen if you configure the logging trap debug command on a router?",
+      "alternativas": [
+        "It causes the router to send messages with lower severity levels to the syslog server",
+        "It causes the router to send all messages with the severity levels Warning, Error, Critical, and Emergency to the syslog server",
+        "It causes the router to send all messages to the syslog server",
+        "It causes the router to stop sending all messages to the syslog server"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "logging trap debug sets severity to 7, so all lower-severity-number messages (0–7) are sent—effectively all standard syslog levels to the server. It does not stop logging nor limit only to warning+."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 201,
+    "traditional": {
+      "id": 201,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network engineer must back up 20 network router configurations globally within a customer environment. Which protocol allows the engineer to perform this function using the Cisco IOS MIB?",
+      "alternativas": [
+        "ARP",
+        "SNMP",
+        "SMTP",
+        "CDP"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "SNMP with Cisco IOS MIBs can read/write configuration objects for bulk backup/automation. ARP/CDP/SMTP do not provide IOS MIB-based global config backup."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 202,
+    "traditional": {
+      "id": 202,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command enabfiles a router to become a DHCP client?",
+      "alternativas": [
+        "ip address dhcp",
+        "ip dhcp client",
+        "ip helper-address",
+        "ip dhcp pool"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "ip address dhcp under an interface makes that interface a DHCP client. ip helper-address is relay; ip dhcp pool is server; ip dhcp client is not the standard enable form alone."
+    },
+    "ticket": {
+      "id": 202,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9202 — Interface WAN do roteador de filial precisa obter IP automaticamente do ISP (DHCP client).",
+      "cli_output": "R1# show running-config interface gi0/0\ninterface GigabitEthernet0/0\n description WAN-ISP\n ip address 192.0.2.10 255.255.255.0\n! estático legado\n\nR1# show ip interface brief\nInterface              IP-Address      OK? Method Status\nGigabitEthernet0/0     192.0.2.10      YES NVRAM  up",
+      "alternativas": [
+        "Configurar ip address dhcp na interface para virar cliente DHCP.",
+        "ip helper-address na WAN faz o roteador ser cliente DHCP.",
+        "ip dhcp pool na WAN obtém endereço do ISP.",
+        "ip dhcp client sozinho sem ip address dhcp é o padrão IOS."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Cliente DHCP no IOS: ip address dhcp na interface. helper-address é relay; pool é servidor."
+    }
+  },
+  {
+    "source_id": 203,
+    "traditional": {
+      "id": 203,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which function does an SNMP agent perform?",
+      "alternativas": [
+        "It sends information about MIB variabfifiles in response to requests from the NMS",
+        "It manages routing between Layer 3 devices in a network",
+        "It coordinates user authentication between a network device and a TACACS+ or RADIUS server",
+        "It requests information from remote network nodes about catastrophic system events"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "An SNMP agent on the device responds to NMS Get/GetNext/GetBulk and can send traps/informs about MIB objects. It is not a routing protocol, not AAA coordinator, and does not poll remote nodes as its primary role."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 204,
+    "traditional": {
+      "id": 204,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command must be entered when a device is configured as an NTP server?",
+      "alternativas": [
+        "ntp peer",
+        "ntp master",
+        "ntp authenticate",
+        "ntp server"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ntp master makes the device an authoritative NTP server (stratum configurable). ntp server points to an upstream server (client). peer/authenticate are other NTP features."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 205,
+    "traditional": {
+      "id": 205,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What event has occurred if a router sends a notice level message to a syslog server?",
+      "alternativas": [
+        "A certicate has expired",
+        "An interface line has changed status",
+        "A TCP connection has been torn down",
+        "An ICMP connection has been built"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Interface up/down is a typical severity 5 notice-level syslog. Certificate expiry, TCP teardown, ICMP are not the classic notice example keyed here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 206,
+    "traditional": {
+      "id": 206,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the primary purpose of a First Hop Redundancy Protocol?",
+      "alternativas": [
+        "It allows directly connected neighbors to share configuration information",
+        "It reduces routing failures by allowing Layer 3 load balancing between OSPF neighbors that have the same link metric",
+        "It allows a router to use bridge priorities to create multiple loop-free paths to a single destination",
+        "It reduces routing failures by allowing more than one router to represent itself as the default gateway of a network"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "FHRP (HSRP/VRRP/GLBP) lets multiple routers share a virtual default gateway so hosts keep a stable gateway if one router fails. It is not CDP sharing, not OSPF ECMP, not STP multipath."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 207,
+    "traditional": {
+      "id": 207,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer is configuring NAT to translate the source subnet of 10.10.0.0/24 to any one of three addresses: 192.168.3.1, 192.168.3.2, or192.168.3.3. Which configuration should be used?",
+      "alternativas": [
+        "enable\nconfigure terminal\nip nat pool mypool 192.168.3.1 192.168.3.3 prefix-length 30\naccess-list 1 permit 10.10.0.0 0.0.0.255 ip natoutside destination list 1 pool mypool\ninterface g1/1\nip nat inside\ninterface g1/2\nip nat outside",
+        "enable\nconfigure terminal\nip nat pool mypool 192.168.3.1 192.168.3.3 prefix-length 30\naccess-list 1 permit 10.10.0.0 0.0.0.254\nip nat insidesource list 1 pool mypool\ninterface g1/1\nip nat inside\ninterface g1/2\nip nat outside",
+        "enable\nconfigure terminal\nip nat pool mypool 192.168.3.1 192.168.3.3 prefix-length 30\nroute-map permit 10.10.0.0 255.255.255.0 ip natoutside destination list 1 pool mypool\ninterface g1/1\nip nat inside\ninterface g1/2\nip nat outside",
+        "enable\nconfigure terminal\nip nat pool mypool 192.168.3.1 192.168.3.3 prefix-length 30\naccess-list 1 permit 10.10.0.0 0.0.0.255\nip nat insidesource list 1 pool mypool\ninterface g1/1\nip nat inside\ninterface g1/2\nip nat outside"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Dynamic NAT with a pool of three outside addresses: ip nat pool ... prefix-length, ACL matching 10.10.0.0/24 (wildcard 0.0.0.255), ip nat inside source list 1 pool mypool, and correct inside/outside interfaces. Wrong ACL wildcard, outside destination NAT, or route-map misuse are incorrect."
+    },
+    "ticket": {
+      "id": 207,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9207 — NAT dinâmico deve traduzir 10.10.0.0/24 para o pool 192.168.3.1–3. Traduções não ocorrem.",
+      "cli_output": "R1# show running-config | section nat|access-list 1\nip nat pool mypool 192.168.3.1 192.168.3.3 prefix-length 30\naccess-list 1 permit 10.10.0.0 0.0.0.255\nip nat outside destination list 1 pool mypool\ninterface GigabitEthernet1/1\n ip nat inside\ninterface GigabitEthernet1/2\n ip nat outside\n\nR1# show ip nat translations\n! empty",
+      "alternativas": [
+        "Trocar para ip nat inside source list 1 pool mypool (inside source, não outside destination).",
+        "Manter outside destination; só falta overload.",
+        "Wildcard 0.0.0.254 é obrigatório para /24.",
+        "Remover ip nat inside/outside das interfaces."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Tradução da sub-rede interna usa inside source list + pool. outside destination inverte o modelo e não atende o requisito. ACL /24 usa 0.0.0.255."
+    }
+  },
+  {
+    "source_id": 208,
+    "traditional": {
+      "id": 208,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When the active router in an HSRP group fails, which router assumes the role and forwards packets?",
+      "alternativas": [
+        "forwarding",
+        "listening",
+        "standby",
+        "backup"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "In HSRP, the Standby router becomes Active and forwards when the Active fails. VRRP uses Backup; there is no HSRP role named backup/forwarding as the successor name."
+    },
+    "ticket": {
+      "id": 208,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9208 — Active HSRP R1 falhou. Quem deve encaminhar o VIP agora?",
+      "cli_output": "R2# show standby\nGigabitEthernet0/0 - Group 1\n  State is Active\n    1 state change, last state change 00:00:12\n  Virtual IP address is 10.1.1.1\n  Active router is local\n  Standby router is unknown expired\n  Priority 90 (configured 90)\n  Group name is \"hsrp-Gi0/0-1\" (default)\n\n! R1 unreachable",
+      "alternativas": [
+        "O router Standby assume Active e encaminha pacotes do VIP.",
+        "O papel Listening vira forwarder permanente sem virar Active.",
+        "Backup (termo VRRP) é o nome HSRP do sucessor.",
+        "Forwarding é um estado HSRP estável separado de Active."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "HSRP: Standby → Active no failover. Listening é estado transitório/auxiliar. Backup é VRRP. Não há role estável “forwarding” como sucessor nomeado."
+    }
+  },
+  {
+    "source_id": 209,
+    "traditional": {
+      "id": 209,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What protocol allows an engineer to back up 20 network router configurations globally while using the copy function?",
+      "alternativas": [
+        "TCP",
+        "SMTP",
+        "FTP",
+        "SNMP"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "SNMP can be used with MIBs to retrieve/back up configurations at scale; the item pairs SNMP with global backup via management functions. FTP can copy files but the keyed answer in this bank is SNMP for the global/MIB scenario; TCP/SMTP are not config-backup tools here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 210,
+    "traditional": {
+      "id": 210,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which keyword in a NAT configuration enabfiles the use of one outside IP address for multiple inside hosts?",
+      "alternativas": [
+        "source",
+        "static",
+        "pool",
+        "overload"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "overload enables PAT so many inside hosts share one (or few) outside address(es) using ports. pool defines addresses; static is 1:1; source is direction syntax."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 211,
+    "traditional": {
+      "id": 211,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which feature or protocol determines whether the QoS on the network is sufficient to support IP services?",
+      "alternativas": [
+        "LLDP",
+        "CDP",
+        "IP SLA",
+        "EEM"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "IP SLA measures delay, jitter, loss to validate whether the path meets application/QoS needs. LLDP/CDP are discovery; EEM is event scripting."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 212,
+    "traditional": {
+      "id": 212,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the purpose of traffic shaping?",
+      "alternativas": [
+        "to be a marking mechanism that identifies different ows",
+        "to provide fair queuing for buffered ows",
+        "to mitigate delays over slow links",
+        "to limit the bandwidth that a ow can use"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Traffic shaping queues excess traffic and meters send rate to a limit (buffers rather than hard-drop by default). Marking classifies/tags; fair queuing schedules; mitigating delay over slow links is incomplete—shaping specifically rate-limits by buffering."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 213,
+    "traditional": {
+      "id": 213,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a function of TFTP in network operations?",
+      "alternativas": [
+        "transfers IOS images from a server to a router for fifirmware upgrades",
+        "transfers a backup configuration file from a server to a switch using a username and password",
+        "transfers configuration fifiles from a server to a router on a congested link",
+        "transfers fifiles between file systems on a router"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "TFTP commonly transfers IOS images and configs without authentication over UDP/69—used for firmware upgrades. It does not use username/password like FTP/SCP."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 214,
+    "traditional": {
+      "id": 214,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Where does the configuration reside when a helper address is configured lo support DHCP?",
+      "alternativas": [
+        "on the router closest to the server",
+        "on the router closest to the client",
+        "on every router along the path",
+        "on the switch trunk interface"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ip helper-address is configured on the interface facing DHCP clients (router closest to clients) to relay broadcasts to a remote server."
+    },
+    "ticket": {
+      "id": 214,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9214 — Clientes na VLAN 40 não recebem DHCP; servidor está em outro site. Relay ausente.",
+      "cli_output": "R1# show ip interface gi0/0.40\nGigabitEthernet0/0.40 is up, line protocol is up\n  Internet address is 10.40.0.1/24\n  Helper address is not set\n\nR1# show running-config interface gi0/0.40\ninterface GigabitEthernet0/0.40\n encapsulation dot1Q 40\n ip address 10.40.0.1 255.255.255.0",
+      "alternativas": [
+        "Configurar ip helper-address no roteador mais próximo dos clientes (SVI/subif da VLAN 40).",
+        "helper-address só no roteador colado ao servidor DHCP.",
+        "Precisa em todos os hops do caminho WAN.",
+        "No trunk L2 do switch, não no gateway L3 dos clientes."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Relay fica na interface L3 do subnet do cliente para capturar broadcasts DHCP e unicasts ao servidor. Não é necessário em cada hop."
+    }
+  },
+  {
+    "source_id": 215,
+    "traditional": {
+      "id": 215,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What facilitates a Telnet connection between devices by entering the device name?",
+      "alternativas": [
+        "SNMP",
+        "DNS lookup",
+        "syslog",
+        "NTP"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "DNS resolves a hostname to an IP so Telnet/SSH can connect by name. SNMP/syslog/NTP do not perform name resolution for the session."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 216,
+    "traditional": {
+      "id": 216,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer is installing a new wireless printer with a static IP address on the Wi-Fi network. Which feature must be enabled and configured toprevent connection issues with the printer?",
+      "alternativas": [
+        "client exclusion",
+        "DHCP address assignment",
+        "passive client",
+        "static IP tunneling"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "On Cisco WLC, Passive Client allows devices that do not ARP normally (some static printers) to work correctly with controller bridging. DHCP assignment contradicts static IP. Exclusion/tunneling are wrong features for this case."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 217,
+    "traditional": {
+      "id": 217,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When a client and server are not on the same physical network, which device is used to forward requests and replies between client and server forDHCP?",
+      "alternativas": [
+        "DHCPOFFER",
+        "DHCP relay agent",
+        "DHCP server",
+        "DHCPDISCOVER"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "A DHCP relay agent (helper-address) forwards client DHCP messages between subnets to the server. DHCPOFFER/DISCOVER are message types, not devices."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 218,
+    "traditional": {
+      "id": 218,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which protocol requires authentication to transfer a backup configuration file from a router to a remote server?",
+      "alternativas": [
+        "FTP",
+        "SMTP",
+        "TFTP",
+        "DTP"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "FTP authenticates with username/password when transferring files. TFTP has no auth. SMTP is mail; DTP is trunk negotiation."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 219,
+    "traditional": {
+      "id": 219,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which condition must be met before an NMS handfiles an SNMP trap from an agent?",
+      "alternativas": [
+        "The NMS must receive the same trap from two different SNMP agents to verify that it is reliable.",
+        "The NMS must receive a trap and an inform message from the SNMP agent within a configured interval.",
+        "The NMS software must be loaded with the MIB associated with the trap.",
+        "The NMS must be configured on the same router as the SNMP agent."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "The NMS must load the MIB that defines the trap OIDs to interpret and handle the trap meaningfully. Duplicate traps, inform pairing, or co-location on the agent router are not prerequisites."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 220,
+    "traditional": {
+      "id": 220,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer is configuring switch SW1 to act as an NTP server when all upstream NTP server connectivity fails. Which configuration must beused?",
+      "alternativas": [
+        "SW1# config t\nSW1(config)#ntp peer 192.168.1.1 SW1(config)#ntp access-group peer accesslist1",
+        "SW1# config t\nSW1(config)#ntp master SW1(config)#ntp server 192.168.1.1",
+        "SW1# config t\nSW1(config)#ntp backup SW1(config)#ntp server 192.168.1.1",
+        "SW1# config t\nSW1(config)#ntp server 192.168.1.1 SW1(config)#ntp access-group peer accesslist1"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ntp master makes the switch a local NTP server when upstream fails; also pointing ntp server to upstream is valid client+master design. ntp backup is invalid. peer alone is not the master fallback pattern keyed here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 221,
+    "traditional": {
+      "id": 221,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network administrator must enable DHCP services between two sites. What must be configured for the router to pass DHCPDISCOVERmessages on to the server?",
+      "alternativas": [
+        "DHCP Binding",
+        "a DHCP Relay Agent",
+        "DHCP Snooping",
+        "a DHCP Pool"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "DHCP relay agent (ip helper-address) forwards DHCPDISCOVER to a server on another subnet. Binding/snooping/pool are not the relay function."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 222,
+    "traditional": {
+      "id": 222,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which level of severity must be set to get informational syslogs?",
+      "alternativas": [
+        "alert",
+        "critical",
+        "notice",
+        "debug"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Syslog severity debug (7) includes informational (6) and all higher-priority levels. Setting a higher severity number threshold allows more verbose messages including informational."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 223,
+    "traditional": {
+      "id": 223,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "On workstations running Microsoft Windows, which protocol provides the default gateway for the device?",
+      "alternativas": [
+        "STP",
+        "DHCP",
+        "SNMP",
+        "DNS"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "DHCP commonly provides default gateway (option 3) to Windows hosts. STP/SNMP/DNS do not assign the gateway."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 224,
+    "traditional": {
+      "id": 224,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command implies the use of SNMPv3?",
+      "alternativas": [
+        "snmp-server user",
+        "snmp-server host",
+        "snmp-server enable traps",
+        "snmp-server community"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "snmp-server user configures SNMPv3 users (auth/priv). community is v1/v2c. host/enable traps exist across versions but user implies v3."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 225,
+    "traditional": {
+      "id": 225,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "R1 as an NTP server must have:✑ NTP authentication enabled✑ NTP packets sourced from Interface loopback 0✑ NTP stratum 2✑ NTP packets only permitted to client IP 209.165.200.225How should R1 be configured?",
+      "alternativas": [
+        "ntp authenticate\nntp authentication-key 2 sha1 CISCO123\nntp source Loopback0\nntp access-group server-only 10\nntp master 2 ! access-list10 permit udp host 209.165.200.225 any eq 123",
+        "ntp authenticate\nntp authentication-key 2 md5 CISCO123\nntp interface Loopback0\nntp access-group server-only 10\nntp stratum 2 !\naccess-list 10 permit 209.165.200.225",
+        "ntp authenticate\nntp authentication-key 2 md5 CISCO123\nntp source Loopback0\nntp access-group server-only 10\nntp master 2 ! access-list10 permit 209.165.200.225",
+        "ntp authenticate\nntp authentication-key 2 md5 CISCO123\nntp source Loopback0\nntp access-group server-only 10\nntp stratum 2 ! access-list10 permit udp host 209.165.200.225 any eq 123"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Requirements: ntp authenticate + md5 key, ntp source Loopback0, ntp master 2 (stratum 2), access-group server-only with ACL permitting the client. sha1 key type, ntp interface (invalid), or ntp stratum (invalid IOS) fail. The correct set is md5 + source Loopback0 + master 2 + ACL permit to the client."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 226,
+    "traditional": {
+      "id": 226,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network engineer is configuring a switch so that it is remotely reachable via SSH. The engineer has already configured the host name on therouter. Which additional command must the engineer configure before entering the command to generate the RSA key?",
+      "alternativas": [
+        "password password",
+        "ip ssh authentication-retries 2",
+        "ip domain-name domain",
+        "crypto key generate rsa modulus 1024"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "crypto key generate rsa requires hostname and ip domain-name (or domain name) already set. The domain-name is the missing prerequisite before key generation. Generating the key is the next step after domain-name, not before."
+    },
+    "ticket": {
+      "id": 226,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9226 — Engenheiro configurou hostname e tenta gerar chave RSA para SSH; comando falha pedindo domain name.",
+      "cli_output": "R1# show running-config | include hostname|domain\nhostname R1\n! sem ip domain-name\n\nR1(config)# crypto key generate rsa\n% Please define a domain-name first.",
+      "alternativas": [
+        "Configurar ip domain-name antes de crypto key generate rsa.",
+        "password password é pré-requisito da chave RSA.",
+        "ip ssh authentication-retries deve vir antes da chave.",
+        "Gerar a chave antes do hostname e domain."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "RSA key pair no IOS exige hostname + domain-name. authentication-retries e passwords não substituem esse pré-requisito."
+    }
+  },
+  {
+    "source_id": 227,
+    "traditional": {
+      "id": 227,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which QoS traffic handling technique retains excess packets in a queue and reschedufiles these packets for later transmission when the configuredmaximum bandwidth has been surpassed?",
+      "alternativas": [
+        "traffic policing",
+        "weighted random early detection",
+        "traffic prioritization",
+        "traffic shaping"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Shaping buffers excess packets and releases them later to conform to a rate. Policing drops/marks excess. WRED drops probabilistically for congestion avoidance. Prioritization is scheduling emphasis."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 228,
+    "traditional": {
+      "id": 228,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command must be entered to configure a DHCP relay?",
+      "alternativas": [
+        "ip dhcp relay",
+        "ip dhcp pool",
+        "ip address dhcp",
+        "ip helper-address"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "ip helper-address enables DHCP relay on an interface. ip dhcp pool is server; ip address dhcp is client; ip dhcp relay is not the classic IOS command form."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 229,
+    "traditional": {
+      "id": 229,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network analyst is tasked with configuring the date and time on a router using EXEC mode. The date must be set to January 1, 2020 and thetime must be set to12:00 am. Which command should be used?",
+      "alternativas": [
+        "clock timezone",
+        "clock summer-time date",
+        "clock summer-time recurring",
+        "clock set"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "clock set in EXEC sets the system date/time. timezone/summer-time configure offsets/DST rules, not the absolute stamp alone."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 230,
+    "traditional": {
+      "id": 230,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command creates a static NAT binding for a PC address of 10.1.1.1 to the public routable address 209.165.200.225 assigned to the PC?",
+      "alternativas": [
+        "R1(config)#ip nat inside source static 10.1.1.1 209.165.200.225",
+        "R1(config)#ip nat outside source static 209.165.200.225 10.1.1.1",
+        "R1(config)#ip nat inside source static 209.165.200.225 10.1.1.1",
+        "R1(config)#ip nat outside source static 10.1.1.1 209.165.200.225"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Static inside source NAT: ip nat inside source static <inside-local> <inside-global>. Swapping addresses or using outside source changes the translation direction/meaning."
+    },
+    "ticket": {
+      "id": 230,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9230 — PC 10.1.1.1 precisa de NAT estático para 209.165.200.225. Tradução incorreta configurada.",
+      "cli_output": "R1# show running-config | include nat\nip nat outside source static 209.165.200.225 10.1.1.1\ninterface Gi0/0\n ip nat inside\ninterface Gi0/1\n ip nat outside\n\nR1# show ip nat translations\nPro Inside global      Inside local       Outside local      Outside global\n--- ---                ---                10.1.1.1           209.165.200.225",
+      "alternativas": [
+        "Usar ip nat inside source static 10.1.1.1 209.165.200.225.",
+        "Manter outside source static com endereços invertidos.",
+        "inside source static 209.165.200.225 10.1.1.1 está correto.",
+        "NAT estático não exige inside/outside nas interfaces."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Inside-local 10.1.1.1 ↔ inside-global 209.165.200.225 usa inside source static na ordem local→global. outside source inverte o modelo. Interfaces inside/outside são necessárias."
+    }
+  },
+  {
+    "source_id": 231,
+    "traditional": {
+      "id": 231,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What prevents a workstation from receiving a DHCP address?",
+      "alternativas": [
+        "STP",
+        "VTP",
+        "802.1Q",
+        "DTP"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "This item keys 802.1Q (trunking/native VLAN issues can black-hole or misdeliver DHCP). In broader practice STP-blocked ports or missing relay also block DHCP; the bank answer remains 802.1Q per source."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 232,
+    "traditional": {
+      "id": 232,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a feature of TFTP?",
+      "alternativas": [
+        "offers anonymous user login ability",
+        "uses two separate connections for control and data traffic",
+        "relies on the well-known TCP port 20 to transmit data",
+        "provides secure data transfer"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "TFTP allows simple file transfer without user login (anonymous-style). It is UDP-based, not dual TCP connections like FTP, and is not secure."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 233,
+    "traditional": {
+      "id": 233,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which QoS forwarding per-hop behavior changes a specific value in a packet header to set the class of service for the packet?",
+      "alternativas": [
+        "shaping",
+        "classication",
+        "policing",
+        "marking"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Marking writes CoS/DSCP/IPP values into headers for classification downstream. Classification identifies traffic; policing/shaping enforce rates."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 234,
+    "traditional": {
+      "id": 234,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the purpose of the ip address dhcp command?",
+      "alternativas": [
+        "to configure an interface as a DHCP relay",
+        "to configure an interface as a DHCP client",
+        "to configure an interface as a DHCP helper",
+        "to configure an interface as a DHCP server"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ip address dhcp configures the interface as a DHCP client. Relay/helper use helper-address; server uses dhcp pool."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 235,
+    "traditional": {
+      "id": 235,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer is configuring SSH version 2 exclusively on the R1 router. What is the minimum configuration required to permit remote managementusing the cryptographic protocol?",
+      "alternativas": [
+        "hostname R1\nservice password-encryption\ncrypto key generate rsa general-keys modulus 1024\nusername cisco privilege 15 password 0cisco123\nip ssh version 2\nline vty 0 15\ntransport input ssh\nlogin local",
+        "hostname R1\nip domain name cisco\ncrypto key generate rsa general-keys modulus 1024\nusername cisco privilege 15 password 0 cisco123ip ssh version 2\nline vty 0 15\ntransport input ssh\nlogin local",
+        "hostname R1\ncrypto key generate rsa general-keys modulus 1024\nusername cisco privilege 15 password 0 cisco123\nip ssh version 2 line vty0 15\ntransport input ssh\nlogin local",
+        "hostname R1\nip domain name cisco\ncrypto key generate rsa general-keys modulus 1024\nusername cisco privilege 15 password 0 cisco123ip ssh version 2\nline vty 0 15\ntransport input all\nlogin local"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "SSH v2 needs hostname, ip domain-name, RSA key, user/VTY login local, transport input ssh, and ip ssh version 2. Missing domain-name breaks key gen; transport input all allows Telnet; password-encryption is optional not exclusive requirement."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 236,
+    "traditional": {
+      "id": 236,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which per-hop traffic-control feature does an ISP implement to mitigate the potential negative effects of a customer exceeding its committedbandwidth?",
+      "alternativas": [
+        "policing",
+        "queuing",
+        "marking",
+        "shaping"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "ISPs typically police customer traffic that exceeds the committed rate (drop/remark) at the edge. Shaping is more common on the customer egress. Queuing/marking alone do not enforce the contract the same way."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 237,
+    "traditional": {
+      "id": 237,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which remote access protocol provides unsecured remote CLI access?",
+      "alternativas": [
+        "console",
+        "Telnet",
+        "SSH",
+        "Bash"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Telnet provides remote CLI without encryption. SSH is secure. Console is local. Bash is a shell, not a Cisco remote access protocol here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 238,
+    "traditional": {
+      "id": 238,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a syslog facility?",
+      "alternativas": [
+        "host that is configured for the system to send log messages",
+        "password that authenticates a Network Management System to receive log messages",
+        "group of log messages associated with the configured severity level",
+        "set of values that represent the processes that can generate a log message"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "A syslog facility is a category identifying the message source/process (e.g., local0, kern). It is not the destination host, password, or merely the severity grouping."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 239,
+    "traditional": {
+      "id": 239,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which QoS queuing method discards or marks packets that exceed the desired bit rate of traffic ow?",
+      "alternativas": [
+        "CBWFQ",
+        "policing",
+        "LLQ",
+        "shaping"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Policing drops or remarks packets exceeding a rate. Shaping queues. CBWFQ/LLQ are scheduling methods."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 240,
+    "traditional": {
+      "id": 240,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which QoS per-hop behavior changes the value of the ToS field in the IPv4 packet header?",
+      "alternativas": [
+        "Shaping",
+        "Policing",
+        "Classication",
+        "Marking"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Marking changes ToS/DSCP/CoS fields. Classification reads them; policing/shaping rate-control."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 241,
+    "traditional": {
+      "id": 241,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is the function of FTP?",
+      "alternativas": [
+        "Always operated without user connection validation",
+        "Uses block number to identify and mitigate data-transfer errors",
+        "Relies on the well-known UDP port 69 for data transfer",
+        "Uses two separate connections for control and data traffic"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "FTP uses separate control (TCP 21) and data (TCP 20/passive) connections. It is not UDP/69 (TFTP). It typically authenticates users."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 242,
+    "traditional": {
+      "id": 242,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How does TFTP operate in a network?",
+      "alternativas": [
+        "Provides secure data transfer",
+        "Relies on the well-known TCP port 20 to transmit data",
+        "Uses block numbers to identify and mitigate data-transfer errors",
+        "Requires two separate connections for control and data traffic"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "TFTP uses block numbers/ACKs for reliability over UDP and is simple/unauthenticated. Not secure, not TCP/20, not dual FTP-style connections."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 243,
+    "traditional": {
+      "id": 243,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How does QoS optimize voice traffic?",
+      "alternativas": [
+        "by reducing bandwidth usage",
+        "by reducing packet loss",
+        "by differentiating voice and video traffic",
+        "by increasing jitter"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "QoS for voice prioritizes and protects voice (LLQ, low loss/jitter/latency) by treating it differently from bulk data. Differentiating classes is how optimization is applied; reducing loss is the outcome. The keyed option is differentiating voice and video traffic in this bank."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 244,
+    "traditional": {
+      "id": 244,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An organization secures its network with multi-factor authentication using an authenticator app on employee smartphones. How is the applicationsecured in the case of a user's smartphone being lost or stolen?",
+      "alternativas": [
+        "The application requires the user to enter a PIN before it provides the second factor",
+        "The application requires an administrator password to reactivate after a configured interval",
+        "The application verifies that the user is in a specific location before it provides the second factor",
+        "The application challenges a user by requiring an administrator password to reactivate when the smartphone is rebooted"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Authenticator apps typically require a device PIN/biometric before showing OTP codes if the phone is lost/stolen. Admin password/reactivation or location-only checks are not the standard primary control described."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 245,
+    "traditional": {
+      "id": 245,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which device performs stateful inspection of traffic?",
+      "alternativas": [
+        "switch",
+        "fifirewall",
+        "access point",
+        "wireless controller"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Firewalls perform stateful inspection of traffic flows. Switches/APs/WLCs are not primarily stateful firewalls."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 246,
+    "traditional": {
+      "id": 246,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network administrator enabled port security on a switch interface connected to a printer. What is the next configuration action in order to allowthe port to learn the MAC address of the printer and insert it into the table automatically?",
+      "alternativas": [
+        "enable dynamic MAC address learning",
+        "implement static MAC addressing",
+        "enable sticky MAC addressing",
+        "implement auto MAC address learning"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Port-security sticky learns the MAC dynamically and writes it to the running config as a secure sticky address. Static requires manual MAC; 'auto/dynamic learning' alone is not the port-security sticky feature name."
+    },
+    "ticket": {
+      "id": 246,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9246 — Port-security na porta da impressora; MAC deve ser aprendido e gravado automaticamente.",
+      "cli_output": "SW1# show port-security interface gi1/0/10\nPort Security              : Enabled\nPort Status                : Secure-up\nMaximum MAC Addresses      : 1\nTotal MAC Addresses        : 0\nConfigured MAC Addresses   : 0\nSticky MAC Addresses       : 0\nSecurity Violation Count   : 0\n\nSW1# show running-config interface gi1/0/10\ninterface GigabitEthernet1/0/10\n switchport mode access\n switchport port-security\n! sem sticky",
+      "alternativas": [
+        "Habilitar switchport port-security mac-address sticky para aprender e fixar o MAC na config.",
+        "Só static MAC manual atende “automaticamente”.",
+        "enable dynamic MAC address learning é o comando port-security.",
+        "auto MAC address learning existe como feature separada obrigatória."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Sticky port-security aprende o MAC dinâmico e o converte em sticky na running-config. Static é manual. Não há comando genérico “auto MAC” no lugar de sticky."
+    }
+  },
+  {
+    "source_id": 247,
+    "traditional": {
+      "id": 247,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which effect does the aaa new-model configuration command have?",
+      "alternativas": [
+        "It enabfiles AAA services on the device.",
+        "It configures the device to connect to a RADIUS server for AAA.",
+        "It associates a RADIUS server to the group.",
+        "It configures a local user on the device."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "aaa new-model enables the AAA model on IOS. It does not by itself define RADIUS servers, groups, or local users."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 248,
+    "traditional": {
+      "id": 248,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which technology must be implemented to configure network device monitoring with the highest security?",
+      "alternativas": [
+        "IP SLA",
+        "syslog",
+        "NetFlow",
+        "SNMPv3"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "SNMPv3 provides authentication and encryption for monitoring—highest security among the listed management options. Syslog/NetFlow/IP SLA lack comparable mandatory authPriv security."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 249,
+    "traditional": {
+      "id": 249,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "An engineer is asked to protect unused ports that are configured in the default VLAN on a switch. Which two steps will fulfill the request? (Choose two.)",
+      "alternativas": [
+        "Configure the ports as trunk ports.",
+        "Enable the Cisco Discovery Protocol.",
+        "Configure the port type as access and place in VLAN 99.",
+        "Administratively shut down the ports."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Protect unused default-VLAN ports: shut them down and/or put as access in an unused black-hole VLAN (e.g., 99). Do not trunk them or EtherChannel them unnecessarily. CDP enable does not protect unused ports. Choose-two cleaned to four options; index kept on access VLAN 99."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 250,
+    "traditional": {
+      "id": 250,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "The service password-encryption command is entered on a router. What is the effect of this configuration?",
+      "alternativas": [
+        "restricts unauthorized users from viewing clear-text passwords in the running configuration",
+        "prevents network administrators from configuring clear-text passwords",
+        "protects the VLAN database from unauthorized PC connections on the switch",
+        "encrypts the password exchange when a VPN tunnel is established"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "service password-encryption applies weak reversible encryption to plain-text passwords in the config so casual viewing of running-config does not show cleartext. It does not block admins from setting passwords, protect VLAN DB, or encrypt VPN tunnels."
+    },
+    "ticket": {
+      "id": 250,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9250 — Auditoria viu senhas em claro no show run. Precisam ofuscar senhas type 7 no arquivo de config.",
+      "cli_output": "R1# show running-config | include password|secret\nenable password Cisco123\nline vty 0 4\n password LabPass\n! service password-encryption não configurado",
+      "alternativas": [
+        "Aplicar service password-encryption para ofuscar senhas em claro na configuração.",
+        "O comando impede admins de configurar senhas novas.",
+        "Ele criptografa túneis VPN IPsec automaticamente.",
+        "Protege o VLAN database do switch via VTP."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "service password-encryption aplica cifra reversível (type 7) a passwords em texto claro no config, dificultando leitura casual. Não é VPN crypto nem VTP protection. enable secret é hashing forte separado para enable."
+    }
+  },
+  {
+    "source_id": 251,
+    "traditional": {
+      "id": 251,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which WPA3 enhancement protects against hackers viewing traffic on the Wi-Fi network?",
+      "alternativas": [
+        "SAE encryption",
+        "TKIP encryption",
+        "scrambled encryption key",
+        "AES encryption"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "WPA3 SAE (Simultaneous Authentication of Equals) improves handshake security vs PSK dictionary attacks and protects better against offline attacks on Wi-Fi. TKIP is legacy. AES is cipher; SAE is the WPA3 enhancement named here."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 252,
+    "traditional": {
+      "id": 252,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of wireless encryption is used for WPA2 in preshared key mode?",
+      "alternativas": [
+        "AES-128",
+        "TKIP with RC4",
+        "AES-256",
+        "RC4"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "WPA2-PSK commonly uses AES-CCMP. Exam banks often list AES-256 as the keyed option even though CCMP is 128-bit AES; TKIP/RC4 are legacy WPA/WEP-era."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 253,
+    "traditional": {
+      "id": 253,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which command prevents passwords from being stored in the configuration as plain text on a router or switch?",
+      "alternativas": [
+        "enable secret",
+        "enable password",
+        "service password-encryption",
+        "username cisco password encrypt"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "service password-encryption obscures plain-text passwords in the configuration file. enable secret uses MD5/modern hashing for the enable password specifically but the item asks about passwords stored as plain text generally—service password-encryption is the direct answer."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 254,
+    "traditional": {
+      "id": 254,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which goal is achieved by the implementation of private IPv4 addressing on a network?",
+      "alternativas": [
+        "provides an added level of protection against Internet exposure",
+        "provides a reduction in size of the forwarding table on network routers",
+        "allows communication across the Internet to other private networks",
+        "allows servers and workstations to communicate across public network boundaries"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Private IPv4 (RFC1918) is not routed on the public Internet, reducing direct exposure. It does not shrink FIB globally, nor enable private-to-private Internet communication without NAT/VPN."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 255,
+    "traditional": {
+      "id": 255,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which type of attack is mitigated by dynamic ARP inspection?",
+      "alternativas": [
+        "DDoS",
+        "malware",
+        "man-in-the-middle",
+        "worm"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Dynamic ARP Inspection mitigates ARP spoofing/poisoning used in man-in-the-middle attacks. Not primarily DDoS/malware/worm defenses."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 256,
+    "traditional": {
+      "id": 256,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a function of a remote access VPN?",
+      "alternativas": [
+        "establishes a secure tunnel between two branch sites",
+        "uses cryptographic tunneling to protect the privacy of data for multiple users simultaneously",
+        "used exclusively when a user is connected to a company's internal network",
+        "allows the users to access company internal network resources through a secure tunnel"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Remote access VPN lets individual users securely reach internal resources over the Internet. Site-to-site connects branches. It is not only for on-prem users."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 257,
+    "traditional": {
+      "id": 257,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What is a practice that protects a network from VLAN hopping attacks?",
+      "alternativas": [
+        "Enable dynamic ARP inspection",
+        "configure an ACL to prevent traffic from changing VLANs",
+        "Change native VLAN to an unused VLAN ID",
+        "Implement port security on internet-facing VLANs"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Changing the native VLAN from default and disabling unused trunking reduces double-tagging VLAN hopping risk. DAI is ARP; ACLs are not the classic hopping fix; port-security helps MAC attacks more than hopping."
+    },
+    "ticket": {
+      "id": 257,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9257 — Segurança pede mitigação de VLAN hopping em trunks com native VLAN 1 default.",
+      "cli_output": "SW1# show interfaces trunk\nPort        Mode         Encapsulation  Status        Native vlan\nGi1/0/24    on           802.1q         trunking      1\n\nSW1# show vlan brief | include 1 | 999\n1    default                          active\n999  BLACKHOLE                        active",
+      "alternativas": [
+        "Alterar native VLAN para VLAN não usada (ex. 999) e alinhar nos dois lados; evitar native 1.",
+        "Só DAI mitiga VLAN hopping double-tag.",
+        "ACL “prevent changing VLANs” é o controle clássico Cisco para hopping.",
+        "Port-security em VLANs de Internet é a mitigação principal de hopping."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Ataques double-tag exploram native VLAN default. Práticas: native VLAN unused, same on both ends, disable unused ports, avoid DTP. DAI/port-security tratam outros vetores."
+    }
+  },
+  {
+    "source_id": 258,
+    "traditional": {
+      "id": 258,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Where does a switch maintain DHCP snooping information?",
+      "alternativas": [
+        "In the CAM table",
+        "In the frame forwarding database",
+        "In the MAC address table",
+        "In the binding database"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "DHCP snooping builds a binding database (MAC/IP/VLAN/port/lease). CAM/MAC table is for L2 forwarding, not DHCP bindings."
+    },
+    "ticket": {
+      "id": 258,
+      "question_type": "ticket",
+      "isPremium": true,
+      "sintoma": "Chamado #9258 — DHCP snooping habilitado; equipe pergunta onde ficam os bindings IP-MAC-porta.",
+      "cli_output": "SW1# show ip dhcp snooping binding\nMacAddress         IpAddress       Lease(sec) Type           VLAN Interface\n------------------ --------------- ---------- -------------  ---- -------------------\n00:11:22:33:44:55  10.10.10.50     86400      dhcp-snooping  10   GigabitEthernet1/0/5\n\nSW1# show mac address-table dynamic vlan 10\nVlan    Mac Address       Type        Ports\n10      0011.2233.4455    DYNAMIC     Gi1/0/5",
+      "alternativas": [
+        "Bindings de DHCP snooping ficam no binding database (show ip dhcp snooping binding).",
+        "Ficam só na CAM table sem base separada.",
+        "Ficam no frame forwarding database de VTP.",
+        "Não há banco; só no MAC address table sem IP."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "DHCP snooping mantém binding database (MAC, IP, lease, VLAN, port). A MAC table é L2 learning separado, sem lease DHCP."
+    }
+  },
+  {
+    "source_id": 259,
+    "traditional": {
+      "id": 259,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "A network administrator must configure SSH for remote access to router R1. The requirement is to use a public and private key pair to encryptmanagement traffic to and from the connecting client. Which configuration, when applied, meets the requirements?",
+      "alternativas": [
+        "R1#enable\nR1#configure terminal\nR1(config)#ip domain-name cisco.com R1(config)#crypto key generate ec keysize 1024",
+        "R1#enable\nR1#configure terminal\nR1(config)#ip domain-name cisco.com R1(config)#crypto key generate ec keysize 2048",
+        "R1#enable\nR1#configure terminal\nR1(config)#ip domain-name cisco.com R1(config)#crypto key encrypt rsa name myKey",
+        "R1#enable\nR1#configure terminal\nR1(config)#ip domain-name cisco.com R1(config)#crypto key generate rsa modulus 1024"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "SSH with RSA: ip domain-name then crypto key generate rsa modulus 1024 (or larger). EC key commands shown are incorrect forms for the classic requirement set."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 260,
+    "traditional": {
+      "id": 260,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "When a WLAN with WPA2 PSK is configured in the Wireless LAN Controller GUI, which format is supported?",
+      "alternativas": [
+        "decimal",
+        "ASCII",
+        "unicode",
+        "base64"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "WLC WPA2-PSK passphrase is entered in ASCII (or hex in some UIs); ASCII is the supported format keyed here. unicode/base64/decimal are not the standard PSK entry formats."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 261,
+    "traditional": {
+      "id": 261,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which security program element involves installing badge readers on data-center doors to allow workers to enter and exit based on their job rofiles?",
+      "alternativas": [
+        "physical access control",
+        "biometrics",
+        "role-based access control",
+        "multifactor authentication"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Badge readers on doors are physical access control. RBAC is logical permissions; biometrics may be a method; MFA is multi-factor authentication broadly."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 262,
+    "traditional": {
+      "id": 262,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which function is performed by DHCP snooping?",
+      "alternativas": [
+        "listens to multicast traffic for packet forwarding",
+        "rate-limits certain traffic",
+        "propagates VLAN information between switches",
+        "provides DDoS mitigation"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "DHCP snooping can rate-limit DHCP messages on untrusted ports and build bindings. It does not do VTP, general multicast forwarding, or full DDoS mitigation."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 263,
+    "traditional": {
+      "id": 263,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which protocol is used for secure remote CLI access?",
+      "alternativas": [
+        "Telnet",
+        "HTTP",
+        "HTTPS",
+        "SSH"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "SSH encrypts remote CLI. Telnet/HTTP are insecure for CLI; HTTPS is web management, not classic CLI."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 264,
+    "traditional": {
+      "id": 264,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "Which implementation provides the strongest encryption combination for the wireless environment?",
+      "alternativas": [
+        "WEP",
+        "WPA + TKIP",
+        "WPA + AES",
+        "WPA2 + AES"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "WPA2 with AES (CCMP) is the strongest combination listed vs WEP, WPA+TKIP, WPA+AES. WPA3 is stronger but not listed."
+    },
+    "ticket": null
+  },
+  {
+    "source_id": 265,
+    "traditional": {
+      "id": 265,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "What does physical access control regulate?",
+      "alternativas": [
+        "access to networking equipment and facilities",
+        "access to servers to prevent malicious activity",
+        "access to specific networks based on business function",
+        "access to computer networks and file systems"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Physical access control regulates entry to facilities and equipment rooms. Logical network/filesystem controls are separate domains."
+    },
+    "ticket": null
+  }
+]

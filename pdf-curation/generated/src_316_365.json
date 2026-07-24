@@ -1,0 +1,702 @@
+[
+  {
+    "id": 316,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Where is the interface between the control plane and data plane within the software-dened architecture?",
+    "alternativas": [
+      "application layer and the management layer",
+      "application layer and the infrastructure layer",
+      "control layer and the application layer",
+      "control layer and the infrastructure layer"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 317,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Why would a network administrator choose to implement automation in a network environment?",
+    "alternativas": [
+      "To simplify the process of maintaining a consistent conguration state across all devices",
+      "To centralize device information storage",
+      "To implement centralized user account management",
+      "To deploy the management plane separately from the rest of the network"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 318,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "In software-dened architecture, which plane handles switching for trac through a Cisco router?",
+    "alternativas": [
+      "control",
+      "data",
+      "management",
+      "application"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 319,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What makes Cisco DNA Center different from traditional network management applications and their management of networks?",
+    "alternativas": [
+      "Its modular design allows the implementation of different versions to meet the specic needs of an organization.",
+      "It only supports auto-discovery of network elements in a greeneld deployment.",
+      "It omits support high availability of management functions when operating in cluster mode.",
+      "It abstracts policy from the actual device conguration."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 320,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which API is used in controller-based architectures to interact with edge devices?",
+    "alternativas": [
+      "southbound",
+      "overlay",
+      "northbound",
+      "underlay"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 321,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What differentiates device management enabled by Cisco DNA Center from traditional campus device management?",
+    "alternativas": [
+      "CLI-oriented device",
+      "centralized",
+      "device-by-device hands-on",
+      "per-device"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 322,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How do servers connect to the network in a virtual environment?",
+    "alternativas": [
+      "a cable connected to a physical switch on the network",
+      "wireless to an access point that is physically connected to the network",
+      "a virtual switch that links to an access point that is physically connected to the network",
+      "a software switch on a hypervisor that is physically connected to the network"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 323,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the function of the controller in a software-dened network?",
+    "alternativas": [
+      "forwarding packets",
+      "multicast replication at the hardware level",
+      "making routing decisions",
+      "fragmenting and reassembling packets"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 324,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function of a southbound API?",
+    "alternativas": [
+      "Use orchestration to provision a virtual server conguration from a web server",
+      "Automate conguration changes between a server and a switching fabric",
+      "Manage ow control between an SDN controller and a switching fabric",
+      "Facilitate the information exchange between an SDN controller and application"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 325,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which script paradigm does Puppet use?",
+    "alternativas": [
+      "recipes and cookbooks",
+      "playbooks and roles",
+      "strings and marionettes",
+      "manifests and modules"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 326,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which set of methods is supported with the REST API?",
+    "alternativas": [
+      "GET, PUT, ERASE, CHANGE",
+      "GET, POST, MOD, ERASE",
+      "GET, PUT, POST, DELETE",
+      "GET, POST, ERASE, CHANGE"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 327,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which technology is appropriate for communication between an SDN controller end applications running over the network?",
+    "alternativas": [
+      "Southbound API",
+      "REST API",
+      "NETCONF",
+      "OpenFlow"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 328,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the function of `off-the-shelf` switches in a controller-based network?",
+    "alternativas": [
+      "setting packet-handling policies",
+      "forwarding packets",
+      "providing a central view of the deployed network",
+      "making routing decisions"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 329,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which REST method updates an object in the Cisco DNA Center Intent API?",
+    "alternativas": [
+      "CHANGE",
+      "UPDATE",
+      "POST",
+      "PUT"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 330,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which denition describes JWT in regard to REST API security?",
+    "alternativas": [
+      "an encrypted JSON token that is used for authentication",
+      "an encrypted JSON token that is used for authorization",
+      "an encoded JSON token that is used to securely exchange information",
+      "an encoded JSON token that is used for authentication"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 331,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which communication interaction takes place when a southbound API is used?",
+    "alternativas": [
+      "between the SDN controller and PCs on the network",
+      "between the SDN controller and switches and routers on the network",
+      "between the SDN controller and services and applications on the network",
+      "between network applications and switches and routers on the network"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 332,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is an expected outcome when network management automation is deployed?",
+    "alternativas": [
+      "A distributed management plane must be use",
+      "B. Complexity increases when new device congurations are adde",
+      "C. Custom applications are needed to congure network devices.",
+      "Software upgrades are performed from a central controller."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 333,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which HTTP status code is returned after a successful REST API request?",
+    "alternativas": [
+      "200",
+      "301",
+      "404",
+      "500"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 334,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "With REST API, which standard HTTP header tells a server which media type is expected by the client?",
+    "alternativas": [
+      "Accept-Encoding: gzip. deate",
+      "Accept-Patch: text/example; charset=utf-8",
+      "Content-Type: application/json; charset=utf-8",
+      "Accept: application/json"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 335,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the purpose of the Cisco DNA Center controller?",
+    "alternativas": [
+      "to securely manage and deploy network devices",
+      "to scan a network and generate a Layer 2 network diagram",
+      "to secure physical access to a data center",
+      "to provide Layer 3 services to autonomous access points"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 336,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the function of the controller in a software-dened network?",
+    "alternativas": [
+      "forwarding packets",
+      "multicast replication at the hardware level",
+      "setting packet-handling policies",
+      "fragmenting and reassembling packets"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 337,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which statement identies the functionality of virtual machines?",
+    "alternativas": [
+      "Virtualized servers run most eciently when they are physically connected to a switch that is separate from the hypervisor",
+      "The hypervisor can virtualize physical components including CPU, memory, and storage",
+      "Each hypervisor can support a single virtual machine and a single software switch",
+      "The hypervisor communicates on Layer 3 without the need for additional resources"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 338,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which network plane is centralized and manages routing decisions?",
+    "alternativas": [
+      "management plane",
+      "data plane",
+      "policy plane",
+      "control plane"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 339,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a benet of using private IPv4 addressing?",
+    "alternativas": [
+      "Multiple companies can use the same addresses without conicts.",
+      "Direct connectivity is provided to internal hosts from outside an enterprise network.",
+      "Communication to the internet is reachable without the use of NAT.",
+      "All external hosts are provided with secure communication to the internet."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 340,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which element of a virtualization solution manages virtualized services and enables connections between virtualized services and externalinterfaces?",
+    "alternativas": [
+      "software",
+      "network functionality",
+      "virtual machine",
+      "hardware"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 341,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which group of channels in the 802.11b/gin/ac/ax 2.4 GHz frequency bands are nonoverlapping channels?",
+    "alternativas": [
+      "channels 1, 5, and 10",
+      "channels 1, 6, and 11",
+      "channels 1, 5, and 11",
+      "channels 1, 6, and 10"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 342,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function of Layer 3 switches?",
+    "alternativas": [
+      "They route trac between devices in different VLANs.",
+      "They transmit broadcast trac when operating in Layer 3 mode exclusively.",
+      "They move frames between endpoints limited to IP addresses.",
+      "They forward Ethernet frames between VLANs using only MAC addresses,"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 343,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which cable type must be used to interconnect one switch using 1000 BASE-SX GBIC modules and another switch using 1000 BASE-SX SFPmodules?",
+    "alternativas": [
+      "LC to SC",
+      "SC to SC",
+      "LC to LC",
+      "SC to ST"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 344,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a benet of a point-to-point leased line?",
+    "alternativas": [
+      "low cost",
+      "full-mesh capability",
+      "simplicity of conguration",
+      "exibility of design"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 345,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the role of nonoverlapping channels in a wireless environment?",
+    "alternativas": [
+      "to increase bandwidth",
+      "to stabilize the RF environment",
+      "to allow for channel bonding",
+      "to reduce interference"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 346,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the purpose of the service-set identier?",
+    "alternativas": [
+      "It identies the wireless network to which an application must connect.",
+      "It identies the wired network to which a network device is connecte",
+      "C. It identies the wired network to which a user device is connecte",
+      "D. It identies a wireless network for a mobile device to connect."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 347,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which is a fact related to FTP?",
+    "alternativas": [
+      "It always operates without user authentication.",
+      "It uses block numbers to identify and mitigate data-transfer errors.",
+      "It uses two separate connections for control and data tra",
+      "D. It relies on the well-known UDP port 69."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 348,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "How do UTP and STP cables compare?",
+    "alternativas": [
+      "UTP cables provide faster and more reliable data transfer rates and STP cables are slower and less reliable.",
+      "STP cables are shielded and protect against electromagnetic interference and UTP lacks the same protection against electromagneticinterference.",
+      "STP cables are cheaper to procure and easier to install and UTP cables are more expensive and harder to install.",
+      "UTP cables are less prone to crosstalk and interference and STP cables are more prone to crosstalk and interference."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 349,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which technology allows for multiple operating systems to be run on a single host computer?",
+    "alternativas": [
+      "virtual routing and forwarding",
+      "virtual device contexts",
+      "network port ID virtualization",
+      "server virtualization"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 350,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Why would an administrator choose to implement an automated network management solution?",
+    "alternativas": [
+      "to reduce operational costs",
+      "to support simpler password policies",
+      "to enable “box by box” conguration and deployment",
+      "to limit recurrent management costs"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 351,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function of the core and distribution layers in a collapsed-core architecture?",
+    "alternativas": [
+      "The router can support HSRP for Layer 2 redundancy in an IPv6 network.",
+      "The core and distribution layers are deployed on two different devices to enable failover.",
+      "The router operates on a single device or a redundant pair.",
+      "The router must use IPv4 and IPv6 addresses at Layer 3."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 352,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What must be considered before deploying virtual machines?",
+    "alternativas": [
+      "resource limitations, such as the number of CPU cores and the amount of memory",
+      "support for physical peripherals, such as monitors, keyboards, and mice",
+      "whether to leverage VSM to map multiple virtual processors to two or more virtual machines",
+      "location of the virtual machines within the data center environment"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 353,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a link-local all-nodes IPv6 multicast address?",
+    "alternativas": [
+      "ff02:0:0:0:0:0:0:1",
+      "2004:33c:94d9:431e:255::",
+      "fffe:034:0dd:45d6:789e::",
+      "fe80:4433:034:0dd::2"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 354,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which is a reason to implement IPv4 private addressing?",
+    "alternativas": [
+      "Comply with PCI regulations.",
+      "Reduce the size of the forwarding table on network routers.",
+      "Reduce the risk of a network security breach.",
+      "Comply with local law."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 355,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which signal frequency appears 60 times per minute?",
+    "alternativas": [
+      "1 Hz signal",
+      "1 GHz signal",
+      "60 Hz signal",
+      "60 GHz signal"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 356,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function of spine-and-leaf architecture?",
+    "alternativas": [
+      "offers predictable latency of the trac path between end devices",
+      "mitigates oversubscription by adding a layer of leaf switches",
+      "exclusively sends multicast trac between servers that are directly connected to the spine",
+      "limits payload size of trac within the leaf layer"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 357,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function of an endpoint?",
+    "alternativas": [
+      "It passes unicast communication between hosts in a network.",
+      "It transmits broadcast trac between devices in the same VLAN.",
+      "It provides security between trusted and untrusted sections of the network.",
+      "It is used directly by an individual user to access network services."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 358,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function of MAC address learning?",
+    "alternativas": [
+      "It is disabled by default on all interfaces connected to trunks.",
+      "It increases security on the management VLAN.",
+      "It is enabled by default on all VLANs and interfaces.",
+      "It increases the potential for MAC address ooding."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 359,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which IPv6 address range is suitable for anycast addresses for distributed services such as DHCP or DNS?",
+    "alternativas": [
+      "FF00:1/12",
+      "2001:db8:0234:ca3e::1/128",
+      "FE80::1/10",
+      "2002:db84:3f30:ca84:be76:2/64"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 360,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a similarity between OM3 and OM4 ber optic cable?",
+    "alternativas": [
+      "Both have a 62.5 micron core diameter.",
+      "Both have a 100 micron core diameter.",
+      "Both have a 50 micron core diameter.",
+      "Both have a 9 micron core diameter."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 361,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which device segregates a network into separate zones that have their own security policies?",
+    "alternativas": [
+      "IPS",
+      "switch",
+      "access point",
+      "rewall"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 362,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the primary purpose of private address space?",
+    "alternativas": [
+      "limit the number of nodes reachable via the Internet",
+      "simplify the addressing in the network",
+      "conserve globally unique address space",
+      "reduce network complexity"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 363,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a characteristic of a collapsed-core network topology?",
+    "alternativas": [
+      "It enables all workstations in a SOHO environment to connect on a single switch with internet access.",
+      "It enables the core and access layers to connect to one logical distribution device over an EtherChannel.",
+      "It allows wireless devices to connect directly to the core layer, which enables faster data transmission.",
+      "It allows the core and distribution layers to run as a single combined layer."
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 364,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the functionality of the Cisco DNA Center?",
+    "alternativas": [
+      "IP address pool distribution scheduler",
+      "data center network policy controller",
+      "console server that permits secure access to all network devices",
+      "software-dened controller for automation of devices and services"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 365,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which functionality is provided by the console connection on a Cisco WLC?",
+    "alternativas": [
+      "HTTP-based GUI connectivity",
+      "secure in-band connectivity for device administration",
+      "out-of-band management",
+      "unencrypted in-band connectivity for le transfers"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  }
+]

@@ -1,0 +1,492 @@
+[
+  {
+    "id": 201,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network engineer must back up 20 network router congurations globally within a customer environment. Which protocol allows the engineer toperform this function using the Cisco IOS MIB?",
+    "alternativas": [
+      "ARP",
+      "SNMP",
+      "SMTP",
+      "CDP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 202,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which command enables a router to become a DHCP client?",
+    "alternativas": [
+      "ip address dhcp",
+      "ip dhcp client",
+      "ip helper-address",
+      "ip dhcp pool"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 203,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which function does an SNMP agent perform?",
+    "alternativas": [
+      "It sends information about MIB variables in response to requests from the NMS",
+      "It manages routing between Layer 3 devices in a network",
+      "It coordinates user authentication between a network device and a TACACS+ or RADIUS server",
+      "It requests information from remote network nodes about catastrophic system events"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 204,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which command must be entered when a device is congured as an NTP server?",
+    "alternativas": [
+      "ntp peer",
+      "ntp master",
+      "ntp authenticate",
+      "ntp server"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 205,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What event has occurred if a router sends a notice level message to a syslog server?",
+    "alternativas": [
+      "A certicate has expired",
+      "An interface line has changed status",
+      "A TCP connection has been torn down",
+      "An ICMP connection has been built"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 206,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the primary purpose of a First Hop Redundancy Protocol?",
+    "alternativas": [
+      "It allows directly connected neighbors to share conguration information",
+      "It reduces routing failures by allowing Layer 3 load balancing between OSPF neighbors that have the same link metric",
+      "It allows a router to use bridge priorities to create multiple loop-free paths to a single destination",
+      "It reduces routing failures by allowing more than one router to represent itself as the default gateway of a network"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 207,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer is conguring NAT to translate the source subnet of 10.10.0.0/24 to any one of three addresses: 192.168.3.1, 192.168.3.2, or192.168.3.3. Which conguration should be used?",
+    "alternativas": [
+      "enable congure terminal ip nat pool mypool 192.168.3.1 192.168.3.3 prex-length 30 access-list 1 permit 10.10.0.0 0.0.0.255 ip natoutside destination list 1 pool mypool interface g1/1 ip nat inside interface g1/2 ip nat outside",
+      "enable congure terminal ip nat pool mypool 192.168.3.1 192.168.3.3 prex-length 30 access-list 1 permit 10.10.0.0 0.0.0.254 ip nat insidesource list 1 pool mypool interface g1/1 ip nat inside interface g1/2 ip nat outside",
+      "enable congure terminal ip nat pool mypool 192.168.3.1 192.168.3.3 prex-length 30 route map permit 10.10.0.0 255.255.255.0 ip natoutside destination list 1 pool mypool interface g1/1 ip nat inside interface g1/2 ip nat outside",
+      "enable congure terminal ip nat pool mypool 192.168.3.1 192.168.3.3 prex-length 30 access-list 1 permit 10.10.0.0 0.0.0.255 ip nat insidesource list 1 pool mypool interface g1/1 ip nat inside interface g1/2 ip nat outside"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 208,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "When the active router in an HSRP group fails, which router assumes the role and forwards packets?",
+    "alternativas": [
+      "forwarding",
+      "listening",
+      "standby",
+      "backup"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 209,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What protocol allows an engineer to back up 20 network router congurations globally while using the copy function?",
+    "alternativas": [
+      "TCP",
+      "SMTP",
+      "FTP",
+      "SNMP"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 210,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which keyword in a NAT conguration enables the use of one outside IP address for multiple inside hosts?",
+    "alternativas": [
+      "source",
+      "static",
+      "pool",
+      "overload"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 211,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which feature or protocol determines whether the QOS on the network is sucient to support IP services?",
+    "alternativas": [
+      "LLDP",
+      "CDP",
+      "IP SLA",
+      "EEM"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 212,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the purpose of trac shaping?",
+    "alternativas": [
+      "to be a marking mechanism that identies different ows",
+      "to provide fair queuing for buffered ows",
+      "to mitigate delays over slow links",
+      "to limit the bandwidth that a ow can use"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 213,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a function of TFTP in network operations?",
+    "alternativas": [
+      "transfers IOS images from a server to a router for rmware upgrades",
+      "transfers a backup conguration le from a server to a switch using a username and password",
+      "transfers conguration les from a server to a router on a congested link",
+      "transfers les between le systems on a router"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 214,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Where does the conguration reside when a helper address is congured lo support DHCP?",
+    "alternativas": [
+      "on the router closest to the server",
+      "on the router closest to the client",
+      "on every router along the path",
+      "on the switch trunk interface"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 215,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What facilitates a Telnet connection between devices by entering the device name?",
+    "alternativas": [
+      "SNMP",
+      "DNS lookup",
+      "syslog",
+      "NTP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 216,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer is installing a new wireless printer with a static IP address on the Wi-Fi network. Which feature must be enabled and congured toprevent connection issues with the printer?",
+    "alternativas": [
+      "client exclusion",
+      "DHCP address assignment",
+      "passive client",
+      "static IP tunneling"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 217,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "When a client and server are not on the same physical network, which device is used to forward requests and replies between client and server forDHCP?",
+    "alternativas": [
+      "DHCPOFFER",
+      "DHCP relay agent",
+      "DHCP server",
+      "DHCPDISCOVER"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 218,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which protocol requires authentication to transfer a backup conguration le from a router to a remote server?",
+    "alternativas": [
+      "FTP",
+      "SMTP",
+      "TFTP",
+      "DTP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 219,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which condition must be met before an NMS handles an SNMP trap from an agent?",
+    "alternativas": [
+      "The NMS must receive the same trap from two different SNMP agents to verify that it is reliable.",
+      "The NMS must receive a trap and an inform message from the SNMP agent within a congured interval.",
+      "The NMS software must be loaded with the MIB associated with the trap.",
+      "The NMS must be congured on the same router as the SNMP agent."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 220,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer is conguring switch SW1 to act as an NTP server when all upstream NTP server connectivity fails. Which conguration must beused?",
+    "alternativas": [
+      "SW1# cong t SW1(cong)#ntp peer 192.168.1.1 SW1(cong)#ntp access-group peer accesslist1",
+      "SW1# cong t SW1(cong)#ntp master SW1(cong)#ntp server192.168.1.1",
+      "SW1# cong t SW1(cong)#ntp backup SW1(cong)#ntp server192.168.1.1",
+      "SW1# cong t SW1(cong)#ntp server192.168.1.1 SW1(cong)#ntp access-group peer accesslist1"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 221,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network administrator must enable DHCP services between two sites. What must be congured for the router to pass DHCPDISCOVERmessages on to the server?",
+    "alternativas": [
+      "DHCP Binding",
+      "a DHCP Relay Agent",
+      "DHCP Snooping",
+      "a DHCP Pool"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 222,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which level of severity must be set to get informational syslogs?",
+    "alternativas": [
+      "alert",
+      "critical",
+      "notice",
+      "debug"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 223,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "On workstations running Microsoft Windows, which protocol provides the default gateway for the device?",
+    "alternativas": [
+      "STP",
+      "DHCP",
+      "SNMP",
+      "DNS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 224,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which command implies the use of SNMPv3?",
+    "alternativas": [
+      "snmp-server user",
+      "snmp-server host",
+      "snmp-server enable traps",
+      "snmp-server community"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 225,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "R1 as an NTP server must have:✑ NTP authentication enabled✑ NTP packets sourced from Interface loopback 0✑ NTP stratum 2✑ NTP packets only permitted to client IP 209.165.200.225How should R1 be congured?",
+    "alternativas": [
+      "ntp authenticate ntp authentication-key 2 sha1 CISCO123 ntp source Loopback0 ntp access-group server-only 10 ntp master 2 ! access-list10 permit udp host 209.165.200.225 any eq 123",
+      "ntp authenticate ntp authentication-key 2 md5 CISCO123 ntp interface Loopback0 ntp access-group server-only 10 ntp stratum 2 ! access-list 10 permit 209.165.200.225",
+      "ntp authenticate ntp authentication-key 2 md5 CISCO123 ntp source Loopback0 ntp access-group server-only 10 ntp master 2 ! access-list10 permit 209.165.200.225",
+      "ntp authenticate ntp authentication-key 2 md5 CISCO123 ntp source Loopback0 ntp access-group server-only 10 ntp stratum 2 ! access-list10 permit udp host 209.165.200.225 any eq 123"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 226,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network engineer is conguring a switch so that it is remotely reachable via SSH. The engineer has already congured the host name on therouter. Which additional command must the engineer congure before entering the command to generate the RSA key?",
+    "alternativas": [
+      "password password",
+      "ip ssh authentication-retries 2",
+      "ip domain-name domain",
+      "crypto key generate rsa modulus 1024"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 227,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which QoS trac handling technique retains excess packets in a queue and reschedules these packets for later transmission when the conguredmaximum bandwidth has been surpassed?",
+    "alternativas": [
+      "trac policing",
+      "weighted random early detection",
+      "trac prioritization",
+      "trac shaping"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 228,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which command must be entered to congure a DHCP relay?",
+    "alternativas": [
+      "ip dhcp relay",
+      "ip dhcp pool",
+      "ip address dhcp",
+      "ip helper-address"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 229,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A network analyst is tasked with conguring the date and time on a router using EXEC mode. The date must be set to January 1, 2020 and thetime must be set to12:00 am. Which command should be used?",
+    "alternativas": [
+      "clock timezone",
+      "clock summer-time date",
+      "clock summer-time recurring",
+      "clock set"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 230,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which command creates a static NAT binding for a PC address of 10.1.1.1 to the public routable address 209.165.200.225 assigned to the PC?",
+    "alternativas": [
+      "R1(cong)#ip nat inside source static 10.1.1.1 209.165.200.225",
+      "R1(cong)#ip nat outside source static 209.165.200.225 10.1.1.1",
+      "R1(cong)#ip nat inside source static 209.165.200.225 10.1.1.1",
+      "R1(cong)#ip nat outside source static 10.1.1.1 209.165.200.225"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 231,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What prevents a workstation from receiving a DHCP address?",
+    "alternativas": [
+      "STP",
+      "VTP",
+      "802.1Q",
+      "DTP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 232,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is a feature of TFTP?",
+    "alternativas": [
+      "offers anonymous user login ability",
+      "uses two separate connections for control and data trac",
+      "relies on the well-known TCP port 20 to transmit data",
+      "provides secure data transfer"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 233,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Which QoS forwarding per-hop behavior changes a specic value in a packet header to set the class of service for the packet?",
+    "alternativas": [
+      "shaping",
+      "classication",
+      "policing",
+      "marking"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 234,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "What is the purpose of the ip address dhcp command?",
+    "alternativas": [
+      "to congure an interface as a DHCP relay",
+      "to congure an interface as a DHCP client",
+      "to congure an interface as a DHCP helper",
+      "to congure an interface as a DHCP server"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  },
+  {
+    "id": 235,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "An engineer is conguring SSH version 2 exclusively on the R1 router. What is the minimum conguration required to permit remote managementusing the cryptographic protocol?",
+    "alternativas": [
+      "hostname R1 service password-encryption crypto key generate rsa general-keys modulus 1024 username cisco privilege 15 password 0cisco123 ip ssh version 2 line vty 0 15 transport input ssh login local",
+      "hostname R1 ip domain name cisco crypto key generate rsa general-keys modulus 1024 username cisco privilege 15 password 0 cisco123ip ssh version 2 line vty 0 15 transport input ssh login local",
+      "hostname R1 crypto key generate rsa general-keys modulus 1024 username cisco privilege 15 password 0 cisco123 ip ssh version 2 line vty0 15 transport input ssh login local",
+      "hostname R1 ip domain name cisco crypto key generate rsa general-keys modulus 1024 username cisco privilege 15 password 0 cisco123ip ssh version 2 line vty 0 15 transport input all login local"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ""
+  }
+]

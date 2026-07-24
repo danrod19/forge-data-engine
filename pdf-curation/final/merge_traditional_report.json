@@ -1,0 +1,52 @@
+{
+  "inputs": {
+    "enriched": 511,
+    "recovered": 184,
+    "concatenated": 695
+  },
+  "dedupe": {
+    "duplicates_removed": 110,
+    "quality_rejected": {
+      "alts": 0,
+      "answer_idx": 0,
+      "expl_short": 0,
+      "banned": 0,
+      "no_enunciado": 0,
+      "missing": 0
+    }
+  },
+  "total_before_dedupe": 695,
+  "total_final": 585,
+  "invalid_after_reindex": 0,
+  "output": "C:\\Users\\maria\\Desktop\\ccna\\pdf-curation\\final\\questions_traditional_FINAL.json",
+  "examples": [
+    {
+      "id": 1,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "How do TCP and UDP differ in the way that they establish a connection between two endpoints?",
+      "alternativas": [
+        "TCP uses the three-way handshake, and UDP does not guarantee message delivery.",
+        "TCP uses synchronization packets, and UDP uses acknowledgment packets.",
+        "UDP provides reliable message transfer, and TCP is a connectionless protocol.",
+        "UDP uses SYN, SYN ACK, and FIN bits in the frame header while TCP uses SYN, SYN ACK, and ACK bits."
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "TCP is connection-oriented: before data transfer it completes a three-way handshake (SYN → SYN-ACK → ACK) so both endpoints agree on sequence numbers and readiness. UDP is connectionless and sends datagrams without a setup phase or delivery guarantee. Option B is incomplete and misleading — UDP does not use ACK packets for transport reliability. Option C reverses the roles: UDP is unreliable/connectionless; TCP is reliable/connection-oriented. Option D confuses layers and protocols: SYN/FIN/ACK are TCP segment flags in the transport header, not UDP frame bits, and UDP does not implement that handshake."
+    },
+    {
+      "id": 2,
+      "question_type": "traditional",
+      "isPremium": true,
+      "enunciado": "In which way does a spine-and-leaf architecture allow for scalability in a network when additional access ports are required?",
+      "alternativas": [
+        "A spine switch and a leaf switch can be added with redundant connections between them.",
+        "A spine switch can be added with at least 40 GB uplinks.",
+        "A leaf switch can be added with connections to every spine switch.",
+        "A leaf switch can be added with a single connection to a core spine switch."
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "In a spine-and-leaf fabric, every leaf connects to every spine. To add access ports you deploy a new leaf and uplink it to all spines, preserving equal-cost multipath and predictable east-west latency. Adding only a spine does not by itself create new access ports for endpoints. A single uplink from leaf to one spine breaks the full-mesh leaf-to-spine design and creates a bottleneck/single path. Fixed uplink speeds (e.g. 40 Gbps) are a capacity choice, not the scalability mechanism when you need more edge ports."
+    }
+  ]
+}

@@ -41,6 +41,8 @@ interface AnswerRecord {
 
 interface SimuladoModeProps {
   lives: number;
+  /** Conta PRO: desbloqueia explicações sem blur */
+  isPro?: boolean;
   onWrongAnswer: () => void;
   disabled: boolean;
   onUpgrade: () => void;
@@ -54,6 +56,7 @@ function formatTime(totalSeconds: number): string {
 
 export function SimuladoMode({
   lives,
+  isPro = false,
   onWrongAnswer,
   disabled,
   onUpgrade,
@@ -599,7 +602,7 @@ export function SimuladoMode({
             {hasDeepExplanation(question) && (
               <Explicacao
                 text={question.explicacao_profunda!}
-                isPremium={question.isPremium}
+                isPremium={question.isPremium && !isPro}
                 isCorrect={!!isCorrect}
                 onUpgrade={onUpgrade}
               />

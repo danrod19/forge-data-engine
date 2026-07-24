@@ -18,7 +18,17 @@ export interface Question {
   explicacao_profunda?: string;
 }
 
-export type NavTab = "trilha" | "simulado" | "estudo" | "sobre";
+export type NavTab =
+  | "home"
+  | "trilha"
+  | "simulado"
+  | "estudo"
+  | "sobre"
+  | "conta";
+
+/** E-mail de suporte / contato do produto */
+export const CONTACT_EMAIL = "ccnaforge19@gmail.com";
+export const CONTACT_MAILTO = `mailto:${CONTACT_EMAIL}`;
 
 /** Prompt principal da questão (enunciado ou sintoma) */
 export function getQuestionPrompt(q: Question): string {

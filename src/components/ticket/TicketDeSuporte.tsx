@@ -27,6 +27,8 @@ import {
 interface TicketDeSuporteProps {
   questions: Question[];
   lives: number;
+  /** Conta PRO: desbloqueia explicações sem blur */
+  isPro?: boolean;
   onWrongAnswer: () => void;
   onUpgrade: () => void;
   disabled: boolean;
@@ -36,17 +38,21 @@ interface TicketDeSuporteProps {
   onNewSession?: () => void;
   /** Voltar para outro modo (ex.: Sobre / home) */
   onExit?: () => void;
+  /** Sessão ainda montando / shuffle pós-hydration */
+  loading?: boolean;
 }
 
 export function TicketDeSuporte({
   questions,
   lives,
+  isPro = false,
   onWrongAnswer,
   onUpgrade,
   disabled,
   bankSize,
   onNewSession,
   onExit,
+  loading = false,
 }: TicketDeSuporteProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -122,6 +128,31 @@ export function TicketDeSuporte({
     handleRestartLocal();
   };
 
+  if (loading) {
+    return (
+      <div className="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+        <div className="flex items-center gap-2">
+          <div className="size-8 animate-pulse rounded-lg bg-slate-800" />
+          <div className="h-3 w-32 animate-pulse rounded bg-slate-800" />
+        </div>
+        <div className="h-4 w-full animate-pulse rounded bg-slate-800/80" />
+        <div className="h-4 w-3/4 animate-pulse rounded bg-slate-800/60" />
+        <div className="mt-2 h-28 animate-pulse rounded-xl border border-slate-800 bg-slate-950/50" />
+        <div className="space-y-2 pt-1">
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-11 animate-pulse rounded-xl bg-slate-800/50"
+            />
+          ))}
+        </div>
+        <p className="pt-1 text-center font-mono text-[10px] text-slate-600">
+          $ shuffle --tickets …
+        </p>
+      </div>
+    );
+  }
+
   if (!question || total === 0) {
     return (
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 text-center text-sm text-slate-400">
@@ -163,7 +194,7 @@ export function TicketDeSuporte({
             </span>
           </div>
           <p className="mt-2 text-xs text-slate-500">
-            Vidas restantes: {lives}
+            Vidas restantes: {isPro ? "∞" : lives}
             {typeof bankSize === "number" && bankSize > 0 && (
               <> · Banco: {bankSize} tickets</>
             )}
@@ -429,7 +460,7 @@ export function TicketDeSuporte({
             {showExplanation && (
               <Explicacao
                 text={question.explicacao_profunda!}
-                isPremium={question.isPremium}
+                isPremium={question.isPremium && !isPro}
                 isCorrect={!!isCorrect}
                 onUpgrade={onUpgrade}
               />

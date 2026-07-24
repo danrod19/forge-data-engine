@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CCNA_DOMAINS, domainAccentClasses } from "@/data/domains";
+import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/types/question";
 
 const fadeUp = {
   initial: { opacity: 0, y: 10 },
@@ -278,6 +279,19 @@ export function SobreProva() {
           </p>
         </div>
       </Section>
+
+      {/* Contato */}
+      <section className="rounded-xl border border-slate-800/90 bg-slate-900/50 p-4">
+        <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+          contato
+        </p>
+        <a
+          href={CONTACT_MAILTO}
+          className="mt-1.5 inline-block font-mono text-sm text-neon-cyan underline-offset-2 hover:underline"
+        >
+          {CONTACT_EMAIL}
+        </a>
+      </section>
 
       <p className="pb-2 text-center text-[10px] text-slate-600">
         Conteúdo educacional · confira sempre o exam topics oficial da Cisco

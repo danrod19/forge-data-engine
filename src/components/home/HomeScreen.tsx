@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Map,
@@ -18,11 +19,14 @@ import { Button } from "@/components/ui/button";
 import { CONTACT_EMAIL, CONTACT_MAILTO, type NavTab } from "@/types/question";
 import { TOTAL_TICKETS } from "@/data/tickets";
 import { TOTAL_SIMULADO_QUESTIONS } from "@/data/simulado-questions";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { ProPlans, TrialButton } from "@/components/pro/ProPlans";
 
 interface HomeScreenProps {
   isPro: boolean;
   onNavigate: (tab: NavTab) => void;
   onUpgrade: () => void;
+  onAuthClick?: () => void;
 }
 
 const howToCards: {
@@ -67,7 +71,28 @@ const howToCards: {
   },
 ];
 
-export function HomeScreen({ isPro, onNavigate, onUpgrade }: HomeScreenProps) {
+export function HomeScreen({
+  isPro,
+  onNavigate,
+  onUpgrade,
+  onAuthClick,
+}: HomeScreenProps) {
+  const { user, trialAvailable, startTrial } = useAuth();
+  const [trialLoading, setTrialLoading] = useState(false);
+  const [trialError, setTrialError] = useState<string | null>(null);
+
+  const handleTrial = async () => {
+    if (!user) {
+      onAuthClick?.();
+      return;
+    }
+    setTrialLoading(true);
+    setTrialError(null);
+    const { error } = await startTrial();
+    if (error) setTrialError(error);
+    setTrialLoading(false);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -144,7 +169,7 @@ export function HomeScreen({ isPro, onNavigate, onUpgrade }: HomeScreenProps) {
                 <span
                   className={`flex size-10 shrink-0 items-center justify-center rounded-lg border ${card.accent}`}
                 >
-                  <Icon className="size-4.5" />
+                  <Icon className="size-4" />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-2">
@@ -166,7 +191,7 @@ export function HomeScreen({ isPro, onNavigate, onUpgrade }: HomeScreenProps) {
         </div>
       </section>
 
-      {/* Free vs PRO */}
+      {/* Free vs PRO + planos */}
       <section className="grid gap-2.5 sm:grid-cols-2">
         <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
           <div className="mb-2 flex items-center gap-2">
@@ -196,7 +221,7 @@ export function HomeScreen({ isPro, onNavigate, onUpgrade }: HomeScreenProps) {
             <li className="flex items-center gap-1.5">
               <Zap className="size-3 text-amber-400" /> Explicações sem blur
             </li>
-            <li>› Diagnósticos e labs liberados</li>
+            <li>› Trial 24h (1x por conta)</li>
           </ul>
           {!isPro && (
             <Button
@@ -205,11 +230,35 @@ export function HomeScreen({ isPro, onNavigate, onUpgrade }: HomeScreenProps) {
               className="relative mt-3 h-9 w-full overflow-hidden border-0 text-xs font-bold text-slate-950"
             >
               <span className="gold-gradient absolute inset-0" />
-              <span className="relative">Upgrade PRO</span>
+              <span className="relative">Ver planos PRO</span>
             </Button>
           )}
         </div>
       </section>
+
+      {!isPro && (
+        <section className="space-y-3 rounded-xl border border-amber-500/20 bg-slate-900/50 p-4">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-amber-400/80">
+            planos pro
+          </p>
+          {user && trialAvailable && (
+            <div className="space-y-2">
+              <TrialButton onStart={handleTrial} loading={trialLoading} />
+              {trialError && (
+                <p className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 font-mono text-[11px] text-rose-300">
+                  ! {trialError}
+                </p>
+              )}
+            </div>
+          )}
+          {!user && (
+            <p className="text-[12px] text-slate-400">
+              Faça login para ativar o trial grátis de 24h (1x por conta).
+            </p>
+          )}
+          <ProPlans />
+        </section>
+      )}
 
       {/* Contato */}
       <section className="rounded-xl border border-slate-800/90 bg-slate-900/50 p-4">

@@ -1,6 +1,7 @@
 "use client";
 
-import { Crown, Heart, Infinity, Clock, Zap, Terminal } from "lucide-react";
+import { useState } from "react";
+import { Crown, Heart, Infinity, Clock, Zap, Terminal, LogIn } from "lucide-react";
 import { motion } from "framer-motion";
 import {
   Dialog,
@@ -10,11 +11,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { ProPlans, TrialButton } from "@/components/pro/ProPlans";
 
 interface PaywallModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   reason: "lives" | "upgrade";
+  onAuthClick?: () => void;
 }
 
 const features = [
@@ -23,13 +27,32 @@ const features = [
   { icon: Clock, label: "Diagnósticos CLI ilimitados" },
 ];
 
-export function PaywallModal({ open, onOpenChange, reason }: PaywallModalProps) {
+export function PaywallModal({
+  open,
+  onOpenChange,
+  reason,
+  onAuthClick,
+}: PaywallModalProps) {
+  const { user, isProEfetivo, trialAvailable, startTrial } = useAuth();
+  const [trialLoading, setTrialLoading] = useState(false);
+  const [trialError, setTrialError] = useState<string | null>(null);
   const isLives = reason === "lives";
+
+  const handleTrial = async () => {
+    setTrialLoading(true);
+    setTrialError(null);
+    const { error } = await startTrial();
+    setTrialLoading(false);
+    if (error) {
+      setTrialError(error);
+      return;
+    }
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[min(100vw-2rem,24rem)] gap-0 overflow-hidden border-slate-700/80 bg-[#0a0f1a] p-0 shadow-2xl shadow-neon-green/5 sm:max-w-md">
-        {/* Terminal-style top chrome */}
+      <DialogContent className="max-h-[min(90dvh,40rem)] max-w-[min(100vw-2rem,24rem)] gap-0 overflow-y-auto border-slate-700/80 bg-[#0a0f1a] p-0 shadow-2xl shadow-neon-green/5 sm:max-w-md">
         <div className="flex items-center gap-2 border-b border-slate-800 bg-slate-950/90 px-3 py-2">
           <span className="size-2.5 rounded-full bg-[#ff5f57]" />
           <span className="size-2.5 rounded-full bg-[#febc2e]" />
@@ -42,8 +65,7 @@ export function PaywallModal({ open, onOpenChange, reason }: PaywallModalProps) 
 
         <div className="gold-gradient h-0.5 w-full opacity-80" />
 
-        <div className="relative p-6">
-          {/* Grid bg */}
+        <div className="relative p-5 sm:p-6">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 opacity-40"
@@ -79,12 +101,12 @@ export function PaywallModal({ open, onOpenChange, reason }: PaywallModalProps) 
 
             <DialogDescription className="text-sm leading-relaxed text-slate-400">
               {isLives
-                ? "Assine o PRO para vidas infinitas ou aguarde 4 horas para recuperar."
-                : "Acesse explicações profundas, diagnósticos detalhados e vidas infinitas."}
+                ? "Ative o PRO (trial ou plano) para vidas infinitas, ou aguarde para recuperar."
+                : "Trial de 24h ou planos por período — explicações sem blur e vidas infinitas."}
             </DialogDescription>
           </DialogHeader>
 
-          <ul className="relative mt-5 space-y-2">
+          <ul className="relative mt-4 space-y-2">
             {features.map(({ icon: Icon, label }, i) => (
               <motion.li
                 key={label}
@@ -100,27 +122,49 @@ export function PaywallModal({ open, onOpenChange, reason }: PaywallModalProps) 
             ))}
           </ul>
 
-          <div className="relative mt-6 flex flex-col gap-2">
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                type="button"
-                className="relative h-11 w-full overflow-hidden border-0 text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/25"
-                onClick={() => onOpenChange(false)}
-              >
-                <span className="gold-gradient absolute inset-0" />
-                <span className="relative flex items-center justify-center gap-2">
-                  <Crown className="size-4" fill="currentColor" />
-                  Assinar PRO — R$ 29,90/mês
-                </span>
-              </Button>
-            </motion.div>
+          <div className="relative mt-5 space-y-3">
+            {isProEfetivo ? (
+              <p className="rounded-lg border border-neon-green/30 bg-neon-green/10 px-3 py-2 text-center font-mono text-xs text-neon-green">
+                PRO já ativo nesta conta.
+              </p>
+            ) : (
+              <>
+                {!user && onAuthClick && (
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      onOpenChange(false);
+                      onAuthClick();
+                    }}
+                    className="h-10 w-full gap-2 border border-neon-cyan/35 bg-neon-cyan/10 font-semibold text-neon-cyan hover:bg-neon-cyan/20"
+                  >
+                    <LogIn className="size-4" />
+                    Entrar para usar trial / PRO
+                  </Button>
+                )}
+
+                {user && trialAvailable && (
+                  <div className="space-y-2">
+                    <TrialButton onStart={handleTrial} loading={trialLoading} />
+                    {trialError && (
+                      <p className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 font-mono text-[11px] text-rose-300">
+                        ! {trialError}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <ProPlans />
+              </>
+            )}
+
             <Button
               type="button"
               variant="ghost"
-              className="h-9 font-mono text-xs text-slate-500 hover:bg-slate-800/50 hover:text-slate-300"
+              className="h-9 w-full font-mono text-xs text-slate-500 hover:bg-slate-800/50 hover:text-slate-300"
               onClick={() => onOpenChange(false)}
             >
-              {isLives ? "> wait --hours 4" : "> continue --free"}
+              {isLives ? "> wait --recover" : "> continue --free"}
             </Button>
           </div>
         </div>

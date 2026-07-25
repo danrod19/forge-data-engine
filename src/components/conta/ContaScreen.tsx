@@ -11,9 +11,12 @@ import {
   Mail,
   Loader2,
   Shield,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { ProPlans, TrialButton } from "@/components/pro/ProPlans";
+import { formatProExpiresAt } from "@/lib/pro";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/types/question";
 
 interface ContaScreenProps {
@@ -21,12 +24,25 @@ interface ContaScreenProps {
   onUpgrade: () => void;
 }
 
-export function ContaScreen({ onAuthClick, onUpgrade }: ContaScreenProps) {
-  const { user, isPro, loading, signOut, resetPassword } = useAuth();
+export function ContaScreen({ onAuthClick }: ContaScreenProps) {
+  const {
+    user,
+    isProEfetivo,
+    proExpiresAt,
+    trialAvailable,
+    loading,
+    signOut,
+    resetPassword,
+    startTrial,
+  } = useAuth();
   const [resetStatus, setResetStatus] = useState<
     "idle" | "loading" | "ok" | "error"
   >("idle");
   const [resetMessage, setResetMessage] = useState<string | null>(null);
+  const [trialLoading, setTrialLoading] = useState(false);
+  const [trialError, setTrialError] = useState<string | null>(null);
+
+  const expiresLabel = formatProExpiresAt(proExpiresAt);
 
   const handleResetPassword = async () => {
     if (!user?.email) return;
@@ -42,6 +58,14 @@ export function ContaScreen({ onAuthClick, onUpgrade }: ContaScreenProps) {
     setResetMessage(
       "E-mail de redefinição enviado. Confira sua caixa de entrada (e spam)."
     );
+  };
+
+  const handleTrial = async () => {
+    setTrialLoading(true);
+    setTrialError(null);
+    const { error } = await startTrial();
+    if (error) setTrialError(error);
+    setTrialLoading(false);
   };
 
   if (loading) {
@@ -70,7 +94,7 @@ export function ContaScreen({ onAuthClick, onUpgrade }: ContaScreenProps) {
             </p>
             <h1 className="mt-0.5 text-lg font-bold text-slate-50">Conta</h1>
             <p className="mt-1 text-[12px] leading-relaxed text-slate-400">
-              Gerencie login, plano e acesso PRO no CCNA Forge.
+              Gerencie login, trial e planos PRO no CCNA Forge.
             </p>
           </div>
         </div>
@@ -79,9 +103,9 @@ export function ContaScreen({ onAuthClick, onUpgrade }: ContaScreenProps) {
       {!user ? (
         <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
           <p className="text-sm leading-relaxed text-slate-300">
-            Entre ou crie uma conta para sincronizar o status{" "}
-            <span className="text-amber-300">PRO</span> e liberar vidas
-            infinitas + explicações completas.
+            Entre ou crie uma conta para usar o{" "}
+            <span className="text-neon-green">trial de 24h</span> e sincronizar
+            o plano <span className="text-amber-300">PRO</span>.
           </p>
           <div className="mt-4 flex flex-col gap-2">
             <Button
@@ -110,8 +134,8 @@ export function ContaScreen({ onAuthClick, onUpgrade }: ContaScreenProps) {
               <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
                 plano
               </p>
-              <div className="mt-1.5 flex items-center gap-2">
-                {isPro ? (
+              <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                {isProEfetivo ? (
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-500/15 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-amber-300">
                     <Crown className="size-3.5" fill="currentColor" />
                     PRO
@@ -122,11 +146,29 @@ export function ContaScreen({ onAuthClick, onUpgrade }: ContaScreenProps) {
                     Free
                   </span>
                 )}
+                {trialAvailable ? (
+                  <span className="rounded-full border border-neon-green/30 bg-neon-green/10 px-2 py-0.5 text-[10px] font-medium text-neon-green">
+                    trial disponível
+                  </span>
+                ) : (
+                  <span className="rounded-full border border-slate-700 bg-slate-900 px-2 py-0.5 text-[10px] text-slate-500">
+                    trial já usado
+                  </span>
+                )}
               </div>
-              {isPro ? (
-                <p className="mt-2 text-[12px] text-neon-green">
-                  Plano PRO ativo — vidas infinitas e explicações liberadas.
-                </p>
+
+              {isProEfetivo ? (
+                <div className="mt-2 space-y-1">
+                  <p className="text-[12px] text-neon-green">
+                    Plano PRO ativo — vidas infinitas e explicações liberadas.
+                  </p>
+                  {expiresLabel && (
+                    <p className="flex items-center gap-1.5 font-mono text-[11px] text-slate-400">
+                      <Clock className="size-3.5 text-neon-cyan" />
+                      Expira em {expiresLabel}
+                    </p>
+                  )}
+                </div>
               ) : (
                 <p className="mt-2 text-[12px] text-slate-400">
                   No Free, vidas são limitadas e explicações profundas ficam com
@@ -134,21 +176,39 @@ export function ContaScreen({ onAuthClick, onUpgrade }: ContaScreenProps) {
                 </p>
               )}
             </div>
-
-            {!isPro && (
-              <Button
-                type="button"
-                onClick={onUpgrade}
-                className="relative h-10 w-full overflow-hidden border-0 text-sm font-bold text-slate-950"
-              >
-                <span className="gold-gradient absolute inset-0" />
-                <span className="relative flex items-center justify-center gap-1.5">
-                  <Crown className="size-4" fill="currentColor" />
-                  Upgrade PRO
-                </span>
-              </Button>
-            )}
           </section>
+
+          {!isProEfetivo && (
+            <section className="space-y-3 rounded-xl border border-amber-500/25 bg-amber-500/5 p-4">
+              <p className="font-mono text-[10px] uppercase tracking-wider text-amber-400/80">
+                desbloquear pro
+              </p>
+              {trialAvailable && (
+                <div className="space-y-2">
+                  <TrialButton onStart={handleTrial} loading={trialLoading} />
+                  {trialError && (
+                    <p className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 font-mono text-[11px] text-rose-300">
+                      ! {trialError}
+                    </p>
+                  )}
+                </div>
+              )}
+              <ProPlans />
+            </section>
+          )}
+
+          {isProEfetivo && (
+            <section className="space-y-2 rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+              <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                renovar / estender
+              </p>
+              <p className="text-[12px] text-slate-400">
+                Compre outro período para estender o PRO (ativação manual após
+                pagamento).
+              </p>
+              <ProPlans />
+            </section>
+          )}
 
           <section className="space-y-2 rounded-xl border border-slate-800 bg-slate-900/50 p-4">
             <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">

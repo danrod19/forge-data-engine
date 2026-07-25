@@ -35,7 +35,8 @@ function readStoredNumber(key: string, fallback: number): number {
 }
 
 export default function HomePage() {
-  const { isPro } = useAuth();
+  const { isPro, isProEfetivo } = useAuth();
+  // isPro === isProEfetivo (pro_expires_at no futuro)
 
   /**
    * Hydration-safe:
@@ -137,9 +138,10 @@ export default function HomePage() {
               transition={{ duration: 0.2 }}
             >
               <HomeScreen
-                isPro={isPro}
+                isPro={isProEfetivo}
                 onNavigate={setActiveTab}
                 onUpgrade={openUpgrade}
+                onAuthClick={() => setAuthOpen(true)}
               />
             </motion.div>
           )}
@@ -236,6 +238,7 @@ export default function HomePage() {
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
         reason={paywallReason}
+        onAuthClick={() => setAuthOpen(true)}
       />
 
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />

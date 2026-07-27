@@ -9,6 +9,7 @@
     "lint": "eslint",
     "fix-ocr": "node scripts/fix-ocr-questions.mjs",
     "build-premium": "node scripts/build-premium-simulado.mjs",
+    "rebalance-tickets": "node scripts/rebalance-ticket-answers.mjs",
     "pages:deploy": "wrangler pages deploy out --project-name=ccna-forge"
   },
   "dependencies": {

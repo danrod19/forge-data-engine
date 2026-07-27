@@ -1,0 +1,46 @@
+{
+  "dryRun": false,
+  "files": {
+    "src/data/tickets_unique.json": {
+      "total": 359,
+      "processed": 359,
+      "skipped": 0,
+      "moved": 267,
+      "before": {
+        "0": 359,
+        "1": 0,
+        "2": 0,
+        "3": 0
+      },
+      "after": {
+        "0": 92,
+        "1": 81,
+        "2": 104,
+        "3": 82
+      },
+      "letterMentionCount": 0,
+      "letterMentionIds": []
+    },
+    "src/data/tickets_from_bulk.json": {
+      "total": 81,
+      "processed": 81,
+      "skipped": 0,
+      "moved": 61,
+      "before": {
+        "0": 81,
+        "1": 0,
+        "2": 0,
+        "3": 0
+      },
+      "after": {
+        "0": 20,
+        "1": 21,
+        "2": 14,
+        "3": 26
+      },
+      "letterMentionCount": 0,
+      "letterMentionIds": []
+    }
+  },
+  "letterMentions": []
+}

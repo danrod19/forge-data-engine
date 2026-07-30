@@ -1,0 +1,16 @@
+﻿# Dependências e builds
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# Arquivos grandes de dados (proteger)
+src/data/
+*.json
+
+# Outros
+.git/
+.vercel/
+*.log
+.env*

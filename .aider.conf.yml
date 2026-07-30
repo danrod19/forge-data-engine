@@ -1,0 +1,8 @@
+read:
+  - PROMPT_BASE.md
+  - DECISIONS.md
+  - TASKS.md
+  - CHANGELOG.md
+  - AGENTS.md
+
+model: openrouter/deepseek/deepseek-chat

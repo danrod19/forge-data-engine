@@ -16,9 +16,8 @@ interface ProPlansProps {
 function openPlan(plan: StripePlan) {
   if (!plan.url) {
     window.alert(
-      `Link do plano ${plan.durationLabel} ainda não configurado.\n\nPor favor, entre em contato:\n${CONTACT_EMAIL}`
+      `Link do plano ${plan.durationLabel} ainda não configurado. Contato: ${CONTACT_EMAIL}`
     );
-    console.warn(`Stripe link not configured for plan ${plan.id}`);
     return;
   }
   window.open(plan.url, "_blank", "noopener,noreferrer");

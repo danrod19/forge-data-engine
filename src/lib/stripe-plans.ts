@@ -13,15 +13,7 @@ export interface StripePlan {
 
 function envUrl(key: string): string {
   const v = process.env[key];
-  if (typeof v !== "string") return "";
-  
-  const url = v.trim();
-  // Valida formato básico do link Stripe
-  if (!url.startsWith("https://buy.stripe.com/")) {
-    console.warn(`Invalid Stripe URL format for ${key}`);
-    return "";
-  }
-  return url;
+  return typeof v === "string" ? v.trim() : "";
 }
 
 /** Planos one-shot via Stripe Payment Links (sem subscription). */

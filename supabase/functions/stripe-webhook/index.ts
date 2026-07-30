@@ -31,12 +31,7 @@ Deno.serve(async (req) => {
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
   if (!stripeKey || !webhookSecret || !supabaseUrl || !serviceKey) {
-    console.error("Missing env secrets", {
-      stripeKey: Boolean(stripeKey),
-      webhookSecret: Boolean(webhookSecret),
-      supabaseUrl: Boolean(supabaseUrl),
-      serviceKey: Boolean(serviceKey),
-    });
+    console.error("Missing env secrets");
     return new Response("Server misconfigured", {
       status: 500,
       headers: cors,

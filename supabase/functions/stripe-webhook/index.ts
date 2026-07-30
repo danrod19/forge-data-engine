@@ -81,14 +81,23 @@ Deno.serve(async (req) => {
     .toLowerCase();
 
   const days = daysFromAmount(session.amount_total);
-  console.log({
+  console.log("Webhook payload:", {
+    event_type: event.type,
     email,
     amount_total: session.amount_total,
     days,
-    status: session.payment_status,
+    payment_status: session.payment_status,
+    customer_details: session.customer_details,
+    metadata: session.metadata
   });
 
   if (!email || !days || session.payment_status === "unpaid") {
+    console.error("Invalid session:", {
+      reason: !email ? "no_email" : !days ? "invalid_amount" : "unpaid",
+      email,
+      days,
+      payment_status: session.payment_status
+    });
     return new Response(JSON.stringify({ received: true, skipped: true }), {
       status: 200,
       headers: { ...cors, "Content-Type": "application/json" },
@@ -138,7 +147,14 @@ Deno.serve(async (req) => {
     return new Response("Update failed", { status: 500, headers: cors });
   }
 
-  console.log("PRO activated", { email, days, expires: expires.toISOString() });
+  console.log("PRO activated", { 
+    email,
+    profile_id: profile.id,
+    previous_expires: profile.pro_expires_at,
+    new_expires: expires.toISOString(),
+    days_added: days,
+    payment_id: session.id
+  });
 
   return new Response(JSON.stringify({ received: true, ok: true, days }), {
     status: 200,

@@ -11,11 +11,6 @@ export interface StripePlan {
   url: string;
 }
 
-function envUrl(key: string): string {
-  const v = process.env[key];
-  return typeof v === "string" ? v.trim() : "";
-}
-
 /** Planos one-shot via Stripe Payment Links (sem subscription). */
 export function getStripePlans(): StripePlan[] {
   return [
@@ -25,7 +20,7 @@ export function getStripePlans(): StripePlan[] {
       priceLabel: "R$ 6,90",
       durationLabel: "7 dias",
       bestValue: false,
-      url: envUrl("NEXT_PUBLIC_STRIPE_LINK_7D"),
+      url: (process.env.NEXT_PUBLIC_STRIPE_LINK_7D ?? "").trim(),
     },
     {
       id: "30d",
@@ -33,7 +28,7 @@ export function getStripePlans(): StripePlan[] {
       priceLabel: "R$ 20,90",
       durationLabel: "30 dias",
       bestValue: false,
-      url: envUrl("NEXT_PUBLIC_STRIPE_LINK_30D"),
+      url: (process.env.NEXT_PUBLIC_STRIPE_LINK_30D ?? "").trim(),
     },
     {
       id: "120d",
@@ -41,7 +36,7 @@ export function getStripePlans(): StripePlan[] {
       priceLabel: "R$ 57,90",
       durationLabel: "120 dias",
       bestValue: true,
-      url: envUrl("NEXT_PUBLIC_STRIPE_LINK_120D"),
+      url: (process.env.NEXT_PUBLIC_STRIPE_LINK_120D ?? "").trim(),
     },
   ];
 }

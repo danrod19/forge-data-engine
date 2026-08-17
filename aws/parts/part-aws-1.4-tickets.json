@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1401: EC2 app-01 running; usuários reportam timeout na porta 8080. Processos na instance escutam 8080 (SSM session).",
+    "cli_output": "$ aws ec2 describe-instances --instance-ids i-0app01 \\\n  --query 'Reservations[].Instances[].{State:State.Name,AZ:Placement.AvailabilityZone,Subnet:SubnetId,SGs:SecurityGroups,Priv:PrivateIpAddress}'\nState: running\nAZ: us-east-1a\nSubnet: subnet-0priva\nSGs: [{GroupId: sg-app, GroupName: app-tier}]\nPriv: 10.0.10.25\n\n$ aws ec2 describe-security-groups --group-ids sg-app\nInbound:\n  TCP 22  Source sg-bastion\n  (no TCP 8080)\nOutbound: all 0.0.0.0/0\n\n$ aws ec2 describe-security-groups --group-ids sg-alb\nInbound: TCP 443 0.0.0.0/0\nOutbound: all\n\n$ aws elbv2 describe-target-health --target-group-arn arn:...:targetgroup/app/...\ni-0app01:8080 State: unhealthy Reason: Target.Timeout\n\n$ aws ec2 describe-instance-status --instance-ids i-0app01\nInstanceStatus: ok  SystemStatus: ok",
+    "alternativas": [
+      "Adicionar inbound no sg-app TCP 8080 com Source = sg-alb (ou CIDR das subnets do ALB)",
+      "Recriar a AMI e relançar sem revisar SG",
+      "Aumentar o tamanho do volume root para 2 TB",
+      "Trocar On-Demand por Spot imediatamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Instance e status checks ok e app escuta 8080; health timeout com SG sem 8080 aponta filtragem no ENI. Allow 8080 do ALB no sg-app resolve. AMI/root/Spot não abrem a porta. Tip de prova: unhealthy Target.Timeout + SG sem porta = regra inbound.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1402: Não conseguem anexar volume de dados à instance de relatório.",
+    "cli_output": "$ aws ec2 describe-instances --instance-ids i-0report \\\n  --query 'Reservations[].Instances[].{State:State.Name,AZ:Placement.AvailabilityZone}'\nState: running\nAZ: us-east-1a\n\n$ aws ec2 describe-volumes --volume-ids vol-0data\nVolumeId: vol-0data\nState: available\nSize: 500\nAvailabilityZone: us-east-1b\nAttachments: []\n\n$ aws ec2 attach-volume --volume-id vol-0data --instance-id i-0report --device /dev/sdf\nAn error occurred (InvalidVolume.ZoneMismatch) when calling the AttachVolume operation:\nThe volume 'vol-0data' is not in the same availability zone as instance 'i-0report'\n\n$ aws ec2 describe-snapshots --snapshot-ids snap-0data\nSnapshotId: snap-0data  State: completed  VolumeSize: 500",
+    "alternativas": [
+      "Forçar attach com --force-cross-az (API inexistente para EBS clássico)",
+      "Criar novo volume a partir de snap-0data na us-east-1a e anexar a i-0report",
+      "Abrir porta 2049 no SG para o volume aparecer",
+      "Converter a instance para another account"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "ZoneMismatch fecha: vol em 1b, instance em 1a. Snapshot completed permite create-volume na AZ da instance e attach. SG e cross-account não resolvem AZ. Tip de prova: InvalidVolume.ZoneMismatch → recrie o volume na AZ da instance via snapshot.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1403: Após terminate de instance de CI, o root sumiu e o job perdeu o workspace. Não havia snapshot.",
+    "cli_output": "$ aws ec2 describe-instances --instance-ids i-0ci01\nState: terminated\nStateTransitionReason: User initiated (terminate)\n\n$ aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=i-0ci01\n(no volumes — attachments gone)\n\n# Launch template / block device mapping (histórico):\nRoot /dev/xvda  Ebs.DeleteOnTermination: true  VolumeSize: 30\nData /dev/sdf   Ebs.DeleteOnTermination: false  (este volume NÃO estava no launch desta instance)\n\n$ aws ec2 describe-snapshots --owner-ids self --filters Name=description,Values=*i-0ci01*\n(no matching snapshots)\n\n$ aws ce get-cost-and-usage ... \nEC2-Instances hours dropped after terminate (expected)",
+    "alternativas": [
+      "Terminate nunca apaga root — o volume deve reaparecer em 24h",
+      "Reserved Instance restaura o disco automaticamente",
+      "Root com DeleteOnTermination true foi removido no terminate; sem snapshot não há restore — revisar flag e política de snapshot/AMI",
+      "Basta start-instances no id terminated"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Terminated + DeleteOnTermination true no root e zero snapshots explicam perda do workspace. Start não revive terminated; RI não restaura disco. Tip de prova: terminate + DeleteOnTermination → snapshot/AMI antes, ou false em volumes de dados.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1404: App na EC2 não lê s3://corp-config/*. Timeout de rede não — AccessDenied na API.",
+    "cli_output": "$ aws ec2 describe-instances --instance-ids i-0cfg \\\n  --query 'Reservations[].Instances[].{State:State.Name,Subnet:SubnetId,Profile:IamInstanceProfile}'\nState: running\nSubnet: subnet-0priva\nProfile: null\n\n$ aws ec2 describe-iam-instance-profile-associations \\\n  --filters Name=instance-id,Values=i-0cfg\nAssociations: []\n\n# Na instance (SSM):\n$ curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/\n(empty / 404)\n\n$ aws s3api get-object --bucket corp-config --key app.json out.json\nUnable to locate credentials / AccessDenied (no role)\n\n$ aws iam get-role --role-name ConfigReadRole\nRole exists; Trust: ec2.amazonaws.com\nAttached: ReadOnly on arn:aws:s3:::corp-config/*\n\n$ aws ec2 describe-security-groups --group-ids sg-cfg\nOutbound: 0.0.0.0/0 allow",
+    "alternativas": [
+      "Abrir inbound 443 0.0.0.0/0 no sg-cfg como único fix",
+      "Recriar o bucket S3 em outra Região",
+      "Aumentar IOPS do root volume",
+      "Criar instance profile com ConfigReadRole e associar a i-0cfg (IMDS passará a expor credenciais)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Profile null e metadata sem credentials com role existente = falta association do instance profile. SG outbound já allow; IOPS e recriar bucket não dão identidade. Tip de prova: AccessDenied S3 na EC2 + Profile null → associate-iam-instance-profile.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1405: Frota batch Spot; jobs falham no meio da noite com instance sumindo.",
+    "cli_output": "$ aws ec2 describe-instances --filters Name=tag:Fleet,Values=batch-spot \\\n  --query 'Reservations[].Instances[].{Id:InstanceId,State:State.Name,Life:InstanceLifecycle,Reason:StateTransitionReason}'\ni-0b1  State: terminated  Life: spot  Reason: Client.InstanceInitiatedShutdown\ni-0b2  State: terminated  Life: spot  Reason: Server.SpotInstanceTermination\ni-0b3  State: running     Life: spot\n\n$ aws ec2 describe-spot-instance-requests --spot-instance-request-ids sir-0b2\nStatus.Code: instance-terminated-by-price / capacity\nStatus.Message: Spot instance terminated due to interruption\n\n# Job design atual: single worker, state only on local disk, no checkpoint to S3\n# SLA: jobs can retry; max cost is hard constraint",
+    "alternativas": [
+      "Tratar Spot como On-Demand 100% uptime e desabilitar retries",
+      "Mover o único banco primário de produção para a mesma Spot fleet sem réplica",
+      "Aceitar interrupção Spot: checkpoints em S3/EBS snapshot, retries e/ou capacidade On-Demand mista para o coordenador",
+      "Remover todas as IAM roles da fleet"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Evidência SpotInstanceTermination + state só em disco local explica perda a meio do job. Design deve checkpoint/retry ou híbrido On-Demand; não vender Spot como uptime garantido nem pôr DB primário só em Spot. Tip de prova: Life spot + terminated by interruption → arquitetura tolerante, não 'bug da AMI'.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  }
+]

@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "App em EC2 precisa decifrar objetos S3 com SSE-KMS (CMK customer). Além de s3:GetObject, o que a role precisa?",
+    "alternativas": [
+      "kms:Decrypt (e permissões correlatas) no ARN da CMK, com key policy permitindo a role",
+      "Somente sns:Publish no tópico default",
+      "Somente ec2:CreateTags",
+      "Somente route53:ChangeResourceRecordSets"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "SSE-KMS usa a CMK no GetObject: a role precisa kms:Decrypt e a key policy deve permitir esse principal. SNS/Route 53 não decifram o objeto. Tip de prova: S3 SSE-KMS AccessDenied → some s3:GetObject com kms:Decrypt na CMK e key policy.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Diferença prática CMK customer managed vs AWS managed key (ideia)?",
+    "alternativas": [
+      "AWS managed nunca cifra S3",
+      "Customer CMK permite key policy, rotação e escopo definidos por você; AWS managed é operada pela AWS com menos controle fino",
+      "Customer CMK só funciona em CloudHSM obrigatório",
+      "AWS managed exige Principal * na key policy"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Customer CMK permite key policy, rotação e escopo definidos por você; AWS managed é operada pela AWS com menos controle fino. Isso resolve o cenário: Diferença prática CMK customer managed vs AWS managed key (ideia)?… O distractor «AWS managed nunca cifra S3» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Role tem iam:PassRole e s3:* mas GetObject em objeto SSE-KMS falha com kms:Decrypt AccessDenied. Causa raiz típica?",
+    "alternativas": [
+      "Falta Allow kms:Decrypt na identity e/ou na key policy da CMK para essa role",
+      "Visibility timeout da fila SQS",
+      "Alias Route 53 no apex",
+      "ASG desired capacity 0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Falta Allow kms:Decrypt na identity e/ou na key policy da CMK para essa role. Isso resolve o cenário: Role tem iam:PassRole e s3:* mas GetObject em objeto SSE-KMS falha com kms:Decry… O distractor «Visibility timeout da fila SQS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Envelope encryption (ideia): qual o papel do GenerateDataKey?",
+    "alternativas": [
+      "Gerar uma data key para cifrar o payload localmente; a CMK protege a data key",
+      "Apagar a CMK após cada PutObject",
+      "Substituir o Security Group do ALB",
+      "Criar um tópico SNS por objeto"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "GenerateDataKey devolve data key plaintext+encrypted; o app cifra dados com a plaintext e guarda a encrypted. Não apaga CMK nem mexe em ALB. Tip de prova: payload grande → envelope (data key) + CMK, não Encrypt direto de GBs na API KMS.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Secret db/prod/password no Secrets Manager; Lambda precisa da senha em runtime. Action principal?",
+    "alternativas": [
+      "s3:GetObject no secret ARN",
+      "kms:CreateKey a cada invoke",
+      "secretsmanager:GetSecretValue no ARN do secret (e kms se o secret usa CMK)",
+      "sqs:DeleteMessage no secret"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: secretsmanager:GetSecretValue no ARN do secret (e kms se o secret usa CMK). Isso resolve o cenário: Secret db/prod/password no Secrets Manager; Lambda precisa da senha em runtime. … O distractor «s3:GetObject no secret ARN» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Multi-constraint: objetos S3 com CMK customer, least privilege da role de leitura, e auditoria de uso da chave. Desenho?",
+    "alternativas": [
+      "SSE-S3 apenas e role AdministratorAccess",
+      "Bucket público Principal * e CMK desabilitada",
+      "Access key de root no Lambda",
+      "SSE-KMS com CMK customer, key policy + IAM kms:Decrypt mínimo no ARN da chave, CloudTrail de KMS"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "CMK customer + least privilege kms/s3 atende controle e auditoria. Admin e bucket público violam least privilege. Tip de prova: S3 + controle de chave + least privilege → SSE-KMS CMK + policies mínimas, não SSE-S3 com admin.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Grant KMS (ideia leve) serve para quê?",
+    "alternativas": [
+      "Delegar permissões de uso da chave a um principal de forma controlada/temporária sem reescrever toda a key policy",
+      "Substituir o NACLs da VPC",
+      "Criar hosted zone pública",
+      "Desligar MFA do root"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Delegar permissões de uso da chave a um principal de forma controlada/temporária sem reescrever toda a key policy. Isso resolve o cenário: Grant KMS (ideia leve) serve para quê?… O distractor «Substituir o NACLs da VPC» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Compliance exige rotação automática da senha do RDS a cada 30 dias. Onde encaixa melhor?",
+    "alternativas": [
+      "Texto fixo no user-data da EC2",
+      "Tag Name da instance",
+      "Secrets Manager com rotation habilitada (integração/Lambda ideia) e app lendo GetSecretValue",
+      "Security Group description field"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Secrets Manager com rotation habilitada (integração/Lambda ideia) e app lendo GetSecretValue. Isso resolve o cenário: Compliance exige rotação automática da senha do RDS a cada 30 dias. Onde encaixa… O distractor «Texto fixo no user-data da EC2» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "SSM Parameter Store SecureString vs Secrets Manager (ideia de escolha)?",
+    "alternativas": [
+      "São idênticos em rotation de DB gerenciada sempre",
+      "SecureString é parâmetro cifrado; Secrets Manager destaca secrets de app com rotation e casos de integração de credenciais",
+      "Parameter Store proíbe KMS",
+      "Secrets Manager só funciona com S3 website"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: SecureString é parâmetro cifrado; Secrets Manager destaca secrets de app com rotation e casos de integração de credenciais. Isso resolve o cenário: SSM Parameter Store SecureString vs Secrets Manager (ideia de escolha)?… O distractor «São idênticos em rotation de DB gerenciada sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "CMK com KeyState=Disabled. Sintoma ao ler dados antigos cifrados com essa chave?",
+    "alternativas": [
+      "Decrypt/uso da chave falha até reabilitar (enable-key); dados permanecem cifrados",
+      "A AWS apaga automaticamente todos os objetos S3",
+      "O ALB converte para HTTP",
+      "A fila SQS vira FIFO"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Decrypt/uso da chave falha até reabilitar (enable-key); dados permanecem cifrados. Isso resolve o cenário: CMK com KeyState=Disabled. Sintoma ao ler dados antigos cifrados com essa chave?… O distractor «A AWS apaga automaticamente todos os objetos S3» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Key policy da CMK lista só o root da conta e um admin. A role app-reader tem IAM kms:Decrypt. Resultado típico?",
+    "alternativas": [
+      "Decrypt ainda falha se a key policy não incluir a role (ou um caminho que a autorize)",
+      "IAM sozinho sempre vence key policy vazia",
+      "S3 ignora KMS se a role tiver s3:*",
+      "Route 53 libera a chave"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Decrypt ainda falha se a key policy não incluir a role (ou um caminho que a autorize). Isso resolve o cenário: Key policy da CMK lista só o root da conta e um admin. A role app-reader tem IAM… O distractor «IAM sozinho sempre vence key policy vazia» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "EBS volume encrypted com CMK. Instance profile sem kms. O que ocorre no attach/uso?",
+    "alternativas": [
+      "Sempre funciona porque EBS não usa KMS",
+      "Só falha se Multi-AZ do RDS estiver on",
+      "Pode falhar operações que exigem uso da CMK (attach/uso) por falta de kms na role/key policy",
+      "Converte o volume em instance store"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Pode falhar operações que exigem uso da CMK (attach/uso) por falta de kms na role/key policy. Isso resolve o cenário: EBS volume encrypted com CMK. Instance profile sem kms. O que ocorre no attach/u… O distractor «Sempre funciona porque EBS não usa KMS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Multi-constraint: secret de API third-party com rotation a cada 90 dias, least privilege da Lambda e CMK customer no secret. Pacote?",
+    "alternativas": [
+      "Secret no Secrets Manager cifrado com CMK, rotation on, role com GetSecretValue + kms:Decrypt mínimos no secret/key ARNs",
+      "Senha em variável de ambiente plaintext no console sem rotation",
+      "Secret em S3 público com Principal *",
+      "SSM String (não Secure) commitado no git"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Secrets Manager + CMK + IAM mínimo + rotation fecha compliance e least privilege. Plaintext e S3 público falham os três eixos. Tip de prova: rotation + CMK + least privilege → Secrets Manager + policies mínimas GetSecretValue/kms.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "schedule-key-deletion na CMK em uso por S3. Risco imediato?",
+    "alternativas": [
+      "Janela de pending deletion: após o waiting period a chave some e decrypt de dados existentes falha",
+      "Melhora automática do throughput do ALB",
+      "Habilita PubliclyAccessible no RDS",
+      "Cria read replica grátis"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Janela de pending deletion: após o waiting period a chave some e decrypt de dados existentes falha. Isso resolve o cenário: schedule-key-deletion na CMK em uso por S3. Risco imediato?… O distractor «Melhora automática do throughput do ALB» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "RDS storage encryption com CMK: a role da app precisa kms:Decrypt para cada SELECT?",
+    "alternativas": [
+      "A app sempre chama kms:Decrypt a cada linha SELECT",
+      "SELECT exige sns:Publish",
+      "Encryption RDS proíbe Security Groups",
+      "Em geral o RDS usa a chave no serviço; a app usa credenciais DB — mas admins/ops e certos fluxos de snapshot/copy exigem kms adequado nos principals certos"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O engine gerencia decrypt de storage; a app autentica no DB. Quem copia snapshots/exporta com CMK precisa kms. Tip de prova: app SQL → secret/DB auth; kms na role da app não é 'por linha SELECT', mas ops de chave/snapshot sim.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resource policy do secret nega GetSecretValue a todos exceto role-A. Role-B tem IAM Allow GetSecretValue. Resultado para role-B?",
+    "alternativas": [
+      "IAM sempre vence Deny do secret",
+      "GetSecretValue ignora resource policies",
+      "Role-B obtém o secret via S3 ListBucket",
+      "Allow se a resource policy do secret e a identity permitirem; Deny na resource policy bloqueia role-B"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Allow se a resource policy do secret e a identity permitirem; Deny na resource policy bloqueia role-B. Isso resolve o cenário: Resource policy do secret nega GetSecretValue a todos exceto role-A. Role-B tem … O distractor «IAM sempre vence Deny do secret» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Rotação do secret falhou (rotation Lambda erro). Sintoma para a app?",
+    "alternativas": [
+      "A VPC inteira é deletada",
+      "Todos os Security Groups abrem 0.0.0.0/0",
+      "Pode continuar com a versão atual até correção, mas compliance/rotação fica em estado de falha — monitore describe-secret / eventos",
+      "O CloudFront invalida o mundo"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Pode continuar com a versão atual até correção, mas compliance/rotação fica em estado de falha — monitore describe-secret / eventos. Isso resolve o cenário: Rotação do secret falhou (rotation Lambda erro). Sintoma para a app?… O distractor «A VPC inteira é deletada» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SQS SSE-KMS com CMK: producer SendMessage. Além de sqs:SendMessage, o que pode faltar?",
+    "alternativas": [
+      "ec2:RunInstances obrigatório",
+      "route53:ListHostedZones",
+      "kms:GenerateDataKey / uso da CMK conforme a doc do SSE-KMS na fila para o principal que envia",
+      "elasticloadbalancing:CreateLoadBalancer"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: kms:GenerateDataKey / uso da CMK conforme a doc do SSE-KMS na fila para o principal que envia. Isso resolve o cenário: SQS SSE-KMS com CMK: producer SendMessage. Além de sqs:SendMessage, o que pode f… O distractor «ec2:RunInstances obrigatório» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Least privilege na key policy: o que evitar?",
+    "alternativas": [
+      "Allow kms:Decrypt só à role da app no key ARN",
+      "Admin key só para security-admins group",
+      "Statement Principal * com kms:* em CMK de produção",
+      "Condition aws:RequestedRegion na policy"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Statement Principal * com kms:* em CMK de produção. Isso resolve o cenário: Least privilege na key policy: o que evitar?… O distractor «Allow kms:Decrypt só à role da app no key ARN» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo desta part KMS/Secrets?",
+    "alternativas": [
+      "Key policy e kms:Decrypt",
+      "GetSecretValue e rotation ideia",
+      "CMK disabled/pending deletion",
+      "CloudHSM lab, custom key store deep e asymmetric signing lab completo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: CloudHSM lab, custom key store deep e asymmetric signing lab completo. Isso resolve o cenário: Fora de escopo profundo desta part KMS/Secrets?… O distractor «Key policy e kms:Decrypt» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Via de trânsito TLS e at rest KMS: como se complementam?",
+    "alternativas": [
+      "KMS substitui TLS em todas as APIs públicas",
+      "TLS desliga a necessidade de key policy",
+      "TLS protege em trânsito; KMS/CMK protege em repouso — requisitos de dados sensíveis costumam exigir ambos",
+      "CMK remove HTTPS do CloudFront"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: TLS protege em trânsito; KMS/CMK protege em repouso — requisitos de dados sensíveis costumam exigir ambos. Isso resolve o cenário: Via de trânsito TLS e at rest KMS: como se complementam?… O distractor «KMS substitui TLS em todas as APIs públicas» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "App cacheia secret por 24h; rotation a cada 4h. Risco?",
+    "alternativas": [
+      "A CMK se auto-destrói",
+      "App pode usar senha antiga após rotation → falhas de auth até refresh do cache",
+      "O secret vira público no S3",
+      "O ASG zera o desired"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: App pode usar senha antiga após rotation → falhas de auth até refresh do cache. Isso resolve o cenário: App cacheia secret por 24h; rotation a cada 4h. Risco?… O distractor «A CMK se auto-destrói» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Copy snapshot EBS encrypted com CMK para outra conta (ideia). O que costuma ser necessário?",
+    "alternativas": [
+      "Somente abrir 22 na origem",
+      "Permissões KMS/share da CMK (ou reencrypt) além de share do snapshot — só share EBS não basta",
+      "Somente CNAME no apex",
+      "Somente desligar MFA"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Permissões KMS/share da CMK (ou reencrypt) além de share do snapshot — só share EBS não basta. Isso resolve o cenário: Copy snapshot EBS encrypted com CMK para outra conta (ideia). O que costuma ser … O distractor «Somente abrir 22 na origem» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "describe-key mostra KeyState=PendingDeletion. Ação para recuperar uso antes do purge?",
+    "alternativas": [
+      "create-invalidation no CloudFront",
+      "cancel-key-deletion e ensure KeyState Enabled com policies intactas",
+      "terminate nas instances",
+      "delete-bucket force"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: cancel-key-deletion e ensure KeyState Enabled com policies intactas. Isso resolve o cenário: describe-key mostra KeyState=PendingDeletion. Ação para recuperar uso antes do p… O distractor «create-invalidation no CloudFront» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "IAM condition kms:ViaService = s3.us-east-1.amazonaws.com na key policy. Efeito ideia?",
+    "alternativas": [
+      "Permite qualquer Decrypt de qualquer conta sem log",
+      "Restringe uso da chave a pedidos que vêm via o serviço S3 na região, reduzindo uso direto indevido",
+      "Desliga CloudTrail",
+      "Obriga PubliclyAccessible no RDS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Restringe uso da chave a pedidos que vêm via o serviço S3 na região, reduzindo uso direto indevido. Isso resolve o cenário: IAM condition kms:ViaService = s3.us-east-1.amazonaws.com na key policy. Efeito … O distractor «Permite qualquer Decrypt de qualquer conta sem log» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Secret com resource policy + IAM da role: ordem mental de TShoot GetSecretValue denied?",
+    "alternativas": [
+      "Só recriar a AMI",
+      "Só aumentar o EBS",
+      "Só abrir 443 0.0.0.0/0 no SG do Lambda",
+      "Caller identity → IAM GetSecretValue → resource policy do secret → kms se CMK → ARN do secret correto"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Caller identity → IAM GetSecretValue → resource policy do secret → kms se CMK → ARN do secret correto. Isso resolve o cenário: Secret com resource policy + IAM da role: ordem mental de TShoot GetSecretValue … O distractor «Só recriar a AMI» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "AWS managed key aws/s3 vs CMK para bucket com requisito de key policy exclusiva do security team?",
+    "alternativas": [
+      "aws/s3 permite key policy Principal só do security team sempre",
+      "CMK customer: security team controla key policy; aws/s3 não oferece o mesmo controle de policy custom",
+      "CMK proíbe SSE-KMS no S3",
+      "aws/s3 exige CloudHSM"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: CMK customer: security team controla key policy; aws/s3 não oferece o mesmo controle de policy custom. Isso resolve o cenário: AWS managed key aws/s3 vs CMK para bucket com requisito de key policy exclusiva … O distractor «aws/s3 permite key policy Principal só do security team sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Lambda em VPC precisa GetSecretValue. Além de IAM, o que observar?",
+    "alternativas": [
+      "Somente o tamanho da AMI",
+      "Interface VPC endpoint (ou NAT) para secretsmanager/kms na região — sem path de rede a API falha por timeout, não só IAM",
+      "Somente o weight do Route 53",
+      "Somente o sticky session do ALB"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Interface VPC endpoint (ou NAT) para secretsmanager/kms na região — sem path de rede a API falha por timeout, não só IAM. Isso resolve o cenário: Lambda em VPC precisa GetSecretValue. Além de IAM, o que observar?… O distractor «Somente o tamanho da AMI» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mental KMS/Secrets nesta part?",
+    "alternativas": [
+      "Só recriar a conta",
+      "Só desligar o BPA do S3",
+      "Só aumentar max do ASG",
+      "Estado da CMK (enabled) → key policy → IAM kms → secret policy/GetSecretValue → ViaService/grants → rotation status"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Estado da CMK (enabled) → key policy → IAM kms → secret policy/GetSecretValue → ViaService/grants → rotation status. Isso resolve o cenário: Checklist mental KMS/Secrets nesta part?… O distractor «Só recriar a conta» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo KMS + Secrets foundations no SAA-C03:",
+    "alternativas": [
+      "Senhas no código + CMK Principal * + secret sem rotation com compliance de 30 dias",
+      "Só SSE-S3 e nunca GetSecretValue",
+      "Desabilitar CMKs em uso para 'economizar'",
+      "CMK com key policy+IAM mínimos, envelope quando couber, Secrets Manager para secrets/rotation, TShoot Decrypt/GetSecretValue e KeyState"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Design seguro une CMK least privilege, secrets gerenciados com rotation e chave enabled. Principal * e senha no código são anti-patterns. Tip de prova: se a opção equilibra CMK policy, GetSecretValue e rotation, costuma ser a correta.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  }
+]

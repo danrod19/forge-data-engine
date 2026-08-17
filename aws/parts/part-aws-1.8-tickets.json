@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1801: Workers processam ~4 min por msg; mensagens reaparecem e duplicam cobranças.",
+    "cli_output": "$ aws sqs get-queue-attributes --queue-url https://sqs.us-east-1.amazonaws.com/111122223333/pay-jobs --attribute-names All\nVisibilityTimeout: 30\nReceiveMessageWaitTimeSeconds: 20\nApproximateNumberOfMessagesVisible: 120\nApproximateNumberOfMessagesNotVisible: 40\nRedrivePolicy: {\"deadLetterTargetArn\":\"arn:aws:sqs:...:pay-dlq\",\"maxReceiveCount\":\"10\"}\n\n# Worker log (i-0w1):\nreceived msg-9 at 10:00:00\nprocessing... (still running at 10:00:45)\nreceived msg-9 AGAIN on i-0w2 at 10:00:35  # duplicate\n# DeleteMessage only called after success ~10:04:00\n\n$ aws sqs receive-message --queue-url ... --max-number-of-messages 1\n# shows same body after 30s if not deleted",
+    "alternativas": [
+      "Aumentar VisibilityTimeout (ex. 300–360s) ou estender com ChangeMessageVisibility durante o job — 30s < 4 min de processamento",
+      "Trocar a fila para FIFO sem ajustar timeout",
+      "Desligar long polling",
+      "Remover a DLQ"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Visibility 30s com job de 4 min explica reentrega e duplicata antes do Delete. FIFO sozinho não corrige timeout curto. Tip de prova: msg reaparece no meio do job → visibility < tempo de processamento.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1802: DLQ pay-dlq sobe sem parar; fila principal parece 'saudável' mas erros de parse.",
+    "cli_output": "$ aws sqs get-queue-attributes --queue-url .../pay-jobs --attribute-names RedrivePolicy,ApproximateNumberOfMessagesVisible\nRedrivePolicy: {\"deadLetterTargetArn\":\"arn:aws:sqs:us-east-1:111122223333:pay-dlq\",\"maxReceiveCount\":\"3\"}\nApproximateNumberOfMessagesVisible: 5\n\n$ aws sqs get-queue-attributes --queue-url .../pay-dlq --attribute-names ApproximateNumberOfMessagesVisible\nApproximateNumberOfMessagesVisible: 1842\n\n# Sample message in DLQ (body):\n{\"orderId\": null, \"amount\": \"NaN\"}   # poison payload\n\n# CloudWatch: NumberOfMessagesReceived high on pay-jobs; deletes low for bad payloads\n# Worker log: JSON parse error; no DeleteMessage; receive count increments to 3 → DLQ",
+    "alternativas": [
+      "Ignorar a DLQ e aumentar maxReceiveCount para 1000 sem corrigir o producer",
+      "Corrigir o formato da mensagem no producer e/ou handler; inspecionar poison na DLQ — maxReceiveCount=3 está movendo falhas repetidas",
+      "Abrir 0.0.0.0/0 no SG da fila",
+      "Desabilitar SSE-SQS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "maxReceiveCount=3 + parse error sem delete enche a DLQ com poison. Subir maxReceiveCount só atrasa. Tip de prova: DLQ enchendo → leia a msg venenosa e corrija producer/handler antes do redrive em massa.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1803: API role api-producer não envia para a fila orders; AccessDenied.",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:sts::111122223333:assumed-role/api-producer/session\n\n$ aws sqs send-message --queue-url https://sqs.us-east-1.amazonaws.com/111122223333/orders --message-body '{\"ok\":1}'\nAn error occurred (AccessDenied) when calling the SendMessage operation:\nUser: arn:aws:sts::111122223333:assumed-role/api-producer/session is not authorized to perform: sqs:SendMessage\non resource: arn:aws:sqs:us-east-1:111122223333:orders\n\n$ aws iam list-attached-role-policies --role-name api-producer\nAttached: arn:aws:iam::111122223333:policy/ApiReadOnly\n# ApiReadOnly: s3:GetObject, sqs:GetQueueAttributes  (no SendMessage)\n\n$ aws sqs get-queue-attributes --queue-url .../orders --attribute-names Policy\nPolicy: (none / default)\n\nVisibilityTimeout: 60  # irrelevant to AccessDenied",
+    "alternativas": [
+      "Anexar/allow sqs:SendMessage no ARN da fila orders à role api-producer",
+      "Só aumentar VisibilityTimeout para 3600",
+      "Converter a fila em tópico SNS",
+      "Criar health check Route 53 na fila"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1803: API role api-producer não envia para a fila orders; AccessDenied.…), a ação correta é: Anexar/allow sqs:SendMessage no ARN da fila orders à role api-producer. «Só aumentar VisibilityTimeout para 3600» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.8.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1804: SNS topic order-events publica com 200; fila fulfillment-q não recebe.",
+    "cli_output": "$ aws sns list-subscriptions-by-topic --topic-arn arn:aws:sns:us-east-1:111122223333:order-events\nSubscriptionArn: arn:aws:sns:...:order-events:uuid\nProtocol: sqs\nEndpoint: arn:aws:sqs:us-east-1:111122223333:fulfillment-q\n# Status: Confirmed\n\n$ aws sns publish --topic-arn arn:aws:sns:us-east-1:111122223333:order-events --message '{\"order\":1}'\nMessageId: 9b3c...\n\n$ aws sqs get-queue-attributes --queue-url .../fulfillment-q --attribute-names All\nApproximateNumberOfMessagesVisible: 0\nPolicy: {\n  \"Statement\": [{\n    \"Effect\": \"Allow\",\n    \"Principal\": {\"AWS\": \"arn:aws:iam::111122223333:root\"},\n    \"Action\": \"sqs:SendMessage\",\n    \"Resource\": \"arn:aws:sqs:us-east-1:111122223333:fulfillment-q\"\n  }]\n}\n# Missing: Principal Service sns.amazonaws.com + Condition aws:SourceArn = topic\n\n$ aws sqs receive-message --queue-url .../fulfillment-q --wait-time-seconds 5\n(no messages)",
+    "alternativas": [
+      "Atualizar a queue policy para permitir sns.amazonaws.com SendMessage com SourceArn do topic order-events",
+      "Remover a subscription confirmada",
+      "Trocar o topic para FIFO SNS sem policy (fora do foco e não corrige principal)",
+      "Aumentar o retention da fila para 14 dias apenas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1804: SNS topic order-events publica com 200; fila fulfillment-q não recebe.…), a ação correta é: Atualizar a queue policy para permitir sns.amazonaws.com SendMessage com SourceArn do topic order-events. «Remover a subscription confirmada» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.8.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1805: Time migrou telemetria high-volume para FIFO e viu throttling / backlog enorme; ordem global não era requisito.",
+    "cli_output": "$ aws sqs get-queue-attributes --queue-url .../telemetry-fifo.fifo --attribute-names All\nFifoQueue: true\nContentBasedDeduplication: true\nApproximateNumberOfMessagesVisible: 900000\nVisibilityTimeout: 30\n\n# Producer errors:\nTotal Throughput Limit Exceeded / rate issues on SendMessage batch\n# All messages use MessageGroupId = \"global\"\n\n$ aws cloudwatch get-metric-statistics ... NumberOfMessagesSent\n# plateau below expected 100k+/min design target\n\n# Business: metrics order not required; idempotent aggregators exist",
+    "alternativas": [
+      "Manter um único MessageGroupId global e subir só o visibility",
+      "Desligar a Internet da VPC",
+      "Migrar telemetria para SQS standard (ou múltiplos group ids se FIFO for obrigatório) — hot group FIFO limita paralelismo/throughput",
+      "Abrir a fila com Principal * SendMessage"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "FIFO com group global e alto volume cria gargalo; o negócio não exige ordem → standard é o encaixe. Visibility e Principal * não resolvem throughput FIFO. Tip de prova: telemetria high-volume sem ordem → standard; FIFO hot group = backlog.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  }
+]

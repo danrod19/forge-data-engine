@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9201 — VLANs 10 e 20 não se falam via ROAS. O switch trunk “parece ok”. Subinterface .20 tem IP.",
+    "cli_output": "R1# show running-config | section interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n no ip address\n!\ninterface GigabitEthernet0/0.10\n encapsulation dot1Q 10\n ip address 192.168.10.1 255.255.255.0\n!\ninterface GigabitEthernet0/0.20\n ip address 192.168.20.1 255.255.255.0\n\nR1# show ip interface brief | include GigabitEthernet0/0\nGigabitEthernet0/0      unassigned      YES unset  up    up\nGigabitEthernet0/0.10   192.168.10.1    YES manual up    up\nGigabitEthernet0/0.20   192.168.20.1    YES manual up    up\n\nSW1# show interfaces trunk\nPort        Mode   Encapsulation  Status     Native vlan\nGi1/0/48    on     802.1q         trunking   1\nPort        Vlans allowed on trunk\nGi1/0/48    1,10,20\n\nPC-20> ping 192.168.10.10\nEsgotado o tempo limite do pedido.",
+    "alternativas": [
+      "Allowed no trunk omite a VLAN 20",
+      "Gi0/0.20 up/up com IP mas sem encapsulation dot1Q 20 — ROAS da VLAN 20 incompleto; .10 tem encap e a 20 não",
+      "Ambas subinterfaces sem IP no brief",
+      "Native 99 vs 1 no trunk é a única falha listada"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Running mostra .10 com encapsulation e .20 só com IP. Brief up/up não dispensa encap. Allowed tem 10,20. Native é 1, não mismatch 99 no recorte.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9202 — Gateway 10.10.30.1 (SVI 30) não responde. Nenhum host na VLAN 30 ainda; só config “preparada”.",
+    "cli_output": "Dist1# show ip interface brief | include Vlan30\nVlan30   10.10.30.1   YES manual up   down\n\nDist1# show running-config interface Vlan30\ninterface Vlan30\n ip address 10.10.30.1 255.255.255.0\n\nDist1# show vlan brief | include 30\n30   SERVERS   active\n\nDist1# show vlan brief\n... (nenhuma porta listada em SERVERS)\n\nDist1# show interfaces status | include 30\n (no access ports in VLAN 30)\n\nDist1# show ip route | include 10.10.30\n",
+    "alternativas": [
+      "Vlan30 up/up com rota C 10.10.30.0/24 no output",
+      "interface Vlan30 está shutdown na running",
+      "VLAN 30 não existe no show vlan brief",
+      "Vlan30 up/down, VLAN 30 active sem portas: SVI sem L2 ativo na VLAN — line protocol down até haver porta/trunk up na 30"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Brief up/down e VLAN sem membros explicam SVI down de protocolo. Running não tem shutdown. VLAN existe active. Sem rota C no recorte.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9203 — SVIs 10 e 20 up/up, hosts pingam o próprio gateway, mas não a outra VLAN. “O L3 switch não roteia”.",
+    "cli_output": "L3SW# show ip interface brief | include Vlan\nVlan10   192.168.10.1   YES manual up  up\nVlan20   192.168.20.1   YES manual up  up\n\nL3SW# show ip route\nCodes: C - connected, L - local, S - static\nGateway of last resort is not set\n\nL3SW# show running-config | include ip routing\nno ip routing\n\nL3SW# show vlan brief | include 10|20\n10  USERS   active  Gi1/0/1-12\n20  VOICE   active  Gi1/0/13-20\n\nPC-10> ping 192.168.10.1\nResposta de 192.168.10.1: tempo=1ms\nPC-10> ping 192.168.20.10\nEsgotado o tempo limite do pedido.",
+    "alternativas": [
+      "SVIs down/down no brief",
+      "ip routing está habilitado e há C 192.168.10.0/24 na tabela",
+      "no ip routing na running com SVIs up/up e show ip route sem connected das VLANs: L3 desabilitado — inter-VLAN não ocorre no switch",
+      "VLAN 20 inexistente no brief"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "no ip routing + tabela sem C das SVIs apesar de up/up explica o sintoma. VLANs existem; gateways respondem L2/local à SVI mas sem routing entre elas.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9204 — ROAS com subinterfaces 10 e 40 configuradas com encap. Hosts da 40 não saem do switch de acesso.",
+    "cli_output": "R1# show run | section GigabitEthernet0/0.40\ninterface GigabitEthernet0/0.40\n encapsulation dot1Q 40\n ip address 192.168.40.1 255.255.255.0\n\nSW-Access# show interfaces trunk\nPort        Mode   Encapsulation  Status     Native vlan\nGi1/0/48    on     802.1q         trunking   1\nPort        Vlans allowed on trunk\nGi1/0/48    1,10,20,30\nPort        Vlans allowed and active in management domain\nGi1/0/48    1,10,20,30\n\nSW-Access# show vlan brief | include 40\n40   IOT   active    Gi1/0/5, Gi1/0/6\n\nSW-Access# show interfaces status | include Gi1/0/5\nGi1/0/5  CAM-01   connected  40  a-full  a-1000\n\nPC-IOT> ping 192.168.40.1\nEsgotado o tempo limite do pedido.",
+    "alternativas": [
+      "VLAN 40 fora do allowed do trunk Gi1/0/48 (só 1,10,20,30) — ROAS .40 com encap não recebe a tag no uplink",
+      "encapsulation ausente em Gi0/0.40 no run",
+      "VLAN 40 inexistente e portas notconnect",
+      "Native 40 vs 1 é a linha do show trunk"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Allowed omite 40; encap existe; VLAN e portas active/connected. Native é 1, não 40 no trunk output.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9205 — Time misturou “porta L3” com SVI. Uplink entre cores não roteia; VLANs de usuário no mesmo link “somem”.",
+    "cli_output": "CoreA# show running-config interface GigabitEthernet1/0/1\ninterface GigabitEthernet1/0/1\n description TO-CORE-B\n no switchport\n ip address 10.0.0.1 255.255.255.252\n\nCoreA# show interfaces Gi1/0/1 switchport\nSwitchport: Disabled\n\nCoreA# show interfaces trunk\n\nCoreB# show run interface Gi1/0/1\ninterface GigabitEthernet1/0/1\n switchport mode trunk\n switchport trunk allowed vlan 10,20,30\n switchport trunk native vlan 99\n\nCoreB# show interfaces trunk | include Gi1/0/1\nGi1/0/1   on   802.1q   trunking   99\n\nCoreA# show ip interface brief | include GigabitEthernet1/0/1\nGigabitEthernet1/0/1   10.0.0.1   YES manual up  up\n\n# expectativa do projeto: L3 p2p /30 entre cores — CoreB ainda em trunk",
+    "alternativas": [
+      "Ambos os lados com no switchport e /30",
+      "CoreA routed (no switchport, Switchport Disabled) vs CoreB trunk native 99 allowed 10–30 — mismatch de modelo L3 vs L2 trunk no mesmo link",
+      "SVI Vlan99 down é a única saída do brief de Gi1/0/1",
+      "show interfaces trunk em CoreA lista Gi1/0/1 trunking"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "CoreA é routed port L3; CoreB é trunk 802.1Q — modelos incompatíveis no enlace. Trunk em CoreA está vazio. Brief mostra IP na física, não SVI. Não há ambos no switchport.",
+    "part_id": "3.2"
+  }
+]

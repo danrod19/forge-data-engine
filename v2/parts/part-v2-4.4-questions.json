@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Usuário acessa http://203.0.113.50 com sucesso, mas http://portal.empresa.local falha. ping 203.0.113.50 ok; ping portal.empresa.local não resolve. Qual o foco principal?",
+    "alternativas": [
+      "Diagnóstico DNS (registro A/AAAA ou resolvedor do cliente), não a rota até o IP do servidor",
+      "Trocar o cabo do core por fiber",
+      "clear ip ospf process no ABR",
+      "Desabilitar Spanning Tree na VLAN do usuário"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Reachability por IP com falha por nome isola o problema na resolução DNS: registro ausente/errado ou DNS do cliente/servidor. OSPF, STP e cabo não explicam a assimetria IP ok / nome falha. Use nslookup no FQDN e confira os DNS servers do host.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual registro mapeia um hostname diretamente para um endereço IPv4?",
+    "alternativas": [
+      "MX",
+      "A",
+      "PTR",
+      "NS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O registro A associa nome a IPv4. MX aponta para hosts de mail; PTR faz reverse; NS indica name servers da zona. Em falha de web IPv4 por nome, o A (ou o caminho até quem responde o A) é o primeiro suspeito.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "nslookup www.app.local devolve CNAME para app-prod.local e em seguida Non-existent domain para app-prod.local. O que está quebrado?",
+    "alternativas": [
+      "Apenas o PTR do cliente",
+      "Somente a porta 443 no firewall",
+      "Cadeia CNAME: alias aponta para nome sem A/AAAA válido",
+      "Duplex mismatch no uplink"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "CNAME só redireciona o nome; o canônico precisa existir com A ou AAAA. Aqui o alias existe e o alvo não — cadeia quebrada. PTR e duplex não explicam Non-existent domain no alvo do CNAME.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Fila de e-mail não entrega para @parceiro.com. Qual par de verificações DNS é o mais adequado primeiro?",
+    "alternativas": [
+      "Somente show interfaces CRC no core",
+      "Apenas STP root no access",
+      "Somente hostname do switch de borda",
+      "Registros MX do domínio e depois A/AAAA do hostname retornado no MX"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Entrega SMTP depende de MX e de o host do MX resolver para um IP alcançável. CRC e STP não substituem essa checagem. nslookup set type=MX seguido de type=A no host MX é o Diagnose clássico.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Cliente dual-stack prefere IPv6. Existe A para app.local, mas não há AAAA. Sintoma: app falha por nome em alguns PCs. Hipótese DNS?",
+    "alternativas": [
+      "AAAA ausente enquanto o cliente tenta IPv6 por nome — validar AAAA ou comportamento de fallback",
+      "Falta de VLAN nativa no trunk",
+      "Excesso de rotas estáticas",
+      "Banner motd bloqueando HTTPS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem AAAA, resolução IPv6 do nome falha; alguns stacks/apps não fazem fallback limpo para A. O Diagnose 4.4 inclui AAAA para acesso por nome em ambientes com IPv6. VLAN nativa e banner não são a causa DNS.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual registro responde à pergunta 'qual o nome associado a este IP' (reverse)?",
+    "alternativas": [
+      "CNAME",
+      "PTR",
+      "A",
+      "MX"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "PTR mapeia IP → nome na zona reverse. A e CNAME atuam no sentido nome→alvo; MX é mail. Problemas de validação de mail e ferramentas de reverse dependem de PTR correto.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ipconfig /all mostra DNS Servers 10.255.255.9; ping 10.255.255.9 falha. Zona interna responde se testada a partir do servidor DNS 10.10.10.10. Causa mais provável do sintoma no PC?",
+    "alternativas": [
+      "Registro A do Google ausente",
+      "PTR público do ISP",
+      "Cliente apontando para DNS inacessível — não necessariamente zona corrompida",
+      "CNAME em loop na raiz da Internet"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Se o DNS configurado no cliente está morto/inalcançável, a resolução falha mesmo com a zona saudável em outro servidor. Testar nslookup contra 10.10.10.10 confirma. Corrija option 6/estático do cliente e a rota/ACL até o DNS.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "MX preferência 10 → mail1.empresa.com e 20 → mail2.empresa.com. mail1 não tem registro A. O que ocorre na prática?",
+    "alternativas": [
+      "O MX 10 é ignorado magicamente sem impacto",
+      "Todos os CNAMEs da zona são apagados",
+      "O switch access vira mail server",
+      "Entrega tenta mail1, falha na resolução do host MX e deve cair para mail2 se o MTA seguir a lista"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Prioridade menor é preferida, mas o hostname do MX precisa resolver. Sem A/AAAA em mail1, a entrega sofre falha nesse alvo e MTAs podem tentar o próximo MX. Garantir A no host MX faz parte do Diagnose de mail.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Ferramenta mais direta para ver se o FQDN resolve e para qual IP, no nível de plantão?",
+    "alternativas": [
+      "nslookup (ou dig) do FQDN, comparando com ping do IP",
+      "write erase no edge",
+      "debug all no core",
+      "shutdown do Port-channel de uplink"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "nslookup/dig mostram a resposta DNS; ping IP valida reachability. Comandos destrutivos não diagnosticam registro. Separe nome e IP antes de escalar L3/L1 amplos.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual registro indica os name servers autorizativos de uma zona?",
+    "alternativas": [
+      "A",
+      "NS",
+      "PTR",
+      "CNAME do host de impressora"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "NS lista os servidores de nomes da zona. A é forward IPv4; PTR reverse; CNAME alias de host. NS incorreto ou apontando para hosts offline quebra resolução de forma ampla.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após migração, portal.empresa.com ainda resolve para o IP antigo (servidor desligado). ping IP novo ok se digitado. Qual registro corrigir?",
+    "alternativas": [
+      "A (e/ou AAAA) do portal para o IP novo; limpar cache se necessário",
+      "Apenas STP na VLAN 1",
+      "Somente enable secret do switch",
+      "Apenas etherchannel load-balance"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "IP antigo no A é o clássico pós-migração. Atualizar A/AAAA e considerar TTL/cache. STP e enable secret não controlam o mapeamento nome→IP do portal.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "nslookup -type=MX empresa.com retorna 0 mail.empresa.com; nslookup mail.empresa.com → Non-existent domain. Diagnóstico?",
+    "alternativas": [
+      "Problema exclusivo de cabo Cat6",
+      "MX aponta para hostname sem registro A/AAAA — corrija o host do MX ou crie o A",
+      "Excesso de colisões late no core",
+      "Falta de PoE na câmera"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "MX existe, mas o hostname do exchanger não resolve. Mail quebra na segunda etapa do Diagnose. Crie A/AAAA para mail.empresa.com ou aponte o MX para um host válido.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Servidor SMTP de saída tem IP 198.51.100.20. Alguns destinos rejeitam com falha de reverse DNS. O que checar?",
+    "alternativas": [
+      "CNAME de www apenas",
+      "Duplex da impressora",
+      "Registro PTR para 198.51.100.20 na zona reverse do bloco",
+      "Hostname do access point só em CAPWAP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Muitos sistemas validam PTR do IP de origem SMTP. Ausência ou PTR incorreto gera rejeição. Isso é Diagnose de reverse, não de CNAME web ou wireless CAPWAP.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "www.loja.com é CNAME para cdn.loja.com; cdn.loja.com tem A correto. Cliente resolve www, mas o app ainda falha por TLS/hostname mismatch (cenário à parte). Do ponto de vista só DNS forward, a cadeia está:",
+    "alternativas": [
+      "Quebrada porque CNAME não pode apontar para nome com A",
+      "Inválida sem PTR em todos os clientes",
+      "Completa no forward: CNAME → A final presente",
+      "Impossível em IPv4"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Cadeia saudável: CNAME resolve ao canônico e o canônico tem A. TLS/SNI é outra camada. No escopo 4.4, reconhecer cadeia completa vs quebrada é o ponto.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem correta de Diagnose para 'app só falha no hostname'?",
+    "alternativas": [
+      "reload core → apagar VLAN → ver DNS",
+      "debug ip packet global → write erase",
+      "Cliente DNS e nslookup do FQDN/tipo → se ok, IP path; se nome falha, registro/servidor DNS",
+      "Desligar todos os uplinks e medir CRC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Comece pelo resolvedor e pelo tipo de registro; só então aprofunde L3 se o nome já virou IP. Reload e write erase não são Diagnose de DNS. A cadeia cliente→registro→servidor evita escopo excessivo.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "nslookup tipo AAAA app.local responde 'No answer' / sem AAAA; tipo A responde 10.10.10.50. Cliente só tenta v6. Ação DNS adequada?",
+    "alternativas": [
+      "Apagar o registro A para forçar falha total",
+      "Criar AAAA correto (ou ajustar cliente) para o acesso por nome em IPv6",
+      "Converter a VLAN em VXLAN no exame CCNA",
+      "Remover todos os NS da zona pública"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem AAAA, resolução IPv6 do nome falha. Criar AAAA válido ou garantir fallback/cliente é o caminho. Apagar A ou NS piora o serviço. VXLAN está fora do escopo desta part.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual cenário melhor ilustra problema de NS?",
+    "alternativas": [
+      "Name servers da zona apontam para hosts offline; resolução falha de forma ampla para o domínio",
+      "Um PC com cabo rompido e CRC local",
+      "Uma porta em half duplex com late collisions",
+      "Um SFP com RX −30 dBm em um único uplink"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "NS incorreto ou morto afeta a zona inteira. CRC, duplex e DOM são L1 (1.1), não registros NS. No 4.4, diferencie falha de mídia de falha de name server autorizativo.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Router tem ip name-server 8.8.8.8; o PC do usuário tem DNS 10.1.1.53 via DHCP. O PC não resolve intranet. Onde olhar primeiro?",
+    "alternativas": [
+      "Somente o name-server do router, porque o PC herda automaticamente",
+      "DNS servers do PC (ipconfig) e a zona/intranet em 10.1.1.53 — o IOS name-server não é o resolvedor do PC",
+      "Apenas clear arp no core",
+      "Somente trocar o SFP do uplink de Internet"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "ip name-server no IOS serve ao device, não substitui o DNS do host. O PC usa 10.1.1.53; diagnostique esse resolvedor e os registros internos. Confundir os dois gera escopo errado.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ping mail.empresa.com resolve e responde; ainda assim destinos externos reclamam reverse do IP de saída 203.0.113.10. O que está ok e o que não?",
+    "alternativas": [
+      "Forward A ok; PTR do IP de saída pode estar ausente/errado",
+      "Forward sempre implica PTR correto",
+      "PTR é o mesmo que MX",
+      "Se A existe, reverse é automático em todos os ISPs"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Forward (A) e reverse (PTR) são zonas diferentes. Nome→IP ok não garante IP→nome. Verifique PTR de 203.0.113.10. MX é outro tipo, não substitui PTR.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Sintoma: 'Non-existent domain' para api.empresa.com; outros nomes da mesma zona resolvem. Pista?",
+    "alternativas": [
+      "DNS server do cliente sem energia elétrica global",
+      "Falha de todos os NS da Internet",
+      "Cabo da impressora",
+      "Provável registro específico (A/AAAA/CNAME) ausente ou nome errado — não queda total do resolvedor"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Se só um nome falha e o restante da zona responde, o resolvedor funciona e falta o registro daquele host ou há typo. Queda total do DNS afetaria muitos nomes. Foque no registro da api.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual uso correto de set type=PTR no nslookup?",
+    "alternativas": [
+      "Criar automaticamente um MX",
+      "Forçar duplex full",
+      "Consultar reverse a partir de um IP (ou forma reverse do IP)",
+      "Apagar CNAME remotamente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "type=PTR pede reverse. Não configura MX nem L1. No plantão, use PTR para validar IP de mail ou reverse de diagnóstico.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "CNAME de blog.empresa.com aponta para blog.empresa.com (ele mesmo). Efeito?",
+    "alternativas": [
+      "Resolve mais rápido que A",
+      "Cadeia inválida/loop de alias — deve apontar para canônico distinto com A/AAAA",
+      "Substitui a necessidade de NS",
+      "Gera PTR automático"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "CNAME deve referenciar outro nome que termine em A/AAAA. Loop ou auto-referência quebra a resolução. Não cria NS nem PTR.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Usuário digita IP da intranet e navega; FQDN falha. DNS server responde, mas A está com typo no IP. Qual a classificação do problema?",
+    "alternativas": [
+      "Servidor DNS inacessível",
+      "Falta de NS em toda a Internet",
+      "Registro A incorreto (dado errado na zona)",
+      "Problema exclusivo de L1 no PC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O DNS responde, logo o caminho ao resolvedor está ok; o conteúdo do A está errado. Corrija o registro. Não é DNS morto nem L1 genérico se o IP digitado funciona.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "MX com preferência 5 e 50. Qual é o mais preferido?",
+    "alternativas": [
+      "O de preferência 50",
+      "Sempre o que tem CNAME",
+      "Nenhum; MX não usa preferência",
+      "O de preferência 5 (menor valor = maior preferência)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Em MX, o número menor indica maior preferência. O 5 é tentado antes do 50. CNAME não redefine essa regra. Lembre também de validar o A do host escolhido.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "DHCP entregou DNS 192.0.2.53 (legado) após split de rede; o DNS novo é 10.50.0.53. Sintoma em massa só em hosts DHCP. Ação de Diagnose?",
+    "alternativas": [
+      "Confirmar option de DNS no DHCP e que 192.0.2.53 ainda alcança/serve a zona; corrigir option 6 se obsoleto",
+      "Desligar Spanning Tree em todo campus",
+      "Forçar half duplex nos uplinks",
+      "Apagar todos os registros AAAA da empresa"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sintoma em massa em clientes DHCP aponta option de DNS desatualizada. O 4.4 liga o sintoma ao resolvedor do cliente sem exigir lab completo de DHCP. Corrija option 6 e valide nslookup.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual sintoma casa melhor com PTR ausente?",
+    "alternativas": [
+      "Late collisions em half duplex",
+      "CRC em fibra suja",
+      "Falha de reverse lookup / rejeição de mail por reverse DNS, com forward A possivelmente ok",
+      "Porta notconnect sem SFP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "PTR ausente afeta reverse e políticas de mail. L1 (CRC, duplex, SFP) é outro domínio. Separe 4.4 de 1.1 na leitura do sintoma.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "nslookup FQDN contra 10.10.10.10 ok; mesmo FQDN no PC com DNS 10.10.10.11 timeout. Conclusão?",
+    "alternativas": [
+      "A zona pública da Internet sumiu",
+      "O registro A nunca existiu",
+      "Problema no resolvedor 10.10.10.11 ou caminho até ele — não no nome em si",
+      "CNAME proibido em redes privadas"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O nome resolve em um servidor e timeout no outro: isole o DNS 10.10.10.11 (serviço, rota, ACL). Não conclua que o registro não existe se outro autoritativo/recursivo responde.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "App mobile usa apenas IPv4. AAAA existe com IP v6 errado; A está correto. Risco?",
+    "alternativas": [
+      "Nenhum, apps IPv4-only nunca consultam DNS",
+      "AAAA errado sempre apaga o A",
+      "PTR vira obrigatório em IPv4-only",
+      "Alguns resolvers/apps dual-stack podem preferir AAAA e falhar; valide A e AAAA"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Ambientes dual-stack podem tentar AAAA primeiro. AAAA incorreto quebra o acesso mesmo com A bom. Diagnose inclui os dois tipos quando há IPv6 na rede. Apps puros v4 tendem a usar A, mas o registro sujo ainda é risco operacional.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Para o domínio parceiro.com, nslookup type=NS lista ns1.externo.net offline. Impacto?",
+    "alternativas": [
+      "Resolução do domínio pode falhar ou ficar inconsistente até NS/serviço corretos",
+      "Apenas late collisions aumentam",
+      "Somente o PoE das câmeras cai",
+      "O CRC do cobre some automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "NS offline prejudica a resolução autorizativa/recursiva do domínio. Não é contador L1. Corrija NS e a saúde dos name servers.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Escolha o melhor resumo do Diagnose DNS 4.4 no CCNA.",
+    "alternativas": [
+      "Sempre começar com write erase no DNS server",
+      "Configurar DNSSEC e DoH em todos os PCs no primeiro passo",
+      "Editar zone files BIND completos em toda ocorrência",
+      "Separar IP vs nome; verificar A/AAAA/CNAME/MX/NS/PTR e o DNS do cliente com evidência nslookup"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O tópico pede Diagnose operacional dos registros e da cadeia cliente/servidor, com ferramentas simples. Não exige DNSSEC/DoH avançado nem zone files completos nem write erase. Foque evidência e tipo de registro certo para o sintoma.",
+    "part_id": "v2-4.4"
+  }
+]

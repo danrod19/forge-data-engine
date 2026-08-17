@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Em uma filial com 12 PCs, uma impressora e um único link de Internet, o provedor entregou um CPE que faz NAT, Wi-Fi e quatro portas LAN. Qual topologia de design melhor descreve esse ambiente?",
+    "alternativas": [
+      "SOHO com dispositivo all-in-one na borda",
+      "Three-tier de campus com core dedicado",
+      "Spine-leaf de data center",
+      "WAN full-mesh entre filiais"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Ambiente pequeno com poucos hosts e um equipamento que concentra roteamento/firewall/Wi-Fi encaixa em SOHO. Three-tier e spine-leaf servem campus grande e data center, respectivamente. WAN full-mesh descreve interligação entre vários sites, não o layout interno dessa filial isolada.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Dois PCs na mesma VLAN 20 e na mesma subnet trocam arquivos. Qual dispositivo realiza o encaminhamento principal entre as portas de acesso?",
+    "alternativas": [
+      "Roteador de borda WAN, por IP de destino",
+      "Switch de camada 2, por endereço MAC",
+      "Firewall NGFW, por zona DMZ",
+      "WLC, por SSID corporativo"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Tráfego na mesma VLAN/subnet é comutado em L2 com base em MAC. O roteador só entra quando o destino está em outra rede. Firewall por zona e WLC não são o encaminhador padrão entre duas portas cabeadas da mesma VLAN de acesso.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual papel descreve corretamente um endpoint na borda da rede corporativa?",
+    "alternativas": [
+      "Aprende todos os MACs da VLAN e comuta quadros entre portas",
+      "Mantém tabela de rotas e reescreve o quadro L2 a cada hop WAN",
+      "Origina e consome tráfego; em geral não encaminha fluxos de terceiros como switch ou roteador",
+      "Centraliza SSIDs e políticas RF de dezenas de APs"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Endpoints (PC, impressora, câmera, telefone IP) geram e recebem fluxos de aplicação. Comutar por MAC é função de switch; rotas e rewrite L2 em hops são de roteador; centralizar SSID/RF é papel de WLC. A distinção origem/destino versus encaminhador é clássica no blueprint.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Um campus médio usa switches de acesso ligados a um par de switches de agregação que também fazem o backbone entre prédios, sem camada de core separada. Qual arquitetura é essa?",
+    "alternativas": [
+      "Spine-leaf com spines sem conexão a servidores",
+      "Three-tier completo Access-Distribution-Core",
+      "SOHO all-in-one sem camada de acesso",
+      "Two-tier (collapsed core), com Distribution e Core colapsados"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Quando Access sobe para uma camada que agrega e também faz o papel de core, o design é two-tier (collapsed core). Three-tier manteria Core separado. Spine-leaf é fabric de DC. SOHO não descreve campus com pares de agregação entre prédios.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A empresa exige um único SSID corporativo, roaming transparente e ajuste centralizado de canais RF em 40 APs. Qual combinação atende a esse requisito?",
+    "alternativas": [
+      "APs lightweight gerenciados por WLC",
+      "Apenas switches L2 com VLANs, sem controller wireless",
+      "Um roteador WAN por andar, sem AP",
+      "Firewall entre zonas LAN e DMZ no lugar dos APs"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Política, SSID, autenticação e RF centralizados pedem WLC com APs lightweight. Switch L2 sozinho não orquestra RF/roaming. Roteador WAN e firewall resolvem encaminhamento/política de zonas, não a função de rádio e associação Wi-Fi na borda.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Hosts na VLAN 10 (192.168.10.0/24) precisam falar com servidores na VLAN 20 (192.168.20.0/24). O switch de acesso é apenas L2. Qual abordagem de encaminhamento entre VLANs é coerente com o conteúdo estudado?",
+    "alternativas": [
+      "Manter tudo em L2 e confiar só na tabela MAC do access switch",
+      "Usar switch L3 com SVIs (ou roteador) para rotear entre as subnets das VLANs",
+      "Configurar spine-leaf apenas no access switch de borda",
+      "Apontar o default gateway dos hosts para o endereço MAC do AP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Redes IP diferentes exigem decisão L3: SVI em switch multilayer ou roteador (incl. router-on-a-stick). Tabela MAC do L2 não roteia entre subnets. Spine-leaf não é recurso de um access switch isolado. Gateway é IP de L3, não MAC do AP.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual afirmação diferencia corretamente firewall tradicional e IPS no caminho de segurança?",
+    "alternativas": [
+      "Firewall só comuta por MAC; IPS só monta tabela de rotas WAN",
+      "IPS substitui o switch de acesso e elimina a necessidade de VLAN",
+      "Firewall filtra entre zonas (IP/porta/estado); IPS analisa ameaças e pode bloquear tráfego malicioso em linha",
+      "Ambos existem apenas na nuvem e não se usam on-premises"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Firewall trabalha política entre zonas com critérios clássicos de sessão; IPS aprofunda inspeção de ataques e pode prevenir em linha. Nenhum dos dois vira switch L2 de acesso nem monta rotas no lugar do roteador. Ambos podem existir on-prem ou integrados a NGFW.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Em um data center, servidores conectam-se a switches leaf, e cada leaf sobe para todos os switches spine. Spines não conectam servidores diretamente. Qual topologia é essa?",
+    "alternativas": [
+      "Three-tier de campus com Core na borda de usuário",
+      "SOHO com AP autônomo",
+      "Two-tier collapsed core de escritório",
+      "Spine-leaf orientada a tráfego leste-oeste"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A descrição (leafs nos servers, full mesh leaf-spine, spines sem hosts) é spine-leaf de DC, eficiente para east-west. Three-tier e two-tier são modelos de campus. SOHO não se aplica a fabric de servidores.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Um pacote sai da LAN da matriz rumo a uma aplicação hospedada em VPC na nuvem pública, passando por VPN no firewall de borda. Qual modelo de implantação descreve melhor o conjunto?",
+    "alternativas": [
+      "Híbrido: cargas on-prem e cloud com conectividade segura entre ambos",
+      "SOHO puro, sem necessidade de WAN",
+      "Apenas spine-leaf local, sem borda WAN",
+      "Three-tier em que o Core substitui a nuvem"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Recursos locais + cloud com VPN/firewall na borda caracterizam modelo híbrido. SOHO e spine-leaf não explicam a integração multi-site com provedor. Core de campus não “substitui” a nuvem como destino de carga.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Na hierarquia three-tier de campus, qual camada conecta diretamente endpoints e APs e costuma aplicar segmentação básica por porta/VLAN?",
+    "alternativas": [
+      "Core, priorizando apenas transporte entre blocos",
+      "Access, na borda de usuário",
+      "Spine, sem ligação a hosts",
+      "WAN edge do provedor MPLS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Access é a borda onde PCs e APs se conectam. Core foca backbone de alta velocidade entre módulos. Spine pertence a fabric de DC. WAN edge do provedor não é a camada de acesso do campus three-tier.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após migrar de router-on-a-stick para SVIs em um switch multilayer, o atraso entre VLANs de usuários e servidores caiu. Qual é a razão de design mais coerente?",
+    "alternativas": [
+      "O switch L2 passou a reescrever rotas BGP da WAN automaticamente",
+      "A WLC passou a rotear entre VLANs no lugar do switch",
+      "O inter-VLAN routing no L3 switch evita o hairpin externo e encaminha entre SVIs de forma mais eficiente em redes médias/grandes",
+      "As VLANs deixaram de precisar de gateway IP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Switch L3 com SVIs roteia internamente entre VLANs, em geral melhor que subir todo o tráfego a um roteador externo (hairpin). WLC não assume esse papel de inter-VLAN de campus. Gateway IP continua necessário por subnet; L2 sozinho não “vira BGP WAN”.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um cliente Wi-Fi associa-se ao AP do 3º andar e acessa um servidor em outra subnet. Qual caminho de papéis está correto?",
+    "alternativas": [
+      "A WLC substitui o default gateway de todos os clientes e elimina L3",
+      "O AP roteia diretamente pela tabela MAC do spine",
+      "O firewall remove o IP e encaminha só por SSID",
+      "AP termina a associação L2 na WLAN; a saída para outra subnet ainda depende de gateway L3 (SVI/roteador)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O AP é entrada L2 wireless; mudar de subnet exige gateway L3. WLC centraliza controle, mas não apaga a necessidade de roteamento. AP não roteia via MAC de spine; firewall não descarta IP para rotear por SSID.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A política de segurança exige zonas LAN, DMZ e WAN com filtragem por IP, porta e estado da conexão, além de inspeção de aplicação e usuário. Qual par de tecnologias cobre esses requisitos?",
+    "alternativas": [
+      "Somente switch L2 com tabela MAC",
+      "Apenas AP autônomo sem controller",
+      "Roteador sem ACL e sem firewall",
+      "Firewall/NGFW no caminho entre zonas, com recursos de inspeção avançada típicos de NGFW"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Zonas e filtragem stateful são domínio de firewall; inspeção de app/usuário aponta para NGFW. Switch L2 e AP não implementam essa política de zonas. Roteador pode ter ACL, mas o enunciado pede o papel de firewall/NGFW entre zonas de confiança.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual critério prático ajuda a decidir se o quadro será apenas comutado em L2 ou precisará de roteamento L3?",
+    "alternativas": [
+      "Se o destino usa Wi-Fi, sempre vai à WLC e nunca ao switch",
+      "Mesma network IP → comutação L2; networks diferentes → decisão de roteamento L3",
+      "Se existir VLAN, o tráfego nunca precisa de gateway",
+      "Se o link for fibra, o encaminhamento é sempre spine-leaf"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O teste de mesma subnet versus subnets distintas define L2 versus L3. Wi-Fi não obriga bypass do switch; VLAN ainda exige gateway entre subnets; meio físico (fibra) não impõe topologia spine-leaf sozinho.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Filial A e Filial B estão em cidades diferentes e precisam de conectividade estável entre LANs internas. Switches de acesso já existem em cada site. Qual elemento de design falta no desenho de interligação?",
+    "alternativas": [
+      "Substituir todos os switches por APs autônomos",
+      "Criar spine-leaf dentro de cada sala de reunião",
+      "Borda WAN com roteadores/firewalls e transporte do provedor (MPLS, Internet+VPN ou link dedicado)",
+      "Remover default gateways e unificar tudo em um único domínio de broadcast interurbano"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Interligar sites geograficamente separados é papel da WAN na borda (roteador/firewall + transporte). Trocar switch por AP ou forçar spine-leaf local não cria o caminho entre cidades. Unificar broadcast interurbano não é design válido nem escalável.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Sobre controllers (ex.: WLC) e dispositivos de encaminhamento, qual separação de planos é a mais alinhada ao estudo da parte 1.2?",
+    "alternativas": [
+      "Controller encaminha todos os bits de usuário; AP só guarda inventário",
+      "Switch L2 centraliza política RF e o controller só comuta MAC",
+      "Não existe separação: todo AP autônomo elimina qualquer controller",
+      "Políticas e controle no controller; plano de dados de rádio/encaminhamento nos APs e demais devices"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "No modelo centralizado, o controller concentra política/controle e os APs (e switches/roteadores no caso SDN amplo) tratam o encaminhamento de dados. Inverter esses papéis ou afirmar que AP autônomo “proíbe” o modelo com WLC distorce o conteúdo.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Durante um incidente, o SOC pede bloqueio imediato de um padrão de ataque conhecido que já atravessa o link entre LAN e DMZ. O firewall de zona já permite a porta da aplicação. Qual recurso adicional atende melhor o pedido?",
+    "alternativas": [
+      "IPS (integrado ao NGFW ou appliance) inspecionando e prevenindo a assinatura em linha",
+      "Aumentar apenas a velocidade do Core three-tier",
+      "Desligar todas as SVIs do switch L3 de acesso",
+      "Migrar endpoints para spine-leaf no andar de usuários"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Permitir porta no firewall não impede payload malicioso; IPS/NGFW com prevenção atua sobre assinaturas/comportamento. Acelerar Core, derrubar SVIs ou redesenhar para spine-leaf no campus de usuário não responde ao bloqueio pontual da ameaça.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Na camada Distribution do three-tier, qual conjunto de funções é o mais típico?",
+    "alternativas": [
+      "Conectar apenas impressoras USB sem IP",
+      "Agregar uplinks de acesso, aplicar políticas e com frequência rotear (L3) entre blocos de acesso",
+      "Terminar exclusivamente links de provedor MPLS no lugar do edge WAN",
+      "Servir de leaf para servidores bare-metal no rack"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Distribution agrega o Access, aplica política e costuma ser ponto L3 do campus. Não é a borda WAN do provedor por definição, nem leaf de DC, nem porta de periférico sem rede. Confundir Distribution com Core puro ou com spine-leaf é erro comum.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um projetista compara two-tier e three-tier para um campus que deve crescer para vários prédios com core de alta disponibilidade separado da agregação. Qual escolha e justificativa estão corretas?",
+    "alternativas": [
+      "SOHO, porque all-in-one escala indefinidamente",
+      "Spine-leaf de DC aplicado a cada mesa de usuário",
+      "Three-tier, separando Core de alta velocidade da Distribution de política/agregação",
+      "Apenas um switch L2 único para todo o campus multi-prédio"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Quando há necessidade clara de core dedicado e distribuição com política, three-tier é o modelo. SOHO e um único L2 não escalam multi-prédio com HA de backbone. Spine-leaf resolve fabric de DC, não o campus de mesa de usuário descrito.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual benefício de gerenciamento centralizado com controllers é mais alinhado ao conteúdo da trilha?",
+    "alternativas": [
+      "Eliminar a necessidade de endereços IP nos endpoints",
+      "Substituir todo firewall por tabela MAC",
+      "Transformar automaticamente SOHO em spine-leaf",
+      "Configuração consistente, templates, visibilidade e menor erro manual em escala"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Controllers reduzem variação de config e melhoram inventário/automação. Não removem IP dos hosts, não trocam firewall por MAC e não mudam magicamente a topologia física de SOHO para fabric de DC.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um técnico vê o AP no modo autônomo, com SSID e senha configurados só naquele equipamento. Qual limitação operacional é esperada ao crescer para dezenas de andares?",
+    "alternativas": [
+      "Dificuldade de padronizar SSID, RF e políticas em escala, pois não há WLC centralizando o controle",
+      "Impossibilidade total de associar qualquer cliente Wi-Fi",
+      "Obrigatoriedade de spine-leaf em cada AP",
+      "Conversão automática do AP em roteador BGP de Internet"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "AP autônomo funciona localmente, mas escala mal para política/RF uniformes — daí o modelo lightweight+WLC. Clientes ainda associam em um AP só; não há obrigação de spine-leaf nem de o AP virar roteador BGP.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "No hop de um roteador de borda WAN, o que acontece com os cabeçalhos ao encaminhar o pacote ao próximo enlace?",
+    "alternativas": [
+      "O IP de L3 é apagado e só o MAC original de ponta a ponta permanece",
+      "O roteador reescreve o quadro L2 do próximo enlace e usa o IP de L3 para a decisão de encaminhamento (salvo cenários com NAT)",
+      "O switch L2 da LAN reescreve as rotas do provedor",
+      "A WLC remove o quadro Ethernet e envia apenas SSID pelo link WAN"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Em cada hop o roteador monta novo quadro L2 adequado ao enlace; o IP orienta o encaminhamento ponta a ponta (exceto NAT). MAC de origem da LAN não atravessa a WAN intacto como único identificador. Switch L2 e WLC não assumem esse papel no edge WAN.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Servidores de aplicação e banco no mesmo DC geram muito tráfego leste-oeste. O time quer paths curtos e previsíveis entre racks. Qual topologia atende melhor?",
+    "alternativas": [
+      "SOHO com um único switch não gerenciável",
+      "Three-tier de campus com Access de usuários no lugar dos leafs",
+      "Spine-leaf, com leafs nos servers e uplinks para todos os spines",
+      "Apenas firewall de borda Internet, sem fabric interna"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Spine-leaf foi pensada para east-west em DC com múltiplos caminhos leaf-spine. SOHO e three-tier de usuários não otimizam fabric de racks. Firewall de Internet não estrutura o encaminhamento interno entre servidores.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual combinação descreve corretamente o uso de VLANs no switch L2 de acesso junto à segmentação de endpoints?",
+    "alternativas": [
+      "VLANs eliminam a necessidade de qualquer endereço IP",
+      "VLANs transformam o switch L2 em WLC",
+      "VLANs só existem em links WAN do provedor",
+      "VLANs criam domínios de broadcast lógicos; endpoints ainda se conectam nas portas de acesso e podem ser isolados por VLAN/ACL/802.1X"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "VLAN segmenta broadcast no L2 e é base de isolamento de endpoints na borda, frequentemente com ACL/802.1X. IP continua necessário para comunicação entre redes. VLAN não vira WLC nem é exclusividade de WAN.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um NGFW está entre a LAN corporativa e a Internet. Switches L3 internos já roteiam entre VLANs de usuários. Qual afirmação sobre papéis está correta?",
+    "alternativas": [
+      "O NGFW complementa o encaminhamento com política de segurança na borda; não substitui o papel dos switches/roteadores internos de comutar e rotear a LAN",
+      "O NGFW substitui todas as SVIs e apaga a tabela MAC dos access switches",
+      "Com NGFW, APs e WLC tornam-se desnecessários mesmo com WLAN",
+      "O NGFW opera apenas como leaf spine-leaf no Core de campus"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Firewall/NGFW aplica política entre zonas de confiança e na borda Internet; a LAN continua dependendo de switches (e L3) para comutar/rotear. NGFW não remove SVIs/MAC tables nem elimina WLAN, e não é leaf de fabric de DC por definição.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A matriz mantém Active Directory e file servers no data center local, enquanto o e-mail migrou para SaaS. Usuários na filial acessam ambos via Internet+VPN e link MPLS. Qual leitura de modelo está correta?",
+    "alternativas": [
+      "Somente cloud, pois qualquer SaaS elimina on-prem",
+      "Híbrido: parte das cargas on-premises e parte na cloud, com WAN/VPN unindo os sites",
+      "Somente SOHO, independentemente do DC e do SaaS",
+      "Somente spine-leaf, porque há MPLS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Servidores locais + SaaS + conectividade entre sites formam cenário híbrido. SaaS não apaga o on-prem restante. SOHO não descreve matriz/DC/filial. MPLS é transporte WAN, não define spine-leaf.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual diferença de papel entre switch L3 e roteador de borda WAN é a mais precisa para o CCNA nesta parte?",
+    "alternativas": [
+      "Switch L3 só existe em SOHO; roteador só em spine-leaf",
+      "Roteador não usa tabela de roteamento; switch L3 usa apenas MAC",
+      "Ambos podem rotear entre redes IP; o roteador de borda costuma terminar WAN/VPN/NAT, enquanto o L3 switch brilha no inter-VLAN e LAN de campus",
+      "Nenhum dos dois reescreve quadro L2 em hops"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Os dois encaminham entre redes IP, mas o contexto muda: L3 switch no campus/inter-VLAN; roteador de borda em WAN, VPN, NAT e provedor. Ambos usam rotas (não “só MAC” no L3). Em cada hop L3 o quadro L2 é adequado ao enlace. Não há exclusividade SOHO/spine-leaf como dito nas outras opções.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "No Core do three-tier, qual prioridade de design é a mais correta?",
+    "alternativas": [
+      "Conectar cada PC de usuário diretamente ao Core",
+      "Aplicar 802.1X em todas as portas de impressora sem uplink",
+      "Servir de WLC para APs de guest apenas",
+      "Transporte de alta velocidade e disponibilidade entre blocos/módulos do campus"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Core é backbone: velocidade e resiliência entre distribution blocks. Endpoints e APs ficam no Access; políticas de borda e agregação pesam na Distribution/Access. WLC não é sinônimo de Core.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um escritório home-office de um diretor usa um único roteador Wi-Fi do provedor e dois notebooks. O time de redes da empresa classifica o site para inventário de topologias. Qual rótulo é o mais adequado?",
+    "alternativas": [
+      "SOHO de pequeno porte",
+      "Three-tier com Core dedicado",
+      "Spine-leaf com dois spines",
+      "Campus two-tier multi-prédio"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Poucos hosts e CPE all-in-one = SOHO. Não há camadas de campus nem fabric de DC. Classificar home-office como three-tier ou spine-leaf distorce o mapa de topologias da parte 1.2.",
+    "part_id": "1.2"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após um redesign, APs lightweight passam a baixar configuração da WLC, enquanto o default gateway dos usuários Wi-Fi continua sendo a SVI do switch L3 de distribuição. Qual conclusão está correta?",
+    "alternativas": [
+      "A WLC substituiu o switch L3 e as SVIs devem ser removidas",
+      "Controle wireless centralizado na WLC coexiste com encaminhamento inter-subnet no switch L3; são papéis complementares",
+      "SVI e WLC são incompatíveis no mesmo campus",
+      "Os APs agora roteiam a WAN no lugar do firewall de borda"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "WLC centraliza o controle dos APs (SSID, RF, políticas wireless); o tráfego para outras subnets ainda usa gateway L3 (SVI/roteador). Não há incompatibilidade nem substituição automática do L3 ou do firewall de borda pelos APs.",
+    "part_id": "1.2"
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "HD-1601: estação Windows 'sem rede' após técnico aplicar IP estático manual. Corrija com base no output.",
+    "cli_output": "C:\\> ipconfig /all\nEthernet adapter Ethernet:\n   DHCP Enabled. . . . . . . . . . . : No\n   IPv4 Address. . . . . . . . . . . : 10.40.0.88\n   Subnet Mask . . . . . . . . . . . : 255.255.0.0\n   Default Gateway . . . . . . . . . : 10.41.0.1\n   DNS Servers . . . . . . . . . . . : 10.40.0.53\n\nC:\\> ping 10.41.0.1\nDestination host unreachable.\n\nC:\\> route print | findstr 0.0.0.0\n          0.0.0.0          0.0.0.0       10.41.0.1     10.40.0.88     25\n\nDesign: VLAN 40 = 10.40.0.0/24, SVI/gateway = 10.40.0.1",
+    "alternativas": [
+      "Corrigir no OS: mask 255.255.255.0 e gateway 10.40.0.1 (estático alinhado à VLAN)",
+      "Manter mask /16 e gateway 10.41 — está correto para /24",
+      "Rodar format C: e reinstalar o core",
+      "O problema é só registro MX da empresa"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Mask /16 e gateway 10.41.0.1 estão fora do desenho 10.40.0.0/24 com SVI 10.40.0.1. Destination host unreachable confirma GW inválido. Configure estático correto no Windows. MX e format não aplicam.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "HD-1602: notebook Windows não navega; DHCP deveria estar ativo na VLAN.",
+    "cli_output": "C:\\> ipconfig /all\nWireless LAN adapter Wi-Fi:\n   DHCP Enabled. . . . . . . . . . . : Yes\n   Autoconfiguration Enabled . . . . : Yes\n   IPv4 Address. . . . . . . . . . . : 169.254.44.19(Preferred)\n   Subnet Mask . . . . . . . . . . . : 255.255.0.0\n   Default Gateway . . . . . . . . . :\n   DNS Servers . . . . . . . . . . . :\n\nC:\\> ipconfig /renew\nAn error occurred while renewing interface Wi-Fi : unable to contact your DHCP server.\n\nC:\\> ping 10.40.0.1\nPinging 10.40.0.1 with 32 bytes of data:\nDestination host unreachable.\n\nMedia State: Wi-Fi Connected / SSID CORP-USER",
+    "alternativas": [
+      "Tratar 169.254 como IP de produção e criar rota estática para a Internet",
+      "Configurar gateway 169.254.0.1 manualmente",
+      "APIPA: sem lease DHCP — no cliente tentar renew/rede; escalar L2/DHCP (1.7), não inventar estático aleatório",
+      "O DNS 8.8.8.8 fixo resolve APIPA sozinho"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "169.254 e falha no /renew mostram ausência de DORA. No ângulo 1.6 reconheça APIPA e evite estático inventado; verifique associação Wi-Fi/VLAN e escale DHCP/rede (1.7). DNS público não atribui IP.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "HD-1603: VM Linux alcança hosts da mesma subnet via IP antigo residual, mas não sai da LAN.",
+    "cli_output": "user@vm:~$ ip addr show eth0\n2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP>\n    inet 10.40.0.77/24 brd 10.40.0.255 scope global eth0\n    inet6 fe80::a00:27ff:fe12:3456/64 scope link\n\nuser@vm:~$ ip route show\n10.40.0.0/24 dev eth0 proto kernel scope link src 10.40.0.77\n(no default via ...)\n\nuser@vm:~$ ping -c 2 10.40.0.10\n64 bytes from 10.40.0.10: icmp_seq=1 ttl=64\n\nuser@vm:~$ ping -c 2 10.40.0.1\nconnect: Network is unreachable\n\nuser@vm:~$ ping -c 1 8.8.8.8\nconnect: Network is unreachable",
+    "alternativas": [
+      "Problema exclusivo de certificado TLS",
+      "Mask /24 está errada (não há evidência)",
+      "DNSSEC no browser",
+      "Ausência de default route — configurar gateway (ex. default via 10.40.0.1) ou DHCP options no cliente"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "ip route sem default e Network is unreachable para o GW/Internet isolam falta de gateway no Linux. LAN on-link funciona. Adicione default via 10.40.0.1 ou obtenha via DHCP. TLS/DNSSEC não instalam rota default.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "HD-1604: Mac/Linux do dev: git clone por IP do servidor ok; por hostname falha. Rede 'parece ok'.",
+    "cli_output": "dev@mac:~$ ping -c 2 10.20.5.40\n64 bytes from 10.20.5.40: icmp_seq=0 ttl=62 time=2 ms\n\ndev@mac:~$ ping -c 1 git.empresa.local\nping: cannot resolve git.empresa.local: Unknown host\n\ndev@mac:~$ dig git.empresa.local\n;; connection timed out; no servers could be reached\n\ndev@mac:~$ scutil --dns | head -20\nresolver #1\n  nameserver[0] : 192.0.2.53\n  nameserver[1] : 192.0.2.53\n\ndev@mac:~$ ping -c 1 192.0.2.53\nRequest timeout for icmp_seq 0\n\nip addr/IP config: 10.40.0.66/24  gw 10.40.0.1 (ping gw OK)",
+    "alternativas": [
+      "Trocar a mask para 255.0.0.0",
+      "Problema de duplex no core (sem evidência L1)",
+      "DNS no OS aponta para 192.0.2.53 inacessível — corrigir DNS do cliente; IP path ok",
+      "APIPA IPv4 em andamento"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Ping IP e GW ok; dig timeout no DNS listado no OS. Configure DNS válido (corporativo alcançável). É o ângulo 1.6/4.4 no host. Não há APIPA nem evidência de duplex.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "HD-1605: usuário insiste que 'o PC está errado'. Valide com tracert se a falha é local.",
+    "cli_output": "C:\\> ipconfig\n   IPv4 Address. . . . . . . . . . . : 10.40.0.91\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.40.0.1\n\nC:\\> ping 10.40.0.1\nReply from 10.40.0.1: bytes=32 time=1ms TTL=64\n\nC:\\> ping 203.0.113.50\nRequest timed out.\n\nC:\\> tracert -d 203.0.113.50\nTracing route to 203.0.113.50 over a maximum of 30 hops\n  1    <1 ms    <1 ms    <1 ms  10.40.0.1\n  2    <1 ms    <1 ms    <1 ms  10.0.0.2\n  3     *        *        *     Request timed out.\n  4     *        *        *     Request timed out.\n\nC:\\> nslookup intranet.empresa.local\nName:    intranet.empresa.local\nAddress:  10.20.5.10",
+    "alternativas": [
+      "Reconfigurar IP/mask/gateway do PC imediatamente (locais ok)",
+      "Cliente e primeiro hops OK — falha além do path local; não culpar settings do OS sem evidência",
+      "Forçar APIPA no Windows",
+      "Apagar o DNS que resolve intranet"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "ipconfig coerente, ping GW ok, tracert passa hop 1 e 2 e morre depois, DNS interno resolve. O cliente está verificado; o problema está além. Evite reconfigurar o OS sem erro local.",
+    "part_id": "v2-1.6"
+  }
+]

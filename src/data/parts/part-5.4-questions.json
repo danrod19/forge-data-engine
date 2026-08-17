@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Uma WLAN configurada como Open (sem autenticação/cifre moderna) implica principalmente:",
+    "alternativas": [
+      "Associação fácil e tráfego no ar sem confidencialidade adequada — qualquer um no alcance pode observar ou usar a rede",
+      "Criptografia AES-CCMP obrigatória por padrão",
+      "Autenticação 802.1X com RADIUS automática",
+      "WPA3-SAE habilitado sem configuração"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Open não protege a confidencialidade dos frames como WPA2/WPA3. Não habilita AES, 802.1X nem SAE sozinha. No CCNA, Open é anti-padrão de segurança wireless, útil só em guest controlado com outros controles (captive) — e ainda assim o ar pode vazar dados se não houver camada superior.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "WEP é considerado inseguro no CCNA porque:",
+    "alternativas": [
+      "Usa certificados X.509 obrigatórios demais complexos",
+      "Emprega criptografia fraca/quebrável (RC4 e práticas de chave inadequadas) — legado obsoleto",
+      "É mais forte que WPA3-Enterprise por definição",
+      "Impede qualquer associação de clientes"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "WEP foi quebrado há anos e não deve ser opção de produção. Não é “mais forte que WPA3” nem exige certs como Enterprise moderno. Clientes ainda podem associar — o problema é a fragilidade, não a impossibilidade de conectar.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Na evolução de segurança Wi-Fi do exame, a ordem mental do mais fraco ao mais adequado costuma ser:",
+    "alternativas": [
+      "WPA3 → WEP → Open",
+      "AES → WEP → Open apenas",
+      "Open/WEP → WPA/TKIP → WPA2-AES → WPA3 (conceitualmente mais forte)",
+      "PSK → sempre pior que Open"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Open e WEP são o fundo; WPA/TKIP é legado intermediário; WPA2-AES é baseline clássico; WPA3 reforça o modelo. PSK não é pior que Open — Open sequer autentica a rede. A linha do tempo evita escolher WEP “por compatibilidade”.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "WPA2-Personal (PSK) difere de WPA2-Enterprise principalmente porque:",
+    "alternativas": [
+      "Enterprise não usa nenhum cipher",
+      "PSK proíbe AES",
+      "Personal não existe no 802.11",
+      "Personal usa senha compartilhada (PSK); Enterprise usa 802.1X/RADIUS com identidade por usuário"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "AKM muda: PSK vs 802.1X. Ambos podem usar AES-CCMP no WPA2. Enterprise não “remove cipher”; Personal é o modo doméstico/filial do exame. Escolha Enterprise quando a política exige conta individual e revogação por usuário.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No modelo WPA2-PSK típico, o papel do AES/CCMP é:",
+    "alternativas": [
+      "Cifrar o tráfego de dados no ar (confidencialidade/integridade do frame)",
+      "Substituir o SSID do AP",
+      "Autenticar o usuário no Active Directory sozinho",
+      "Definir o canal RF 1/6/11 automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Cipher AES-CCMP protege os dados após a autenticação PSK. SSID identifica a rede; AD/RADIUS entram no Enterprise; canal é RF. Separar AKM (PSK) de cipher (AES) evita confusão de prova.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "TKIP no discurso moderno do CCNA é tratado como:",
+    "alternativas": [
+      "Cipher preferido sobre AES em WPA3",
+      "Legado pós-WEP que deve ser evitado; prefira AES-CCMP",
+      "O único cipher permitido em WPA2",
+      "Um tipo de antena MIMO"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "TKIP foi ponte de migração; hoje reintroduz fraqueza e incompatibilidade. WPA2 moderno usa AES. Não é antena nem requisito exclusivo do WPA2. Auditorias marcam TKIP-only como achado.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Cliente exibe “senha de rede incorreta” em WLAN WPA2-PSK. Hipótese mais alinhada:",
+    "alternativas": [
+      "Canal 6 proibido no país",
+      "Spanning Tree bloqueou o SSID",
+      "Mismatch da PSK (ou perfil com senha antiga) entre cliente e AP/WLC",
+      "NAT overload na borda apagou o AES"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Auth PSK falha quando a passphrase não bate (case, espaços, SSID errado no perfil). STP e NAT não validam PSK. Confirme a mesma chave nos dois lados e recrie o perfil do cliente se necessário.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Política: cada funcionário com credencial própria revogável. Qual modo de segurança WLAN atende melhor?",
+    "alternativas": [
+      "Open com SSID oculto apenas",
+      "WEP de 104 bits",
+      "WPA2-PSK única para toda a empresa",
+      "WPA2/WPA3-Enterprise (802.1X/RADIUS) — identidade por usuário"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Enterprise separa identidade e facilita offboarding. PSK única compartilhada não revoga um indivíduo sem trocar a chave de todos. Open/WEP são inseguros. O content 5.4 enfatiza essa escolha de AKM.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Autenticação (AKM) e criptografia (cipher) diferem porque:",
+    "alternativas": [
+      "AKM prova se o cliente pode entrar; cipher protege os frames de dados no meio wireless",
+      "Cipher só escolhe o SSID; AKM só escolhe o canal",
+      "São sinônimos exatos no 802.11",
+      "AKM substitui a necessidade de qualquer cipher sempre"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "PSK/802.1X autenticam; AES cifra. Um sem o outro deixa a solução incompleta (ex.: open sem cipher, ou auth ok com cipher fraco). Não são sinônimos nem funções de RF de canal/SSID.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "WPA3-Personal melhora o modelo PSK clássico principalmente ao introduzir, no nível conceitual:",
+    "alternativas": [
+      "WEP obrigatório de fallback",
+      "SAE (Simultaneous Authentication of Equals) — autenticação mais resistente a ataques offline sobre o handshake",
+      "Somente TKIP",
+      "Open authentication como padrão"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "SAE substitui o PSK handshake clássico vulnerável a ataques offline de dicionário sobre capturas. Não reabilita WEP/TKIP/Open. O exame pede o conceito, não o enrollment detalhado de certificados Enterprise.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "WLAN no WLC: WPA2, AKM PSK, cipher AES. Cliente configurado só para WPA/TKIP. Sintoma típico?",
+    "alternativas": [
+      "Falha de associação ou incompatibilidade de segurança — mismatch de cipher/versão",
+      "Associação Open automática",
+      "RADIUS obrigatório sem PSK",
+      "DHCP snooping derruba o cliente Wi-Fi"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Cliente e AP precisam de suite compatível. TKIP-only vs AES-only não fecha o esperado WPA2-AES. Não vira Open nem exige RADIUS se a WLAN é PSK. Ajuste o perfil do cliente ou a política do WLC de forma consciente.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PSK “12345678” em WPA2-AES corporativo. Avaliação de risco?",
+    "alternativas": [
+      "Risco alto: cipher forte não salva PSK fraca/adivinhavel — toda a WLAN compartilha o segredo",
+      "Risco zero porque AES é inquebrável com qualquer senha",
+      "Risco zero porque WPA2 proíbe senhas curtas no rádio",
+      "Risco irrelevante: só Open tem risco"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "AES protege com a chave derivada; senha fraca facilita quebra/guess e abuso da PSK compartilhada. Policy de senha importa no wireless como no device. Open não é o único risco — PSK fraca também.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show wlan indica Security Policy: None / Open. Conclusão de auditoria?",
+    "alternativas": [
+      "WPA3-Enterprise completo",
+      "WEP com AES",
+      "WLAN sem proteção WPA — tráfego/associação sem o modelo WPA2/WPA3 de privacidade",
+      "PSK de 63 caracteres garantida"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "None/Open é achado crítico de confidencialidade no ar. Não é Enterprise nem WEP-AES (WEP não é AES moderno). Corrija para WPA2/WPA3 com AKM e cipher adequados à política.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "WLAN exige 802.1X; cliente só tem perfil PSK da rede antiga. Resultado?",
+    "alternativas": [
+      "Cliente autentica com qualquer PSK automaticamente",
+      "Falha de autenticação — AKM incompatível (cliente PSK vs WLAN Enterprise)",
+      "WEP assume o papel do 802.1X",
+      "Associação bem-sucedida sem credencial"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "AKM precisa coincidir. Perfil PSK não completa 802.1X/RADIUS. Reconfigure o cliente para Enterprise (usuário/cert) ou mude a política da WLAN se o desenho for PSK — não misture sem saber.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual combinação representa configuração WPA2-PSK “saudável” no lab CCNA?",
+    "alternativas": [
+      "Open + WEP keys",
+      "WPA + TKIP only obrigatório",
+      "WPA2 + AKM PSK + cipher AES (CCMP) + passphrase forte",
+      "Security disabled + SSID broadcast off apenas"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "WPA2-AES-PSK com senha forte é o baseline de lab. Open/WEP e TKIP-only são legados. Esconder SSID não substitui WPA2. É o desenho que o content descreve como típico.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "“Mixed WPA/WPA2 com TKIP e AES” em corporativo moderno. Preocupação principal?",
+    "alternativas": [
+      "Compatibilidade legada pode manter TKIP e aumentar superfície/downgrade — preferir WPA2/WPA3 AES-only",
+      "Garante WPA3-SAE automaticamente",
+      "Impede qualquer cliente Windows de conectar",
+      "Desliga o rádio 2.4 GHz por padrão"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Modos mistos existem por compatibilidade, mas reintroduzem stacks fracos. Política madura remove TKIP/WPA old. Não habilita SAE sozinho nem desliga bandas. Audite ciphers habilitados no show wlan.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cliente associa em WLAN Open e navega. Do ponto de vista de confidencialidade no ar:",
+    "alternativas": [
+      "Está seguro como WPA3-Enterprise",
+      "O 4-way handshake WPA2 protege automaticamente",
+      "Tráfego pode ser capturado por terceiros no canal — falta cifre de link WPA",
+      "Open usa AES-CCMP invisível"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Associar e navegar não implica privacidade L2 wireless. Sem WPA, sniffer no canal lê frames. HTTPS ajuda aplicações, mas o modelo CCNA marca Open como inseguro no enlace Wi-Fi. Não há 4-way WPA2 em Open clássico.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "security wpa akm psk no contexto WLC/IOS-XE wireless (visão leve) seleciona:",
+    "alternativas": [
+      "Autenticação por chave pré-compartilhada (Personal)",
+      "Somente 802.1X sem senha de grupo",
+      "Somente WEP key 1",
+      "Somente RADIUS accounting sem auth"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "AKM PSK = Personal. 802.1X seria akm 802.1x. WEP é outro universo inseguro. Accounting sozinho não autentica a WLAN. Combine com wpa2 ciphers aes no hardening típico.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "WLAN só PSK; política de segurança exige MFA corporativo e conta AD por usuário no Wi-Fi. Gap?",
+    "alternativas": [
+      "Nenhum: PSK já é MFA",
+      "Nenhum: PSK integra AD nativamente sempre",
+      "PSK não fornece identidade individual/RADIUS — desenho deveria ser Enterprise 802.1X",
+      "Open resolve MFA automaticamente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "PSK é segredo de grupo. MFA/AD por usuário pedem 802.1X/IdP. Open piora. O ticket mental do content: alinhar AKM à política de identidade, não só “ter WPA2”.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cipher suite ausente / security desabilitada no perfil da WLAN. Impacto?",
+    "alternativas": [
+      "Cliente usa IPsec de internet obrigatório sem config",
+      "Sem proteção WPA efetiva — equivalente prático a exposição Open ou perfil incompleto",
+      "SSID deixa de existir no beacon",
+      "WLC gera PSK aleatória de 63 chars sozinha"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem cipher/AKM WPA, não há o modelo de privacidade esperado. Beacon/SSID podem continuar; o problema é segurança. Não assume IPsec nem PSK mágica. Corrija security wpa + ciphers aes + akm.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Logs do cliente: “4-way handshake failed”. Em WPA2-PSK, causa comum?",
+    "alternativas": [
+      "PSK incorreta ou corrupta no cliente/AP (ou interferência grave, mas senha é o primeiro check de config)",
+      "Sempre falta de cabo Ethernet no AP",
+      "Sempre native VLAN mismatch no trunk do notebook",
+      "Sempre OSPF area 1"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O 4-way confirma a PSK e instala chaves de sessão. Senha errada é a causa clássica de config. Cabo, native VLAN e OSPF são eixos wired/L3 paralelos, não a primeira leitura do handshake WPA no content 5.4.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que esconder o SSID não substitui WPA2/WPA3?",
+    "alternativas": [
+      "SSID oculto cifra AES automaticamente",
+      "SSID oculto autentica com RADIUS sem config",
+      "SSID ainda vaza em frames; sem WPA o tráfego e a associação permanecem fracos",
+      "SSID oculto é mais forte que WPA3-Enterprise"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Security through obscurity falha no wireless: probe/associação revelam a rede. Confidencialidade e auth vêm de WPA2/WPA3. Ocultar SSID não é controle equivalente a AES+AKM.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "AES e CCMP no contexto WPA2 referem-se a:",
+    "alternativas": [
+      "Um tipo de connector RP-SMA",
+      "Algoritmo/suite de cifragem robusta dos dados 802.11 (em oposição a TKIP/WEP)",
+      "Um protocolo de roteamento mesh obrigatório",
+      "Apenas a largura de canal 40 MHz"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "CCMP usa AES para proteger MSDUs no ar. É o cipher “bom” do WPA2 no exame. Não é conector RF, IGP nem largura de canal. Contraste com TKIP/WEP na auditoria.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mínimo “cliente não associa à WLAN corporativa” no content 5.4:",
+    "alternativas": [
+      "Só aumentar potência do AP ao máximo legal sem olhar security",
+      "SSID/perfil → AKM (PSK vs 802.1X) → cipher (AES vs TKIP/WEP) → PSK/credencial correta",
+      "Só limpar a tabela MAC do core",
+      "Só desligar DHCP snooping no switch de acesso"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O método isola identidade da rede, modo de auth e cipher antes de culpar RF extremo. MAC do core e snooping podem afetar wired path depois de associar, não o handshake WPA em si. Siga o checklist do study note.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "WLC com WLAN legada “WEP-only” ainda enabled para um scanner antigo. Risco residual?",
+    "alternativas": [
+      "Nenhum, se o SSID tiver nome longo",
+      "Nenhum, se o canal for o 36",
+      "Nenhum, se houver ACL na Internet",
+      "Alto: WEP quebrável expõe o segmento wireless e convida downgrade/uso inseguro"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Manter WEP “só para um device” mantém uma WLAN frágil no ar. Segmente/retire o legado. Nome do SSID, canal e ACL de Internet não consertam a criptografia WEP. Achado clássico de auditoria do 5.4.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "security wpa wpa2 ciphers aes (visão de config) indica a intenção de:",
+    "alternativas": [
+      "Usar apenas TKIP",
+      "Habilitar cipher AES no WPA2 — alinhado ao hardening moderno",
+      "Desabilitar WPA2",
+      "Forçar Open authentication"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A linha de cipher aes amarra o WPA2 ao AES/CCMP. Não é TKIP-only, nem Open, nem desliga WPA2. Junto com akm psk ou 802.1x fecha o perfil de segurança.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dois SSIDs: Corp (WPA2-Enterprise) e Guest (Open com captive). Usuário coloca senha PSK no perfil Corp. Efeito?",
+    "alternativas": [
+      "Guest herda a PSK",
+      "Corp aceita PSK como se fosse 802.1X",
+      "WEP é negociado no Corp",
+      "Falha no Corp — perfil com AKM errado; precisa credencial 802.1X, não PSK de grupo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Cada SSID tem sua política. PSK no perfil Enterprise não autentica no RADIUS. Guest Open é outro risco/política. Corrija o perfil do cliente para o SSID e o AKM certos.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual afirmação sobre WPA original (não WPA2) está alinhada ao content?",
+    "alternativas": [
+      "É a recomendação máxima atual acima de WPA3",
+      "Eliminou completamente qualquer uso de TKIP na história",
+      "É sempre idêntico a WPA3-SAE",
+      "Foi etapa intermediária pós-WEP; hoje prefere-se WPA2-AES ou WPA3"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "WPA tapou o buraco do WEP mas envelheceu. WPA2-AES e WPA3 são o alvo. Não é o topo da linha atual nem sinônimo de SAE. Histórico de prova evita saudade de WPA-only.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show client detail mostra Auth: PSK e Cipher: TKIP em rede que deveria ser AES-only. Ação?",
+    "alternativas": [
+      "Celebrar TKIP como mais seguro que AES",
+      "Ignorar: cipher não importa se há PSK",
+      "Remover o SSID do ar sem investigar",
+      "Tratar como desvio de policy — reconfigurar WLAN/cliente para AES e desabilitar TKIP"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Evidência de cipher legado com PSK. Hardening: AES only, revisar mixed mode. PSK não perdoa TKIP. Não “apague o SSID” sem plano; corrija security e reassocie clientes.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor uso combinado de show wlan (security/AKM/cipher) e sintoma do cliente (auth fail vs connected open)?",
+    "alternativas": [
+      "Substituir qualquer site survey",
+      "Só validar o spanning-tree root",
+      "Apagar automaticamente todas as WLANs guest",
+      "Correlacionar política configurada (Open/WEP/PSK/Enterprise/AES) com o tipo de falha ou risco observado no cliente"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "show wlan revela a intenção de segurança; o cliente mostra o efeito (não conecta, conecta inseguro, handshake fail). Juntos fecham o diagnóstico 5.4. Survey e STP são eixos paralelos; não apague guest sem análise de negócio.",
+    "part_id": "5.4"
+  }
+]

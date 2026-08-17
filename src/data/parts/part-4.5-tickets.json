@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4501 — Chamadas VoIP “robotizadas” no horário de pico. Telefones marcam DSCP EF; no core a classe de voz está vazia.",
+    "cli_output": "Access# show run interface GigabitEthernet1/0/10\ninterface GigabitEthernet1/0/10\n description PC-USER\n switchport mode access\n switchport access vlan 20\n ! sem trust de DSCP/CoS — política de edge: untrusted (remark para 0)\n mls qos\n ! nota de lab: interface do phone em Gi1/0/12 confia; Gi1/0/10 (softphone no PC) não\n\nAccess# show run interface GigabitEthernet1/0/12\ninterface GigabitEthernet1/0/12\n description IP-PHONE\n switchport mode access\n switchport voice vlan 30\n mls qos trust dscp\n\nCore# show interfaces GigabitEthernet0/0/0 | include drops|output|input\n  Input queue: 0/375/0/0 (size/max/drops/flushes); Total output drops: 12840\n  Output queue: 0/40 (size/max)\n\n! Captura de lab no uplink do softphone (resumo):\n! IP DSCP chegando ao core = 0x00 (CS0) apesar do app marcar EF no host\n! Softphone conectado em Gi1/0/10 (untrusted)",
+    "alternativas": [
+      "Porta do softphone untrusted reescreve/zera marking — voz chega best-effort; trust só na porta do IP phone",
+      "Output drops 0 em todo o core no show",
+      "mls qos trust dscp está na porta do PC-USER no output",
+      "TFTP no path de voz remove DSCP por padrão"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Gi1/0/12 confia DSCP (phone); Gi1/0/10 (PC/softphone) untrusted — marca EF do host não sobrevive. Core vê CS0; drops altos no uplink batem com congestão sem classe de voz. Não é TFTP “comendo” DSCP. Trust boundary é o eixo.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4502 — Durante backup noturno (FTP full), filas de voz estouram. Não há política de prioridade; tudo em uma fila FIFO de saída.",
+    "cli_output": "Edge# show interfaces GigabitEthernet0/1\nGigabitEthernet0/1 is up, line protocol is up\n  MTU 1500 bytes, BW 100000 Kbit/sec\n  reliability 255/255, txload 240/255, rxload 40/255\n  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 45210\n  Output queue: 0/40 (size/max)\n  5 minute output rate 92000000 bits/sec, 8123 packets/sec\n\nEdge# show run | include policy-map|priority|shape|police\n! (vazio — nenhuma policy de QoS aplicada na interface)\n\nEdge# show run | include tftp|ftp\n! backups agendados via host interno FTP (fora do IOS) — tráfego bulk na WAN\n\n! NOC note: codec G.711 reporta loss/jitter altos só no window do backup\n! Nenhuma classe LLQ/priority configurada",
+    "alternativas": [
+      "txload baixo e zero drops contradizem congestão",
+      "Congestão (txload alto, output drops) sem policy de prioridade — voz compete em best-effort/FIFO com bulk FTP",
+      "priority/LLQ está explícito no show run | include priority",
+      "O problema é apenas stratum NTP 16"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Interface quase saturada (txload 240/255) e dezenas de milhares de output drops; run sem policy-map/priority. Bulk de backup e voz compartilham o mesmo tratamento. Não há LLQ no include; NTP não aparece. PHB ausente sob congestão explica o sintoma.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4503 — Analista diz que “o shaping está dropando a voz”. Policy na WAN: police na classe de dados; shape no parent. Voz em priority.",
+    "cli_output": "R1# show policy-map interface GigabitEthernet0/0\n GigabitEthernet0/0\n  Service-policy output: WAN-OUT\n    Class-map: VOICE (match-all)\n      120034 packets, 18432000 bytes\n      Queueing\n        Strict Priority\n        Output Queue: Conversation 264\n        Bandwidth 512 (kbps) Burst 12800 (Bytes)\n        (pkts matched/bytes matched) 120034/18432000\n        (total drops) 12\n    Class-map: BULK (match-all)\n      890122 packets\n      police:\n          cir 5000000 bps, bc 156250 bytes\n        conformed 800000 packets, actions: transmit\n        exceeded 90122 packets, actions: drop\n    Class-map: class-default (match-any)\n      shape (average) cir 20000000, bc 80000, be 80000\n      target shape rate 20000000\n\nR1# show interfaces GigabitEthernet0/0 | include drops|rate\n  5 minute output rate 18500000 bits/sec\n  Total output drops: 90500\n\n! Nota: excesso dropado concentra-se no contador police da classe BULK",
+    "alternativas": [
+      "Drops do police na classe BULK (exceeded drop) — não é shaping “dropando voz”; VOICE está em strict priority com drops mínimos",
+      "VOICE total drops 120034 no output de priority",
+      "Não há police em nenhuma classe no policy-map",
+      "shape average na default prova que voz está em best-effort only"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "VOICE: strict priority, 12 drops. BULK: police com exceeded drop 90122 — excesso cortado. Shape no parent suaviza a taxa do link; o analista inverteu police vs shape e a classe afetada. Leitura correta do policy-map interface.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4504 — Upgrade de IOS: copy tftp: flash: falha. Servidor TFTP 10.9.9.9 na mesma gerência.",
+    "cli_output": "R1# show ip interface brief | include GigabitEthernet0/0\nGigabitEthernet0/0   10.9.9.1   YES manual up  up\n\nR1# ping 10.9.9.9\n!!!!! Success rate is 100 percent (5/5)\n\nR1# show run | include tftp|access-list|ip access-group\nip access-group BLOCK-TFTP in\naccess-list 120 deny udp any any eq tftp\naccess-list 120 permit ip any any\ninterface GigabitEthernet0/0\n ip access-group BLOCK-TFTP in\n\nR1# copy tftp: flash:\nAddress or name of remote host []? 10.9.9.9\nSource filename []? c1900-universalk9.bin\nDestination filename [c1900-universalk9.bin]?\nAccessing tftp://10.9.9.9/c1900-universalk9.bin...\n%Error opening tftp://10.9.9.9/c1900-universalk9.bin (Timed out)\n\nR1# show flash: | include bytes\n7749468160 bytes total (5200000000 bytes free)",
+    "alternativas": [
+      "Flash sem espaço livre no show flash",
+      "Ping 0% prova que o servidor está down L3",
+      "ACL BLOCK-TFTP deny udp … eq tftp na interface — TFTP (UDP) filtrado apesar do ping ICMP ok",
+      "copy usa FTP no output exibido"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Ping ICMP ok e flash com espaço; o copy é tftp e dá Timed out. ACL 120 deny udp any any eq tftp inbound na Gi0/0 bloqueia a transferência. Ping não testa TFTP. Remova/ajuste a ACL ou use path permitido.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4505 — Time tentou “TFTP com usuário/senha” no servidor Linux; ops exige conta. Firewall libera só TCP 21 e range passivo.",
+    "cli_output": "Admin-PC# tftp 10.50.50.10\ntftp> get ios.bin\nTransfer timed out.\n\nAdmin-PC# ftp 10.50.50.10\nConnected to 10.50.50.10.\n220 FTP Server ready\nName: netops\n331 Password required\nPassword: ********\n230 Login successful\nftp> binary\nftp> get ios.bin\n226 Transfer complete\n\nFW# show run | include tftp|ftp|access-list|permit\naccess-list EXT permit tcp any host 10.50.50.10 eq ftp\naccess-list EXT permit tcp any host 10.50.50.10 range 50000 51000\n! (sem permit udp ... tftp)\n\nR-Core# show run | include tftp|ftp\n! nenhum client tftp server global especial\n\n! Conclusão de lab: TFTP timeout; FTP com auth e TCP liberado funciona",
+    "alternativas": [
+      "TFTP autenticou com netops/senha no output",
+      "Firewall libera UDP TFTP explicitamente no ACL mostrado",
+      "get tftp completou com 226 Transfer complete",
+      "Escolha errada de protocolo: TFTP (UDP, sem auth) falha/filtrado; FTP (TCP+login) atende auth e ACL do firewall"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "TFTP timeout e ACL só TCP/ftp; FTP conecta, autentica e completa 226. O requisito de conta e o firewall apontam FTP, não TFTP. Não há login TFTP no output nem permit UDP. Ticket de escolha TFTP vs FTP + path.",
+    "part_id": "4.5"
+  }
+]

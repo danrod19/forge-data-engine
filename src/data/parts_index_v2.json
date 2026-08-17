@@ -1,0 +1,223 @@
+[
+  {
+    "part_id": "v2-1.1",
+    "title": "Diagnóstico de interfaces e cabos (cobre e fibra)",
+    "blueprint_module": "1.0",
+    "blueprint_topics": [
+      "1.1"
+    ],
+    "verb": "Diagnose",
+    "weight_percent": 25,
+    "questions_count": 30,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-1.1-content.json"
+  },
+  {
+    "part_id": "v2-1.5",
+    "title": "Wireless campus (AP, WLC, CAPWAP, SSID e porta do switch)",
+    "blueprint_module": "1.0",
+    "blueprint_topics": [
+      "1.5"
+    ],
+    "verb": "Configure",
+    "weight_percent": 25,
+    "questions_count": 30,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-1.5-content.json"
+  },
+  {
+    "part_id": "v2-1.6",
+    "title": "Conectividade do cliente (Windows, macOS e Linux)",
+    "blueprint_module": "1.0",
+    "blueprint_topics": [
+      "1.6"
+    ],
+    "verb": "Configure",
+    "weight_percent": 25,
+    "questions_count": 30,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-1.6-content.json"
+  },
+  {
+    "part_id": "v2-1.7",
+    "title": "Diagnóstico de atribuição de IP (DHCPv4 e DHCPv6)",
+    "blueprint_module": "1.0",
+    "blueprint_topics": [
+      "1.7"
+    ],
+    "verb": "Diagnose",
+    "weight_percent": 25,
+    "questions_count": 30,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-1.7-content.json"
+  },
+  {
+    "part_id": "v2-2.2",
+    "title": "Conectividade de dispositivos de borda (hosts, voice, AP, IoT, PoE)",
+    "blueprint_module": "2.0",
+    "blueprint_topics": [
+      "2.2"
+    ],
+    "verb": "Configure",
+    "weight_percent": 25,
+    "questions_count": 30,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-2.2-content.json"
+  },
+  {
+    "part_id": "v2-2.4",
+    "title": "Troubleshooting L2/L3 com captura e ferramentas",
+    "blueprint_module": "2.0",
+    "blueprint_topics": [
+      "2.4"
+    ],
+    "verb": "Diagnose",
+    "weight_percent": 20,
+    "questions_count": 30,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-2.4-content.json"
+  },
+  {
+    "part_id": "v2-2.5",
+    "title": "Spanning Tree na borda e no campus (root, PortFast, BPDU Guard)",
+    "blueprint_module": "2.0",
+    "blueprint_topics": [
+      "2.5"
+    ],
+    "verb": "Configure",
+    "weight_percent": 25,
+    "questions_count": 30,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-2.5-content.json"
+  },
+  {
+    "part_id": "v2-3.2",
+    "title": "Rotas estáticas IPv4 (rede, host, default e floating)",
+    "blueprint_module": "3.0",
+    "blueprint_topics": [
+      "3.2"
+    ],
+    "verb": "Configure",
+    "weight_percent": 20,
+    "questions_count": 29,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-3.2-content.json"
+  },
+  {
+    "part_id": "v2-3.3",
+    "title": "OSPFv2 e OSPFv3 single-area",
+    "blueprint_module": "3.0",
+    "blueprint_topics": [
+      "3.3"
+    ],
+    "verb": "Configure",
+    "weight_percent": 25,
+    "questions_count": 30,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-3.3-content.json"
+  },
+  {
+    "part_id": "v2-3.4",
+    "title": "First Hop Redundancy (HSRP) e gateway virtual",
+    "blueprint_module": "3.0",
+    "blueprint_topics": [
+      "3.4"
+    ],
+    "verb": "Configure",
+    "weight_percent": 20,
+    "questions_count": 29,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-3.4-content.json"
+  },
+  {
+    "part_id": "v2-4.2",
+    "title": "Acesso remoto e transferência de arquivos (SSH, SCP, SFTP)",
+    "blueprint_module": "4.0",
+    "blueprint_topics": [
+      "4.2"
+    ],
+    "verb": "Configure",
+    "weight_percent": 15,
+    "questions_count": 30,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-4.2-content.json"
+  },
+  {
+    "part_id": "v2-4.3",
+    "title": "NAT IPv4 (static, pool dinâmico e PAT/overload)",
+    "blueprint_module": "4.0",
+    "blueprint_topics": [
+      "4.3"
+    ],
+    "verb": "Configure",
+    "weight_percent": 20,
+    "questions_count": 29,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-4.3-content.json"
+  },
+  {
+    "part_id": "v2-4.4",
+    "title": "Diagnóstico de problemas de registros DNS",
+    "blueprint_module": "4.0",
+    "blueprint_topics": [
+      "4.4"
+    ],
+    "verb": "Diagnose",
+    "weight_percent": 20,
+    "questions_count": 30,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-4.4-content.json"
+  },
+  {
+    "part_id": "v2-4.6",
+    "title": "ACLs IPv4 (standard, extended, aplicação e TShoot)",
+    "blueprint_module": "4.0",
+    "blueprint_topics": [
+      "4.6"
+    ],
+    "verb": "Configure",
+    "weight_percent": 20,
+    "questions_count": 29,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-4.6-content.json"
+  },
+  {
+    "part_id": "v2-4.7",
+    "title": "Segurança L2 na borda (port-security, DHCP snooping, DAI, RA Guard)",
+    "blueprint_module": "4.0",
+    "blueprint_topics": [
+      "4.7"
+    ],
+    "verb": "Configure",
+    "weight_percent": 20,
+    "questions_count": 30,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-4.7-content.json"
+  },
+  {
+    "part_id": "v2-5.1",
+    "title": "Agentic AI em operações de rede",
+    "blueprint_module": "5.0",
+    "blueprint_topics": [
+      "5.1"
+    ],
+    "verb": "Describe",
+    "weight_percent": 10,
+    "questions_count": 30,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-5.1-content.json"
+  },
+  {
+    "part_id": "v2-5.2",
+    "title": "Prompts para IA generativa em operações de rede",
+    "blueprint_module": "5.0",
+    "blueprint_topics": [
+      "5.2"
+    ],
+    "verb": "Select",
+    "weight_percent": 10,
+    "questions_count": 30,
+    "tickets_count": 5,
+    "content_path": "v2/parts/part-v2-5.2-content.json"
+  }
+]

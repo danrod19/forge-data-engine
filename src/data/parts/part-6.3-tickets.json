@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6301 — Script de compliance marca VLAN errada: espera number 20, nunca entra no if.",
+    "cli_output": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  \"id\": \"intf-12\",\n  \"name\": \"GigabitEthernet1/0/12\",\n  \"accessVlan\": \"20\",\n  \"voiceVlan\": \"30\",\n  \"adminStatus\": \"up\",\n  \"operStatus\": \"up\"\n}\n\n// trecho do script (lab)\nif (data.accessVlan === 20) {\n  markCompliant();\n} else {\n  markFail(\"vlan mismatch\");\n}\n// resultado: markFail sempre\n// typeof data.accessVlan === \"string\"",
+    "alternativas": [
+      "accessVlan e number 20 no body — o if deveria ser true com === 20",
+      "Status 401 impede o parse do JSON",
+      "voiceVlan ausente no body",
+      "accessVlan veio como string \"20\"; comparacao estrita com number 20 falha — tipo string vs number"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Body 200 com accessVlan entre aspas = string. === 20 (number) e falso. Nao e 401 nem campo voice ausente. Normalize com Number/parseInt ou compare com \"20\". Tema central de tipos da 6.3.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6302 — Automacao aplica banner no \"segundo device\" do inventário, mas altera o switch errado.",
+    "cli_output": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n[\n  {\n    \"id\": \"dev-001\",\n    \"hostname\": \"SW-ACCESS-A\",\n    \"managementIp\": \"10.10.10.11\"\n  },\n  {\n    \"id\": \"dev-002\",\n    \"hostname\": \"SW-ACCESS-B\",\n    \"managementIp\": \"10.10.10.12\"\n  },\n  {\n    \"id\": \"dev-003\",\n    \"hostname\": \"SW-CORE\",\n    \"managementIp\": \"10.10.10.1\"\n  }\n]\n\n// script usou devices[1] achando que era o core\ntarget = devices[1].hostname  // SW-ACCESS-B\n// operador queria SW-CORE (terceiro elemento, indice 2)",
+    "alternativas": [
+      "devices[1] e SW-CORE com IP 10.10.10.1",
+      "devices[1] e SW-ACCESS-B (indice 1); SW-CORE esta em devices[2] — escolha de indice errada na lista",
+      "Array tem um unico objeto; indices invalidos",
+      "managementIp de B e 10.10.10.1 no JSON"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Indice 0=A, 1=B, 2=CORE. Script no [1] pega B. Corrija filtro por hostname/id em vez de indice fixo. JSON valido com tres objetos. Ticket de array/inventario.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6303 — POST de policy falha; dev cola JSON de template com erro de digitacao.",
+    "cli_output": "$ curl -i -X POST -H \"Authorization: Bearer VALID\" -H \"Content-Type: application/json\" \\\n  -d '{\n  \"name\": \"QOS-VOICE\",\n  \"enabled\": true,\n  \"dscp\": 46,\n}' \\\n  https://ctrl.lab/api/v1/policy\nHTTP/1.1 400 Bad Request\nContent-Type: application/json\n\n{\n  \"error\": \"Invalid JSON: Unexpected token } in JSON at position 52\",\n  \"hint\": \"trailing comma or quote issue\"\n}\n\n// JSON enviado tem virgula apos 46 antes do fecha-chaves\n// Apos remover a trailing comma, POST retorna 201 Created",
+    "alternativas": [
+      "401 por token VALID",
+      "201 Created ja no primeiro POST com trailing comma",
+      "JSON invalido (virgula sobrando) → 400 parse error; nao e falha de autenticacao",
+      "404 no path /api/v1/policy em todos os testes"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "400 com mensagem de Unexpected token e trailing comma. Token VALID. Corrija sintaxe JSON. Nao e 401/404 nem 201 no primeiro POST. Erro classico de virgula da 6.3.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6304 — Dashboard mostra sucesso, mas o campo softwareVersion que o script grava no CMDB fica vazio.",
+    "cli_output": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  \"id\": \"dev-001\",\n  \"hostname\": \"SW-DIST-1\",\n  \"managementIp\": \"10.20.20.5\",\n  \"platform\": \"C9300-48P\",\n  \"reachability\": \"REACHABLE\",\n  \"software\": {\n    \"type\": \"IOS-XE\",\n    \"version\": \"17.9.4a\"\n  }\n}\n\n// script legado\nversion = body.softwareVersion\n// version === undefined\n// body.software.version === \"17.9.4a\"\n// API v2 moveu a versao para objeto aninhado software",
+    "alternativas": [
+      "Campo softwareVersion na raiz esta presente como 17.9.4a",
+      "Status 404 Not Found",
+      "Parse impossivel: JSON invalido",
+      "200 OK mas chave softwareVersion ausente na raiz — versao esta em software.version (campo/path mudou)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "JSON valido e 200; softwareVersion nao existe no top-level. Valor real em software.version. Atualize o path do script. Nao e 404 nem JSON quebrado. Ticket de campo ausente no path esperado.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6305 — Script le interface.name e recebe undefined; operador ve Gi1/0/1 no JSON \"na tela\".",
+    "cli_output": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  \"id\": \"dev-010\",\n  \"hostname\": \"SW-ACCESS-10\",\n  \"managementIp\": \"10.30.30.10\",\n  \"interface\": {\n    \"name\": \"GigabitEthernet1/0/1\",\n    \"operStatus\": \"up\",\n    \"speed\": 1000\n  }\n}\n\n// tentativas do script\nconsole.log(body.name)              // undefined\nconsole.log(body.interfaces[0].name) // TypeError: cannot read properties of undefined\nconsole.log(body.interface.name)     // GigabitEthernet1/0/1\n\n// API devolve objeto singular \"interface\", nao array \"interfaces\"",
+    "alternativas": [
+      "Path correto e body.interface.name — objeto aninhado singular; body.interfaces[0] assume array inexistente",
+      "body.name na raiz contem Gi1/0/1",
+      "JSON invalido impede qualquer leitura",
+      "operStatus e number 1000 no body"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "interface e object aninhado com name string. Nao ha array interfaces nem name na raiz. speed e number 1000; operStatus e string up. Ajuste o path ao schema real. Ticket de aninhamento/path errado.",
+    "part_id": "6.3"
+  }
+]

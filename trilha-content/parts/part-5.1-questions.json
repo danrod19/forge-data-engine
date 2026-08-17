@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No vocabulário de segurança do CCNA, vulnerability é:",
+    "alternativas": [
+      "Uma fraqueza explorável no sistema, processo ou configuração",
+      "Sempre o atacante humano em si",
+      "O mesmo que mitigation",
+      "Apenas um tipo de cabo de rede"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Vulnerabilidade é a falha ou fraqueza (senha fraca, serviço aberto, patch ausente). A ameaça é o potencial de dano; o exploit é o meio de abusar da falha; mitigation reduz o risco. Não confundir “quem ataca” com “o que está frágil”.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Threat, no mesmo vocabulário, refere-se principalmente a:",
+    "alternativas": [
+      "O hash tipo 9 do enable secret",
+      "O potencial de causar dano (ator, malware, erro, evento adverso)",
+      "Somente a ACL de saída da WAN",
+      "Apenas o comando service password-encryption"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Ameaça é o que pode causar prejuízo. Hash e ACL são controles/artefatos técnicos; password-encryption é mitigação fraca de armazenamento. A prova separa threat de vulnerability e de exploit.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Exploit é melhor definido como:",
+    "alternativas": [
+      "Um treinamento de awareness obrigatório",
+      "Um controle físico de rack",
+      "O método ou código que aproveita uma vulnerabilidade",
+      "O nome oficial do enable password"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Exploit materializa o abuso da vulnerabilidade (script, técnica, payload). Awareness e tranca de rack são mitigações/processos. enable password é configuração legada, não a definição de exploit.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Mitigation, em termos de prova, é:",
+    "alternativas": [
+      "Ignorar logs para economizar disco",
+      "Compartilhar a senha de enable com toda a equipe",
+      "Manter Telnet em todas as VTY por compatibilidade",
+      "Controle ou ação que reduz a probabilidade ou o impacto do risco"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Mitigação inclui secret forte, SSH, patch, treino, ACL, tranca física. As outras opções aumentam risco. O CCNA cobra reconhecer mitigações adequadas a cada vetor.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Phishing é tipicamente classificado como:",
+    "alternativas": [
+      "Engenharia social que tenta enganar o usuário (e-mail/mensagem) para credenciais ou malware",
+      "Um algoritmo de hashing do enable secret",
+      "Um tipo de Spanning Tree",
+      "Um módulo de OSPF"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Phishing manipula pessoas via mensagem fraudulenta. Mitigações: treino, filtros, verificação. Não é hash IOS, STP nem OSPF. Social engineering em geral inclui telefone e pretexting além do e-mail.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Por que o acesso físico ao console é crítico na segurança do device?",
+    "alternativas": [
+      "Porque o console só aceita IPv6",
+      "Porque quem tem o cabo/console pode contornar parte dos controles remotos se a linha estiver desprotegida",
+      "Porque o console desliga o enable secret automaticamente",
+      "Porque o console usa apenas Telnet cifrado"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Acesso físico + console sem autenticação ou com recovery expõe o equipamento. Controles físicos (sala, rack) complementam secret/VTY. Console não “é Telnet cifrado” nem apaga secret sozinho.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A diferença principal entre enable secret e enable password no discurso do CCNA é:",
+    "alternativas": [
+      "password é sempre tipo 9; secret é sempre texto claro",
+      "secret e password são idênticos em força criptográfica",
+      "enable secret usa armazenamento em hash forte; enable password é legado e mais fraco",
+      "enable password desabilita o modo privileged"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "secret é a prática recomendada (tipo 5/9 conforme plataforma). password é legado e frágil, sobretudo com tipo 7. Se ambos existem, o secret prevalece no enable. password não “desliga” o privileged mode.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "username admin secret Cisco123! é preferível a username admin password Cisco123! porque:",
+    "alternativas": [
+      "password gera automaticamente chaves SSH RSA",
+      "secret desativa todas as VTY",
+      "password é obrigatório para SNMPv3",
+      "secret armazena a senha do usuário com hash mais seguro que password em claro/tipo fraco"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "username secret alinha ao hardening local. password pode deixar credencial frágil na running. secret não remove VTY nem cria RSA sozinho. Use com login local nas linhas de acesso.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "service password-encryption no IOS:",
+    "alternativas": [
+      "Aplica ofuscação tipo 7 a senhas em claro — fraca/reversível; não substitui enable secret",
+      "É equivalente criptográfico ao tipo 9 scrypt em todos os casos",
+      "Cifra o plano de dados de todos os usuários da LAN",
+      "Remove a necessidade de autenticação nas VTY"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Tipo 7 evita leitura casual no show run, mas é quebrável. enable/username secret continuam essenciais. Não cifra o tráfego da LAN nem autentica VTY sozinho.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Telnet no gerenciamento remoto é risco porque:",
+    "alternativas": [
+      "Usa sempre certificados mTLS obrigatórios",
+      "Impede qualquer uso de enable secret",
+      "Cifra senhas com AES-256 por padrão no CCNA",
+      "Envia credenciais e sessão em cleartext no caminho"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Mesmo com senha complexa, sniffer no path lê Telnet. Preferir SSH e transport input ssh. Telnet não impõe mTLS nem AES no modelo clássico do exame; enable secret ainda é útil, mas o transporte permanece inseguro.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Running mostra enable password Cisco e enable secret $1$…. Qual manda no comando enable?",
+    "alternativas": [
+      "Sempre o password em claro, ignorando secret",
+      "O enable secret — prevalece sobre enable password quando ambos existem",
+      "Nenhum; o enable fica desabilitado",
+      "A community SNMP ro"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Com ambos configurados, o IOS usa o secret para privileged mode. Ainda assim, manter password legado é má prática; remova com no enable password. SNMP não autentica enable.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Política de senhas alinhada ao content 5.1 inclui:",
+    "alternativas": [
+      "Reutilizar a mesma senha em todos os devices e nuvens",
+      "Complexidade adequada, não compartilhar contas e não reutilizar senhas entre sistemas",
+      "Publicar senhas no mural do NOC para plantão",
+      "Usar apenas “cisco” e “admin” por padrão de fábrica"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Policy cobre complexidade, não reutilização e não compartilhamento, além de processos de offboarding. Defaults de fábrica e senhas no mural são anti-padrões. Awareness reforça o cumprimento.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "line vty 0 4 sem login, sem login local e sem password. Avaliação de risco?",
+    "alternativas": [
+      "Configuração ideal de hardening enterprise",
+      "SSH version 2 fica obrigatório automaticamente",
+      "Acesso remoto sem método de autenticação adequado — falha clássica de hardening",
+      "O device rejeita qualquer pacote IP por padrão"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "VTY precisa de método de login (local, password de linha, AAA). Ausência expõe ou deixa o acesso inconsistente/inseguro. Não é hardening ideal nem “bloqueia IP sozinho”. Corrija com login local + username secret e transport ssh.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Malware, no nível conceitual do CCNA, é:",
+    "alternativas": [
+      "Um tipo de cabo crossover",
+      "Um protocolo de roteamento interno",
+      "Apenas o nome do enable secret",
+      "Software malicioso que compromete sistemas (vírus, worm, ransomware, trojan, etc.)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Malware é categoria de software hostil. Mitigações: antimalware, patch, least privilege, backups, treino. Não é mídia física nem IGP. Combine com defesa em camadas no device e no host.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "User awareness contribui para a segurança porque:",
+    "alternativas": [
+      "Substitui a necessidade de qualquer controle técnico",
+      "Reduz sucesso de phishing e engenharia social ao treinar comportamentos seguros",
+      "Gera chaves RSA automaticamente",
+      "Desliga o service password-encryption"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Pessoas são alvo frequente; treino e processos reduzem cliques e vazamento de senha. Não elimina a necessidade de secret/SSH/ACL. Programa de segurança = pessoas + processos + tecnologia.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show privilege após login mostra nível 1. Interpretação leve?",
+    "alternativas": [
+      "Usuário em user EXEC (não privileged 15) — comandos limitados até o enable",
+      "Usuário root absoluto sem restrições",
+      "VTY desabilitada permanentemente",
+      "NTP stratum 1 obrigatório"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Nível 1 é o user mode típico; 15 é privileged após enable/secret correto. privilege levels finos existem, mas o exame foca a ideia de privilégio após autenticação. Não prova VTY off nem NTP.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Senha “123456” como enable secret em roteador de borda. Qual afirmação é correta?",
+    "alternativas": [
+      "Atende qualquer policy de complexidade moderna",
+      "Viola política de senhas fortes — secret não torna senha fraca aceitável",
+      "É inquebrável por ser secret e não password",
+      "Impede qualquer captura de Telnet"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Hash protege armazenamento, não a qualidade da senha escolhida. Senhas fracas caem por força bruta/dicionário se o atacante obtém o hash ou tenta login. Telnet ainda seria cleartext se habilitado. Policy exige complexidade real.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Social engineering difere de exploit técnico de buffer overflow porque:",
+    "alternativas": [
+      "Social engineering manipula pessoas; exploit técnico abusa falha de software/config",
+      "Social engineering só existe em IPv6",
+      "Buffer overflow é sempre phishing",
+      "Ambos são nomes do enable password"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A distinção vetor humano vs vetor técnico é cobrada em definição. Mitigações diferem (awareness vs patch). Não são sinônimos nem ligados a versão IP ou ao comando enable password.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "login local na console e nas VTY, sem nenhum username na running. Efeito típico?",
+    "alternativas": [
+      "Autenticação falha — database local vazio",
+      "Login com qualquer string é aceito",
+      "enable secret é apagado",
+      "Telnet vira SSH automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "login local exige usuários locais. Sem username/secret, o login não autentica corretamente. Corrija criando username. Não libera “qualquer senha”, não apaga enable secret nem converte Telnet.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual combinação melhor representa hardening básico de acesso do content 5.1?",
+    "alternativas": [
+      "enable password em claro + Telnet only + senha compartilhada “cisco”",
+      "Sem autenticação na console + VTY aberta",
+      "service password-encryption sozinho sem secret",
+      "enable secret + username secret + login local + preferir SSH e desabilitar Telnet"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O checklist une armazenamento forte, usuários locais e transporte cifrado. password-encryption sozinho é insuficiente. Defaults fracos e linhas sem login são o oposto do hardening.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Device em corredor aberto, console sem senha, funcionários passando. Risco principal além do lógico?",
+    "alternativas": [
+      "Apenas falha de QoS PHB",
+      "Apenas esgotamento de pool DHCP",
+      "Falha de controle de acesso físico permitindo manipulação local do equipamento",
+      "Apenas mismatch de native VLAN"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Physical security é parte do programa de segurança. Console livre em área pública é cenário clássico. QoS, DHCP e native VLAN não explicam o vetor físico do chamado.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que tipo 7 (password-encryption) não deve ser tratado como “criptografia forte”?",
+    "alternativas": [
+      "Porque é ofuscação reversível conhecida — atacante com o show run pode recuperar a senha",
+      "Porque tipo 7 é idêntico ao tipo 9",
+      "Porque tipo 7 apaga a running-config",
+      "Porque tipo 7 só funciona em IPv6"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Ferramentas públicas revertem tipo 7. Use secret (hash) para enable/usuários. Tipo 7 ajuda contra olhar por cima do ombro, não contra adversário com a config. Não apaga config nem depende de IPv6.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Conta única “netops” compartilhada por cinco técnicos. Qual princípio de policy é violado?",
+    "alternativas": [
+      "Exclusivamente o algoritmo de DSCP EF",
+      "Exclusivamente o hello OSPF",
+      "Exclusivamente o native VLAN",
+      "Não compartilhar credenciais / responsabilização individual (accountability)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Contas compartilhadas impedem auditoria de quem fez o quê e violam boa política. Não é tema de QoS, OSPF ou VLAN nativa. Prefira usuários individuais com secret e, em desenhos maiores, AAA.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Relação correta: senha fraca no enable é uma ____; um atacante que tenta adivinhar é uma ____; o script de força bruta é um ____.",
+    "alternativas": [
+      "mitigation · exploit · threat",
+      "exploit · mitigation · vulnerability",
+      "vulnerability · threat · exploit",
+      "threat · vulnerability · mitigation"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Senha fraca = vulnerabilidade; ator/potencial de ataque = threat; ferramenta/método = exploit. Mitigation seria MFA, secret forte, rate-limit, SSH only. Ordem errada é pegadinha de prova.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "transport input telnet nas VTY com username secret forte. Avaliação?",
+    "alternativas": [
+      "Credenciais fortes não importam se o transporte é cleartext — Telnet permanece risco",
+      "Telnet + secret torna a sessão inquebrável no cabo",
+      "username secret cifra o Telnet automaticamente",
+      "O IOS recusa Telnet se existir secret"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Segurança de armazenamento ≠ segurança em trânsito. Sniffer ainda lê Telnet. Migre para SSH e remova telnet do transport. secret não “vira VPN” da sessão Telnet.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "line console 0 com password fraca e login (senha de linha). Mitigação alinhada?",
+    "alternativas": [
+      "Remover qualquer autenticação da console",
+      "Publicar a senha no ticket público do helpdesk",
+      "login local + username secret forte e controle físico do console; evitar senhas de linha fracas",
+      "Só aumentar o bandwidth da WAN"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Console merece autenticação forte e físico. login local com secret é melhor que password de linha fraca compartilhada. Remover auth ou publicar senha piora. Banda WAN não protege console.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual afirmação sobre enable password em texto claro na running está correta?",
+    "alternativas": [
+      "É a melhor prática Cisco 2020+ para todos os devices",
+      "É falha de hardening — use enable secret e remova o password legado",
+      "É aceitável se o device só tiver IPv4",
+      "É irrelevante se houver PortFast"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Texto claro no show run é risco se a config vazar. enable secret + no enable password. IPv4/PortFast não justificam password em claro. password-encryption tipo 7 ainda é fraco comparado a secret.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Programa de segurança eficaz, segundo o content, combina:",
+    "alternativas": [
+      "Somente compra de firewall sem treino",
+      "Pessoas (awareness), processos (policy) e tecnologia (controles no device/rede)",
+      "Somente cabos blindados",
+      "Somente aumentar o número de VLANs"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Defesa em camadas humanas e técnicas. Firewall sozinho não corrige senha compartilhada nem console aberta. VLANs e cabos não substituem policy e treino. O 5.1 une conceitos e hardening de acesso.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mental “acesso ao device inseguro” do 5.1:",
+    "alternativas": [
+      "Só ver o status de EtherChannel",
+      "Só limpar a tabela ARP",
+      "Secret vs password · login nas linhas · transporte (SSH vs Telnet) · tipo 7 · físico/awareness",
+      "Só o tamanho do pool NAT"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O método cobre armazenamento, autenticação de linha, cifre do transporte, ofuscação fraca e fatores humanos/físicos. EtherChannel, ARP e NAT pool não são o eixo do 5.1.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor uso de show run | include enable|username|password|secret|transport no incidente de hardening?",
+    "alternativas": [
+      "Substituir qualquer análise de ameaça phishing",
+      "Só provar o estado do STP root",
+      "Apagar automaticamente todas as VLANs",
+      "Revelar se há enable password em claro, users sem secret, Telnet e ausência de secret — evidência de config insegura"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O include resume a postura de senha e transporte na running. Combine com section line e show privilege. Não substitui awareness de phishing nem mede STP. É o show de auditoria rápida do content 5.1.",
+    "part_id": "5.1"
+  }
+]

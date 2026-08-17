@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual é o endereço de rede de 192.168.10.70/27?",
+    "alternativas": [
+      "192.168.10.64",
+      "192.168.10.0",
+      "192.168.10.70",
+      "192.168.10.96"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "/27 → máscara 255.255.255.224 → bloco 256−224=32. Redes: .0, .32, .64, .96… O IP .70 cai no bloco que começa em .64. .0 seria /24; .70 é host; .96 é a próxima rede.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Para a sub-rede 192.168.10.64/27, qual é o endereço de broadcast?",
+    "alternativas": [
+      "192.168.10.64",
+      "192.168.10.95",
+      "192.168.10.127",
+      "192.168.10.255"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Bloco /27 = 32 endereços. Broadcast = rede + 32 − 1 = .64+31 = .95. .64 é a rede; .127 seria fim de /25 a partir de .0 em outro recorte; .255 é broadcast de /24.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Quantos hosts utilizáveis existem em uma sub-rede /26 (máscara 255.255.255.192)?",
+    "alternativas": [
+      "64",
+      "30",
+      "126",
+      "62"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Bits de host = 32−26 = 6 → 2^6 = 64 endereços brutos; utilizáveis = 64−2 = 62 (tira rede e broadcast). 30 é /27; 126 é /25; 64 conta o total bruto, não só hosts.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A máscara 255.255.255.240 corresponde a qual prefixo CIDR?",
+    "alternativas": [
+      "/26",
+      "/27",
+      "/28",
+      "/29"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "240 no último octeto = 11110000 → 4 bits de host → prefixo /28. /26=.192, /27=.224, /29=.248.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Hosts 10.1.4.17/28 e 10.1.4.30/28 estão na mesma sub-rede?",
+    "alternativas": [
+      "Sim; ambos pertencem à rede 10.1.4.16/28",
+      "Não; um está em 10.1.4.0/28 e o outro em 10.1.4.32/28",
+      "Sim; qualquer /28 compartilha o mesmo broadcast 10.1.4.255",
+      "Não; /28 não permite mais de 4 hosts"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "/28 → bloco 16. Redes: .0, .16, .32… .17 e .30 ficam em 10.1.4.16 (broadcast .31). Não estão em .0 nem .32. Broadcast da subnet é .31, não .255. Hosts úteis = 14, não 4.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual é o primeiro e o último host utilizáveis de 172.16.5.0/30?",
+    "alternativas": [
+      "172.16.5.0 e 172.16.5.3",
+      "172.16.5.1 e 172.16.5.2",
+      "172.16.5.1 e 172.16.5.3",
+      "172.16.5.2 e 172.16.5.3"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "/30 tem 4 endereços: rede .0, hosts .1 e .2, broadcast .3. Usar .0 ou .3 como host é erro clássico. .1–.3 incluiria o broadcast.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Um PC exibe IPv4 169.254.32.10 com máscara 255.255.0.0. O que isso indica com mais precisão?",
+    "alternativas": [
+      "IP público roteável na Internet",
+      "Multicast local de roteamento",
+      "Endereço link-local APIPA, típico quando o host não obteve DHCP",
+      "Loopback da pilha IP do sistema"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "169.254.0.0/16 é APIPA/link-local de autoconfiguração. Não é público, não é 224/4 multicast nem 127/8 loopback. Costuma sinalizar falha de DHCP/acesso.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual faixa representa corretamente um bloco privado RFC 1918?",
+    "alternativas": [
+      "127.0.0.0/8",
+      "224.0.0.0/4",
+      "169.254.0.0/16",
+      "10.0.0.0/8"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Privados: 10/8, 172.16/12, 192.168/16. 127/8 é loopback; 224/4 multicast; 169.254/16 APIPA. 10.0.0.0/8 é o bloco privado clássico de “Classe A”.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual operação determina o endereço de rede a partir de um IP e sua máscara?",
+    "alternativas": [
+      "IP AND máscara",
+      "IP OR máscara",
+      "IP XOR 255.255.255.255",
+      "IP + wildcard"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Rede = IP AND máscara (bit a bit). OR/XOR não produzem o prefixo de rede. Somar wildcard não é o método padrão de obtenção da rede.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Em um /24, quantos bits de host existem e quantos hosts utilizáveis resultam?",
+    "alternativas": [
+      "8 bits de host e 256 hosts utilizáveis",
+      "8 bits de host e 254 hosts utilizáveis",
+      "24 bits de host e 24 hosts utilizáveis",
+      "0 bits de host e 2 hosts utilizáveis"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "/24 deixa 8 bits de host → 256 endereços; utilizáveis 254 (menos rede e broadcast). 256 conta o total bruto. 24 bits de host seria /8.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dado 10.20.30.45/29, qual par rede/broadcast está correto?",
+    "alternativas": [
+      "Rede 10.20.30.40 / broadcast 10.20.30.47",
+      "Rede 10.20.30.0 / broadcast 10.20.30.255",
+      "Rede 10.20.30.45 / broadcast 10.20.30.46",
+      "Rede 10.20.30.32 / broadcast 10.20.30.63"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "/29 → bloco 8. Múltiplos: .0, .8, .16, .24, .32, .40, .48… .45 está em .40; broadcast .47. /24 daria .0–.255; usar o próprio host como rede está errado; .32/.63 é bloco /27.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um técnico configura o gateway do host 192.168.5.33/27 como 192.168.5.32. Por que isso falha?",
+    "alternativas": [
+      "Porque /27 não admite gateway",
+      "Porque o gateway deve ser 192.168.5.63 (broadcast)",
+      "Porque 192.168.5.32 é o endereço de rede da sub-rede, não um host utilizável",
+      "Porque o único gateway válido seria 192.168.5.0/24"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "/27 bloco 32 → rede de .33 é .32; hosts .33–.62; broadcast .63. Gateway = .32 usa o endereço de rede. Broadcast .63 também é inválido como gateway. /24 não é a máscara do host.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual wildcard mask corresponde à máscara 255.255.255.224?",
+    "alternativas": [
+      "0.0.0.224",
+      "0.0.0.63",
+      "255.255.255.224",
+      "0.0.0.31"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Wildcard ≈ 255.255.255.255 − máscara → 0.0.0.31 para /27 (.224). 0.0.0.63 é /26; repetir a máscara ou 0.0.0.224 não é a wildcard correta.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Você precisa de pelo menos 100 hosts em uma sub-rede. Qual o menor prefixo (mais longo possível) que atende?",
+    "alternativas": [
+      "/26 (62 hosts)",
+      "/25 (126 hosts)",
+      "/24 (254 hosts) apenas, pois /25 não basta",
+      "/30 (2 hosts)"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "/26 oferece 62 < 100. /25 oferece 126 ≥ 100 e é mais específico que /24. /30 só tem 2 hosts. “Apenas /24” ignora que /25 já cobre 100 hosts.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Bloco 192.168.1.0/24 será dividido em VLSM: um /26 e em seguida o próximo /26 contíguo. Quais faixas de rede resultam sem sobreposição?",
+    "alternativas": [
+      "192.168.1.0/26 e 192.168.1.32/26",
+      "192.168.1.0/26 e 192.168.1.64/26",
+      "192.168.1.0/26 e 192.168.1.16/26",
+      "192.168.1.0/26 e 192.168.1.0/26 novamente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "/26 ocupa 64 endereços. Primeiro: .0–.63. Próximo alinhado: .64/26 (.64–.127). .32/26 e .16/26 sobrepõem o primeiro bloco. Repetir .0/26 é sobreposição total.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "127.0.0.1 pertence a qual uso especial de endereço?",
+    "alternativas": [
+      "Multicast de todos os hosts na LAN",
+      "APIPA quando o DHCP falha",
+      "Broadcast limitado 255.255.255.255",
+      "Loopback, para testar a pilha IP local (faixa 127.0.0.0/8)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "127/8 é loopback. Multicast começa em 224; APIPA é 169.254/16; broadcast limitado é 255.255.255.255.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dois hosts: A=10.0.0.50/23 e B=10.0.1.200/23. Estão na mesma sub-rede?",
+    "alternativas": [
+      "Sim; a rede comum é 10.0.0.0/23 (bloco 512 endereços: 10.0.0.0–10.0.1.255)",
+      "Não; /23 separa 10.0.0.0/24 de 10.0.1.0/24 obrigatoriamente",
+      "Sim; qualquer 10.0.0.0/8 privado é a mesma subnet",
+      "Não; 10.0.1.200 é broadcast de 10.0.0.0/23"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "/23 → máscara 255.255.254.0; redes em passos de 2 no 3º octeto. 10.0.0.0/23 cobre 10.0.0.0–10.0.1.255. A e B caem dentro. Não são /24 separados. /8 privado ≠ mesma subnet. Broadcast de 10.0.0.0/23 é 10.0.1.255, não .200.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual afirmação sobre classes A/B/C vs CIDR é a mais correta no CCNA atual?",
+    "alternativas": [
+      "A classe do primeiro octeto sempre define a máscara real na Internet",
+      "CIDR usa o prefixo /n informado; defaults classful são legado",
+      "Todo endereço 192.x.x.x é obrigatoriamente /24 e privado",
+      "Classe B proíbe o uso de /20 ou /22"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Operação moderna é CIDR: o /n manda. Classes são default histórico. 192.0.2.0/24 de documentação não é RFC1918; privados 192.168/16. Prefixos longos/curtos existem em qualquer range.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Link ponto a ponto usa 10.10.10.0/30. Quais IPs de interface são válidos nos dois roteadores?",
+    "alternativas": [
+      "10.10.10.0 e 10.10.10.1",
+      "10.10.10.1 e 10.10.10.2",
+      "10.10.10.2 e 10.10.10.3",
+      "10.10.10.0 e 10.10.10.3"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Em /30: .0 rede, .1 e .2 hosts, .3 broadcast. Pares com .0 ou .3 como “host” de interface estão errados no modelo clássico de hosts utilizáveis.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Endereços na faixa 224.0.0.0 a 239.255.255.255 são classificados como:",
+    "alternativas": [
+      "Unicast privados RFC 1918",
+      "Loopback",
+      "Link-local APIPA",
+      "Multicast IPv4 (224.0.0.0/4)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "224/4 é multicast. Privados são 10/8, 172.16/12, 192.168/16. Loopback 127/8. APIPA 169.254/16.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Calcule a rede de 172.16.100.130 com máscara 255.255.255.192.",
+    "alternativas": [
+      "172.16.100.128",
+      "172.16.100.0",
+      "172.16.100.192",
+      "172.16.100.130"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ".192 → /26 → bloco 64. Redes .0, .64, .128, .192. .130 está em .128. .0 e .192 são outros blocos; .130 é o host, não a rede.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Em VLSM a partir de 10.0.0.0/24, já se usou 10.0.0.0/25. Qual próximo bloco /26 está livre e alinhado?",
+    "alternativas": [
+      "10.0.0.0/26 (ainda dentro do /25 usado)",
+      "10.0.0.64/26 (ainda dentro do /25 usado)",
+      "10.0.0.128/26",
+      "10.0.0.192/25"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "10.0.0.0/25 consome .0–.127. Livres: .128–.255. Um /26 alinhado livre é 10.0.0.128/26 (.128–.191). .0/26 e .64/26 sobrepõem o /25. .192/25 não é /26 e mudaria o tamanho.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Host com IP 192.168.8.1/24 e gateway 192.168.9.1/24. Qual é o problema fundamental?",
+    "alternativas": [
+      "Nenhum; /24 diferentes ainda formam a mesma rede se o 3º octeto for sequencial",
+      "O host e o gateway não estão na mesma sub-rede (192.168.8.0/24 ≠ 192.168.9.0/24)",
+      "Falta apenas wildcard 0.0.0.255 no host",
+      "192.168.9.1 é loopback e por isso inválido"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "AND com /24: redes 192.168.8.0 e 192.168.9.0 são distintas. Gateway precisa ser host da mesma subnet. Wildcard no host não une subnets. 192.168.9.1 não é loopback (127/8).",
+    "part_id": "1.4"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual valor de incremento (bloco) no último octeto para a máscara 255.255.255.248?",
+    "alternativas": [
+      "16",
+      "4",
+      "32",
+      "8"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Bloco = 256 − 248 = 8 → /29. 16 é /28 (.240); 4 é /30 (.252); 32 é /27 (.224).",
+    "part_id": "1.4"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "0.0.0.0/0 em uma tabela de roteamento representa com mais precisão:",
+    "alternativas": [
+      "Apenas o endereço de rede de 0.0.0.0/8 classful",
+      "Broadcast de todas as subnets locais",
+      "Rota default (qualquer destino não mais específico)",
+      "Multicast obrigatório de todos os roteadores"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "0.0.0.0/0 é a default route. Não é classful A operacional, nem broadcast 255.255.255.255, nem faixa multicast 224/4.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Quantas sub-redes /28 cabem exatamente dentro de um único /24, sem sobrepor?",
+    "alternativas": [
+      "4",
+      "8",
+      "16",
+      "32"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Bits emprestados de /24 para /28 = 4 → 2^4 = 16 sub-redes de 16 endereços. 4 e 8 subestimam; 32 seria passo de /29 (8 endereços) em outro cálculo.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual endereço NÃO deve ser configurado como IP de host em 10.1.1.0/25?",
+    "alternativas": [
+      "10.1.1.1",
+      "10.1.1.100",
+      "10.1.1.126",
+      "10.1.1.127"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "/25 de 10.1.1.0: rede .0, hosts .1–.126, broadcast .127. .127 é broadcast e inválido como host. Os demais estão na faixa útil.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "172.16.0.0/12 é privado. Qual endereço está DENTRO desse bloco?",
+    "alternativas": [
+      "172.15.255.1",
+      "172.32.0.1",
+      "172.31.255.1",
+      "173.16.0.1"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "172.16.0.0/12 cobre 172.16.0.0–172.31.255.255. 172.31.255.1 está dentro. 172.15 e 172.32 ficam fora; 173.16 também.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "IP 200.10.5.100 e máscara 255.255.255.128. Qual broadcast da sub-rede do host?",
+    "alternativas": [
+      "200.10.5.127",
+      "200.10.5.255",
+      "200.10.5.100",
+      "200.10.5.128"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "/25 → bloco 128. Redes .0 e .128. .100 está em .0; broadcast .127. .255 seria /24; .128 é a outra rede; .100 é o host.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ao montar VLSM, o erro clássico de sobreposição ocorre quando:",
+    "alternativas": [
+      "Dois blocos reivindicam os mesmos endereços, ex.: 192.168.0.0/26 e 192.168.0.32/26",
+      "Se usa /30 em links seriais",
+      "Se documenta gateway em host utilizável",
+      "Se converte máscara .252 para prefixo /30"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "192.168.0.0/26 usa .0–.63; 192.168.0.32/26 não é alinhado/livre e colide com o primeiro. /30 em serial, gateway válido e .252=/30 são práticas corretas, não sobreposição.",
+    "part_id": "1.4"
+  }
+]

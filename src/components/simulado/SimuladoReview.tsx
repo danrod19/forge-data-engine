@@ -13,8 +13,9 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Question } from "@/types/question";
-import { getQuestionPrompt } from "@/types/question";
+import { getQuestionPrompt, isTraditionalQuestion } from "@/types/question";
 import { letterIndex } from "@/components/simulado/simulado-feedback";
+import { TerminalCLI } from "@/components/ticket/TerminalCLI";
 
 export interface ReviewItem {
   question: Question;
@@ -111,16 +112,21 @@ export function SimuladoReview({
           transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
           className="space-y-3"
         >
-          {/* Enunciado */}
+          {/* Enunciado / sintoma */}
           <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-              Questão
+              {rq.question_type === "ticket" || !isTraditionalQuestion(rq)
+                ? "Troubleshooting"
+                : "Questão"}
             </p>
             <h2 className="text-sm font-medium leading-relaxed text-slate-100 sm:text-base">
               <span className="mr-1.5 text-neon-green">#</span>
               {prompt}
             </h2>
           </div>
+
+          {(rq.question_type === "ticket" || !isTraditionalQuestion(rq)) &&
+            rq.cli_output && <TerminalCLI output={rq.cli_output} />}
 
           {/* Comparison cards */}
           <div className="grid gap-2 sm:grid-cols-2">

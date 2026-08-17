@@ -19,7 +19,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CCNA_DOMAINS, domainAccentClasses } from "@/data/domains";
+import { MODULE_1_PARTS, MODULE_1_TITLE, MODULE_1_WEIGHT } from "@/data/module-1-fundamentos";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/types/question";
+import { useTrack } from "@/lib/track-context";
+import { SobreProvaAws } from "@/components/sobre/SobreProvaAws";
 
 const fadeUp = {
   initial: { opacity: 0, y: 10 },
@@ -27,6 +30,14 @@ const fadeUp = {
 };
 
 export function SobreProva() {
+  const { track } = useTrack();
+
+  if (track === "aws") {
+    return <SobreProvaAws />;
+  }
+
+  const isV2 = track === "ccna-v2";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -49,11 +60,14 @@ export function SobreProva() {
             </p>
             <h1 className="text-lg font-bold text-slate-50 sm:text-xl">
               Sobre a Prova{" "}
-              <span className="text-neon-green">CCNA 200-301</span>
+              <span className="text-neon-green">
+                {isV2 ? "CCNA 200-301 v2.0" : "CCNA 200-301"}
+              </span>
             </h1>
             <p className="mt-1.5 text-[12px] leading-relaxed text-slate-400">
-              Tudo que você precisa saber para atacar a certificação com
-              estratégia — sem decorar no escuro.
+              {isV2
+                ? "Posture troubleshooting · ~28% diagnostic — tickets e análise de CLI como treino principal."
+                : "Tudo que você precisa saber para atacar a certificação com estratégia — sem decorar no escuro."}
             </p>
           </div>
         </div>
@@ -119,56 +133,127 @@ export function SobreProva() {
         </ul>
       </Section>
 
-      {/* v2.0 alert */}
+      {/* v2.0 alert — destaque forte no track V2; aviso de transição no V1 */}
       <motion.div
         {...fadeUp}
         transition={{ delay: 0.1 }}
-        className="rounded-2xl border border-amber-500/35 bg-amber-500/5 p-5"
+        className={cn(
+          "rounded-2xl border p-5",
+          isV2
+            ? "border-neon-green/40 bg-neon-green/5"
+            : "border-amber-500/35 bg-amber-500/5"
+        )}
       >
         <div className="mb-3 flex items-center gap-2">
-          <div className="flex size-9 items-center justify-center rounded-lg border border-amber-500/40 bg-amber-500/10">
-            <AlertTriangle className="size-4 text-amber-400" />
+          <div
+            className={cn(
+              "flex size-9 items-center justify-center rounded-lg border",
+              isV2
+                ? "border-neon-green/40 bg-neon-green/10"
+                : "border-amber-500/40 bg-amber-500/10"
+            )}
+          >
+            <AlertTriangle
+              className={cn(
+                "size-4",
+                isV2 ? "text-neon-green" : "text-amber-400"
+              )}
+            />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-amber-300">
-              Mudança importante: CCNA v2.0
+            <h2
+              className={cn(
+                "text-sm font-bold",
+                isV2 ? "text-neon-green" : "text-amber-300"
+              )}
+            >
+              {isV2
+                ? "Track CCNA V2 · posture troubleshooting"
+                : "Mudança importante: CCNA v2.0"}
             </h2>
-            <p className="text-[10px] text-amber-500/80">
-              Transição prevista · fevereiro 2027
+            <p
+              className={cn(
+                "text-[10px]",
+                isV2 ? "text-neon-green/70" : "text-amber-500/80"
+              )}
+            >
+              {isV2
+                ? "~28% diagnostic / troubleshoot · tickets como treino principal"
+                : "Transição prevista · fevereiro 2027"}
             </p>
           </div>
         </div>
         <div className="space-y-2 text-[12px] leading-relaxed text-slate-300">
           <p>
-            A versão atual do blueprint já prepara o terreno; a{" "}
-            <strong className="text-amber-200">v2.0</strong> reforça ainda mais
-            a habilidade de{" "}
-            <strong className="text-neon-green">diagnosticar</strong> e{" "}
-            <strong className="text-neon-green">solucionar problemas</strong>{" "}
-            — cerca de{" "}
-            <span className="rounded bg-amber-500/15 px-1.5 py-0.5 font-bold text-amber-300">
-              28% do exame
-            </span>
-            .
+            {isV2 ? (
+              <>
+                Você está no track{" "}
+                <strong className="text-neon-green">CCNA V2</strong>. O blueprint
+                v2.0 reforça{" "}
+                <strong className="text-neon-green">diagnosticar</strong> e{" "}
+                <strong className="text-neon-green">solucionar problemas</strong>{" "}
+                — cerca de{" "}
+                <span className="rounded bg-neon-green/15 px-1.5 py-0.5 font-bold text-neon-green">
+                  28% do exame
+                </span>
+                . A Trilha (tickets com sintoma + CLI) é o treino principal deste
+                track.
+              </>
+            ) : (
+              <>
+                A versão clássica do blueprint já prepara o terreno; a{" "}
+                <strong className="text-amber-200">v2.0</strong> reforça ainda
+                mais a habilidade de{" "}
+                <strong className="text-neon-green">diagnosticar</strong> e{" "}
+                <strong className="text-neon-green">solucionar problemas</strong>{" "}
+                — cerca de{" "}
+                <span className="rounded bg-amber-500/15 px-1.5 py-0.5 font-bold text-amber-300">
+                  28% do exame
+                </span>
+                . Troque para o track{" "}
+                <strong className="text-slate-200">CCNA V2</strong> no TopBar se
+                quiser o banco e a posture v2.0.
+              </>
+            )}
           </p>
-          <ul className="mt-2 space-y-1.5 border-l-2 border-amber-500/30 pl-3 text-slate-400">
+          <ul
+            className={cn(
+              "mt-2 space-y-1.5 border-l-2 pl-3 text-slate-400",
+              isV2 ? "border-neon-green/30" : "border-amber-500/30"
+            )}
+          >
             <li className="flex gap-2">
-              <ChevronRight className="mt-0.5 size-3 shrink-0 text-amber-400" />
+              <ChevronRight
+                className={cn(
+                  "mt-0.5 size-3 shrink-0",
+                  isV2 ? "text-neon-green" : "text-amber-400"
+                )}
+              />
               <span>
                 <strong className="text-slate-300">Menos memorização</strong> de
                 listas soltas e mais análise de falhas reais.
               </span>
             </li>
             <li className="flex gap-2">
-              <ChevronRight className="mt-0.5 size-3 shrink-0 text-amber-400" />
+              <ChevronRight
+                className={cn(
+                  "mt-0.5 size-3 shrink-0",
+                  isV2 ? "text-neon-green" : "text-amber-400"
+                )}
+              />
               <span>
                 <strong className="text-slate-300">Mais leitura de saídas</strong>{" "}
-                de comandos (<code className="text-neon-cyan">show</code>,{" "}
-                logs, tabelas de rota, interfaces).
+                de comandos (<code className="text-neon-cyan">show</code>, logs,
+                tabelas de rota, interfaces).
               </span>
             </li>
             <li className="flex gap-2">
-              <ChevronRight className="mt-0.5 size-3 shrink-0 text-amber-400" />
+              <ChevronRight
+                className={cn(
+                  "mt-0.5 size-3 shrink-0",
+                  isV2 ? "text-neon-green" : "text-amber-400"
+                )}
+              />
               <span>
                 Foque em{" "}
                 <strong className="text-slate-300">
@@ -227,6 +312,42 @@ export function SobreProva() {
         </p>
       </Section>
 
+      {/* Módulo 1.0 no Forge */}
+      <Section
+        delay={0.13}
+        icon={BookOpen}
+        title={`Módulo 1.0 · ${MODULE_1_TITLE} (~${MODULE_1_WEIGHT}%)`}
+        accent="green"
+      >
+        <p className="mb-3 text-[12px] text-slate-400">
+          Cobertura focada de Network Fundamentals alinhada ao 200-301 — não
+          afirmamos “100% de todos os tópicos do blueprint mundial”. O Forge
+          organiza o estudo em partes práticas:
+        </p>
+        <ul className="mb-3 space-y-1.5">
+          {MODULE_1_PARTS.map((p) => (
+            <li
+              key={p.part_id}
+              className="flex gap-2 rounded-lg border border-slate-800/80 bg-slate-950/40 px-2.5 py-2 text-[11px] text-slate-300"
+            >
+              <span className="shrink-0 font-mono font-bold text-neon-green">
+                {p.part_id}
+              </span>
+              <span>{p.title}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="text-[11px] leading-relaxed text-slate-500">
+          <strong className="text-slate-400">Trilha</strong> = tickets de
+          troubleshooting · <strong className="text-slate-400">Estudo</strong>{" "}
+          = por parte ·{" "}
+          <strong className="text-slate-400">Simulado</strong> = traditional
+          (Fundamentos ou banco completo) ·{" "}
+          <strong className="text-slate-400">Drill</strong> = cálculo IPv4 na
+          parte 1.4.
+        </p>
+      </Section>
+
       {/* Como usar o Forge */}
       <Section
         delay={0.14}
@@ -235,7 +356,7 @@ export function SobreProva() {
         accent="cyan"
       >
         <p className="mb-3 text-[12px] text-slate-400">
-          Três modos, um objetivo: passar com confiança e raciocínio de
+          Quatro frentes, um objetivo: passar com confiança e raciocínio de
           engenheiro.
         </p>
         <div className="space-y-2.5">
@@ -245,7 +366,11 @@ export function SobreProva() {
             color="text-neon-green"
             border="border-neon-green/25"
             bg="bg-neon-green/10"
-            desc="Sintoma + saída de CLI. Treine o olhar de troubleshooting que a v2.0 valoriza — lives, streak e feedback imediato."
+            desc={
+              isV2
+                ? "Treino principal do V2: sessões de tickets com sintoma + CLI. Posture diagnostic/troubleshoot alinhada ao ~28% da prova."
+                : "Sessões de 10 tickets. Sintoma + CLI — o olhar de troubleshooting que a prova valoriza."
+            }
           />
           <HowCard
             icon={ClipboardList}
@@ -253,15 +378,19 @@ export function SobreProva() {
             color="text-neon-cyan"
             border="border-neon-cyan/25"
             bg="bg-neon-cyan/10"
-            desc="Banco large de questões traditional, timer opcional e revisão dos erros. Simule o ritmo dos 120 minutos."
+            desc={
+              isV2
+                ? "Banco traditional v2.0 consolidado. Inclui foco analítico / diagnóstico. Timer opcional."
+                : "Questões traditional. Escolha módulos, v2 ou legado. Timer opcional; drill de subnetting não entra aqui."
+            }
           />
           <HowCard
             icon={BookOpen}
-            title="Estudo por Tópicos"
+            title="Estudo por partes"
             color="text-neon-gold"
             border="border-neon-gold/25"
             bg="bg-neon-gold/10"
-            desc="Navegue pelos 6 domínios, veja tópicos e pratique só o que está fraco. Feche buracos antes da prova."
+            desc="Parts por módulo com tópicos e prática. Progresso salvo por track (V1 e V2 não se misturam)."
           />
         </div>
         <div className="mt-4 rounded-xl border border-slate-700/80 bg-slate-950/60 p-3 font-mono text-[11px] leading-relaxed text-slate-400">
@@ -270,12 +399,11 @@ export function SobreProva() {
           <span className="text-neon-cyan">~</span>
           <span className="text-slate-600">$ </span>
           <span className="text-slate-300">
-            suggest plan --daily tickets=5 --weekly simulado --weak_domains
+            suggest plan --daily tickets --weekly simulado --estudo parts
           </span>
           <p className="mt-2 text-slate-500">
-            → Pratique tickets diários, um simulado por semana e use Estudo para
-            atacar os domínios com menor progresso. Consistência &gt; maratona
-            de última hora.
+            → Tickets diários, um simulado por semana e Estudo nas partes com
+            menor progresso. Consistência &gt; maratona de última hora.
           </p>
         </div>
       </Section>

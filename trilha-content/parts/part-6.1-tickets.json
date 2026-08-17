@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6101 — Filiais A e B deveriam ter a mesma policy de VLAN de voz e ACL de guest. Usuários de B reclamam de comportamento diferente. Operação ainda é CLI hop-a-hop.",
+    "cli_output": "NOC-NOTE: sem controller/templates em producao\n\nSW-A# show run | include voice|access-list GUEST\nswitchport voice vlan 30\naccess-list GUEST deny ip any 10.0.0.0 0.255.255.255\naccess-list GUEST permit ip any any\n\nSW-B# show run | include voice|access-list GUEST\nswitchport voice vlan 130\naccess-list GUEST permit ip any any\n! (sem deny para 10.0.0.0/8)\n\nSW-A# show run | include hostname\nhostname SW-A\nSW-B# show run | include hostname\nhostname SW-B\n\nINVENTORY-CSV (manual):\nsite,device,voice_vlan,guest_acl_version\nA,SW-A,30,v2-deny10\nB,SW-B,130,v1-permit-any\n\n! Mudanca de policy v2 aplicada so em A via tftp script local; B esquecido",
+    "alternativas": [
+      "Ambos os sites tem voice VLAN 30 e a mesma ACL GUEST no output",
+      "Controller DNA aplicou intent identica e o inventário mostra managed/in-sync",
+      "Data plane foi removido em B porque ha ACL permit any",
+      "Config manual divergente (VLAN de voz e ACL diferentes) — falta de policy centralizada/controller ou processo de template"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "SW-A e SW-B divergem em voice VLAN (30 vs 130) e ACL GUEST. Inventário manual confirma versões diferentes. Não há controller in-sync. Sintoma clássico de drift sem automação central — não é data plane apagado.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6102 — Ping entre hosts da mesma VLAN ok; rota para outra filial some. NOC culpou o DNA Center.",
+    "cli_output": "EDGE# show ip interface brief | include up\nGigabitEthernet0/0   10.10.10.1   YES manual up  up\nGigabitEthernet0/1   10.0.0.1     YES manual up  up\n\nEDGE# show ip ospf neighbor\nNeighbor ID  State\n2.2.2.2      DOWN/ -   (was FULL, now dead)\n\nEDGE# show ip route 10.20.0.0\n% Network not in table\n\nEDGE# ping 10.10.10.50\n!!!!! Success rate is 100 percent\n\nCTRL# show system status\nController cluster: HEALTHY\nNorthbound API: listening :443\nManaged devices: 42/42 reachable\n\n! DNA/controller saudavel; problema e adjacencia OSPF e rota ausente",
+    "alternativas": [
+      "Controller northbound down e inventário 0/42",
+      "Falha de control plane de roteamento (OSPF neighbor DOWN, rota ausente) com data plane local ok — não é outage do controller",
+      "Data plane da VLAN local está down (ping 0%)",
+      "Southbound OpenFlow obrigatório ausente no show ip route"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Ping local ok = data plane na subnet. OSPF DOWN e rota sumida = control plane. Controller HEALTHY com devices reachable. Isolar planos evita culpar DNA por falha de adjacência.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6103 — Portal de automação não aplica change. Usuários navegando normalmente. Time de rede jura que o switch de acesso está offline.",
+    "cli_output": "ORCH# curl -k -u orchestrator https://dnac.lab.local/dna/intent/api/v1/network-device\nHTTP/1.1 503 Service Unavailable\n{ \"error\": \"controller API gateway timeout\" }\n\nCTRL# show cluster\nNode-1: NOT_READY\nNode-2: NOT_READY\nVIP northbound: UNREACHABLE from orchestrator subnet\n\nACCESS-SW# show ip interface brief | include Vlan10|up\nVlan10   10.10.10.2   YES manual up  up\n\nPC-USER# ping 8.8.8.8\nReply from 8.8.8.8: time=12ms\n\nACCESS-SW# show cdp neighbors\nCore1  Gig 1/0/1  148  S I  WS-C\n\n! Inventario: device access ainda responde ICMP na gestao; cluster controller indisponivel para apps",
+    "alternativas": [
+      "Data plane de Internet do usuário está down (ping 8.8.8.8 falha)",
+      "CDP neighbors vazio prova cabo do access cortado",
+      "Falha northbound (app/orquestrador não alcança API do controller 503/cluster NOT_READY); data plane do user e switch access seguem up — não é southbound do access offline",
+      "Southbound do access está offline porque Vlan10 está administratively down"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "curl 503 e cluster NOT_READY = northbound/controller API. User ping Internet ok; access up com CDP. Não é switch órfão de cabo. Separe app→controller de user data plane e de device southbound.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6104 — Switch de site remoto saiu do inventário do controller há 2 dias. Usuários locais ainda acessam o gateway e a Internet da filial.",
+    "cli_output": "CTRL# show inventory device BRANCH-SW1\nStatus: UNREACHABLE / LAST_SEEN: 48h ago\nSync: OUT_OF_SYNC\nLast policy push: FAILED (connection timed out)\n\nBRANCH-SW1# show ip interface brief | include up\nVlan20   10.20.20.1   YES manual up  up\nGi0/1    203.0.113.2  YES manual up  up\n\nBRANCH-SW1# show run | include hostname|ip default\nhostname BRANCH-SW1\nip default-gateway 203.0.113.1\n\nPC-FILIAL# ping 10.20.20.1\nReply\nPC-FILIAL# ping 8.8.8.8\nReply\n\nBRANCH-SW1# ping 10.255.0.10\n..... Success rate is 0 percent\n! 10.255.0.10 = IP de gestao do controller (VPN/gestao corporativa)\n\n! Conclusao de lab: underlay de usuarios ok; path de gestao ao controller quebrado",
+    "alternativas": [
+      "Device órfão do controller (inventário UNREACHABLE) mas data plane local segue com última config — southbound/gestão ao controller falha, usuários ainda encaminham",
+      "Data plane local down (pings do PC falham)",
+      "Controller aplicou policy nova com sucesso (LAST policy push SUCCESS)",
+      "Northbound 200 OK no inventário para BRANCH-SW1"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Inventário UNREACHABLE e policy push FAILED; ping ao controller 0%. PC local e Internet ok. Encaminhamento local permanece; orquestração central parou. É o device órfão do content 6.1, não outage total de data plane.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6105 — Após endurecer ACL na VTY e SNMP, o NOC perdeu gestão. Tráfego de usuários e OSPF Full permanecem. Time de SDN reiniciou o cluster sem necessidade.",
+    "cli_output": "CORE# show ip ospf neighbor\nNeighbor ID  State\n2.2.2.2      FULL/BDR\n\nCORE# show ip route | include 10.50\nO        10.50.0.0/16 [110/2] via 10.0.0.2\n\nPC# ping 10.50.1.10\nReply from 10.50.1.10\n\nCORE# show run | section line vty\nline vty 0 4\n access-class 99 in\n transport input ssh\n login local\n\nCORE# show access-lists 99\nStandard IP access list 99\n    10 permit 10.9.9.0, wildcard bits 0.0.0.255\n    20 deny   any (120 matches)\n\nNOC-PC 10.8.8.50# ssh admin@10.0.0.1\n% Connection refused / timed out by ACL behavior\n\nCTRL# show cluster\nCluster HEALTHY — reinicio desnecessario registrado no change log",
+    "alternativas": [
+      "OSPF DOWN e rota 10.50 ausente — control plane morto",
+      "Ping de user falha — data plane morto",
+      "Cluster controller NOT_READY no output",
+      "Management plane: access-class 99 bloqueia origem 10.8.8.50 na VTY; control/data de user e OSPF ok — eixo de gestão, não SDN cluster"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "OSPF FULL, rota presente, ping user ok. ACL 99 na VTY só permite 10.9.9.0/24; NOC 10.8.8.50 negado. Cluster HEALTHY. Isolar management plane evita reinício inútil do controller.",
+    "part_id": "6.1"
+  }
+]

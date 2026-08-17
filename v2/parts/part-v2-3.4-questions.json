@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Principal problema que o HSRP resolve para os hosts da LAN?",
+    "alternativas": [
+      "SPOF do default gateway — VIP virtual mantém o first hop se um router cair",
+      "Loops L2 no uplink de fibra",
+      "Falta de NAT overload",
+      "Eleição de root bridge STP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Hosts usam um gateway; se for um IP físico único, a queda do router isola a LAN. HSRP oferece VIP estável com Active/Standby. Não é STP nem NAT. O default gateway do PC deve ser o VIP.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No HSRP, quem encaminha o tráfego destinado ao VIP em operação normal?",
+    "alternativas": [
+      "Somente o Standby",
+      "O router no estado Active",
+      "Todos os Listen em load-balance obrigatório",
+      "O switch access com PortFast"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O Active é o encaminhador do VIP e responde ARP do endereço virtual. Standby fica pronto para failover. Listen não faz ECMP HSRP clássico. PortFast é L2 edge.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Priority HSRP default típica?",
+    "alternativas": [
+      "1",
+      "255 obrigatória",
+      "100",
+      "32768"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Default de priority HSRP é 100. Valores maiores favorecem Active (com preempt). 32768 é tipicamente STP, não HSRP. 255 é o máximo, não o default.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Comando para VIP 10.40.0.1 no grupo 40?",
+    "alternativas": [
+      "ip route 10.40.0.1 255.255.255.255",
+      "standby 40 priority 10.40.0.1",
+      "hsrp 40 gateway 10.40.0.1 apenas",
+      "standby 40 ip 10.40.0.1"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A sintaxe clássica é standby <grupo> ip <vip> na interface/SVI. Priority não carrega o VIP. ip route não configura FHRP.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Para que serve standby preempt?",
+    "alternativas": [
+      "Permitir que o router de maior priority retome Active quando voltar",
+      "Desligar o VIP",
+      "Forçar Standby permanente",
+      "Trocar o grupo HSRP automaticamente para 0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem preempt, após failover o novo Active pode permanecer mesmo com priority menor quando o preferido sobe. Preempt restaura o design. Não remove o VIP.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show standby brief é útil para ver?",
+    "alternativas": [
+      "Apenas a tabela MAC",
+      "Resumo de interface, grupo, priority, estado (Active/Standby) e VIP",
+      "Apenas rotas OSPF",
+      "Apenas power inline"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show standby brief consolida o estado HSRP por interface/grupo — verify essencial. Não lista MAC de host, OSPF nem PoE.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Default gateway recomendado no PC da VLAN com HSRP?",
+    "alternativas": [
+      "IP físico do Standby apenas",
+      "IP físico do Active apenas (sem VIP)",
+      "O endereço virtual (VIP) do grupo HSRP",
+      "0.0.0.0"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O VIP é o first hop estável. Apontar só o IP físico do Active recria SPOF. 0.0.0.0 não é gateway unicast válido no host.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "R1 priority 105, R2 priority 100, ambos com preempt. Quem tende a ser Active?",
+    "alternativas": [
+      "R2 sempre",
+      "Nenhum; HSRP exige priority 255",
+      "O de menor IP real sempre",
+      "R1 (maior priority) com preempt"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Maior priority vence e preempt garante que R1 assuma/retome. R2 fica Standby. Priority 255 não é obrigatória.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Comparação leve correta?",
+    "alternativas": [
+      "HSRP e VRRP são ideias de FHRP (gateway virtual); no lab CCNA típico configure HSRP com standby",
+      "VRRP substitui o STP",
+      "HSRP só funciona em IPv6",
+      "GLBP é obrigatório em todo campus CCNA"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "FHRP inclui HSRP/VRRP/GLBP conceitualmente. O exame/lab foca comandos standby do HSRP. VRRP não é STP; HSRP é IPv4 clássico nesta part; GLBP não é obrigatório.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Grupo HSRP 10 no R1 e grupo 11 no R2, mesmo VIP. Resultado típico?",
+    "alternativas": [
+      "Formam par perfeito",
+      "Preempt vira automático",
+      "Mismatch de grupo — não operam como um único grupo HSRP coerente",
+      "VIP é ignorado e vira OSPF"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O número do grupo deve ser igual nos peers. Grupos diferentes não formam o par Active/Standby esperado. Alinhe standby <mesmo-grupo> ip <mesmo-vip>.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após queda e recovery do R1 (priority 120, sem preempt), R2 (100) continua Active. Por quê?",
+    "alternativas": [
+      "Sem preempt o Active atual pode permanecer mesmo com priority menor no peer recuperado",
+      "Priority 120 é inválida",
+      "VIP mudou sozinho",
+      "Standby não existe em HSRP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Preempt é necessário para o preferido retomar. Só priority alta sem preempt não força a reconquista. Habilite standby preempt no R1.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "VIP 10.40.0.1; R1 10.40.0.2; R2 10.40.0.3. O que deve estar na mesma subnet?",
+    "alternativas": [
+      "Apenas o VIP em outra VLAN",
+      "IPs reais e VIP na subnet dos hosts (ex. 10.40.0.0/24)",
+      "VIP em 192.0.2.0/24 obrigatório",
+      "Standby sem IP real"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "VIP e endereços reais dos routers no SVI ficam na LAN dos hosts. VIP em outra rede quebra o first hop. Ambos routers precisam de IP real + HSRP na interface.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show standby: State is Init. Interpretação de TShoot?",
+    "alternativas": [
+      "HSRP saudável Active",
+      "Sempre dual Active",
+      "Estado anormal/incompleto — interface, config ou peers; investigar por que não chegou a Active/Standby",
+      "Significa preempt on"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Init (ou Speak prolongado) indica que o grupo não estabilizou. Verifique interface up, standby ip, grupo, e peer. Não é estado final saudável de Active.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dois routers ambos se declaram Active na mesma LAN. Causa configuracional típica?",
+    "alternativas": [
+      "Priority 100 em ambos com preempt e Hellos ok sempre causa dual Active estável",
+      "Grupo ou VIP divergentes, ou L2 entre eles quebrado (não veem Hellos)",
+      "show standby brief proibido",
+      "PortFast no SVI"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem ver o peer (L2 ou grupo/VIP errados), cada um pode achar-se Active. Corrija grupo/VIP e conectividade L2 entre routers. Priority igual com Hellos ok elege um Active e um Standby.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem de Diagnose: hosts sem Internet; gateway 10.40.0.2 (IP físico do R1); R2 existe mas sem HSRP.",
+    "alternativas": [
+      "Só aumentar MTU",
+      "Só limpar ARP no core",
+      "Configurar HSRP com VIP e apontar hosts ao VIP; gateway físico único = SPOF",
+      "Desligar R2"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Sem FHRP o design depende só do R1. Introduza standby group + VIP e atualize o DHCP/default gateway. MTU/ARP não criam redundância de first hop.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "standby 1 priority 90 no router que deveria ser Active preferido (peer 100). Efeito?",
+    "alternativas": [
+      "90 sempre vence 100",
+      "O peer 100 tende a ser Active — priority do ‘preferido’ está invertida",
+      "HSRP desliga",
+      "VIP muda para 90.0.0.0"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Maior priority vence. 90 < 100 deixa o peer como Active. Corrija para 110/120 no desejado e use preempt.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Interface SVI do Active cai (down/down). O que deve ocorrer se Standby ok?",
+    "alternativas": [
+      "VIP é apagado da subnet para sempre",
+      "Standby assume Active e continua respondendo pelo VIP",
+      "Hosts mudam sozinhos para OSPF",
+      "Priority vira 0 em todos"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Failover HSRP: Standby detecta perda do Active e assume o VIP. Hosts mantêm o mesmo gateway virtual. Não é OSPF no PC.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ideia leve de tracking de interface no HSRP?",
+    "alternativas": [
+      "Substituir o VIP por MAC aleatório",
+      "Desligar preempt para sempre",
+      "Baixar priority se um uplink crítico cair, favorecendo failover",
+      "Converter HSRP em STP root"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Tracking (ideia) decrementa priority quando a interface monitorada cai, ajudando o Standby a virar Active se o Active perdeu o uplink. Não é lab profundo aqui.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "R1 VIP 10.40.0.1 grupo 40; R2 VIP 10.40.0.254 grupo 40. Problema?",
+    "alternativas": [
+      "Grupo 40 é inválido",
+      "Priority default proíbe VIP .1",
+      "Standby não pode ter IP real",
+      "VIP mismatch — peers devem usar o mesmo endereço virtual"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Mesmo grupo com VIPs diferentes quebra o FHRP coerente. Padronize o VIP (ex. .1) nos dois. Grupo 40 é válido.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Verify mínimo após configurar HSRP?",
+    "alternativas": [
+      "Apenas show version",
+      "Apenas show flash",
+      "Apenas show vlan brief",
+      "show standby brief + confirmação de Active/Standby e Virtual IP"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "show standby brief valida estado e VIP. version/flash/vlan não provam FHRP. Complete com teste de gateway no host.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Papel Listen no HSRP (ideia)?",
+    "alternativas": [
+      "Router no grupo que não é Active nem Standby (cenários com mais membros)",
+      "Sinônimo de Active",
+      "Desliga o VIP",
+      "Só existe em VRRP com nome diferente e nunca em HSRP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Com mais de dois routers, Listen ouve Hellos sem ser Active/Standby. Active e Standby são os papéis principais de encaminhamento/backup.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Autenticação HSRP (ideia leve) serve para?",
+    "alternativas": [
+      "Cifrar todo o tráfego de usuários da VLAN",
+      "Substituir SSH no VTY",
+      "Reduzir risco de router não autorizado participar do grupo (string/MD5 conforme plataforma)",
+      "Eleger root STP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Auth HSRP protege a negociação do grupo, não o data plane dos hosts nem o SSH de gestão. É ideia de endurecimento, não lab profundo.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Hosts fazem ARP para o VIP; quem responde em operação normal?",
+    "alternativas": [
+      "O Active (com MAC virtual HSRP)",
+      "Todos os switches do campus",
+      "O servidor DNS",
+      "Somente o Standby"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O Active responde ARP do VIP usando o MAC virtual do grupo. Standby não encaminha em normal. DNS não responde ARP de gateway.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo desta part?",
+    "alternativas": [
+      "standby ip / priority / preempt",
+      "show standby brief",
+      "Active vs Standby",
+      "GLBP deep, VRRP lab completo e SSO/NSF enterprise"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Configure/verify HSRP e TShoot básico. GLBP/VRRP lab e SSO/NSF avançados ficam de fora. Comparação leve com VRRP basta.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dois Actives por mismatch de grupo: risco para hosts?",
+    "alternativas": [
+      "Instabilidade de gateway/ARP e possível inconsistência de first hop",
+      "Melhora de throughput garantida",
+      "STP desliga sozinho",
+      "NAT vira automático"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Dois Actives na mesma LAN com VIPs conflitantes ou grupos errados confundem o first hop. Corrija grupo/VIP e L2. Não melhora throughput por design.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Timers HSRP hello/hold (ideia): se hello for muito longo…",
+    "alternativas": [
+      "Failover pode demorar mais a detectar Active down",
+      "Priority vira 255",
+      "VIP muda de subnet",
+      "Preempt é desnecessário sempre"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Timers maiores atrasam a detecção de falha. Ajuste só com design consciente. Não alteram VIP/subnet sozinhos.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "R1 e R2 com HSRP ok; hosts ainda usam 10.40.0.2 (R1 real) via DHCP option. Sintoma residual?",
+    "alternativas": [
+      "Standby não pode existir",
+      "show standby brief fica vazio sempre",
+      "Priority deve ser 0",
+      "HSRP inútil se o DHCP não entregar o VIP como default-router"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "FHRP no router não atualiza sozinho a option default-router dos PCs. Ajuste o DHCP/pool para o VIP. Caso contrário o SPOF do .2 permanece.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Estado Speak no HSRP (ideia operacional)?",
+    "alternativas": [
+      "Estado final melhor que Active",
+      "Transição de eleição; se ficar preso, há problema de config/L2/timers",
+      "Significa dual Active saudável",
+      "Desliga o SVI"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Speak faz parte da máquina de estados na eleição. Permanecer em Speak/Init indica falha de formar Active/Standby estável. Investigue peers e interface.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor par de comandos no router preferido?",
+    "alternativas": [
+      "Só ip route 0.0.0.0 0.0.0.0",
+      "Só switchport mode access",
+      "standby <g> ip <vip> + standby priority alta + standby preempt",
+      "Só spanning-tree portfast no SVI L3"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "VIP + priority + preempt definem o Active desejado e a reconquista. Default route e PortFast não configuram HSRP sozinhos.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo Configure/Verify HSRP no CCNA:",
+    "alternativas": [
+      "Só GLBP com 4 AVG obrigatórios",
+      "Só VRRP com lab de autenticação AH",
+      "Só SSO em chassis dual supervisor",
+      "VIP + grupo, Active/Standby, priority/preempt, show standby e TShoot de mismatch/failover"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O núcleo é HSRP com VIP, papéis, priority/preempt e verify. GLBP/VRRP lab e SSO enterprise ficam fora do foco desta part.",
+    "part_id": "v2-3.4"
+  }
+]

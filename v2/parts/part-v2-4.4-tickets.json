@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4401: usuários abrem o portal pelo IP 10.20.5.40, mas o atalho https://portal.empresa.local falha. Avalie a evidência de resolução.",
+    "cli_output": "PC-USER> ping 10.20.5.40\nReply from 10.20.5.40: bytes=32 time=1ms TTL=64\n\nPC-USER> ping portal.empresa.local\nPing request could not find host portal.empresa.local.\nPlease check the name and try again.\n\nPC-USER> nslookup portal.empresa.local\nServer:  dns-int.empresa.local\nAddress:  10.10.10.53\n\n*** dns-int.empresa.local can't find portal.empresa.local: Non-existent domain\n\nPC-USER> ipconfig /all | findstr /i \"DNS Servers\"\n   DNS Servers . . . . . . . . . . . : 10.10.10.53\n\nDNS-INT (admin view) zone empresa.local has hosts web01, mail01 — no portal name.",
+    "alternativas": [
+      "Problema de duplex no uplink do core",
+      "Rota default ausente no PC (IP do portal responde, logo L3 local ok)",
+      "Registro A (ou AAAA) de portal.empresa.local ausente/errado — DNS do cliente responde NXDOMAIN",
+      "clear ip ospf process no ABR"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Ping por IP ok e NXDOMAIN no nome isolam DNS: falta o A/AAAA de portal. O resolvedor 10.10.10.53 está alcançável e responde. Não é OSPF nem duplex. Crie/corrija o registro forward do portal.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4402: www.app.local não abre. A equipe diz que 'o CNAME está criado'. Verifique a cadeia.",
+    "cli_output": "PC> nslookup www.app.local 10.10.10.53\nServer:  dns-int.empresa.local\nAddress:  10.10.10.53\n\nName:    www.app.local\nCanonical name = app-prod.app.local\n\nPC> nslookup app-prod.app.local 10.10.10.53\nServer:  dns-int.empresa.local\nAddress:  10.10.10.53\n\n*** dns-int.empresa.local can't find app-prod.app.local: Non-existent domain\n\nPC> nslookup -type=A www.app.local 10.10.10.53\n(follows CNAME then fails on target)\n\nPC> ping 10.20.8.12\nReply from 10.20.8.12: time<1ms\n(note: that IP is the intended app server, but no A name app-prod)",
+    "alternativas": [
+      "Cadeia CNAME quebrada: alias ok, alvo app-prod.app.local sem A/AAAA — criar A do canônico ou corrigir o CNAME",
+      "Falha exclusiva de PoE na câmera do corredor",
+      "PTR do PC do usuário impede HTTP",
+      "Speed mismatch 10/100 em todo o data center"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O CNAME existe, mas o nome canônico não tem A/AAAA (NXDOMAIN). O IP do servidor responde se digitado, confirmando que o buraco é o registro do alvo. Complete a cadeia ou aponte o CNAME para um nome com A válido.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4403: parceiros não conseguem enviar e-mail para @empresa.com. Web da empresa por nome está ok.",
+    "cli_output": "EXT> nslookup -type=MX empresa.com 8.8.8.8\nNon-authoritative answer:\nempresa.com     MX preference = 10, mail exchanger = mail.empresa.com\n\nEXT> nslookup mail.empresa.com 8.8.8.8\n*** Non-existent domain\n\nEXT> nslookup -type=A www.empresa.com 8.8.8.8\nName:    www.empresa.com\nAddress: 203.0.113.80\n\nEXT> nslookup -type=NS empresa.com 8.8.8.8\nempresa.com     nameserver = ns1.empresa.com\nns1.empresa.com  internet address = 203.0.113.53\n\nQueue log (partner MTA): 'Host not found for MX mail.empresa.com'",
+    "alternativas": [
+      "Problema de CRC na fibra do parceiro apenas",
+      "Falta de registro A de www",
+      "Desligar o NS público",
+      "MX aponta para mail.empresa.com sem A/AAAA — criar A do host MX (ou corrigir o MX)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "MX existe, mas mail.empresa.com não resolve. www tem A, então a zona e NS básicos funcionam. Mail exige A/AAAA no hostname do MX. Corrija o host do exchanger.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4404: servidor de e-mail envia com HELO mail.empresa.com (A=203.0.113.25). Alguns destinos rejeitam por reverse DNS.",
+    "cli_output": "OPS> nslookup mail.empresa.com 8.8.8.8\nName:    mail.empresa.com\nAddress: 203.0.113.25\n\nOPS> nslookup 203.0.113.25 8.8.8.8\n*** server can't find 25.113.0.203.in-addr.arpa: Non-existent domain\n\nOPS> nslookup -type=PTR 25.113.0.203.in-addr.arpa 8.8.8.8\n*** Non-existent domain\n\nOPS> nslookup -type=MX empresa.com 8.8.8.8\nempresa.com     MX preference = 10, mail exchanger = mail.empresa.com\n\nRemote bounce sample:\n  550 5.7.1 Rejected: no reverse DNS for 203.0.113.25",
+    "alternativas": [
+      "Apagar o registro A de mail para 'forçar' PTR",
+      "Forward A e MX ok; PTR do IP de saída ausente — solicitar/criar reverse correto no bloco",
+      "Problema de duplex half no MX",
+      "CNAME de www quebra SMTP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Forward A e MX estão corretos; o reverse do IP de saída não existe. Destinos que exigem PTR rejeitam. Crie/ajuste PTR para 203.0.113.25 alinhado ao hostname de mail. Não apague o A.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4405: após mudança de DHCP, PCs da VLAN 40 não resolvem nomes internos. A zona em 10.50.0.53 está saudável (teste do jump host).",
+    "cli_output": "PC-VLAN40> ipconfig /all\n   IPv4 Address. . . . . . . . . . . : 10.40.0.88\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.40.0.1\n   DNS Servers . . . . . . . . . . . : 192.0.2.53\n\nPC-VLAN40> ping 192.0.2.53\nRequest timed out.\n\nPC-VLAN40> nslookup intranet.empresa.local\nDNS request timed out.\n    timeout was 2 seconds.\n*** Can't find server name\n\nJUMP> nslookup intranet.empresa.local 10.50.0.53\nName:    intranet.empresa.local\nAddress: 10.20.5.10\n\nSW-DHCP-scope note: option 006 still set to 192.0.2.53 (decommissioned)\nRouter IOS: ip name-server 10.50.0.53  (not used by PCs)",
+    "alternativas": [
+      "Registro A de intranet nunca existiu (jump host prova o contrário)",
+      "Falha de SFP no core apenas",
+      "Cliente com DNS 192.0.2.53 inacessível (option DHCP legada); corrigir DNS do cliente para 10.50.0.53",
+      "MX da zona pública impede intranet"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A zona responde em 10.50.0.53; os PCs apontam para 192.0.2.53 morto e dão timeout. É problema de resolvedor do cliente (option 6), não de registro A. Atualize o DHCP e renove os leases. name-server do IOS não alimenta o PC.",
+    "part_id": "v2-4.4"
+  }
+]

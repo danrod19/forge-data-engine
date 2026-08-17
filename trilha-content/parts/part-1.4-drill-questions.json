@@ -1,0 +1,302 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual é a rede de 192.168.5.100/24?",
+    "alternativas": [
+      "192.168.5.0",
+      "192.168.5.100",
+      "192.168.5.255",
+      "192.168.0.0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "/24 → máscara 255.255.255.0. AND zera o último octeto: rede 192.168.5.0. .100 é host; .255 é broadcast.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Broadcast de 10.0.0.0/30?",
+    "alternativas": [
+      "10.0.0.1",
+      "10.0.0.3",
+      "10.0.0.0",
+      "10.0.0.4"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "/30 bloco 4: rede .0, hosts .1–.2, broadcast .3.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Hosts utilizáveis em /28?",
+    "alternativas": [
+      "16",
+      "32",
+      "14",
+      "30"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "2^(32−28)=16 endereços; utilizáveis 16−2=14.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Máscara de /26 em decimal?",
+    "alternativas": [
+      "255.255.255.128",
+      "255.255.255.224",
+      "255.255.255.240",
+      "255.255.255.192"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "/26 = 255.255.255.192 (2 bits de host no 4º octeto além dos 6? 32−26=6 bits host; 256−64=192). .128=/25, .224=/27, .240=/28.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Rede de 172.16.4.77/27?",
+    "alternativas": [
+      "172.16.4.64",
+      "172.16.4.0",
+      "172.16.4.32",
+      "172.16.4.96"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "/27 bloco 32: .0 .32 .64 .96… .77 ∈ [.64–.95] → rede .64.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Broadcast de 172.16.4.64/27?",
+    "alternativas": [
+      "172.16.4.64",
+      "172.16.4.95",
+      "172.16.4.127",
+      "172.16.4.255"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Rede .64 + bloco 32 − 1 = broadcast .95.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "10.1.1.20/25 e 10.1.1.200/25: mesma subnet?",
+    "alternativas": [
+      "Sim, ambas em 10.1.1.0/25",
+      "Sim, /25 cobre todo o /24",
+      "Não; .20 está em 10.1.1.0/25 e .200 em 10.1.1.128/25",
+      "Não; /25 só permite 2 hosts"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "/25: .0–.127 e .128–.255. .20 e .200 em metades diferentes. Hosts úteis 126, não 2.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Bloco (incremento) de 255.255.255.248?",
+    "alternativas": [
+      "16",
+      "4",
+      "32",
+      "8"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "256−248=8 → /29.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Rede de 10.10.10.130 com máscara 255.255.255.192?",
+    "alternativas": [
+      "10.10.10.128",
+      "10.10.10.0",
+      "10.10.10.192",
+      "10.10.10.64"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": ".192=/26 bloco 64: .0 .64 .128 .192. .130 → .128.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Primeiro e último host de 192.168.0.0/30?",
+    "alternativas": [
+      "192.168.0.0 e 192.168.0.3",
+      "192.168.0.1 e 192.168.0.2",
+      "192.168.0.1 e 192.168.0.3",
+      "192.168.0.2 e 192.168.0.3"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "/30: .0 rede, .1–.2 hosts, .3 broadcast.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Hosts utilizáveis em /25?",
+    "alternativas": [
+      "128",
+      "254",
+      "126",
+      "62"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "2^7=128; úteis 126. 254 é /24; 62 é /26.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após 192.168.1.0/26, próximo /26 alinhado sem sobrepor?",
+    "alternativas": [
+      "192.168.1.32/26",
+      "192.168.1.16/26",
+      "192.168.1.0/26",
+      "192.168.1.64/26"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "/26 ocupa 64 IPs: .0–.63. Próximo: .64/26. .32 e .16 sobrepõem.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Rede de 200.1.1.50/29?",
+    "alternativas": [
+      "200.1.1.48",
+      "200.1.1.0",
+      "200.1.1.32",
+      "200.1.1.56"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "/29 bloco 8: … .48 .56 … .50 ∈ .48–.55 → rede .48.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Broadcast de 200.1.1.48/29?",
+    "alternativas": [
+      "200.1.1.48",
+      "200.1.1.55",
+      "200.1.1.63",
+      "200.1.1.255"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ".48 + 8 − 1 = .55.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "10.0.0.100/23 e 10.0.1.50/23: mesma subnet?",
+    "alternativas": [
+      "Não; /23 separa por /24",
+      "Não; .100 é broadcast",
+      "Sim; 10.0.0.0/23 cobre 10.0.0.0–10.0.1.255",
+      "Sim; qualquer 10/8 é a mesma subnet"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "/23 (255.255.254.0) une dois /24: 10.0.0.0–10.0.1.255. Ambos os IPs caem dentro.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Prefixo de 255.255.255.240?",
+    "alternativas": [
+      "/27",
+      "/26",
+      "/29",
+      "/28"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": ".240 = 4 bits host → /28.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Usou-se 10.0.0.0/25. Qual /26 livre alinhado?",
+    "alternativas": [
+      "10.0.0.0/26",
+      "10.0.0.64/26",
+      "10.0.0.128/26",
+      "10.0.0.192/25"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "/25 .0–.127 ocupado. Livre .128–.255; /26 alinhado: .128/26.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Quantas /28 cabem em um /24?",
+    "alternativas": [
+      "4",
+      "8",
+      "32",
+      "16"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Bits 24→28 = 4 → 2^4 = 16 sub-redes.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual NÃO é host válido em 192.168.10.0/26?",
+    "alternativas": [
+      "192.168.10.63",
+      "192.168.10.1",
+      "192.168.10.50",
+      "192.168.10.62"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "/26: rede .0, hosts .1–.62, broadcast .63.",
+    "part_id": "1.4-drill"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "192.168.0.0/26 e 192.168.0.32/26: o problema é?",
+    "alternativas": [
+      "Máscaras diferentes",
+      "Sobreposição VLSM (.0/26 usa .0–.63)",
+      "Falta de /30",
+      "Broadcast igual a .0"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": ".0/26 consome .0–.63; .32/26 invade o mesmo intervalo.",
+    "part_id": "1.4-drill"
+  }
+]

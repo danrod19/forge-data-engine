@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Em arquitetura corporativa CCNA, o AP lightweight depende principalmente de:",
+    "alternativas": [
+      "Join na WLC e túnel CAPWAP para operação centralizada",
+      "Configuração standalone de todos os SSIDs só no AP sem controller",
+      "Desligar o switch de acesso",
+      "STP root primary no rádio 2,4 GHz"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Lightweight + WLC usa CAPWAP/join. Standalone é o modelo autônomo. STP no rádio e desligar switch não definem o join.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "CAPWAP, no essencial do CCNA, é:",
+    "alternativas": [
+      "Protocolo de roteamento entre VLANs de usuário",
+      "O túnel/controle entre AP lightweight e a WLC",
+      "Algoritmo de hash do EtherChannel",
+      "Nome do SSID padrão de fábrica"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "CAPWAP liga AP e WLC. Não é roteamento inter-VLAN, hash de Po nem SSID de fábrica.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Split-MAC (visão de prova) significa tipicamente que:",
+    "alternativas": [
+      "Todo o RF some e só a WLC transmite no ar",
+      "O cliente faz CAPWAP direto com a Internet",
+      "Funções de controle ficam na WLC e o AP trata o RF/dados no ar",
+      "O switch apaga a tabela MAC a cada beacon"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Controle no controller, rádio no AP. Não elimina RF no AP nem CAPWAP do cliente para a Internet.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Canais non-overlapping clássicos em 2,4 GHz:",
+    "alternativas": [
+      "2, 7 e 12 apenas",
+      "3, 4 e 5",
+      "8, 9 e 10",
+      "1, 6 e 11"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "1/6/11 são o trio clássico. 3/4/5 se sobrepõem fortemente.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "SSID é melhor descrito como:",
+    "alternativas": [
+      "O nome da rede wireless anunciada aos clientes",
+      "O endereço IP da WLC",
+      "O custo STP do uplink",
+      "O modo LACP do LAG"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "SSID = nome da WLAN no ar. Não é IP da WLC, custo STP nem LACP.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "FlexConnect no branch serve principalmente para:",
+    "alternativas": [
+      "Obrigar todo tráfego a sair só pela Internet sem WLC nunca",
+      "Desligar CAPWAP permanentemente",
+      "Permitir switching local de dados no site remoto com controle central na WLC",
+      "Substituir PoE no AP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "FlexConnect habilita comutação local no branch. Não apaga CAPWAP por definição nem substitui PoE.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "AP em mode Local (campus clássico) tipicamente:",
+    "alternativas": [
+      "Ignora a WLC após o boot",
+      "Opera só como sniffer sem clientes",
+      "Centraliza o caminho de dados via WLC (central switching) no modelo de estudo comum",
+      "Usa apenas canais 3 e 4 em 2,4 GHz"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Local mode = operação sob WLC com switching central clássico. Não ignora a WLC nem fixa canais 3/4.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "LAG no WLC agrega principalmente:",
+    "alternativas": [
+      "Rádios 2,4 e 5 em um único SSID mágico",
+      "APs em mesh sem CAPWAP",
+      "Clientes Bluetooth",
+      "Portas de distribuição da WLC em direção ao switch (uplink da controller)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "LAG = uplink cabeado da WLC. Não é mesh CAPWAP nem Bluetooth.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Autenticação e encriptação no wireless introdutório:",
+    "alternativas": [
+      "São o mesmo campo do SSID",
+      "Autenticação valida identidade/acesso; encriptação protege o sigilo no ar",
+      "Encriptação só existe em open networks",
+      "Autenticação substitui a VLAN de dados"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Conceitos distintos. Open não cifra de verdade. Autenticação não define sozinha a VLAN de dados do WLC.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Vantagem típica de 5 GHz sobre 2,4 GHz no campus:",
+    "alternativas": [
+      "Sempre maior alcance através de várias paredes densas",
+      "Menos canais disponíveis que 2,4",
+      "Em geral mais canais e melhor capacidade / menos congestão doméstica típica",
+      "Elimina a necessidade de WLC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "5 GHz costuma ter mais canais e capacidade; alcance através de obstáculos costuma ser pior. Não elimina WLC.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "AP tem IP e pinga a WLC, mas permanece Not Joined. Causa alinhada ao content:",
+    "alternativas": [
+      "Falha no discovery/join CAPWAP (ACL/UDP, cert/time, option/DNS, imagem) apesar de ICMP ok",
+      "Falta de canal 6 no notebook do admin",
+      "STP blocked em todas as portas access do mundo",
+      "SSID guest em 5 GHz apenas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Ping ≠ CAPWAP join completo. Canais do admin notebook e SSID guest não explicam Not Joined. STP global “do mundo” é absurdo aqui.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cliente associa no SSID CORP mas recebe IP da VLAN de impressoras. Onde olhar primeiro no WLC?",
+    "alternativas": [
+      "Somente a potência do rádio 2,4",
+      "Apenas o LAG do core",
+      "O hash src-dst-ip do EtherChannel do PC",
+      "Interface/VLAN binding da WLAN CORP no controller"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "WLAN→interface/VLAN define a subnet do cliente. RF/LAG/hash do PC não mapeiam a VLAN da WLAN.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "WLAN desabilitada na WLC. Efeito no cliente:",
+    "alternativas": [
+      "Associa normalmente e só perde DNS",
+      "O AP vira automaticamente autônomo com o mesmo SSID",
+      "CAPWAP é desnecessário",
+      "Não encontra/associa ao SSID corporativo como esperado"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "WLAN disabled = SSID não serve clientes. Não vira autônomo sozinho nem “só DNS”.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Três APs no mesmo open space, todos no canal 6 com potência alta. Resultado RF típico:",
+    "alternativas": [
+      "Canais non-overlapping perfeitos 1/6/11",
+      "Eliminação total de CAPWAP",
+      "Join automático sem IP de management",
+      "Interferência co-canal e degradação de desempenho"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Mesmo canal + sobreposição = co-channel interference. Não é plano 1/6/11 nem afeta CAPWAP/IP mágico.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Discovery da WLC pelo AP pode usar, conceitualmente:",
+    "alternativas": [
+      "Apenas STP BID",
+      "DHCP option / DNS / subnet local / endereço provisionado (entre outros métodos de discovery)",
+      "Somente canal 11",
+      "Apenas native VLAN 999 no rádio"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Discovery usa mecanismos de rede (DHCP/DNS/local/priming). Não é STP BID nem “só canal 11”.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "AP autônomo difere do lightweight porque:",
+    "alternativas": [
+      "Nunca usa SSID",
+      "Sempre exige LAG no WLC",
+      "Termina a WLAN localmente sem depender de join CAPWAP em WLC",
+      "Só opera em 5 GHz"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Standalone configura e serve SSID no próprio AP. Pode usar qualquer banda suportada; não exige WLC/LAG.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cliente com PSK errado no WPA2-Personal. Sintoma mais coerente:",
+    "alternativas": [
+      "Falha de autenticação/associação segura; não completa o acesso à WLAN",
+      "Recebe sempre VLAN de management da WLC",
+      "CAPWAP do AP cai em todos os andares",
+      "Canais 1/6/11 são apagados do espectro"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "PSK errado = security mismatch. Não derruba CAPWAP campus nem apaga canais.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "AP mode monitor (visão leve) destina-se a:",
+    "alternativas": [
+      "Servir máxima densidade de clientes de voz",
+      "Substituir o default gateway IPv4",
+      "Operar como rádio dedicado a RF/espectro, não como access típico de usuários",
+      "Formar EtherChannel com o notebook"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Monitor/sniffer = RF, não serviço normal de clientes. Não é gateway nem EtherChannel de host.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ap summary na WLC ajuda a ver:",
+    "alternativas": [
+      "Se os APs estão joined e dados básicos de inventário/estado",
+      "Apenas rotas OSPF do core",
+      "Somente o hash LACP",
+      "Senhas dos usuários RADIUS em claro"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Inventário/join de APs. Não é tabela OSPF, LACP hash nem dump de senhas.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Uplink da WLC sem LAG e com uma única porta satura. Conceito correto:",
+    "alternativas": [
+      "CAPWAP dos APs usa só o canal 3",
+      "SSID resolve saturação de uplink",
+      "FlexConnect apaga a necessidade de uplink da WLC sempre",
+      "LAG pode agregar portas da WLC ao switch para mais banda/HA no caminho da controller"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "LAG aumenta capacidade do uplink WLC↔switch. SSID/canal 3/FlexConnect não substituem esse papel.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "AP na VLAN de usuários em vez da VLAN de management. Efeito comum:",
+    "alternativas": [
+      "Falha ou dificuldade de discovery/join se a WLC não for alcançável corretamente a partir dessa VLAN",
+      "SSID vira automaticamente open",
+      "Todos os canais viram 1/6/11 perfeitos",
+      "Cliente deixa de precisar de autenticação"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Management errada quebra o caminho até a WLC. Não mexe em open/canais/auth por mágica.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Associação bem-sucedida mas sem IP/serviço. Próximo eixo de diagnóstico:",
+    "alternativas": [
+      "Somente elevar potência ao máximo em 2,4",
+      "Dados pós-associação: VLAN/DHCP/gateway/ACL da WLAN",
+      "Desligar CAPWAP em todos os APs",
+      "Trocar LACP por PAgP no rádio"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Associação ok → problema de caminho de dados. RF máximo e desligar CAPWAP não são o eixo certo.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Potência excessiva em APs densos tende a:",
+    "alternativas": [
+      "Eliminar a necessidade de SSID",
+      "Garantir non-overlapping automático",
+      "Aumentar sobreposição de células e interferência, com clientes “grudados” longe",
+      "Forçar FlexConnect em todos os APs"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Potência alta demais piora co-channel e sticky clients. Não define FlexConnect nem non-overlap mágico.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "WAN do branch cai. Em FlexConnect bem desenhado para switching local, expectativa relativa a Local mode:",
+    "alternativas": [
+      "FlexConnect pode manter algum acesso local; Local mode central depende mais da WLC alcançável",
+      "Local mode nunca usa WLC",
+      "FlexConnect proíbe SSID",
+      "CAPWAP deixa de existir como protocolo"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Diferença clássica local vs flex na WAN. SSID e CAPWAP não somem da arquitetura por definição.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show wlan summary na WLC serve para:",
+    "alternativas": [
+      "Só listar SFPs monomodo do core",
+      "Configurar channel-group mode on",
+      "Apagar a tabela MAC do switch de acesso",
+      "Ver WLANs, SSID e se estão enabled/disabled"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Resumo de WLANs. Não é inventário óptico, EtherChannel nem clear mac.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PoE insuficiente na porta do AP. Sintoma alinhado:",
+    "alternativas": [
+      "SSID guest vira WPA3 sozinho",
+      "AP não energiza/estável o suficiente para operar e join — link de dados sem potência adequada",
+      "LAG da WLC muda para half-duplex",
+      "Canal 11 vira monomodo"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem PoE adequado o AP não sobe direito. Não altera WPA/LAG/canal óptico.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem mental de troubleshooting wireless corporativo:",
+    "alternativas": [
+      "Só aumentar todos os APs para canal 6",
+      "Cliente → SSID → pular join do AP",
+      "AP join (CAPWAP) → WLAN no ar → associação/security → IP/VLAN de dados",
+      "Desligar a WLC para forçar autônomo em massa"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Join → WLAN → client → dados. Canal 6 em massa e desligar WLC são anti-padrões.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Broadcast de SSID desabilitado (hidden). Efeito no cliente comum:",
+    "alternativas": [
+      "Sempre associa mais rápido que SSID visível",
+      "WLC deixa de precisar de interface dinâmica",
+      "CAPWAP usa apenas TCP 80",
+      "Pode não listar a rede automaticamente; o usuário precisa conhecer/configurar o SSID"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "SSID hidden dificulta discovery visual. Não remove interfaces da WLC nem redefine CAPWAP para TCP 80.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Interferência de micro-ondas no 2,4 GHz no refeitório. Mitigação alinhada:",
+    "alternativas": [
+      "Forçar todos os clientes só em 2,4 canal 3",
+      "Preferir/balancear 5 GHz quando possível e planejar canais non-overlapping em 2,4",
+      "Remover CAPWAP e usar hub wireless",
+      "Mapear SSID para native VLAN 1 no rádio"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "5 GHz e plano 1/6/11 ajudam. Canal 3 e hub pioram. Native no rádio não é a mitigação RF.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Diferença chave entre problema de join do AP e problema de associação do cliente:",
+    "alternativas": [
+      "São sempre o mesmo alarme na WLC",
+      "Join é AP↔WLC (CAPWAP); associação é cliente↔SSID no ar após o AP estar operacional",
+      "Associação usa apenas show etherchannel summary",
+      "Join depende só do PSK do notebook"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Camadas diferentes do problema. PSK do notebook não define join do AP; EtherChannel summary não diagnostica associação Wi-Fi.",
+    "part_id": "2.5"
+  }
+]

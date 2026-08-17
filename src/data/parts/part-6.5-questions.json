@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No CCNA, DNA Center é associado principalmente a quais papéis operacionais?",
+    "alternativas": [
+      "Inventário/discovery, policy (intent) e assurance",
+      "Somente substituição do Ethernet por WEP",
+      "Somente eleição de root bridge STP",
+      "Somente NAT overload na borda"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "As três palavras de prova do DNA/controller são inventário, policy e assurance. Não substituem L2 Ethernet, STP root nem NAT. O 6.5 fecha o módulo 6 com o uso operacional do controller, sem lab de fabric profundo.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Discovery/inventário no DNA serve para:",
+    "alternativas": [
+      "Apagar todas as VLANs do campus",
+      "Descobrir e catalogar devices gerenciados (plataforma, IP, software, reachability)",
+      "Substituir o data plane dos switches",
+      "Desabilitar SSH em todos os boxes"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem inventário saudável não há policy nem assurance confiáveis. Devices continuam encaminhando. SSH costuma ser requisito de gestão, não algo a desligar no discovery. Falha de discovery aponta gestão/credencial/path.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Policy no DNA Center, em visão de prova, significa:",
+    "alternativas": [
+      "Somente o arquivo running-config sem intent",
+      "Somente o contador de drops da interface",
+      "Aplicação centralizada de intent/config desejada em escala",
+      "Somente o syslog local do device"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Policy/intent reduz drift multi-site. Não é só um contador de interface. running-config local pode divergir se houver mudança manual. Assurance e inventário são outros pilares.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Assurance no DNA refere-se principalmente a:",
+    "alternativas": [
+      "Apenas a chave WPA2-PSK",
+      "Apenas o módulo Ansible copy",
+      "Apenas a wildcard de ACL",
+      "Visão de saúde, insights e suporte a troubleshooting com telemetria/gestão"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Assurance observa a rede gerenciada. Pode ficar vermelho por telemetria/gestão mesmo com data plane ok — correlacione. Não é WPA, Ansible copy nem wildcard. Pilar distinto de inventário e policy.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "YANG, em uma frase de exame, é:",
+    "alternativas": [
+      "O modelo de dados que estrutura config/estado operacional do device",
+      "Um protocolo de Spanning Tree",
+      "Um tipo de cabo crossover",
+      "Um cipher TKIP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "YANG descreve a árvore de dados. NETCONF/RESTCONF transportam operações sobre esse modelo. Não é STP, mídia nem WPA. Model-driven depende de YANG correto no path.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "NETCONF no nível CCNA é melhor descrito como:",
+    "alternativas": [
+      "Somente portal web Open",
+      "Protocolo de configuração programática (ideia: SSH + mensagens/XML sobre modelos YANG)",
+      "Somente SNMP trap de link down",
+      "Somente CLI expect scraping"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "NETCONF permite get/edit estruturados via modelo YANG, tipicamente sobre SSH. Não é Open WLAN nem só trap SNMP. CLI scraping é o oposto do model-driven. Foque o papel, não RPCs avançados.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "RESTCONF relaciona-se a:",
+    "alternativas": [
+      "Apenas CDP neighbors",
+      "Apenas PortFast",
+      "Acesso HTTP/REST a dados modelados em YANG no device",
+      "Apenas EtherChannel LACP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "RESTCONF expõe YANG via REST/HTTP (JSON/XML). Diferente do northbound do controller, embora ambos usem HTTP. CDP/PortFast/LACP são L2. Path RESTCONF errado → 404 mesmo com CLI ok.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Comparando CLI, SNMP e NETCONF/RESTCONF:",
+    "alternativas": [
+      "CLI é sempre model-driven YANG puro",
+      "SNMP substitui completamente policy DNA",
+      "NETCONF/RESTCONF são só para cabos de console",
+      "CLI é flexível/manual; SNMP clássico em monitor; NETCONF/RESTCONF em config/leitura estruturada YANG"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Três ferramentas, papéis distintos no content. CLI break-glass e humano; SNMP observação; model-driven automação robusta. Nenhuma apaga as outras por completo no campus real.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Mudança de emergência em um único roteador de borda agora. Ferramenta mais adequada na síntese 6.5?",
+    "alternativas": [
+      "CLI pontual (break-glass) no device",
+      "Obrigatoriamente playbook em 500 hosts",
+      "Obrigatoriamente só assurance DNA sem config",
+      "Desligar o underlay inteiro"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Escala 1 e urgência → CLI. Ansible/DNA brilham em massa e inventário/policy. Assurance não aplica a mudança sozinha. Escolha de ferramenta é must_know do fechamento.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Aplicar o mesmo banner e user local em 200 access switches. Melhor encaixe?",
+    "alternativas": [
+      "Somente CLI hop-a-hop em cada um sem inventário",
+      "Ansible (playbook em massa) e/ou policy de controller conforme o desenho",
+      "Somente SNMP trap",
+      "Somente WEP na WLAN"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Escala pede automação (6.4 Ansible) ou intent de controller (DNA policy). CLI puro não escala. SNMP trap não configura banner. WEP é segurança wireless legada. Síntese 6.1–6.4 aplicada.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Device não aparece no inventário DNA; ping ao IP de gestão falha. Eixo principal?",
+    "alternativas": [
+      "Somente cipher TKIP da guest WLAN",
+      "Somente native VLAN do notebook do usuário",
+      "Reachability/gestão do device (path, ACL, IP) — discovery depende de alcançar a gestão",
+      "Somente playbook YAML de banner em outro site"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Sem path de gestão, discovery falha. Corrija L3/ACL/VRF de mgmt. TKIP/native/YAML de outro site não explicam ping 0% ao IP de gestão. Depois valide credenciais e protocolos.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ping de gestão ok, mas discovery falha com erro de autenticação SSH/SNMP. Causa alinhada?",
+    "alternativas": [
+      "Cabo de usuário access cortado em todas as portas",
+      "Data plane de Internet globalmente down",
+      "OSPF area sempre 1 obrigatório",
+      "Credenciais/protocolos de discovery incorretos no controller"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Reachability ≠ onboarding. User/senha, enable, SNMP community/versão errados bloqueiam inventário. Data plane de user pode estar ok. Ajuste perfil de credencial no DNA.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Assurance mostra health ruim; usuários navegam e ping entre VLANs ok. Interpretação?",
+    "alternativas": [
+      "Prova absoluta de que o data plane morreu",
+      "Prova de que o underlay óptico sumiu",
+      "Pode ser telemetria/gestão/assurance degradado — correlacione com sintomas reais de data plane",
+      "Prova de que o CLI foi desabilitado no IOS"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Assurance não substitui verificação de encaminhamento. Sensor/telemetria pode falhar isoladamente. Valide ping/rotas antes de outage massivo. CLI pode estar ok. Tema explícito do content.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "CLI show ip interface brief ok; curl RESTCONF no device retorna 404 no path. Conclusão?",
+    "alternativas": [
+      "Switch sem energia",
+      "Todas as interfaces shutdown",
+      "OSPF process apagado",
+      "Path/feature model-driven (RESTCONF/YANG) incorreto ou desabilitado — CLI legada ainda funciona"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Dois planos de gestão: CLI vs API model-driven. 404/off não matam o show legado. Habilite RESTCONF e use path YANG correto. Energia/interfaces/OSPF não batem com brief up + 404 pontual.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "App orquestrador → DNA API (REST) é principalmente:",
+    "alternativas": [
+      "Southbound do switch para o cabo do PC",
+      "Northbound app → controller (6.2), distinto de RESTCONF no device",
+      "Somente NETCONF XML no access port",
+      "Somente Spanning Tree BPDU"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Síntese: northbound REST do controller ≠ RESTCONF southbound/no box. Ambos HTTP, papéis diferentes. BPDU e cabo de PC não definem a API do DNA. Isolar evita debug no device errado.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Operação model-driven falha com erro de schema/path YANG; show run na CLI mostra a interface. O que isso ilustra?",
+    "alternativas": [
+      "Modelo/path YANG incorreto ou feature incompleta — CLI e model-driven não são o mesmo contrato",
+      "Que JSON foi proibido no device",
+      "Que o data plane sumiu",
+      "Que o Ansible inventory é ilegal"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "YANG mismatch: a API model-driven não encontra o leaf/path. CLI textual ainda lê a config. Corrija modelo/versão/path. Data plane e inventory são eixos paralelos. Ideia de falha do 6.5.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SNMP no contraste do content 6.5 é mais forte para:",
+    "alternativas": [
+      "Substituir DNA policy intent",
+      "Monitoramento clássico (gets/traps), não como substituto completo de config model-driven moderna",
+      "Autenticação WPA3-SAE",
+      "Eleger o DR OSPF"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "SNMP observa e alerta; config robusta em massa prefere NETCONF/RESTCONF/Ansible/controller. WPA3 e OSPF DR são outros domínios. Não use SNMP como única resposta de automação de policy.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ansible playbook vs DNA policy — quando preferir Ansible na síntese?",
+    "alternativas": [
+      "Sempre que houver um único comando de emergência em 1 box",
+      "Quando se quer assurance multi-site nativo DNA sem inventory",
+      "Quando há inventory de hosts e tasks idempotentes em massa (banner, users, VLANs) via agentless",
+      "Quando se quer desligar o control node e usar só Telnet"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Ansible brilha em massa agentless (6.4). Emergência 1 box → CLI. Assurance inventário nativo → DNA. Telnet não é o modelo. Escolha consciente de ferramenta.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Controller-based não elimina o data plane porque:",
+    "alternativas": [
+      "Devices continuam encaminhando frames/pacotes; o controller orquestra policy e visão",
+      "O controller vira o único ASIC de todos os sites",
+      "Switches perdem interfaces físicas",
+      "OSPF é proibido em redes com DNA"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Revisão 6.1 no fechamento 6.5. Forwarding local permanece. Controller não substitui todo o hardware. OSPF pode existir no underlay. Mito da extinção do data plane deve ser rejeitado.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "NETCONF tipicamente roda sobre qual canal de transporte na ideia de prova?",
+    "alternativas": [
+      "Somente HTTP Open sem auth",
+      "Somente frames STP",
+      "SSH (sessão segura de gestão) com payload de operações/XML sobre YANG",
+      "Somente CAPWAP de AP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Associação clássica NETCONF+SSH. RESTCONF usa HTTP. STP e CAPWAP são outros planos. Não é Open sem segurança. Frase de prova suficiente no 200-301.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "RESTCONF usa espírito REST/HTTP; isso implica na prática de lab leve:",
+    "alternativas": [
+      "URI de recurso + métodos HTTP + representação (JSON/XML) alinhada a YANG",
+      "Apenas console RJ-45 sem IP",
+      "Apenas SNMP community pública",
+      "Apenas playbook Puppet obrigatório"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Liga 6.2 (REST) com 6.5 (device model-driven). curl para restconf/data/... é o exemplo. Console/SNMP/Puppet não definem RESTCONF. Path YANG errado quebra a URI.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Device managed no DNA mas CLI local divergiu (banner diferente). Fenômeno?",
+    "alternativas": [
+      "Impossível com inventário REACHABLE",
+      "Drift — estado real ≠ policy/intent; re-sync/policy ou playbook pode realinhar",
+      "Prova de que assurance desliga o CLI",
+      "Prova de que YANG proíbe banners"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Operação híbrida e mudanças manuais geram drift (6.4+6.5). Inventário reachability não congela a running. Assurance não remove CLI. Reaplique intent/playbook. Síntese de consistência.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist de discovery DNA com falha intermitente:",
+    "alternativas": [
+      "Só trocar todos os SFPs do campus sem testar IP de gestão",
+      "Só apagar o OSPF process em loop",
+      "Só desligar PortFast globalmente",
+      "IP de gestão alcançável? credenciais SSH/SNMP/API? protocolos de gestão liberados? ACL/firewall de mgmt?"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Discovery depende de gestão. A ordem evita trocas físicas cegas. OSPF/PortFast podem ser laterais. Documente perfil de credencial e rede de management.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Quando a síntese recomenda DNA Center em vez de só Ansible?",
+    "alternativas": [
+      "Quando o problema é só um typo em um hostname de lab isolado",
+      "Quando se precisa de inventário/assurance/policy intent multi-site com visão central da rede gerenciada",
+      "Quando Telnet cleartext é obrigatório",
+      "Quando se quer evitar qualquer inventário"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "DNA entrega visão e intent de rede. Ansible entrega automação de tasks em hosts do inventory. Typo pontual → CLI. Telnet não é meta. Escolha pelo resultado operacional desejado.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Model-driven programming no device implica que:",
+    "alternativas": [
+      "A config/operacional segue um schema (YANG) acessível por NETCONF/RESTCONF, não só texto livre de CLI",
+      "O data plane é apagado",
+      "O inventory Ansible é proibido",
+      "O JSON da 6.3 deixa de existir"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Schema + protocolo = automação estruturada. CLI ainda existe. Ansible e JSON continuam no ecossistema. Data plane intacto. Definição de fechamento do módulo 6.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "REST northbound do controller falha 503; RESTCONF no switch retorna 200. Isolamento?",
+    "alternativas": [
+      "Problema no serviço/API do controller (northbound), não necessariamente na API model-driven do switch",
+      "Prova de que o switch está offline",
+      "Prova de que o underlay de user está down",
+      "Prova de que YANG foi removido do IOS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Dois endpoints diferentes. 503 no DNA e 200 no device separam eixos. Switch responde RESTCONF. User data plane precisa de outro teste. Não conclua outage global.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual par está correto?",
+    "alternativas": [
+      "NETCONF = só HTTP JSON; RESTCONF = só SSH obrigatório sem HTTP",
+      "YANG = protocolo de transporte; NETCONF = linguagem de modelo",
+      "DNA assurance = apenas banner MOTD",
+      "YANG = modelo; NETCONF/RESTCONF = protocolos de acesso ao modelo; DNA = inventário/policy/assurance"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Frases de prova do 6.5. Inverter YANG/protocolo é pegadinha. NETCONF~SSH; RESTCONF~HTTP. Assurance ≠ banner. Memorize os papéis em uma linha cada.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Operação exige compliance de AAA e NTP em todos os leafs sem portal DNA. Caminho razoável?",
+    "alternativas": [
+      "Somente cliques manuais em 300 GUIs diferentes sem padrão",
+      "Playbook Ansible com inventory dos leafs e tasks idempotentes",
+      "Somente SNMP set de 1990 como única opção",
+      "Somente desligar NETCONF em todos"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Ansible encaixa compliance em massa. GUI hop-a-hop não escala. SNMP set não é o modelo moderno preferido no content. NETCONF pode até ajudar modules, não deve ser desligado por padrão. Síntese ferramenta.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que correlacionar assurance com ping/traceroute de usuário?",
+    "alternativas": [
+      "Porque assurance vermelho sempre prova cabo físico cortado em 100% dos casos",
+      "Porque ping nunca é útil em redes com DNA",
+      "Porque telemetria/gestão pode falhar sem que o encaminhamento do usuário esteja quebrado — evita outage falso",
+      "Porque YANG proíbe ICMP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Evita panic de NOC por sensor. Data plane se valida com testes de tráfego. ICMP não é proibido por YANG. Assurance é pista, não sentença única. Content 6.5 + 6.1.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor síntese do módulo 6.0 em um fluxo de incidente de automação?",
+    "alternativas": [
+      "Só reiniciar todos os APs",
+      "Só limpar a CAM",
+      "Só desligar o NTP",
+      "Classificar plano e norte/sul → DNA inventário/policy/assurance → REST/JSON → Ansible/CLI → NETCONF/RESTCONF/YANG no device se model-driven"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Une 6.1–6.5 sem pular eixos. AP/CAM/NTP podem entrar no plano certo depois. O checklist unificado do content é a resposta de fechamento do módulo de automação do CCNA.",
+    "part_id": "6.5"
+  }
+]

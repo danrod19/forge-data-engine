@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O principal problema que o QoS ataca em redes com contenção de banda é:",
+    "alternativas": [
+      "Como decidir o que transmitir, enfileirar ou descartar sob congestionamento",
+      "Como eliminar a necessidade de endereços IP",
+      "Como substituir o Spanning Tree",
+      "Como desligar permanentemente o TCP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Com filas cheias, o device precisa de política de tratamento por classe. QoS não remove IP, STP nem TCP. O exame foca comportamento sob load: latência, jitter e perda para tráfego sensível versus best-effort.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Best-effort significa, no discurso de QoS do CCNA:",
+    "alternativas": [
+      "Sempre prioridade máxima para voz",
+      "Tratamento sem diferenciação de classes — todos competem igualmente",
+      "Policing obrigatório em todo pacote",
+      "Trust boundary automático em toda porta access"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Best-effort não reserva prioridade: backups e voz concorrem iguais. Voz precisa de classificação/marking e tratamento preferencial sob congestão. Policing e trust são mecanismos à parte, não a definição de best-effort.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Voz interativa é especialmente sensível a:",
+    "alternativas": [
+      "Apenas o tamanho da tabela MAC",
+      "Somente o hostname do roteador",
+      "Latência, jitter e perda de pacotes sob congestão",
+      "Apenas o número da VLAN nativa"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Qualidade de voz degrada com atraso, variação de atraso e drops. MAC, hostname e native VLAN não definem o PHB de mídia. Por isso marking e filas prioritárias aparecem no blueprint conceitual.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Marking no modelo PHB serve para:",
+    "alternativas": [
+      "Apagar rotas OSPF automaticamente",
+      "Substituir o cabeçalho Ethernet por PPP sempre",
+      "Desabilitar TFTP na rede",
+      "Gravar uma classe no pacote/frame (ex.: DSCP/CoS) para hops seguintes tratarem o fluxo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A marca viaja (DSCP no IP; CoS no 802.1Q) e orienta o PHB. Não mexe em OSPF, não força PPP nem desliga TFTP. Sem marking (ou com trust que zera a marca), o core não distingue voz de bulk.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "DSCP e CoS diferem conceitualmente porque:",
+    "alternativas": [
+      "DSCP é marcação L3 no IP; CoS é marcação L2 no frame etiquetado",
+      "CoS só existe em rotas estáticas",
+      "DSCP é exclusivo de TFTP",
+      "CoS substitui o endereço IP de destino"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "DSCP viaja com o pacote IP entre L3 hops; CoS está no header 802.1Q e pode não existir em links untagged. Não são TFTP nem reescrevem o IP de destino. Ambos alimentam classificação/PHB quando confiados.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Trust boundary é o ponto em que a rede decide:",
+    "alternativas": [
+      "O root bridge do STP apenas",
+      "Se aceita (confia) a marca do endpoint ou a reescreve/zera",
+      "O lease time do DHCP apenas",
+      "A community SNMP apenas"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "No edge define-se trust: portas de phone/WLC vs PCs genéricos. Marca não confiável costuma ser reescrita para evitar abuso de DSCP. STP, DHCP e SNMP são outros domínios.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Diferença conceitual central entre policing e shaping:",
+    "alternativas": [
+      "Policing sempre aumenta a banda contratada",
+      "Shaping apaga o DSCP obrigatoriamente",
+      "Policing limita e costuma dropar/remark o excesso; shaping bufferiza e suaviza, podendo atrasar",
+      "Ambos são sinônimos exatos no IOS"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Policing é “corte” mais abrupto; shaping alisa picos com fila de shaping. Nenhum cria banda mágica nem define synonymy. Voz sofre com police agressivo (perda) e com shape excessivo (atraso) — a prova cobra a distinção de efeito.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "TFTP no contexto CCNA caracteriza-se por:",
+    "alternativas": [
+      "TCP com autenticação obrigatória de usuário",
+      "Criptografia ponta a ponta tipo SSH",
+      "Uso exclusivo de BGP communities",
+      "UDP, simplicidade e ausência de autenticação forte — comum em image/config"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "TFTP é trivial e UDP: ideal para lab e ops controladas (IOS, startup-config). Não é FTP/TCP com login, nem SSH, nem BGP. Segurança depende do ambiente e de ACLs, não de user/pass robusto no protocolo.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "FTP diferencia-se do TFTP principalmente por:",
+    "alternativas": [
+      "Usar TCP e oferecer autenticação de usuário, com canais de controle/dados",
+      "Usar apenas UDP na porta 69 sempre",
+      "Não transferir arquivos nunca",
+      "Substituir o papel do NTP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "FTP roda sobre TCP com login e sessão de controle/dados; TFTP é UDP simples. Ambos transferem arquivos; nenhum substitui NTP. Firewall e auth são eixos típicos de falha FTP, não de TFTP.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Comando típico para baixar imagem do servidor TFTP para a flash do IOS:",
+    "alternativas": [
+      "ntp server tftp",
+      "ip ssh version 2",
+      "snmp-server community tftp ro",
+      "copy tftp: flash:"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "copy tftp: flash: inicia a transferência pedindo IP do servidor e nome do arquivo. NTP, SSH e SNMP não copiam IOS. O inverso flash→tftp faz backup da image/config conforme o alvo do copy.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Telefone marca DSCP de voz, mas o access switch zera a marca (untrusted). Efeito no core congestionado?",
+    "alternativas": [
+      "Voz tende a ser tratada como best-effort — marking perdido no trust boundary",
+      "O core inventa CoS 7 automaticamente",
+      "TFTP passa a criptografar a voz",
+      "Policing vira shaping sozinho"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem marca honrada, PHB de voz não se aplica no caminho. Trust boundary errado é falha clássica: “QoS no core” inútil se o edge limpa DSCP. Não há auto CoS 7 mágico nem conversão police↔shape por causa do untrust.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que “só aumentar a banda” pode não resolver qualidade de voz no pico?",
+    "alternativas": [
+      "Porque voz nunca usa IP",
+      "Porque bulk ainda pode encher buffers e gerar jitter/perda sem política de prioridade",
+      "Porque DSCP proíbe links > 100 Mbps",
+      "Porque TFTP consome todo o OSPF"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Mais banda ajuda, mas rajadas de bulk ainda criam microcongestão. Filas prioritárias e marking tratam a disputa. Voz usa IP; DSCP não proíbe gigabit; TFTP≠OSPF. O mito “só banda” é must_know do content.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Em congestão sem fila prioritária para voz, o sintoma típico é:",
+    "alternativas": [
+      "Eliminação automática de todo FTP da WAN",
+      "Voz com jitter/perda competindo com tráfego bulk na mesma disputa de fila",
+      "Conversão de UDP em TCP na voz",
+      "Trust boundary se auto-repara"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem prioridade, pacotes de voz esperam atrás de bursts de dados. PHB de voz exige tratamento diferenciado na fila. FTP não some sozinho; protocolo da voz não “vira TCP” por falta de LLQ conceitual; trust não se corrige sozinho.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cenário: limite de taxa com drops frequentes no excesso, sem atraso extra proposital de buffer de shape. Mecanismo mais alinhado?",
+    "alternativas": [
+      "Apenas Spanning Tree PortFast",
+      "Apenas EtherChannel LACP",
+      "Apenas NTP stratum",
+      "Policing (rate limit com drop/remark do excesso)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Policing descarta ou re-marca o que passa do contrato de taxa. Shaping preferiria bufferizar. STP, LACP e NTP não implementam esse rate-limit de classe. A prova separa o efeito drop (police) do efeito delay (shape).",
+    "part_id": "4.5"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Shaping é preferível conceitualmente quando o objetivo é:",
+    "alternativas": [
+      "Dropar imediatamente 100% da voz marcada",
+      "Suavizar picos de tráfego bufferizando o excesso, aceitando algum atraso adicional",
+      "Desabilitar marking em todo o campus",
+      "Forçar TFTP a usar TCP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Shape alisa a taxa média com fila de shaping. Não é ferramenta para matar voz nem para apagar DSCP campus-wide. TFTP continua UDP. Compare com police quando o desenho exige corte duro de excesso.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "copy flash: tftp: com IP do servidor errado. Resultado esperado?",
+    "alternativas": [
+      "O IOS grava a image em NVRAM automaticamente",
+      "Transferência falha (timeout / error opening) — reachability ou alvo incorreto",
+      "O arquivo é criptografado com enable secret",
+      "O QoS PHB corrige o IP do servidor"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O copy precisa alcançar o TFTP server e o arquivo. IP errado → falha. Não grava magicamente em NVRAM, não usa enable secret como cifra de TFTP e PHB não reescreve o destino da transferência. Ping ao servidor e nome do arquivo entram no TShoot.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ACL na interface bloqueia UDP de TFTP entre o roteador e o servidor. Sintoma no copy tftp?",
+    "alternativas": [
+      "Sucesso garantido porque TFTP usa só TCP 22",
+      "Falha de transferência — UDP/TFTP filtrado no path",
+      "Conversão automática para FTP autenticado",
+      "Geração de chave RSA para SSH"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "TFTP depende de UDP; ACL/firewall que dropa esse fluxo quebra o copy. Não é SSH/22, não vira FTP sozinho e não gera RSA. Libere o path ou use outro método de transferência permitido pela política.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Quando o desenho exige login de usuário no servidor de arquivos, qual protocolo do content é o mais alinhado?",
+    "alternativas": [
+      "TFTP puro sem extensão",
+      "Best-effort marking apenas",
+      "FTP (TCP com autenticação de usuário)",
+      "CoS 0 obrigatório"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "FTP incorpora autenticação; TFTP clássico não oferece auth forte. Marking/CoS são QoS, não login de file server. No CCNA, a comparação TFTP vs FTP destaca auth e TCP vs UDP.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PHB (Per-Hop Behavior) significa essencialmente:",
+    "alternativas": [
+      "Um protocolo de roteamento substituto do OSPF",
+      "Um tipo de cabo de fibra",
+      "O tratamento que cada hop aplica ao pacote conforme sua classe/marca",
+      "O lease time médio do DHCP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Cada dispositivo no caminho aplica comportamento (fila, drop, prioridade) baseado na classificação/marking. Não é IGP, mídia física ou DHCP. Por isso marking e trust precisam ser consistentes hop a hop no desenho.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Backup da startup-config para servidor TFTP no lab. Comando mental correto:",
+    "alternativas": [
+      "copy running-config startup-config apenas (não envia ao servidor)",
+      "interface range gigabitethernet 0/0 - 24",
+      "clear ip ospf process",
+      "copy startup-config tftp: (ou equivalente pedindo IP/arquivo no servidor)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "copy startup-config tftp: envia o arquivo ao servidor TFTP. write memory só grava local; interface range e clear OSPF não fazem backup remoto. Confirme IP, nome do arquivo e alcance UDP.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show interfaces mostra output drops altos em uplink congestionado durante backups. Leitura útil no contexto QoS?",
+    "alternativas": [
+      "Há contenção/fila saturada — tráfego sem prioridade (ex.: voz) pode sofrer; PHB/queuing entram no desenho",
+      "Prova de que TFTP usa TCP",
+      "Prova de que DSCP foi removido do planeta",
+      "Indica que FTP é impossível na rede"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Drops de saída sob load sinalizam congestão na interface. QoS classifica e prioriza; sem isso, mídia sofre. Drops não redefinem TFTP como TCP nem proíbem FTP. É evidência leve de contenção, não lab MQC completo.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Policing aplicado de forma agressiva à classe de voz tende a:",
+    "alternativas": [
+      "Melhorar sempre o jitter para zero absoluto",
+      "Converter voz em TFTP",
+      "Aumentar perda de pacotes de voz quando o excesso é dropado — degradando qualidade",
+      "Eliminar a necessidade de trust boundary"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Police com drop no excesso fere fluxos sensíveis a perda. Voz prefere tratamento de prioridade e contratos de taxa cuidadosos. Não vira TFTP nem remove a necessidade de trust no edge.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Administrador escolhe TFTP para publicar image em rede hostil na Internet sem VPN. Avaliação de risco alinhada ao content?",
+    "alternativas": [
+      "Risco alto: TFTP sem auth forte e UDP simples — inadequado como serviço exposto",
+      "Risco zero porque TFTP cifra por padrão",
+      "TFTP autentica com RADIUS automaticamente",
+      "TFTP exige sempre FTP no mesmo fluxo"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "TFTP não foi feito para Internet aberta: sem criptografia/auth robusta. Prefira caminhos controlados, FTP/SCP em contextos apropriados (SCP fora do escopo profundo). O content alerta o uso típico em lab/ops controladas.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cliente FTP falha com user/senha inválidos; TFTP no mesmo servidor de lab não pedia usuário. Conclusão?",
+    "alternativas": [
+      "FTP e TFTP são o mesmo protocolo com nomes diferentes",
+      "TFTP sempre usa as mesmas credenciais do FTP",
+      "CoS marca usuários de FTP",
+      "Comportamento esperado: FTP autentica; TFTP clássico não exige login de usuário"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A diferença de auth é ponto de prova. Credenciais FTP não se aplicam ao TFTP trivial. Não são o mesmo protocolo; CoS não autentica usuário. Corrija user/pass FTP ou use o método de transferência adequado à política.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Classificar, no pipeline conceitual de QoS, ocorre quando o device:",
+    "alternativas": [
+      "Identifica o tráfego em classes (por marca, ACL, porta, etc.) antes de marcar/tratar",
+      "Apaga a flash periodicamente",
+      "Gera chaves SSH automaticamente a cada pacote",
+      "Converte todas as rotas em estáticas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Classificação separa fluxos; em seguida marking e PHB (fila/police/shape). Não é manutenção de flash, SSH nem reescrita massiva de rotas. No CCNA o foco é o papel da classificação, não a sintaxe MQC completa.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Link WAN com shaping na saída para o rate do contrato do provedor. Benefício conceitual?",
+    "alternativas": [
+      "Dropar todo ACK TCP imediatamente",
+      "Forçar best-effort em voz prioritária",
+      "Suavizar bursts para caber no contrato, reduzindo drops no policer do ISP (com possível atraso local)",
+      "Eliminar a necessidade de IP no CE"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Shape no CE alinha a taxa média ao contrato e evita que o police do ISP corte o excesso de forma abrupta. Há trade-off de delay. Não apaga ACKs por esporte, não rebaixa voz por definição e não remove IP.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual par resume melhor TFTP vs FTP para o exame?",
+    "alternativas": [
+      "TFTP=TCP+auth; FTP=UDP sem arquivo",
+      "TFTP=UDP simples sem auth forte; FTP=TCP com autenticação",
+      "Ambos são exclusivamente protocolos de voz PHB",
+      "Ambos exigem CoS 5 para funcionar"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Memorização útil e fiel ao content. Inverter TCP/UDP é pegadinha clássica. Não são protocolos de QoS de voz; CoS não é pré-requisito de file transfer. Use cada um no cenário certo (lab image vs servidor com login).",
+    "part_id": "4.5"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mental: voz ruim só em horário de backup full. Hipótese QoS mais forte?",
+    "alternativas": [
+      "Congestão + falta de prioridade/marking efetivo para voz frente ao bulk",
+      "Falta de hostname no switch de acesso",
+      "Ausência de ip domain-name no core",
+      "SNMP community ro como causa de jitter"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Correlação temporal com bulk aponta contenção e PHB inadequado. Hostname/domain-name são eixo SSH; SNMP RO não explica jitter de mídia. Verifique trust, marking e filas, não só “subir o link”.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "copy tftp: startup-config com nome de arquivo inexistente no servidor. Efeito?",
+    "alternativas": [
+      "O IOS inventa o arquivo a partir do DHCP pool",
+      "O arquivo é buscado via SNMP trap",
+      "A transferência falha — arquivo não encontrado / erro de abertura no TFTP",
+      "A config é mesclada com o spanning-tree sem copy"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "TFTP exige o path/nome corretos no servidor. Arquivo errado → falha, não criação mágica via DHCP/SNMP/STP. Confira dir no servidor e o prompt do copy no IOS.",
+    "part_id": "4.5"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor leitura combinada de “qualidade de mídia” vs “falha de image upgrade” no content 4.5?",
+    "alternativas": [
+      "São sempre o mesmo problema de trust boundary",
+      "São sempre resolvidos com transport input ssh",
+      "São sempre culpa do stratum NTP apenas",
+      "Mídia ruim → QoS (marking/trust/filas/police-shape); falha de copy → TFTP/FTP/path/ACL/servidor"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Isolar eixos evita “ligar QoS” para consertar IP de TFTP errado ou “regerar chave SSH” para jitter. O content fecha o módulo 4.0 ops com PHB conceitual e ferramentas de arquivo. NTP/SSH podem coexistir, mas não unificam o diagnóstico.",
+    "part_id": "4.5"
+  }
+]

@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No IOS, o comando típico para o device usar um servidor de tempo externo é:",
+    "alternativas": [
+      "ntp server <ip>",
+      "logging host <ip>",
+      "snmp-server community public ro",
+      "ip helper-address <ip>"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "ntp server aponta o cliente NTP à fonte de tempo. logging host é Syslog; snmp-server community é SNMP; helper-address é DHCP relay. No CCNA, a config mínima de cliente NTP e a verificação com show ntp status são o núcleo do tópico.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Stratum no NTP indica principalmente:",
+    "alternativas": [
+      "A largura de banda da WAN em Mbps",
+      "A distância hierárquica/qualidade relativa à fonte de tempo de referência",
+      "O nível de severidade do Syslog 0–7",
+      "A community string do SNMP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Stratum mede quão “longe” o relógio está de uma fonte primária: valores menores tendem a ser melhores/mais próximos da referência. Não é bandwidth, nem severity Syslog, nem community SNMP. Stratum alto/16 costuma aparecer quando não há sincronização válida.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show ntp status é usado para verificar, entre outros:",
+    "alternativas": [
+      "Apenas a community SNMP",
+      "Somente o buffer de logging",
+      "Se o relógio está synchronized e qual o stratum atual",
+      "A tabela MAC do switch"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "show ntp status resume o estado de sincronização, stratum e referência. Associations detalha peers; logging e SNMP têm shows próprios. Em incidente de timestamps estranhos, status/associations são o primeiro par de verificação.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Por que sincronizar relógios com NTP importa para operações?",
+    "alternativas": [
+      "Substitui a necessidade de default route",
+      "Elimina VLANs no campus",
+      "Desliga automaticamente o SNMP",
+      "Permite correlacionar logs e eventos entre devices com timestamps confiáveis"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Logs, incidentes e até validações sensíveis a tempo dependem de relógios alinhados. NTP não substitui roteamento, VLANs ou SNMP. Sem sync, a linha do tempo entre roteador e servidor fica inútil para troubleshooting e auditoria.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No Syslog, o nível 0 (emergencies) em relação ao 7 (debugging) é:",
+    "alternativas": [
+      "Mais grave (menor número = maior severidade)",
+      "Menos grave que debugging",
+      "Igual a informational",
+      "Exclusivo do NTP stratum"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A escala 0–7 vai de emergencies (0) a debugging (7): quanto menor o número, mais crítico o evento. Confundir com “7 é pior” é erro clássico. Stratum NTP é outra métrica. informational é o nível 6, não o 0.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "logging trap warnings no host Syslog envia tipicamente mensagens de severidade:",
+    "alternativas": [
+      "Somente debugging (7)",
+      "0 a 4 (emergencies até warnings) — níveis mais graves e warnings",
+      "Apenas notifications (5) e acima numericamente",
+      "Nenhuma mensagem, pois trap desliga o log"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O nível de trap define o teto de “leveza”: envia aquele nível e os mais graves (números menores). warnings (4) inclui 0–4. Não manda só debug, nem “desliga” o Syslog. notifications (5) e informational/debug ficam de fora desse trap.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Para ver logs na sessão SSH, além do nível monitor, o admin costuma precisar de:",
+    "alternativas": [
+      "ntp server obrigatoriamente na mesma linha",
+      "snmp-server community rw",
+      "terminal monitor na sessão VTY",
+      "clear ip nat translation *"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "logging monitor define o que pode ir à sessão; terminal monitor habilita a exibição na VTY atual. NTP e SNMP não substituem isso; clear NAT é outro domínio. “Não vejo log no SSH” é falha clássica sem terminal monitor.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "logging host 10.0.0.50 configura principalmente:",
+    "alternativas": [
+      "O default-router dos PCs",
+      "O servidor NTP stratum 1",
+      "A community SNMP de escrita",
+      "O destino remoto das mensagens Syslog"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "logging host envia Syslog ao servidor/coletor indicado. Não é gateway DHCP, não é ntp server e não define community SNMP. Sem host (ou com IP errado), o buffer local pode ter logs e o servidor central permanecer vazio.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No modelo SNMP do CCNA, o agent é:",
+    "alternativas": [
+      "O software no device gerenciado que responde a polls e pode enviar traps",
+      "Sempre o servidor NTP da Internet",
+      "O cabo console RJ-45",
+      "O nível 7 do Syslog"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Agent roda no roteador/switch; manager/NMS consulta e recebe traps. NTP e console não são o agent SNMP; severity 7 é Syslog. Essa distinção manager vs agent é must_know da parte 4.3.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "snmp-server community Monitor ro configura a community para:",
+    "alternativas": [
+      "Escrita total de configuração via SNMP sem restrição ética",
+      "Desligar o agent permanentemente",
+      "Substituir logging trap",
+      "Acesso de leitura (RO) pelo manager com a string Monitor"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "ro = read-only para polling/monitoramento. rw permitiria escrita. Community não desliga o agent nem substitui Syslog. Em produção, strings fracas e rw desnecessário são risco — o exame cobra o papel RO vs RW.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ntp status: Clock is unsynchronized, stratum 16. Interpretação típica:",
+    "alternativas": [
+      "Device não está sincronizado a uma fonte NTP válida — timestamps de log pouco confiáveis",
+      "NTP perfeito com stratum ideal 16",
+      "Syslog trap em debugging obrigatório",
+      "SNMP community rw ativa"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Unsynchronized e stratum 16 (comum no IOS sem sync) indicam ausência de fonte boa. Não é estado ideal. Não implica por si Syslog debug ou SNMP rw. Corrija ntp server, alcance UDP/123 e associations antes de confiar nos horários dos logs.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Diferença conceitual entre trap SNMP e polling:",
+    "alternativas": [
+      "Trap é só Syslog nível 0; polling é NTP",
+      "Trap: agent notifica evento; polling: manager consulta o agent periodicamente",
+      "Polling nunca usa community; trap sempre usa ntp server",
+      "São termos idênticos no IOS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Polling (GET) é puxado pelo NMS; trap é empurrado pelo agent em eventos. Não se confundem com Syslog severity nem com NTP. Community v2c pode proteger ambos os acessos conforme o desenho, mas o sentido de trap vs poll permanece.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "logging trap emergencies em produção. Efeito colateral comum?",
+    "alternativas": [
+      "Todos os debugs sobem ao servidor",
+      "NTP desynchroniza automaticamente",
+      "Quase só eventos de severidade 0 chegam ao host — avisos e erros importantes podem não subir",
+      "A community SNMP vira rw"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Trap em 0 é o filtro mais restritivo: omite alerts, errors, warnings etc. Útil só em cenários muito específicos; no exame, “servidor sem eventos” com trap emergencies é cenário clássico. Não mexe em NTP nem SNMP community.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SNMPv2c vs ideia de SNMPv3 no CCNA:",
+    "alternativas": [
+      "v3 elimina o agent no device",
+      "v2c usa community em claro; v3 introduz autenticação/criptografia (mais seguro)",
+      "v2c é sempre criptografado de ponta a ponta por padrão",
+      "v3 proíbe qualquer polling"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "v2c depende de community string; v3 adiciona usuário/auth/priv (conceito). Agent continua no device; polling permanece válido. O exame não exige config full v3, mas a comparação de segurança é cobrada em nível conceitual.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ntp associations serve principalmente para:",
+    "alternativas": [
+      "Listar apenas Severities Syslog",
+      "Inspecionar peers/servidores NTP, alcance e qual associação está selecionada",
+      "Apagar communities SNMP",
+      "Configurar logging host"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Associations mostra com quem o device fala em NTP e indícios de saúde da associação. Complementa show ntp status. Não gerencia Syslog levels nem SNMP. Se status unsync, associations ajuda a ver se o servidor responde.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Buffer local de logs no IOS é associado a:",
+    "alternativas": [
+      "Somente ntp server",
+      "logging buffered e leitura via show logging",
+      "Somente snmp-server community",
+      "ip helper-address"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "logging buffered guarda mensagens na RAM do device; show logging exibe o buffer e parâmetros. NTP e SNMP são eixos paralelos; helper é DHCP. Em lab sem servidor Syslog, o buffer é a primeira evidência de eventos.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "NMS não lê o switch; community no NMS é “public”, no device só existe “OpsRO ro”. Causa alinhada:",
+    "alternativas": [
+      "Stratum NTP 2 bloqueia SNMP",
+      "Community string incorreta entre manager e agent — autenticação v2c falha",
+      "logging trap informational desliga o agent",
+      "terminal monitor apaga snmp-server"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "v2c exige community idêntica (e permissões ro/rw adequadas). public ≠ OpsRO. NTP e Syslog trap não “desligam” SNMP por si. terminal monitor é só sessão VTY. Ajuste a string ou o NMS.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem numérica correta de gravidade Syslog (mais grave → menos grave) no início da escala:",
+    "alternativas": [
+      "7 debugging → 0 emergencies",
+      "5 notifications → 0 emergencies → 7 debugging",
+      "0 emergencies → 1 alerts → 2 critical → 3 errors …",
+      "4 warnings é mais grave que 0 emergencies"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A sequência oficial cresce de 0 (emergencies) a 7 (debugging). Inverter 7→0 ou achar que 4 > 0 em gravidade são erros de prova. notifications (5) não vem antes de emergencies na escala de severidade.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Device sem linha ntp server e relógio manual errado. Impacto mais direto nos logs?",
+    "alternativas": [
+      "Timestamps inconsistentes — difícil correlacionar eventos com outros sistemas",
+      "Impossibilidade total de configurar logging host",
+      "Conversão automática para SNMPv3",
+      "Desligamento do logging console"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem NTP, o clock local pode estar errado e os logs “mentem” a hora. Ainda é possível ter logging host/console; SNMP não migra sozinho para v3. O content 4.3 liga NTP unsync a correlação de incidentes e auditoria.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Manager SNMP é, no modelo da parte 4.3:",
+    "alternativas": [
+      "O processo DORA do DHCP",
+      "A interface com ip nat outside",
+      "O nível logging trap 7",
+      "A estação NMS que faz polling e pode receber traps dos agents"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Manager/NMS gerencia vários agents. Não é DHCP DORA, nem NAT outside, nem um nível Syslog. Separar manager e agent evita achar que “configurar community no PC do usuário” resolve o NMS corporativo.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show logging no troubleshooting de “servidor Syslog vazio” ajuda a ver:",
+    "alternativas": [
+      "Se há logging host, níveis e se o device está gerando mensagens no buffer",
+      "Apenas a tabela de rotas OSPF",
+      "Somente snmp-server rw",
+      "O stratum ideal fixo em 1"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "show logging resume destinos, níveis e o conteúdo buffered. Se o buffer tem eventos e o host está ausente/errado, o gap é o destino remoto. Não substitui show ip route nem força stratum 1. Combine com show run | include logging.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Community rw em SNMP, comparado a ro, permite conceitualmente:",
+    "alternativas": [
+      "Somente traps NTP",
+      "Apenas leitura de Syslog severity 0",
+      "Operações de escrita/alteração via SNMP além da leitura — maior risco se a string vazar",
+      "Desabilitar o agent de forma segura por padrão"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "rw = read-write; ro = read-only. RW aumenta a superfície de ataque se a community for fraca ou exposta. Não é “só NTP traps” nem desliga o agent. Em monitoramento puro, RO é a escolha usual no discurso CCNA.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "service timestamps log datetime msec contribui para:",
+    "alternativas": [
+      "Eleger o root bridge",
+      "Negociar EtherChannel LACP",
+      "Traduzir NAT inside local",
+      "Registrar data/hora (com ms) nas mensagens de log, melhorando legibilidade temporal"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Timestamps no log tornam cada mensagem correlacionável no tempo — ainda mais úteis com NTP sync. Não configuram STP, EtherChannel ou NAT. Junto com NTP, formam a base de logs “auditáveis”.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ntp server 192.0.2.10 configurado, mas associations mostra servidor unreachable. Eixo típico?",
+    "alternativas": [
+      "Alcance de rede/firewall (UDP/123), IP errado ou servidor NTP down — não há sync útil",
+      "logging trap debugging bloqueia NTP",
+      "Community ro impede ntp server",
+      "terminal monitor reseta stratum para 0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Config existe, mas sem alcance o cliente não sincroniza. Verifique L3, ACL e o serviço no servidor. Syslog trap, SNMP community e terminal monitor não são a causa primária de peer NTP unreachable.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Nível Syslog “informational” corresponde ao número:",
+    "alternativas": [
+      "0",
+      "3",
+      "6",
+      "7"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Mapa padrão: 0 emergencies, 1 alerts, 2 critical, 3 errors, 4 warnings, 5 notifications, 6 informational, 7 debugging. informational = 6; 7 é debugging; 3 é errors; 0 é emergencies. Cobrado em logging trap e em leitura de outputs.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mínimo do content 4.3 para “ops cego” (sem tempo, sem log remoto, sem NMS):",
+    "alternativas": [
+      "Só aumentar o pool DHCP",
+      "Só limpar a tabela MAC",
+      "Só desligar PortFast",
+      "NTP sync → logging host/trap adequados → SNMP community/agent acessível ao manager"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Os três pilares da parte: tempo (NTP), registro (Syslog) e monitoramento (SNMP). DHCP, MAC e PortFast são outros módulos. O checklist isola cada falha com show ntp, show logging e show snmp/run include.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual afirmação sobre traps SNMP no nível CCNA está correta?",
+    "alternativas": [
+      "Traps substituem completamente a necessidade de qualquer polling em todos os desenhos",
+      "Traps são mensagens Syslog nível 7 renomeadas",
+      "Traps exigem sempre ntp server na mesma linha de comando",
+      "Traps permitem ao agent avisar o manager sobre eventos sem esperar o próximo poll"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Trap notifica proativamente; muitos NMS ainda usam polling para inventário e baselines. Trap ≠ Syslog (protocolos/papéis diferentes). NTP é recomendável para timestamps, mas não é sintaxe da linha trap. Conceito puro de exame.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "logging console debugging vs logging trap warnings: diferença de destino/efeito?",
+    "alternativas": [
+      "Ambos enviam apenas ao NMS SNMP",
+      "Console afeta a sessão console; trap filtra o que vai ao logging host — níveis podem diferir por destino",
+      "Trap configura apenas NTP",
+      "Console desativa o agent SNMP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Cada destino (console, monitor, buffered, host/trap) pode ter nível próprio. É comum ver muito debug no console e menos no servidor. Trap não é NTP; console não desliga SNMP. Controle fino evita flood no SIEM e cegueira operacional.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Stratum 2 comparado a stratum 4, em condições normais de hierarquia NTP, sugere:",
+    "alternativas": [
+      "Stratum 2 mais próximo da fonte de referência que stratum 4",
+      "Stratum 4 sempre unsynchronized",
+      "Stratum 2 é severity Syslog",
+      "Stratum 4 é community SNMP rw"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Menor stratum = menos hops hierárquicos até a referência (em termos de modelo NTP). 4 não significa automaticamente unsync; unsync costuma mostrar 16 em muitos IOS. Stratum não é severity nem community.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor uso combinado de show ntp status e show logging em “logs com hora absurda e correlação impossível”?",
+    "alternativas": [
+      "Substituir qualquer análise de SNMP community",
+      "Só provar que o EtherChannel está down",
+      "Confirmar se o relógio está sincronizado e se os logs exibem timestamps/host de destino coerentes",
+      "Apagar ntp server e logging host sem diagnóstico"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "status prova sync/stratum; show logging mostra se há timestamps e para onde as mensagens vão. Juntos isolam “hora errada” de “sem log remoto”. Não medem EtherChannel; não substituem 100% o SNMP, mas resolvem o eixo tempo+registro do content 4.3.",
+    "part_id": "4.3"
+  }
+]

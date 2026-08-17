@@ -1,0 +1,107 @@
+{
+  "part_id": "aws-1.9",
+  "title": "KMS + Secrets Manager foundations (CMK, key policy, secrets)",
+  "blueprint_module": "1.0",
+  "blueprint_topics": [
+    "1.3",
+    "1.1"
+  ],
+  "verb": "Design",
+  "weight_percent": 30,
+  "topic_list": [
+    "KMS customer managed key (CMK) vs AWS managed key (ideia)",
+    "Key policy: quem pode administrar e usar a chave",
+    "IAM + key policy: kms:Encrypt, Decrypt, GenerateDataKey",
+    "Envelope encryption ideia (data key + CMK)",
+    "Grants vs policy (ideia leve)",
+    "S3/EBS/RDS/SQS com CMK (cruzar parts anteriores)",
+    "Secrets Manager: secret, GetSecretValue, resource policy",
+    "Rotation de secrets (ideia Lambda/gerenciada)",
+    "Secrets Manager vs SSM Parameter Store SecureString (ideia)",
+    "TShoot AccessDenied kms:Decrypt e secretsmanager:GetSecretValue",
+    "CMK disabled / pending deletion bloqueando decrypt",
+    "NÃO: CloudHSM lab, custom key store deep, asymmetric signing lab full, rotation Lambda code completo"
+  ],
+  "study_notes": [
+    {
+      "heading": "KMS no mapa SAA-C03",
+      "bullets": [
+        "CMK customer managed: você controla key policy, rotação e escopo; AWS managed é operada pela AWS com menos controle fino.",
+        "Uso da chave exige permissão na key policy e, em muitos casos, na identity policy (kms:Decrypt etc.).",
+        "Envelope encryption: KMS gera/protege data keys; o payload grande cifra localmente com a data key."
+      ],
+      "exam_tips": [
+        "AccessDenied kms:Decrypt → key policy + IAM da role no key ARN, não só s3:GetObject."
+      ]
+    },
+    {
+      "heading": "Key policy e IAM",
+      "bullets": [
+        "Key policy é o resource policy da CMK; sem Allow adequado ninguém usa a chave.",
+        "Roles de app precisam kms:Decrypt/GenerateDataKey no ARN da CMK quando o serviço usa customer key.",
+        "Grants delegam uso temporário a principals (ideia) sem reescrever a policy inteira."
+      ],
+      "exam_tips": [
+        "IAM Allow kms:Decrypt sem entrada na key policy (ou Deny) → ainda AccessDenied."
+      ]
+    },
+    {
+      "heading": "Secrets Manager",
+      "bullets": [
+        "Armazena segredos (DB password, API key) com API GetSecretValue e auditoria.",
+        "Rotation (ideia) troca o segredo periodicamente via integração/Lambda.",
+        "SSM SecureString é parâmetro cifrado; Secrets Manager destaca rotation gerenciada e casos de segredo de app."
+      ],
+      "exam_tips": [
+        "GetSecretValue denied → IAM/resource policy do secret; rotation compliance → Secrets Manager rotation enabled."
+      ]
+    },
+    {
+      "heading": "Serviços com CMK",
+      "bullets": [
+        "S3 SSE-KMS, EBS encrypted, RDS storage encryption, SQS SSE-KMS usam a CMK no caminho de dados.",
+        "A role que lê o dado precisa de kms além da permissão do serviço (s3:GetObject, etc.).",
+        "CMK disabled ou scheduled for deletion quebra decrypt de dados já cifrados."
+      ],
+      "exam_tips": [
+        "S3 GetObject ok no IAM mas 403 KMS → falta kms:Decrypt na role/key policy."
+      ]
+    },
+    {
+      "heading": "Anti-patterns de prova (KMS/Secrets)",
+      "bullets": [
+        "Senha de DB em plaintext no user-data ou no código.",
+        "CMK com key policy Principal * kms:* em produção.",
+        "Desabilitar CMK 'temporariamente' sem plano de dados cifrados.",
+        "Só IAM kms:Decrypt e key policy sem o principal da app.",
+        "Secret estático sem rotation quando a política de compliance exige rotação."
+      ],
+      "exam_tips": [
+        "Separe: key policy · IAM kms · secret policy · estado da CMK (enabled) · rotation."
+      ]
+    }
+  ],
+  "key_commands": [
+    "aws kms create-key / describe-key --key-id <id>",
+    "aws kms get-key-policy --key-id <id> --policy-name default",
+    "aws kms put-key-policy ...",
+    "aws kms encrypt / decrypt / generate-data-key",
+    "aws kms enable-key / disable-key / schedule-key-deletion",
+    "aws kms list-grants --key-id <id>",
+    "aws secretsmanager create-secret / get-secret-value --secret-id <name>",
+    "aws secretsmanager describe-secret --secret-id <name>",
+    "aws secretsmanager rotate-secret / put-resource-policy",
+    "aws sts get-caller-identity (TShoot AccessDenied)"
+  ],
+  "must_know": [
+    "CMK: key policy + IAM controlam uso (Encrypt/Decrypt/GenerateDataKey).",
+    "AWS managed keys: menos controle; customer CMK: policy e auditoria finas.",
+    "Envelope encryption: data key para payload; CMK protege a data key.",
+    "S3/RDS/EBS/SQS com CMK exigem kms na role que acessa o dado.",
+    "Secrets Manager: GetSecretValue + rotation ideia vs SSM SecureString.",
+    "AccessDenied Decrypt/GetSecretValue → policy do recurso + identity.",
+    "CMK disabled/pending deletion impede decrypt de dados existentes.",
+    "Fora: CloudHSM, custom key store deep, asymmetric lab full, código completo de rotation."
+  ],
+  "reuse_from_v1": null
+}

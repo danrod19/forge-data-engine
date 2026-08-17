@@ -1,0 +1,143 @@
+{
+  "part_id": "3.5",
+  "title": "Troubleshooting de conectividade IP",
+  "blueprint_module": "3.0",
+  "weight_percent": 25,
+  "topic_list": [
+    "Método sistemático L1/L2 → IP → gateway → rotas",
+    "Leitura de show ip route e códigos C L S O S*",
+    "Longest prefix match vs Administrative Distance",
+    "Next-hop unreachable e interface down",
+    "Floating static vs OSPF (quem vence)",
+    "Inter-VLAN: gateway, SVI e ROAS revisitados",
+    "IPv6: GUA, link-local, default ::/0, dual-stack",
+    "ping e traceroute como prova de caminho",
+    "show ip/ipv6 interface brief",
+    "Rota presente ≠ caminho fim a fim",
+    "Checklist unificado “não chega ao destino”",
+    "Armadilhas: AD vs longest match, default IPv4 para IPv6"
+  ],
+  "study_notes": [
+    {
+      "heading": "Método sistemático de diagnóstico",
+      "bullets": [
+        "Comece de baixo: link up/up (show ip interface brief / cabos/VLAN) antes de culpar o protocolo de roteamento.",
+        "Confirme addressing: IP, máscara e gateway do host na mesma subnet lógica da SVI/subinterface.",
+        "Ping ao gateway da própria VLAN — se falhar, o problema é local (L2/L3 do host/gateway), não o destino remoto.",
+        "Só então inspecione a tabela de rotas no roteador/L3 switch no caminho: match do destino, next-hop, interface de saída.",
+        "Traceroute (ou tracert) localiza o hop onde o caminho quebra ou desvia.",
+        "Em dual-stack, repita a lógica por pilha: IPv4 ok não prova IPv6."
+      ],
+      "exam_tips": [
+        "Ordem: L1/L2 → host/gateway → show ip route → longest match/AD → return path/ACL leve."
+      ]
+    },
+    {
+      "heading": "Ler show ip route com propósito",
+      "bullets": [
+        "Códigos: C connected, L local (/32), S static, S* default estática, O OSPF (AD 110).",
+        "Gateway of last resort / candidate default: existe default (0.0.0.0/0 ou via) para destinos sem match específico?",
+        "Linha da rota: prefixo, [AD/métrica], via next-hop, interface de saída, idade.",
+        "show ip route <prefix> mostra a entry vencedora e ajuda a ver se o match é o esperado.",
+        "show ip route static e show ip route ospf filtram fontes quando a tabela está cheia.",
+        "show run | include ip route revela floatings e defaults configurados que ainda não estão ativos."
+      ],
+      "exam_tips": [
+        "S* e “Gateway of last resort is not set” decidem se a Internet “tem default” no roteador."
+      ]
+    },
+    {
+      "heading": "Longest match vs AD — quem decide",
+      "bullets": [
+        "Passo 1: entre prefixos que casam o destino, vence o mais longo (mais específico).",
+        "Passo 2: só se o prefixo/length for o mesmo, compara fonte/AD (menor AD vence).",
+        "Ex.: 10.1.1.0/24 (O, 110) vence 10.0.0.0/8 (S, 1) para 10.1.1.50 — longest match, não AD.",
+        "Ex.: 192.168.1.0/24 S AD 1 vence 192.168.1.0/24 O AD 110 — mesmo prefixo, menor AD.",
+        "Floating static: mesmo prefixo, AD maior; só instala se a primária sair da tabela.",
+        "Erro clássico do NOC: culpar AD quando o tráfego segue um /24 “inesperado” por longest match."
+      ],
+      "exam_tips": [
+        "Most specific wins first. AD is the tie-breaker for equal prefixes."
+      ]
+    },
+    {
+      "heading": "Por que a rota some ou não encaminha",
+      "bullets": [
+        "Interface de saída down ou next-hop fora de rede connected → estática frequentemente não instala/utiliza.",
+        "OSPF retira prefixo se o neighbor/path cair; floating com AD maior pode então assumir.",
+        "Rota na tabela com next-hop sem ARP/ND ou return path quebrado → ping falha mesmo com S/O presente.",
+        "Overlapping: tráfego usa o prefixo mais específico, não a rota “grande” que o operador olhou primeiro.",
+        "ACL/firewall no caminho (menção leve): filtro pode dropar após o roteamento estar correto."
+      ],
+      "exam_tips": [
+        "Rota existe + ping falha → next-hop, return path, longest match errado ou filtro — não só “falta rota”."
+      ]
+    },
+    {
+      "heading": "Inter-VLAN revisitado no diagnóstico",
+      "bullets": [
+        "Ping ao gateway da própria VLAN falha → SVI/subinterface down, VLAN/trunk, IP/máscara/gateway errados.",
+        "Gateway de outra VLAN no host → nunca usa o L3 correto da subnet local.",
+        "SVI up/down: VLAN sem porta ativa; ROAS sem encapsulation; trunk sem allowed.",
+        "ip routing off no L3 switch: gateways podem responder localmente, inter-VLAN não encaminha.",
+        "Após gateway local ok, aí sim cheque rotas entre subnets (connected das SVIs ou estáticas/OSPF)."
+      ],
+      "exam_tips": [
+        "Inter-VLAN: gateway local primeiro, depois routing entre SVIs/ROAS."
+      ]
+    },
+    {
+      "heading": "IPv6 e dual-stack no troubleshooting",
+      "bullets": [
+        "Só FE80:: → falta GUA (estático/SLAAC) ou RA suppress; destinos GUA remotos falham.",
+        "GUA local sem ::/0 → saída remota IPv6 falha; default IPv4 não serve a pilha v6.",
+        "show ipv6 interface brief e show ipv6 route são o par mínimo de verificação.",
+        "Next-hop link-local em estática IPv6 exige interface de saída em muitos casos.",
+        "OSPFv3/estática IPv6 são independentes do OSPFv2/IPv4 no mesmo cabo (dual-stack)."
+      ],
+      "exam_tips": [
+        "Sintoma “metade da nuvem”: teste v4 e v6 separados — defaults e endereços por pilha."
+      ]
+    },
+    {
+      "heading": "Checklist unificado “não chega ao destino”",
+      "bullets": [
+        "1) Host: IP/máscara/gateway; ping gateway; (IPv6: GUA + default).",
+        "2) L2 do segmento: VLAN, trunk, porta up, ARP/ND.",
+        "3) No roteador de entrada: show ip interface brief; show ip route <destino>.",
+        "4) Match: longest match esperado? AD/fonte correta? next-hop e interface up?",
+        "5) Caminho: traceroute; hop seguinte tem rota de volta?",
+        "6) Se dual-stack: repetir 1–5 em IPv6 (show ipv6 …).",
+        "7) Só então políticas (ACL) se o encaminhamento e o return path estiverem limpos."
+      ],
+      "exam_tips": [
+        "Não pule do sintoma para OSPF se o host nem pinga o gateway da VLAN."
+      ]
+    }
+  ],
+  "key_commands": [
+    "ping <destino>",
+    "traceroute <destino>",
+    "show ip interface brief",
+    "show ipv6 interface brief",
+    "show ip route",
+    "show ip route <prefix>",
+    "show ip route static",
+    "show ip route ospf",
+    "show ipv6 route",
+    "show ipv6 route static",
+    "show running-config | include ip route",
+    "show running-config | include ipv6 route",
+    "show ip ospf neighbor",
+    "show ipv6 neighbors"
+  ],
+  "must_know": [
+    "Diagnóstico de baixo para cima: link → IP/gateway → rotas → return path.",
+    "Longest match decide entre prefixos diferentes; AD só entre o mesmo prefixo/length.",
+    "Floating (AD maior) não assume enquanto a primária (ex.: O AD 110 ou S AD 1) estiver instalada.",
+    "Códigos: C/L/S/S*/O — leia AD/métrica e next-hop na linha da rota.",
+    "Interface down ou next-hop unreachable tira/inutiliza muitas estáticas.",
+    "Inter-VLAN: gateway = SVI/subinterface da VLAN do host; SVI down e ip routing off quebram o caminho.",
+    "Dual-stack: ::/0 e GUA são independentes de 0.0.0.0/0 e do IPv4."
+  ]
+}

@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A sequência correta do processo DHCP DORA no nível CCNA é:",
+    "alternativas": [
+      "Discover → Offer → Request → Ack",
+      "Request → Discover → Ack → Offer",
+      "Offer → Ack → Discover → Request",
+      "Ack → Request → Offer → Discover"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "DORA resume Discover (cliente procura), Offer (servidor oferece), Request (cliente pede/aceita) e Ack (servidor confirma o lease). Inverter a ordem é erro clássico de prova. Não é necessário memorizar bytes de pacote — a sequência e o papel do broadcast/relay bastam no 200-301.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Quando o servidor DHCP está em outra subnet, o comando tipicamente necessário na interface L3 do cliente é:",
+    "alternativas": [
+      "ip name-server no host Windows apenas",
+      "ip helper-address apontando para o IP do servidor DHCP",
+      "ip nat inside source static obrigatório",
+      "no switchport em toda porta access"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Broadcasts DHCP não atravessam o roteador. ip helper-address na interface/SVI do cliente reencaminha o Discover ao servidor remoto. name-server é DNS; NAT static e no switchport não substituem o relay DHCP. Helper na interface errada deixa a VLAN sem leases.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No pool DHCP do IOS, o parâmetro default-router define:",
+    "alternativas": [
+      "O router-id do OSPF",
+      "O IP outside global do NAT",
+      "O gateway default entregue aos clientes do pool",
+      "A VLAN nativa do trunk"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "default-router no pool é a opção de gateway que o host usa para sair da subnet. Sem ele, o PC pode receber IP/máscara e ainda assim não alcançar outras redes. Não configura OSPF RID, NAT nem native VLAN. É um dos erros de pool mais cobrados em cenário.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show ip dhcp binding no servidor IOS serve principalmente para:",
+    "alternativas": [
+      "Listar apenas conflitos de STP",
+      "Mostrar a tabela MAC de switching L2",
+      "Exibir a ACL do helper-address",
+      "Listar associações IP ↔ MAC (leases) conhecidas pelo servidor"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Binding mostra quais IPs o servidor DHCP leaseou e a quais clientes (MAC), com indicação de lease. Não é CAM table, nem STP, nem a linha helper. Combinar com conflict e com o pool ajuda a ver se o problema é “sem oferta” ou “IP já tomado”.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "PC obtém 192.168.10.50/24 via DHCP, mas não sai da VLAN. Pool sem default-router. Diagnóstico alinhado:",
+    "alternativas": [
+      "Falta gateway no lease — host sem default-router funcional para tráfego inter-subnet",
+      "DORA nunca ocorreu se há IP no host",
+      "Helper-address apaga o IP do PC",
+      "DNS obrigatoriamente quebra o ARP local"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "IP/máscara sem gateway (ou gateway errado) isolam o host na subnet local. IP presente prova que DORA em algum nível funcionou. Helper e DNS não explicam “tem IP mas não sai” como primeira hipótese. Corrija default-router no pool e confira o IP da SVI.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O comando network dentro de ip dhcp pool define:",
+    "alternativas": [
+      "O hostname do roteador",
+      "O scope (rede/máscara) de endereços que o pool pode oferecer",
+      "Somente o dns-server secundário",
+      "A interface outside do NAT"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "network estabelece de qual subnet o pool tira endereços. Scope errado (outra VLAN) faz o cliente não receber oferta útil. Não é hostname, não limita só DNS e não marca NAT. É o coração do “pool cobre a VLAN do cliente?”.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ip dhcp excluded-address 192.168.1.1 192.168.1.10 é usado para:",
+    "alternativas": [
+      "Forçar todos os hosts a usarem APIPA",
+      "Desligar o helper-address",
+      "Reservar faixa (ex.: gateway e servidores) fora do range dinâmico do pool",
+      "Apagar bindings permanentemente da NVRAM"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Exclusões impedem o servidor IOS de oferecer IPs que devem permanecer estáticos (gateway, impressoras, servidores). Não desliga helper nem força APIPA. clear de binding é outro comando; exclusão é prevenção de conflito/duplicata no design do scope.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "DNS, no contexto desta parte, tem papel principal de:",
+    "alternativas": [
+      "Traduzir inside local em inside global",
+      "Eleger root bridge no STP",
+      "Negociar canal EtherChannel",
+      "Resolver nomes (FQDN) em endereços IP"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "DNS faz a resolução nome→IP para aplicações e, no IOS, para comandos que usam FQDN. NAT, STP e EtherChannel são outros domínios. No troubleshooting, se ping por IP funciona e por nome falha, o eixo é DNS no host ou name-server no device.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Servidor DHCP na VLAN 99; PCs na VLAN 20 sem IP. Pool e servidor ok. Causa mais provável?",
+    "alternativas": [
+      "Falta ip helper-address na SVI/interface da VLAN 20",
+      "DORA usa apenas unicast desde o Discover",
+      "dns-server no pool bloqueia o Discover",
+      "show ip dhcp binding desativa o relay"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Cliente e servidor em subnets diferentes exigem relay na interface do cliente. Discover é broadcast e não cruza o L3 sozinho. DNS no pool e show binding não impedem o Discover. Cenário clássico de “uma VLAN sem IP” com servidor centralizado.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No roteador, ip name-server 8.8.8.8 serve principalmente para:",
+    "alternativas": [
+      "Entregar lease DHCP aos PCs automaticamente",
+      "Marcar a interface como ip nat outside",
+      "Substituir default-router no pool",
+      "Definir para onde o próprio device envia consultas DNS (ex.: ping por nome no CLI)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "ip name-server configura o resolvedor do IOS, não o DHCP dos hosts. Hosts da LAN recebem DNS via pool (dns-server) ou config manual. NAT outside e default-router são eixos diferentes. domain-lookup precisa estar habilitado para o CLI resolver FQDN.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Pool network 10.1.30.0/24; cliente na VLAN 40 (10.1.40.0/24) com helper correto. Sintoma típico?",
+    "alternativas": [
+      "Scope/network do pool não cobre a subnet do cliente — oferta inadequada ou falha de lease para essa VLAN",
+      "Helper sozinho cria pool /24 para qualquer VLAN",
+      "DORA ignora o campo network do pool",
+      "Exclusão 10.1.30.1 resolve qualquer VLAN"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O servidor precisa de pool/scope alinhado à subnet do cliente (via relay). Helper entrega o pedido, mas network 10.1.30.0/24 não serve a 10.1.40.0/24. DORA não “ignora” o scope. Exclusões e helper não reescrevem o network do pool.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip dhcp conflict lista 192.168.5.20. Interpretação útil:",
+    "alternativas": [
+      "O IP está livre e será o próximo lease garantido",
+      "O servidor detectou conflito nesse endereço — pode evitar reoferecê-lo até limpar/investigar duplicata",
+      "Conflito significa helper ausente em todas as SVIs",
+      "Conflito apaga o default-router do pool"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Conflict marca IPs que o IOS viu em disputa (ping/ARP etc.). Não é sinal de “livre”. Não prova helper globalmente ausente nem remove default-router. Investigue host estático indevido e, se apropriado, clear do conflict após correção.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Host tem IP, gateway e ping 8.8.8.8 ok; navegador falha em nomes. Eixo principal?",
+    "alternativas": [
+      "Spanning Tree em blocking em todas as portas",
+      "Falta de ip nat inside na impressora",
+      "DNS do host ausente/errado (pool sem dns-server ou config manual inválida)",
+      "DORA incompleto apesar do IP válido"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Ping por IP prova L3 básico; falha só em nome aponta resolução DNS no cliente. STP total blocking e NAT na impressora não batem com o sintoma. IP válido implica lease/DORA ok. Verifique dns-server no pool e ipconfig do host.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Helper configurado só na SVI 10; PCs da SVI 20 sem IP; servidor em outra subnet. Causa?",
+    "alternativas": [
+      "dns-server 8.8.8.8 no pool bloqueia VLAN 20",
+      "lease infinito proíbe relay",
+      "show ip interface brief limpa helpers",
+      "Helper na interface errada — VLAN 20 não tem ip helper-address no caminho do cliente"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Relay é por interface L3 do segmento do cliente. Helper só na SVI 10 não atende a SVI 20. DNS e lease não “bloqueiam” o Discover da outra VLAN. Brief não remove helper. Cenário clássico de helper na interface errada.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual papel descreve corretamente o relay DHCP?",
+    "alternativas": [
+      "Substitui o servidor e inventa leases sem pool",
+      "Encaminha pedidos DHCP de clientes locais a um servidor em outra subnet (helper)",
+      "Elimina a necessidade de pool network",
+      "Traduz nomes em IP no lugar do DNS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Relay (ip helper-address) reencaminha o DHCP cross-subnet; o servidor remoto ainda precisa de scope adequado. Não inventa pool, não remove network e não faz DNS. É o elo entre broadcast do cliente e unicast ao servidor.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "No pool, dns-server 1.1.1.1 entrega essa informação a quem?",
+    "alternativas": [
+      "Somente ao processo OSPF",
+      "Aos clientes DHCP como opção de resolvedor DNS no host",
+      "Apenas como inside global do NAT",
+      "Só ao show vlan brief"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "dns-server no pool popula a opção DNS do lease do cliente. É distinto de ip name-server no próprio IOS. Não configura OSPF, NAT nem VLAN database. Sem essa opção (e sem DNS manual), o PC pode ficar sem resolvedor.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Admin no roteador: ping cisco.com falha; ping 192.0.2.1 ok. Hosts da LAN resolvem nomes. Foco no IOS?",
+    "alternativas": [
+      "Reescrever todos os pools DHCP da empresa",
+      "ip name-server (e domain-lookup) no roteador — o device não tem resolvedor, a LAN pode estar ok",
+      "Remover helper de todas as SVIs",
+      "Apagar default-router do pool de produção"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sintoma isolado no CLI do roteador com LAN saudável aponta name-server/domain-lookup do IOS, não o DHCP dos PCs. Remover helpers e default-router piora a LAN. Separar “DNS do device” de “DNS do host” é must_know da parte 4.2.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que o Discover DHCP costuma falhar sem helper quando o servidor está “atrás” de um roteador?",
+    "alternativas": [
+      "Porque DHCP usa apenas anycast de Internet",
+      "Porque o Offer nunca existe no protocolo",
+      "Porque o Discover é broadcast de link e roteadores não encaminham broadcast entre subnets por padrão",
+      "Porque o Ack apaga o IP do servidor"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Broadcast de link não é roteado entre VLANs/subnets. O helper reescreve/encaminha o pedido ao servidor. Offer e Ack existem no DORA; anycast e “Ack apaga servidor” não explicam o modelo CCNA de relay.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PC sem IP; show ip dhcp binding no servidor local vazio para esse MAC; pool network correto; mesma subnet; exclusões não cobrem o range inteiro. Próximo eixo útil?",
+    "alternativas": [
+      "Só configurar ip name-server no core",
+      "L2/VLAN, servidor DHCP ativo, conflitos e se o pool tem endereços livres",
+      "Só aumentar o custo OSPF",
+      "Só desligar PortFast em tudo"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem binding e na mesma subnet, o problema não é helper cross-subnet. Verifique se o serviço DHCP está up, se há conflitos, se o range não esgotou e se o cliente está na VLAN certa (L2). name-server, OSPF e PortFast não são o primeiro eixo de “sem IP”.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "lease 0 8 no pool IOS significa conceitualmente:",
+    "alternativas": [
+      "Oito servidores DNS obrigatórios",
+      "Oito helpers por SVI",
+      "Oito exclusões automáticas",
+      "Duração do empréstimo do IP (ex.: 0 dias e 8 horas, conforme sintaxe)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "lease controla por quanto tempo o cliente pode usar o IP antes de renovar. Não define quantidade de DNS, helpers ou exclusões. No exame, importa o conceito de duração do lease e que o pool pode customizá-la.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Diferença correta entre dns-server no pool e ip name-server no roteador:",
+    "alternativas": [
+      "dns-server vai para os clientes no lease; ip name-server é resolvedor do próprio device IOS",
+      "São sempre o mesmo comando com nomes diferentes",
+      "ip name-server configura o gateway dos PCs",
+      "dns-server só funciona com NAT overload"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pool dns-server = opção DHCP ao host. ip name-server = DNS do roteador/switch L3. Não são sinônimos; name-server não é default-router; DNS do pool não depende de NAT. Essa distinção evita “consertar o core” quando só o PC está sem DNS.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Servidor DHCP IOS na própria SVI da VLAN do cliente. É obrigatório ip helper-address nessa SVI?",
+    "alternativas": [
+      "Sim, sempre, mesmo com servidor local na subnet",
+      "Sim, para ativar default-router",
+      "Não — helper é para alcançar servidor em outra subnet; localmente o broadcast atinge o servidor no segmento",
+      "Sim, senão o DNS do host falha"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Com servidor na mesma subnet/VLAN, o Discover broadcast alcança o servidor sem relay. Helper é o caso cross-subnet. default-router e DNS são parâmetros de pool/host, não justificativa para helper local obrigatório.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mínimo “PC não recebe IP” alinhado ao content 4.2:",
+    "alternativas": [
+      "Só trocar o cabo do servidor DNS público",
+      "Só limpar OSPF LSDB",
+      "Só desabilitar todas as exclusões sem olhar VLAN",
+      "VLAN/L2 → pool network/exclusões → servidor up → helper se outra subnet → binding/conflict"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O método evita pular para DNS ou OSPF quando o host nem tem IP. Ordem: segmento, scope, serviço, relay se preciso, depois binding/conflict. Atalhos isolados mascaram a causa real (helper, network errado, exclusão total do range).",
+    "part_id": "4.2"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Host com APIPA (169.254.x.x) em rede corporativa com DHCP. Interpretação típica de exame:",
+    "alternativas": [
+      "Cliente não obteve lease DHCP válido e autoatribuíu link-local IPv4",
+      "Lease DHCP bem-sucedido com default-router 169.254.0.1",
+      "DNS root hints convertidos em IP de host",
+      "Helper-address configurado com sucesso garantido"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "169.254/16 indica falha em obter DHCP (timeout) e autoconfiguração APIPA. Não é lease corporativo normal nem prova de helper ok. Investigue conectividade L2, servidor, pool e relay — o sintoma “sem IP útil” do content.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Múltiplos ip helper-address na mesma SVI apontando para dois servidores DHCP. Efeito conceitual?",
+    "alternativas": [
+      "O IOS descarta o segundo helper sempre",
+      "Pode encaminhar o pedido a ambos (redundância); o cliente escolhe/aceita uma oferta via DORA",
+      "Desativa DORA e força IP estático",
+      "Converte a SVI em outside NAT"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Vários helpers permitem redundância de servidores. O cliente ainda segue DORA e seleciona uma oferta. Não desliga DHCP nem configura NAT. Design de prova: helper na interface do cliente, um ou mais servidores válidos.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Pool com default-router 10.1.1.1, mas a SVI da VLAN está 10.1.1.254/24. Clientes pegam IP e “não saem”. Hipótese forte?",
+    "alternativas": [
+      "Gateway anunciado no DHCP não é o IP real do gateway da VLAN — default-router inconsistente",
+      "DORA proíbe default-router diferente de .1",
+      "Binding sempre reescreve a SVI para .1",
+      "name-server no IOS corrige o gateway do PC"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O default-router do pool deve ser um gateway alcançável na subnet (em geral a SVI). Anunciar .1 quando o gateway real é .254 quebra a saída. DORA não exige .1 magicamente; binding não move SVI; DNS do IOS não corrige gateway do host.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual comando de verificação lista IPs que o servidor DHCP IOS marcou em conflito?",
+    "alternativas": [
+      "show ip route ospf",
+      "show vlan brief",
+      "show ip dhcp conflict",
+      "show etherchannel summary"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "show ip dhcp conflict é o show dedicado a endereços em conflito no servidor IOS. Rotas OSPF, VLAN database e EtherChannel não listam conflicts DHCP. Use com binding e com a política de exclusões no TShoot de “IP some do pool”.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "“PC não resolve nome” vs “PC não recebe IP”: ordem correta de isolamento?",
+    "alternativas": [
+      "Sempre culpar DNS primeiro, mesmo sem IP",
+      "Sempre recriar o pool com network 0.0.0.0",
+      "Sempre desligar o helper globalmente",
+      "Garantir IP/gateway primeiro; só então testar nome vs IP para isolar DNS"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Sem endereço L3 válido, falar em DNS é prematuro. Com IP e gateway ok, compare ping por IP e por FQDN. Recriar pool 0.0.0.0 ou remover helper em massa não é método. O content 4.2 separa explicitamente os dois sintomas.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "No IOS, além de ip name-server, qual recurso relacionado permite ao CLI resolver FQDN?",
+    "alternativas": [
+      "ip domain-lookup (quando habilitado)",
+      "ip dhcp excluded-address somente",
+      "spanning-tree portfast default somente",
+      "passive-interface default no OSPF somente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "domain-lookup controla se o IOS tenta resolver nomes. name-server define para quem pergunta. Exclusões DHCP, PortFast e passive OSPF não habilitam resolução de FQDN no CLI. Labs cobram a combinação name-server + domain-lookup.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor uso combinado de show run | section dhcp e show ip dhcp binding em incidente “hosts sem IP”?",
+    "alternativas": [
+      "Substituir qualquer teste de VLAN e cabo",
+      "Só provar que o DNS público está down",
+      "Ver pools/exclusões/helpers na config e se o servidor está de fato leaseando (bindings)",
+      "Apagar automaticamente todos os conflicts sem ler"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "section dhcp mostra a intenção configurada (pool, network, default-router, exclusões); binding mostra o resultado operacional. Juntos separam “config errada” de “serviço sem leases”. Não substituem L2, não medem DNS Internet e clear cego de conflict não é o primeiro passo.",
+    "part_id": "4.2"
+  }
+]

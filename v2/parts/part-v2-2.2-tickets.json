@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2201: PC da contabilidade não alcança servidores da VLAN 40. Cabo e NIC ok em outro ponto.",
+    "cli_output": "SW-ACC# show interfaces Gi1/0/18 status\nPort      Name           Status       Vlan  Duplex  Speed Type\nGi1/0/18  PC-CONTAB      connected    1     a-full  a-1000 10/100/1000BaseTX\n\nSW-ACC# show run interface Gi1/0/18\ninterface GigabitEthernet1/0/18\n description PC-CONTAB\n switchport mode access\n switchport access vlan 1\n spanning-tree portfast\n\nSW-ACC# show vlan brief | include 40|1\n1    default                          active    Gi1/0/18, ...\n40   USERS-ACC                        active\n\nPC: ipconfig → 10.1.1.50/24 (VLAN1 lab range) — expected 10.40.0.0/24",
+    "alternativas": [
+      "Problema de PoE fault no PC",
+      "Corrigir switchport access vlan 40 e verificar show interfaces status (Vlan 40)",
+      "Configurar trunk allowed vlan 1-4094 no PC",
+      "Remover PortFast causa a VLAN 40"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Status e running-config mostram access vlan 1; o desenho é VLAN 40. Ajuste access vlan 40. PoE não alimenta PC típico; trunk no endpoint e remover PortFast não movem a VLAN de dados.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2202: PC atrás do telefone navega; telefone não registra no call control. PoE delivering.",
+    "cli_output": "SW-ACC# show run interface Gi1/0/7\ninterface GigabitEthernet1/0/7\n description MESA-12-PHONE\n switchport mode access\n switchport access vlan 40\n spanning-tree portfast\n (no switchport voice vlan)\n\nSW-ACC# show power inline Gi1/0/7\nInterface Admin  Oper       Power   Device              Class Max\n          State  State      (Watts)\n--------- ------ ---------- ------- ------------------- ----- ----\nGi1/0/7   auto   on         6.3     Ieee PD             2     30.0\nInterface AdminPowerMax AdminConsumption\n          (Watts)       (Watts)\n--------- ------------- ----------------\nGi1/0/7   30.0          6.3\n\nSW-ACC# show interfaces Gi1/0/7 switchport | include Access|Voice|Mode\nAdministrative Mode: static access\nAccess Mode VLAN: 40 (USERS)\nVoice VLAN: none\n\nPhone log: registering on data VLAN only / no voice subnet",
+    "alternativas": [
+      "Aumentar a largura do Port-channel do core",
+      "Desligar PoE (já delivering) para forçar registro",
+      "Adicionar switchport voice vlan (ex. 50) — access 40 só cobre o PC; voz ausente",
+      "Mudar mode para trunk native 40 sem voice"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "PoE ok e Voice VLAN: none com PC na 40 explicam voz falha e dados ok. Configure voice vlan. Não desligue PoE que está delivering; trunk nativo não substitui o desenho voice vlan de mesa.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2203: AP novo não acende LEDs; sem discovery no WLC. Cabo recém-passado.",
+    "cli_output": "SW-ACC# show interfaces Gi1/0/24 status\nPort      Name        Status       Vlan  Duplex Speed Type\nGi1/0/24  AP-SALA-3   notconnect   15    auto   auto  10/100/1000BaseTX\n\nSW-ACC# show power inline Gi1/0/24\nInterface Admin  Oper       Power   Device   Class Max\nGi1/0/24  auto   off        0.0     n/a      n/a   30.0\nOper State: off / absent\n\nSW-ACC# show run interface Gi1/0/24\ninterface GigabitEthernet1/0/24\n description AP-SALA-3\n switchport mode access\n switchport access vlan 15\n spanning-tree portfast\n no shutdown\n\nTech: reseated same cable → still notconnect; spare known-good PoE cable → still off",
+    "alternativas": [
+      "Falta de voice vlan 15 no AP",
+      "OSPF missing on access switch",
+      "SSID open obrigatório antes do link",
+      "Sem link/PoE (notconnect, power off/absent) — cabo/PD/porta PoE antes de culpar WLC"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "notconnect e power off/absent mostram que L1/PoE não estabeleceram. VLAN 15 e PortFast já estão; sem link o WLC não descobre o AP. Troque cabo/teste outra porta PoE/PD. Voice e OSPF não acendem o AP.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2204: câmera IoT não obtém IP na VLAN 80; às vezes 'link estranho'. Config encontrada:",
+    "cli_output": "SW-ACC# show run interface Gi1/0/33\ninterface GigabitEthernet1/0/33\n description CAM-PORTAO\n switchport trunk encapsulation dot1q\n switchport mode trunk\n switchport trunk allowed vlan 80\n spanning-tree portfast trunk\n\nSW-ACC# show interfaces Gi1/0/33 switchport | include Mode|Access|Trunking\nAdministrative Mode: trunk\nOperational Mode: trunk\nAccess Mode VLAN: 1 (default)\nTrunking Native Mode VLAN: 1 (default)\n\nSW-ACC# show interfaces Gi1/0/33 status\nPort      Name        Status    Vlan  Duplex Speed\nGi1/0/33  CAM-PORTAO  connected trunk a-full a-1000\n\nCamera expects untagged single VLAN 80 access port",
+    "alternativas": [
+      "Manter trunk e adicionar voice vlan 80",
+      "Remover a câmera da rede e usar Wi-Fi guest",
+      "Alterar para switchport mode access e switchport access vlan 80 (endpoint IoT)",
+      "Configurar no switchport ip address 80 na câmera"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Câmera/IoT deve ser access na VLAN 80, não trunk. Operational trunk com native 1 explica IP errado/ausente. Corrija mode access + access vlan 80. Voice e IP na L2 port do switch não são o fix.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2205: PCs em mesas novas demoram ~40s para pegar DHCP; portas access recém-criadas sem PortFast. Uma porta de sala de reunião vazia ficou up por engano.",
+    "cli_output": "SW-ACC# show run interface Gi1/0/40\ninterface GigabitEthernet1/0/40\n description PC-MESA-NOVA\n switchport mode access\n switchport access vlan 40\n (no spanning-tree portfast)\n no shutdown\n\nSW-ACC# show spanning-tree interface Gi1/0/40\nVlan Role Sts Cost  Prio.Nbr Type\n---- ---- --- ----- -------- ----\nVLAN0040 Desg LRN 19    128.40  P2p\n(transitioning; not yet FWD at boot capture)\n\nSW-ACC# show run interface Gi1/0/48\ninterface GigabitEthernet1/0/48\n description EMPTY-MEETING\n switchport mode access\n switchport access vlan 40\n no shutdown\n\nSW-ACC# show interfaces Gi1/0/48 status\nGi1/0/48  EMPTY-MEETING  notconnect  40  auto  auto",
+    "alternativas": [
+      "Habilitar spanning-tree portfast nas access de usuário e shutdown na porta ociosa Gi1/0/48",
+      "Converter todas as mesas para trunk",
+      "Desabilitar DHCP na VLAN 40",
+      "Remover access vlan e usar só native trunk"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Learning sem PortFast atrasa o forwarding e o DHCP no boot. Portas vazias devem ficar em shutdown. Edge: PortFast nas mesas + shutdown na 48. Trunk em massa e matar DHCP pioram o serviço.",
+    "part_id": "v2-2.2"
+  }
+]

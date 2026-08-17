@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A principal razão de segurança para preferir SSH a Telnet no gerenciamento remoto é:",
+    "alternativas": [
+      "SSH cifra a sessão; Telnet envia credenciais e comandos em cleartext",
+      "Telnet usa sempre porta 22 cifrada",
+      "SSH elimina a necessidade de qualquer senha",
+      "Telnet autentica com certificados SNMPv3 por padrão"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Telnet trafega em texto claro; um sniffer no caminho lê usuário, senha e a sessão inteira. SSH protege a confidencialidade do gerenciamento. SSH ainda exige autenticação; Telnet não “vira seguro” por senha forte. SNMPv3 não é o modelo padrão do Telnet.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Além de hostname adequado, qual comando é pré-requisito clássico antes de gerar a chave RSA para SSH?",
+    "alternativas": [
+      "ip helper-address",
+      "ip domain-name <domínio>",
+      "logging trap debugging",
+      "spanning-tree mode rapid-pvst"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "ip domain-name compõe o FQDN usado na geração da chave. Sem domain-name (e hostname), o crypto key generate rsa falha ou o SSH não habilita corretamente. Helper, logging trap e STP não são pré-requisitos do engine SSH do IOS.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O comando que gera o par de chaves necessário ao servidor SSH no IOS é:",
+    "alternativas": [
+      "username admin secret Cisco",
+      "transport input ssh",
+      "crypto key generate rsa",
+      "access-class 10 in"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "crypto key generate rsa cria a chave do device para SSH. username e login/transport completam autenticação e VTY; access-class filtra origem. Sem a chave, show ip ssh frequentemente mostra SSH disabled mesmo com VTY “bonita”.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "line vty com transport input telnet (somente) e chave RSA já gerada. Comportamento esperado para cliente SSH?",
+    "alternativas": [
+      "SSH sempre funciona porque a chave existe",
+      "O IOS converte Telnet em SSH automaticamente",
+      "access-class deixa de ser necessária para sempre",
+      "Sessões SSH são recusadas — a VTY não aceita SSH como transporte"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "transport input define o protocolo aceito na VTY. Só telnet = clientes SSH não entram, independentemente da chave. A chave habilita o engine; a VTY ainda precisa permitir ssh. Correção típica: transport input ssh (ou ssh telnet, preferindo só ssh).",
+    "part_id": "4.4"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "login local nas linhas VTY significa que a autenticação consulta:",
+    "alternativas": [
+      "Os usuários username configurados no device (database local)",
+      "Apenas a community SNMP",
+      "Somente o servidor NTP",
+      "A tabela MAC da porta Gi0/1"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "login local usa a base local de username/secret (ou password). Não consulta SNMP community, NTP nem CAM. Sem username correspondente, o login SSH falha após o handshake. Diferente do modelo legado password só na VTY.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ip ssh version 2 é recomendado porque:",
+    "alternativas": [
+      "Desliga todas as VTY",
+      "SSHv2 é a versão preferida; v1 é legado e considerado inseguro",
+      "Substitui a necessidade de username",
+      "Gera automaticamente ip domain-name"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Forçar version 2 alinha o device à prática segura do CCNA. Não remove VTY, não cria usuários e não configura domain-name. show ip ssh confirma a versão em uso após a config.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show ip ssh serve principalmente para verificar:",
+    "alternativas": [
+      "Apenas access-lists da LAN de dados",
+      "Somente o status de EtherChannel",
+      "Se o SSH está enabled, versão e parâmetros da chave/autenticação",
+      "O default-router do pool DHCP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "show ip ssh resume o estado do servidor SSH no IOS. É o show central do checklist “SSH não conecta” junto com a section da VTY. Não lista ACL de dados, PoC EtherChannel nem opções DHCP.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "access-class 20 in sob line vty aplica a ACL 20 a:",
+    "alternativas": [
+      "Todo o tráfego NAT overload da WAN",
+      "Somente broadcasts DHCP",
+      "Apenas o plano de dados OSPF",
+      "As sessões de gerenciamento remoto nas VTY (filtra IP de origem do admin)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "access-class na VTY restringe quem pode tentar login remoto (SSH/Telnet). Não é ACL de NAT genérico, DHCP ou LSAs OSPF. ACL errada com deny no IP do NOC explica “ping ok, SSH falha” em muitos labs.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "username admin secret SenhaForte é preferível a password em claro porque:",
+    "alternativas": [
+      "O secret armazena a senha de forma mais segura (hash) no device",
+      "O secret desabilita SSH automaticamente",
+      "O secret remove a necessidade de transport input",
+      "O secret configura ip domain-name sozinho"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "secret usa hashing; password em running pode aparecer em texto ou com proteção fraca legada. Continua sendo preciso VTY/login/transport e chave RSA. secret não “liga SSH sozinho” — é peça da autenticação local.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "AAA no nível conceitual desta parte significa:",
+    "alternativas": [
+      "Somente Spanning Tree avançado",
+      "Apenas tradução de endereços NAT",
+      "Apenas exclusões do pool DHCP",
+      "Authentication, Authorization e Accounting — frequentemente com servidores centrais; no lab CCNA o local username cobre o básico"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "AAA centraliza identidade e políticas (RADIUS/TACACS no mundo real). O 200-301 exige o conceito e o uso de database local (username) nas VTY. Não confundir com STP, NAT ou DHCP excluded-address.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip ssh: SSH Disabled. Hostname e domain-name ok; não há chave. Próximo passo típico?",
+    "alternativas": [
+      "crypto key generate rsa (gerar a chave do servidor SSH)",
+      "Só configurar logging host",
+      "Só aumentar o lease DHCP",
+      "Só desligar PortFast em uplinks"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Com pré-requisitos de nome ok, a ausência de chave deixa SSH disabled. Gerar RSA habilita o serviço. Syslog, DHCP e PortFast não criam o engine SSH. Depois ainda valide VTY transport e login local.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SSH pede usuário/senha e retorna Authentication failed. show ip ssh enabled; transport input ssh. Causa mais alinhada?",
+    "alternativas": [
+      "Falta de rota default na Internet core",
+      "login local sem username válido ou senha incorreta no database local",
+      "Stratum NTP 16 bloqueia autenticação SSH",
+      "Community SNMP ro impede login VTY"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Handshake SSH ok (enabled + transport) mas falha na autenticação aponta usuário/senha ou ausência de login local/username. NTP e SNMP não autenticam VTY. Rota default pode ser necessária para alcance, mas o sintoma específico é falha de auth, não timeout de rede.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Admin na 10.10.10.50; ACL 10 na VTY permite só 10.20.20.0/24. Sintoma?",
+    "alternativas": [
+      "Telnet vira SSH automaticamente para 10.10.10.50",
+      "A chave RSA é apagada a cada login",
+      "Conexões SSH a partir de 10.10.10.50 são bloqueadas pelo access-class",
+      "domain-name deixa de ser necessário"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "access-class aplica a ACL de origem. 10.10.10.50 não está em 10.20.20.0/24 → deny. SSH e chave podem estar corretos; o filtro de gerência bloqueia o NOC. Ajuste a ACL ou a origem do admin.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem mental mínima do checklist “SSH não conecta” no content 4.4:",
+    "alternativas": [
+      "Só recriar todas as VLANs",
+      "Só limpar o OSPF LSDB",
+      "Só trocar o SFP sem testar IP",
+      "Alcance IP → show ip ssh/chave → VTY transport/login → username → access-class"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O método evita culpar só a senha quando o engine está disabled ou a ACL bloqueia. VLAN/OSPF/SFP podem entrar se o ping falhar, mas com alcance ok o foco é SSH/VTY. É o checklist unificado da parte.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Diferença prática entre login local e password configurado só na VTY (legado):",
+    "alternativas": [
+      "São idênticos em todos os aspectos de AAA enterprise",
+      "login local usa username do device; password na VTY é senha de linha compartilhada legada",
+      "password na VTY gera a chave RSA sozinho",
+      "login local desabilita transport input"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "login local + username/secret é o modelo moderno local. password sob line vty é senha única da linha, menos flexível e legado. Nenhum dos dois gera chave RSA. transport input continua independente.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "transport input ssh telnet na VTY implica:",
+    "alternativas": [
+      "Apenas SSH; Telnet fica proibido",
+      "SSH e Telnet aceitos — Telnet continua exposto em cleartext se alcançável",
+      "Nenhum protocolo de gerenciamento remoto",
+      "Somente HTTP secure"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Listar ambos libera os dois transportes. Hardening recomendado no discurso CCNA: só ssh. Deixar Telnet “por compatibilidade” reabre o risco de cleartext. Não é HTTPS.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "enable secret protege principalmente:",
+    "alternativas": [
+      "A geração automática de domain-name",
+      "O modo privilegiado (enable) após o acesso à linha — camada distinta do login VTY",
+      "A community SNMP pública",
+      "O broadcast DHCP Discover"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Após autenticar na VTY/console, enable secret controla a entrada no modo privileged EXEC. É outra barreira. Não configura domain-name, SNMP ou DHCP. Confundir enable secret com username da VTY é erro comum de lab.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cliente SSH recebe connection timed out; ping ao IP de gerenciamento falha. Eixo primeiro?",
+    "alternativas": [
+      "Só regenerar a chave RSA sem testar L3",
+      "Alcance de rede (rota, ACL de interface, firewall, interface down) antes de culpar só a config SSH",
+      "Só criar username novo sem ping",
+      "Só ip ssh version 2 resolve timeout de path"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Timeout com ping falho é problema de path/L3/ACL de dados, não de senha SSH. O checklist começa por alcance. version 2 e username não criam rota. Depois que o ping ok, aí sim engine/VTY.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que hostname genérico/default pode atrapalhar o setup SSH em labs IOS?",
+    "alternativas": [
+      "Porque o hostname entra na identidade FQDN usada com domain-name na geração da chave",
+      "Porque hostname desliga todas as interfaces WAN",
+      "Porque hostname força transport input telnet",
+      "Porque hostname apaga access-lists"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "hostname + domain-name formam o nome para o par de chaves. Defaults inadequados são citação clássica de troubleshooting SSH. Hostname não mexe sozinho em WAN, transport ou ACL. Configure um nome significativo no checklist.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show users (ou who) no troubleshooting de acesso remoto ajuda a:",
+    "alternativas": [
+      "Gerar chave RSA de 4096 bits",
+      "Configurar ip domain-name",
+      "Definir access-class automaticamente",
+      "Listar sessões ativas (console/VTY) e quem está logado"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "show users mostra conexões correntes — útil para ver se o admin entrou, se VTY esgotou ou se há sessão console. Não configura chave, domain-name nem ACL. Complementa show ip ssh no operacional.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cenário: SSH works de dentro da VLAN de gerência; da Internet o acesso é negado por design com ACL VTY. Avaliação de segurança?",
+    "alternativas": [
+      "Comportamento alinhado a restringir origem do gerenciamento com access-class",
+      "Prova de que SSH está disabled globalmente",
+      "Prova de que Telnet é mais seguro que SSH",
+      "Indica ausência total de username"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Filtrar origens de administração é hardening esperado. SSH pode estar enabled e username ok. Telnet não se torna “mais seguro”. Acesso interno ok + externo negado aponta ACL/path de gerência, não engine morto.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual conjunto mínimo habilita SSH utilizável com usuário local no discurso CCNA?",
+    "alternativas": [
+      "Só logging host e ntp server",
+      "Só snmp-server community public ro",
+      "hostname, domain-name, crypto key, username secret, VTY login local + transport input ssh",
+      "Só ip route 0.0.0.0 0.0.0.0 wan"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O pacote mínimo de SSH local está no content: nome/domain, chave, usuário, VTY. Syslog/NTP/SNMP e default route são ops paralelos (rota pode ser necessária para alcance, mas não “cria” SSH). public ro não autentica VTY.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Telnet ainda responde na porta de gerenciamento após “migrar para SSH” sem remover telnet do transport. Risco residual?",
+    "alternativas": [
+      "Nenhum, pois SSH existe no mesmo box",
+      "Apenas perda de OSPF adjacencies",
+      "Apenas falha de NAT PAT",
+      "Sessões cleartext continuam possíveis se o atacante usar Telnet e a VTY aceitar"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Enquanto transport incluir telnet, o vetor cleartext permanece. “Ter SSH” não desliga Telnet sozinho. OSPF e NAT não são o risco descrito. Hardening: transport input ssh apenas.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Modulus baixo demais na chave RSA (legado) é problemático porque:",
+    "alternativas": [
+      "Pode ser rejeitado por clientes modernos / considerado fraco criptograficamente",
+      "Aumenta o stratum NTP para 16",
+      "Converte SSH em Telnet",
+      "Apaga automaticamente username secret"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Chaves curtas (ex.: 512) são inseguras e muitos clientes recusam. Labs CCNA costumam usar 1024/2048 conforme plataforma. Modulus não mexe em NTP, não vira Telnet nem apaga usuários. Regenerar com tamanho adequado faz parte do TShoot de “SSH não sobe no client”.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "line vty 0 4 sem login nem login local. Efeito típico em tentativas remotas?",
+    "alternativas": [
+      "Login remoto autenticado com qualquer senha SNMP",
+      "SSH enabled vira automaticamente passwordless root",
+      "Autenticação de linha inadequada — sessões remotas falham ou ficam sem método de login válido",
+      "domain-name é removido da running"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A VTY precisa de método de autenticação (login local, login com password de linha, AAA, etc.). Sem isso, o acesso remoto não se completa de forma correta. SNMP e passwordless não substituem. domain-name permanece independente.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual comando de verificação lista a ACL usada e ajuda no caso access-class bloqueando o admin?",
+    "alternativas": [
+      "show vlan brief somente",
+      "show ip ospf neighbor somente",
+      "show access-lists (e conferir o número da access-class na VTY)",
+      "show etherchannel summary somente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "show access-lists revela permit/deny da ACL referenciada por access-class. Compare com o IP de origem do admin. Outros shows não explicam o filtro da VTY. Junto com show run | section vty fecha o diagnóstico.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "“SSH connection refused” com show ip ssh enabled e transport input telnet only. Correção direta?",
+    "alternativas": [
+      "Apagar a chave RSA e manter só Telnet",
+      "Configurar transport input ssh (e remover Telnet se o objetivo for hardening)",
+      "Desligar ip domain-name",
+      "Trocar username por community SNMP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O engine está up; a VTY recusa SSH. Ajuste transport input. Apagar a chave piora. Remover domain-name quebra pré-requisitos. SNMP community não autentica VTY no lugar de username.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "No endurecimento de gerenciamento, qual combinação melhor representa a meta da parte 4.4?",
+    "alternativas": [
+      "Telnet only + community rw pública",
+      "SSH disabled + password VTY em claro na Internet",
+      "NTP off e logging trap 0 apenas",
+      "SSH v2, usuários locais com secret, VTY transport ssh, ACL de origem quando possível"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A meta é acesso remoto cifrado, autenticação local decente e restrição de quem pode tentar login. Telnet/community fraca e SSH disabled são o oposto. NTP/Syslog importam em 4.3, mas o hardening de acesso é o núcleo de 4.4.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após gerar nova chave RSA, clientes antigos falham até atualizar known_hosts/fingerprint. Interpretação?",
+    "alternativas": [
+      "Comportamento esperado de mudança de identidade do host SSH — não prova por si que transport input sumiu",
+      "Prova de que login local foi apagado",
+      "Prova de que access-class deny any foi aplicado",
+      "Indica que Telnet voltou a ser obrigatório"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Regenerar chave muda a identidade criptográfica do servidor; clientes avisam MITM/fingerprint mismatch. Verifique se a chave nova era intencional. Não implica automaticamente perda de login local, ACL deny any ou volta do Telnet — confira a running se a dúvida persistir.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor uso combinado de show ip ssh e show run | section line vty em incidente “não entro no roteador”?",
+    "alternativas": [
+      "Substituir qualquer teste de ping e rota",
+      "Só provar o estado do STP root",
+      "Confirmar se o engine SSH está enabled e se a VTY permite ssh com método de login adequado",
+      "Apagar usernames automaticamente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "show ip ssh valida o serviço; a section da VTY mostra transport e login. Juntos isolam disabled vs telnet-only vs sem login. Ainda combine com alcance e access-class. Não medem STP e não devem apagar usuários sem análise.",
+    "part_id": "4.4"
+  }
+]

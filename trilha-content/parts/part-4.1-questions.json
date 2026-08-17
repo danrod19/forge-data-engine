@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No NAT de saída típico do CCNA, o endereço 192.168.10.50 de um PC na LAN, antes de qualquer tradução, é classificado como:",
+    "alternativas": [
+      "Inside local",
+      "Inside global",
+      "Outside global",
+      "Outside local exclusivo de PAT"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Inside local é o IP do host na rede interna (RFC1918 na maioria dos labs). Inside global é o valor pós-tradução visto de fora. Outside global é o IP real do destino na Internet. A prova cobra essa distinção em show ip nat translations e em cenários de static/PAT.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Após PAT bem-sucedido, o PC 10.0.0.8 aparece na Internet como 203.0.113.1 com porta alta. Esse 203.0.113.1 (com porta) representa o:",
+    "alternativas": [
+      "Outside global do servidor web",
+      "Inside global do host interno",
+      "Inside local do host interno",
+      "Outside local da ACL deny"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Inside global é o endereço (e porta no PAT) com o qual o inside host se apresenta na rede externa. Inside local continua 10.0.0.8. Outside global seria o IP do destino remoto. Ler translations exige separar local (interno) de global (pós-NAT de saída).",
+    "part_id": "4.1"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Configuraram pool, ACL e ip nat inside source list … pool, mas show ip nat translations fica vazio para hosts da LAN. Causa mais comum entre as opções:",
+    "alternativas": [
+      "Falta clear ip nat translation a cada pacote",
+      "Static NAT proíbe qualquer dynamic",
+      "Falta ip nat inside e/ou ip nat outside nas interfaces do fluxo",
+      "show ip nat statistics desativa o NAT"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Sem marcar a LAN como inside e a WAN como outside, o IOS não aplica a política inside source ao tráfego que cruza o edge. Pool e ACL sozinhos não bastam. clear e statistics não “ligam” o NAT; static e dynamic podem coexistir no mesmo roteador.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual comando publica o servidor 192.168.5.10 com IP público fixo 198.51.100.10 (static 1:1)?",
+    "alternativas": [
+      "ip nat inside source list 1 interface g0/0 overload",
+      "ip nat pool WEB 198.51.100.10 198.51.100.10 netmask 255.255.255.0 sem static",
+      "access-list 1 permit any",
+      "ip nat inside source static 192.168.5.10 198.51.100.10"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Static NAT usa inside source static <inside-local> <inside-global> para mapeamento 1:1 permanente. Overload/PAT serve saída many-to-one e não fixa inbound ao servidor. Pool sozinho sem static/list adequada não garante o 1:1 permanente pedido. ACL any não cria o mapeamento 1:1.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "PAT (Port Address Translation) no IOS é tipicamente obtido com:",
+    "alternativas": [
+      "Somente ip nat outside na LAN",
+      "ip nat inside source list <ACL> interface <WAN> overload",
+      "Apenas clear ip nat translation *",
+      "ip nat inside source static sem IP global"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A forma clássica de PAT é list + interface (ou pool) com a palavra overload, reutilizando o IP global via portas L4. ip nat outside na LAN inverte o desenho usual. clear só limpa dinâmicas. static exige par local/global e é 1:1, não PAT.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Dynamic NAT com pool de 4 IPs públicos, sem overload. O quinto host simultâneo da LAN tenta sair. Resultado esperado?",
+    "alternativas": [
+      "PAT automático sem configuração",
+      "O quinto host obtém translation; pool nunca esgota",
+      "Pool esgotado: novos hosts podem falhar até liberar endereço no pool",
+      "Todos os hosts passam a usar inside local na Internet"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Dynamic pool sem overload consome um inside global por sessão/host elegível até acabar o pool. Sem espaço, não há nova translation. Overload (PAT) resolve many-to-one; não surge sozinho. Hosts não “aparecem” na Internet com RFC1918 sem tradução válida.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A access-list usada em ip nat inside source list define principalmente:",
+    "alternativas": [
+      "Os IPs outside global permitidos no DNS",
+      "O tráfego inside local elegível a ser traduzido",
+      "A métrica OSPF do link WAN",
+      "O MTU da interface outside"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A ACL da list é o filtro de quem (source inside) pode usar o pool/interface NAT. Se não casar o host, não há entry em translations. Não configura OSPF, MTU nem DNS outside. Erro de wildcard/subnet na ACL é falha clássica de lab.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show ip nat translations é usado no troubleshooting para:",
+    "alternativas": [
+      "Listar apenas rotas estáticas S*",
+      "Ver mapeamentos ativos inside local ↔ inside global (e portas no PAT)",
+      "Apagar a running-config de NAT",
+      "Trocar ip nat inside por outside automaticamente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O comando exibe a tabela de translations — prova se o NAT está criando mapeamentos e quais endereços/portas estão em uso. Não edita config, não é tabela de rotas e não remarca interfaces. Combinar com statistics fecha o diagnóstico de pool e hits/misses.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Em um edge típico, onde se aplica ip nat outside?",
+    "alternativas": [
+      "Na interface voltada à Internet/provedor (WAN)",
+      "Somente em loopback 0",
+      "Em todas as portas access de switch L2",
+      "Apenas no host Windows do usuário"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Outside marca o lado “público”/externo do NAT no roteador. A LAN costuma ser inside. Switch L2 access e config no PC não substituem o marcador no roteador de borda. Loopback raramente é o outside de saída à Internet no desenho CCNA básico.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "clear ip nat translation * tem efeito típico de:",
+    "alternativas": [
+      "Remover apenas rotas OSPF",
+      "Apagar ip nat inside source static da running",
+      "Desligar permanentemente o PAT",
+      "Limpar entries dinâmicas da tabela de translations (static configurado permanece)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O clear remove translations dinâmicas/PAT da tabela ativa. Mapeamentos static continuam na configuração e reaparecem conforme o desenho. Não mexe em OSPF nem remove a linha static da running. Útil após testes ou entries “presas”, sem reescrever a policy NAT.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PC 192.168.1.20 não sai à Internet. show run tem overload na WAN; ACL 1 permite 192.168.2.0/24. Diagnóstico mais alinhado:",
+    "alternativas": [
+      "Overload sempre ignora a ACL",
+      "ACL da list não casa o source do PC — tráfego não é elegível a NAT",
+      "Inside local vira outside global sem ACL",
+      "show ip nat statistics proíbe PAT"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A list filtra o inside local elegível. Host em 192.168.1.20 não casa ACL de 192.168.2.0/24 → sem translation. Overload não contorna a ACL; statistics só monitora. Cenário clássico de “NAT configurado mas ninguém traduz”.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PAT está ok para a LAN inteira, mas clientes externos não abrem o site no servidor interno 10.10.10.50. O que falta com mais frequência no escopo CCNA?",
+    "alternativas": [
+      "Aumentar o OSPF hello para 1 segundo",
+      "Static NAT 1:1 (ou mapeamento fixo) do servidor para um inside global público",
+      "Remover ip nat outside da WAN",
+      "Trocar todos os hosts para outside local"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "PAT many-to-one resolve saída; inbound a um host interno específico exige static (inside local ↔ inside global fixo) além de conectividade/ACL. Remover outside quebra o NAT. OSPF hello e renomear “outside local” nos PCs não publicam o servidor.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Na saída de show ip nat translations, a coluna que mostra o IP privado do usuário é em geral a de:",
+    "alternativas": [
+      "Outside global",
+      "Inside global",
+      "Route distinguisher",
+      "Inside local"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Inside local guarda o endereço interno do host. Inside global é o público (ou IP da interface + porta). Outside global é o destino externo. Não há route distinguisher em NAT clássico CCNA. Interpretar a tabela evita achar que o privado “sumiu” ou que o global é o PC.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip nat statistics indica pool com todos os endereços alocados e misses crescendo. Dynamic sem overload. Ação corretiva típica:",
+    "alternativas": [
+      "Ignorar: misses altos são normais e inofensivos",
+      "Apagar ip nat inside da LAN",
+      "Só habilitar CDP na WAN",
+      "Ampliar o pool e/ou adicionar overload (PAT) para many-to-one"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Pool cheio sem overload impede novas translations — misses refletem falhas de alocação. Ampliar o pool ou migrar para PAT (overload) resolve o esgotamento. Remover inside piora. CDP e “ignorar misses” não liberam endereços do pool.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cenário: ip nat inside na G0/0 (LAN), falta ip nat outside na G0/1 (WAN), list+overload configurados. Sintoma esperado?",
+    "alternativas": [
+      "Translations estáticas apagam a ACL",
+      "NAT funciona só para IPv6",
+      "Overload cria outside automaticamente",
+      "Tráfego LAN→WAN tipicamente sem translation válida — NAT inside source não completa o modelo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Ambos os lados do fluxo precisam de classificação inside/outside. Só inside na LAN com policy source não fecha o NAT de borda sem outside na WAN. Overload não inventa o marcador outside. IPv6 e static não são o foco desse sintoma IPv4 clássico.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual par de termos corresponde a “IP do host na LAN” e “IP com que ele sai na Internet”?",
+    "alternativas": [
+      "Inside local e inside global",
+      "Outside local e outside global apenas",
+      "Inside global e inside local (nessa ordem)",
+      "FE80 e ::/0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Inside local = LAN; inside global = pós-NAT na Internet. Inverter a ordem é erro comum de prova. Outside local/global referem-se ao host externo. FE80/::/0 são IPv6, fora do mapeamento NAT IPv4 desta parte.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Diferença prática central entre static NAT e PAT/overload:",
+    "alternativas": [
+      "Static é many-to-one; PAT é sempre 1:1 fixo",
+      "Static mapeia 1:1 fixo; PAT compartilha IP global com muitas portas (many-to-one)",
+      "PAT exige pool de 256 IPs públicos mínimos",
+      "Static não usa inside local"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Static fixa um par permanente (servidor). PAT reutiliza um (ou poucos) IP global com portas distintas para muitos hosts. Static continua usando inside local. PAT não exige pool enorme — pode ser o próprio IP da interface WAN.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Port exhaustion em PAT significa, em termos de exame:",
+    "alternativas": [
+      "Cabo serial sem clock rate",
+      "VLAN nativa mismatch no trunk",
+      "Esgotamento de portas L4 no IP inside global compartilhado sob muitas sessões",
+      "Falta de SVI no switch de acesso"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "PAT identifica fluxos por IP global + porta. Sob carga extrema, portas disponíveis no mapeamento se esgotam e novos fluxos falham. Não é problema de clock serial, native VLAN ou SVI — embora o sintoma “não navega” possa ser confundido com L2 se o método de TShoot for fraco.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Outside global, na terminologia NAT do CCNA, refere-se tipicamente a:",
+    "alternativas": [
+      "O IP real do destino na rede externa (ex.: servidor na Internet)",
+      "O IP privado do PC na VLAN 10",
+      "O wildcard da ACL de NAT",
+      "O nome do pool ip nat pool"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Outside global é o endereço do host externo como ele existe na rede outside. O PC privado é inside local. Wildcard e nome de pool são configuração, não o papel “outside global”. Em muitos labs sem outside NAT, outside local ≈ outside global.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Comando que, junto de translations, ajuda a ver hits/misses, interfaces NAT e uso de pool:",
+    "alternativas": [
+      "show vlan brief",
+      "show ip ospf neighbor",
+      "show spanning-tree",
+      "show ip nat statistics"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "show ip nat statistics resume contadores, interfaces inside/outside e estado do pool — complemento direto de show ip nat translations. VLAN, OSPF e STP não substituem a visão de alocação NAT. Misses + pool full guiam correção de dynamic/PAT.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Lab: static 192.168.8.8 → 203.0.113.8 ok; hosts da LAN usam list+overload. Um PC da LAN não traduz. Static “quebra” o PAT do resto?",
+    "alternativas": [
+      "Não necessariamente — static e PAT podem coexistir; o PC provavelmente falha por ACL/list, inside/outside ou rota",
+      "Sim: qualquer static desativa overload globalmente",
+      "Sim: static apaga ip nat outside",
+      "Sim: static converte toda a LAN em outside local"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "É comum combinar static para servidor e PAT para usuários. Um PC sem translation aponta para ACL da list, marcação de interface ou roteamento, não para “static matar PAT”. Outside e overload não são apagados por uma linha static isolada.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ip nat inside source list 10 pool NET overload. O que o overload adiciona em relação ao mesmo comando sem overload?",
+    "alternativas": [
+      "Remove a necessidade de ACL 10",
+      "Força um IP global exclusivo por host sem reuso de porta",
+      "Permite many-to-one: vários inside local compartilham IPs do pool via portas",
+      "Desabilita show ip nat translations"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Overload ativa PAT sobre o pool (ou interface): multiplexação por portas. Sem overload, cada host consome um IP do pool (1:1 dinâmico). A ACL continua obrigatória na list. Translations continuam visíveis — na verdade ficam ainda mais numerosas com portas.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Técnico confunde inside global com outside global ao ler uma linha de translation. Risco prático?",
+    "alternativas": [
+      "Achar que o IP público do destino é o IP traduzido do usuário (ou o inverso) e “corrigir” o NAT errado",
+      "Aumentar automaticamente o tamanho do pool",
+      "Ativar PortFast em todas as portas",
+      "Converter OSPF em static default"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Inside global = como o usuário sai; outside global = destino externo. Trocar os papéis leva a diagnosticar o servidor remoto como se fosse o NAT do PC (ou culpar o pool sem necessidade). Pool, PortFast e OSPF não são consequência dessa leitura errada da tabela.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Quando preferir static NAT em vez de só PAT no edge corporativo simples?",
+    "alternativas": [
+      "Quando nenhum host sai à Internet",
+      "Quando a WAN está administratively down",
+      "Quando se precisa de IP público fixo/inbound para um servidor interno",
+      "Quando a ACL da list deve ser removida para sempre"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Static entrega mapeamento previsível 1:1 para publicação de serviço. PAT cobre saída compartilhada dos clientes. WAN down e “ninguém sai” não pedem static. Remover a ACL da list não é objetivo do static — os dois mecanismos resolvem problemas diferentes e coexistem.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show run | include nat não mostra ip nat inside em nenhuma interface, mas mostra list+overload. Conclusão?",
+    "alternativas": [
+      "Config incompleta: faltam marcadores de interface; translations de hosts LAN tendem a não surgir",
+      "NAT está 100% operacional só com overload",
+      "include nat esconde de propósito as interfaces",
+      "Overload implica inside/outside implícitos e suficientes"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A policy source sem inside/outside nas interfaces é configuração incompleta no modelo clássico. Overload sozinho não marca interfaces. show run | include nat listaria ip nat inside se existisse nas linhas — ausência é evidência, não ocultação do parser.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Host inside local 10.1.1.15 gera traffic; translation mostra inside global 203.0.113.5:50432 → outside global 93.184.216.34:443. O destino 93.184.216.34 é:",
+    "alternativas": [
+      "Inside local do proxy interno",
+      "Outside global do servidor remoto",
+      "Nome do pool NAT",
+      "Wildcard da ACL 1"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Outside global identifica o peer externo (site na Internet). 10.1.1.15 é inside local; 203.0.113.5:50432 é inside global (PAT). Pool e wildcard não aparecem como “outside global” na linha de translation. Ler a linha completa evita inverter origem e destino.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dynamic pool sem overload esgotou. Um admin adiciona overload ao comando list+pool. Efeito esperado?",
+    "alternativas": [
+      "Desliga todas as statics existentes",
+      "Remove a necessidade de ip nat outside",
+      "Passa a reutilizar IPs do pool com portas (PAT), aliviando esgotamento 1:1",
+      "Converte inside local em outside local na LAN"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Overload transforma o uso do pool em PAT: muitos hosts por IP do pool via L4. Não apaga statics nem elimina a necessidade de outside. A terminologia inside/outside das interfaces e dos hosts não se inverte na LAN por causa do overload.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem mental mínima do checklist “NAT não traduz” no content 4.1:",
+    "alternativas": [
+      "Só aumentar o pool para  /8 inteiro",
+      "Só clear ip nat translation em loop",
+      "Só trocar o cabo do PC",
+      "inside/outside → ACL list → static/pool/overload → translations/statistics → rota WAN"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O método evita pular para clear ou cabo sem validar marcadores, ACL e tipo de NAT. Pool enorme não corrige ACL errada; clear em loop não cria policy. Rota WAN entra depois de confirmar se o NAT sequer gera translation.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual afirmação sobre static NAT está correta no nível 200-301?",
+    "alternativas": [
+      "Mapeamento 1:1 fixo inside local ↔ inside global; útil para servidor alcançável de fora",
+      "É sinônimo obrigatório de overload",
+      "Elimina a necessidade de default route",
+      "Só funciona se o pool dinâmico estiver vazio"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Static fixa o par de endereços para publicação/consistência. Não é overload (PAT). Continua precisando de roteamento (default/WAN). Pode coexistir com pool/PAT independentemente do pool estar vazio. É o contraste clássico com many-to-one.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor uso combinado de show ip nat translations e show ip nat statistics em um incidente “usuários não navegam”?",
+    "alternativas": [
+      "Substituir qualquer teste de cabo e IP no host",
+      "Só provar que o Spanning Tree está root",
+      "Confirmar se há mapeamentos e se contadores/pool/interfaces NAT explicam falha de alocação",
+      "Apagar automaticamente a ACL 1 da list"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Translations mostram se o NAT está criando pares; statistics mostram volume, misses e saúde do pool/interfaces. Juntos isolam “sem policy/ACL/inside-outside” vs “pool cheio”. Não substituem L1/IP do host, não medem STP root e não alteram a ACL sozinhos.",
+    "part_id": "4.1"
+  }
+]

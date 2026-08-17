@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4201 — Notebooks da VLAN 30 “pegam rede” (IP ok) mas não acessam Internet nem outras VLANs. Gateway no desenho é 10.30.30.1.",
+    "cli_output": "PC# ipconfig\n   IPv4 Address. . . . . . . . . . . : 10.30.30.44\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . :\n\nDist# show run | section dhcp\nip dhcp excluded-address 10.30.30.1 10.30.30.10\nip dhcp pool VLAN30\n network 10.30.30.0 255.255.255.0\n dns-server 8.8.8.8\n lease 0 8\n ! sem default-router\n\nDist# show ip dhcp binding\nBindings from all pools not associated with VRF:\nIP address          Client-ID/              Lease expiration        Type\n                    Hardware address\n10.30.30.44         0100.1a.2b.3c.4d.5e     Mar 12 2026 04:00 PM    Automatic\n\nDist# show ip interface brief | include Vlan30\nVlan30   10.30.30.1   YES manual up  up\n\nPC# ping 10.30.30.1\nReply from 10.30.30.1: bytes=32 time=1ms TTL=64\nPC# ping 8.8.8.8\nDestination host unreachable.",
+    "alternativas": [
+      "Pool network não cobre 10.30.30.0/24",
+      "Binding ausente prova que DORA falhou",
+      "Falta ip helper-address — por isso há IP no PC",
+      "Pool sem default-router: PC com IP/máscara mas gateway vazio; ping local ok e remoto unreachable"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Binding e IP 10.30.30.44 mostram lease ok; network e exclusões coerentes; SVI .1 up. Falta default-router no pool — ipconfig sem Default Gateway. Ping ao .1 ok, 8.8.8.8 unreachable. Helper não é necessário com servidor local na subnet. Eixo: pool sem gateway.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4202 — PCs da VLAN 40 sem IP (APIPA). Servidor DHCP 10.99.0.10 na VLAN 99 funciona para a VLAN 50.",
+    "cli_output": "Dist# show run | include helper|name-server\nip helper-address 10.99.0.10\n! a linha acima está sob interface Vlan50 apenas — ver sections\n\nDist# show run interface Vlan40\ninterface Vlan40\n ip address 10.40.40.1 255.255.255.0\n ! sem ip helper-address\n\nDist# show run interface Vlan50\ninterface Vlan50\n ip address 10.50.50.1 255.255.255.0\n ip helper-address 10.99.0.10\n\nDist# show run interface Vlan99\ninterface Vlan99\n ip address 10.99.0.1 255.255.255.0\n\nDist# show ip interface brief | include Vlan40|Vlan50|Vlan99\nVlan40   10.40.40.1   YES manual up  up\nVlan50   10.50.50.1   YES manual up  up\nVlan99   10.99.0.1    YES manual up  up\n\nPC40# ipconfig\n   IPv4 Address. . . . . . . . . . . : 169.254.12.34\n   Default Gateway . . . . . . . . . :\n\n! Servidor 10.99.0.10 tem scope 10.40.40.0/24 configurado (fora deste recorte)",
+    "alternativas": [
+      "Vlan40 down/down no brief",
+      "ip helper-address ausente na SVI do cliente (Vlan40); helper só em Vlan50 — relay não atende a VLAN 40",
+      "name-server no Dist bloqueia DHCP",
+      "APIPA prova lease bem-sucedido do scope 40"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Servidor está em outra subnet; Vlan50 tem helper e funciona; Vlan40 up/up sem helper — Discover não chega ao 10.99.0.10. APIPA confirma falha de lease. name-server não desliga DHCP. Scope no servidor existe conforme o chamado; o gap no output é helper na interface do cliente.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4203 — VLAN 60 nova: helper ok, PCs ainda sem IP. Servidor DHCP é o próprio Dist.",
+    "cli_output": "Dist# show run | section dhcp\nip dhcp excluded-address 10.60.60.1 10.60.60.20\nip dhcp pool VLAN60\n network 10.16.60.0 255.255.255.0\n default-router 10.60.60.1\n dns-server 1.1.1.1\n\nDist# show run interface Vlan60\ninterface Vlan60\n ip address 10.60.60.1 255.255.255.0\n ! servidor local — sem helper (não necessário na mesma subnet)\n\nDist# show ip dhcp binding\nBindings from all pools not associated with VRF:\nIP address          Client-ID/              Lease expiration        Type\n                    Hardware address\n! (vazio para clientes da VLAN 60)\n\nDist# show ip interface brief | include Vlan60\nVlan60   10.60.60.1   YES manual up  up\n\nDist# show ip dhcp pool VLAN60\nPool VLAN60 :\n Utilization mark (high/low)    : 100 / 0\n Subnet size (first/next)       : 0 / 0\n Total addresses                : 254\n Leased addresses               : 0\n Pending event                  : none\n 1 subnet is currently in the pool :\n Current index        IP address range                    Leased addresses\n 10.16.60.1          10.16.60.1        - 10.16.60.254     0",
+    "alternativas": [
+      "Falta default-router no pool",
+      "SVI Vlan60 administratively down",
+      "network do pool 10.16.60.0/24 não cobre a subnet real da VLAN 10.60.60.0/24 — scope errado",
+      "Helper obrigatório mesmo com servidor na SVI local e binding cheio"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "SVI 10.60.60.1 up; default-router e dns presentes; binding/leased 0. O network do pool é 10.16.60.0/24 (typo/scope) enquanto a VLAN é 10.60.60.0/24 — pool não serve o segmento. Servidor local dispensa helper. Corrigir network (e exclusões) alinha o scope.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4204 — Impressora nova não obtém IP; outros PCs na mesma VLAN ok. Há um host “esquecido” com IP estático no range.",
+    "cli_output": "R1# show run | section dhcp\nip dhcp excluded-address 192.168.80.1 192.168.80.10\nip dhcp pool OFFICE\n network 192.168.80.0 255.255.255.0\n default-router 192.168.80.1\n dns-server 192.168.80.10\n\nR1# show ip dhcp binding\nIP address          Client-ID/              Lease expiration        Type\n                    Hardware address\n192.168.80.50       0100.aa.bb.cc.dd.01     Mar 12 2026 01:00 PM    Automatic\n192.168.80.51       0100.aa.bb.cc.dd.02     Mar 12 2026 01:10 PM    Automatic\n\nR1# show ip dhcp conflict\nIP address        Detection method   Detection time\n192.168.80.60     Ping               Mar 11 2026 09:12 AM\n\nR1# show ip interface brief | include Vlan80\nVlan80   192.168.80.1   YES manual up  up\n\n! Log do lab: host legado com IP estático 192.168.80.60/24 ainda ligado\n! Impressora tenta obter endereço; administrador notou .60 “sumido” do pool",
+    "alternativas": [
+      "show ip dhcp conflict marca 192.168.80.60 (Ping) — IP em disputa com host estático; binding de PCs ok mostra DHCP ativo",
+      "Pool sem network 192.168.80.0/24",
+      "default-router ausente no pool OFFICE",
+      "Vlan80 down impede qualquer binding existente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Conflict lista 192.168.80.60 detectado por Ping — típico de duplicata com estático indevido. Bindings de .50/.51 provam DHCP e VLAN ok. Pool tem network e default-router; Vlan80 up. Remova/altere o estático e trate o conflict; não é falta de network nem SVI down.",
+    "part_id": "4.2"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4205 — Usuário navega por IP numérico (http://203.0.113.10) mas nomes falham. Admin no roteador também não resolve FQDN.",
+    "cli_output": "PC# ipconfig /all\n   IPv4 Address. . . . . . . . . . . : 10.10.10.55\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.10.10.1\n   DNS Servers . . . . . . . . . . . :\n\nPC# ping 8.8.8.8\nReply from 8.8.8.8: bytes=32 time=14ms TTL=117\nPC# ping google.com\nPing request could not find host google.com.\n\nR1# show run | section dhcp\nip dhcp pool LAN\n network 10.10.10.0 255.255.255.0\n default-router 10.10.10.1\n ! sem dns-server\n\nR1# show run | include name-server|domain-lookup\nno ip domain-lookup\n! (sem ip name-server)\n\nR1# show ip dhcp binding | include 10.10.10.55\n10.10.10.55         0100.11.22.33.44.55     Mar 12 2026 06:00 PM    Automatic\n\nR1# show ip interface brief | include GigabitEthernet0/0\nGigabitEthernet0/0   10.10.10.1   YES manual up  up",
+    "alternativas": [
+      "Falta default-router — contradiz ipconfig com gateway 10.10.10.1",
+      "Binding ausente para o PC",
+      "Pool sem dns-server (host sem DNS) e roteador sem ip name-server / com no ip domain-lookup — resolução de nomes falha; IP/rota ok",
+      "Helper-address obrigatório na mesma subnet com binding presente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "IP, gateway e ping 8.8.8.8 ok; DNS Servers vazio no PC — pool sem dns-server. R1 sem name-server e com no domain-lookup — CLI também não resolve. Binding existe; helper local desnecessário. Sintoma clássico de DNS, não de DHCP de endereço.",
+    "part_id": "4.2"
+  }
+]

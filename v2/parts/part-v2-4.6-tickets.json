@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4601: política deveria bloquear a subnet de convidados 10.50.0.0/24 ao sair para a Internet, mas usuários guest ainda navegam.",
+    "cli_output": "EDGE# show run | section access-list|access-group\nip access-list extended BLOCK-GUEST\n deny ip 10.50.0.0 0.0.0.255 any\n permit ip any any\ninterface GigabitEthernet0/0/0\n description LAN-INSIDE\n ip address 10.10.10.1 255.255.255.0\n ip access-group BLOCK-GUEST in\ninterface GigabitEthernet0/0/1\n description WAN\n ip address 203.0.113.2 255.255.255.252\n (no access-group)\n\nEDGE# show ip interface Gi0/0/0 | include access list\n  Outgoing access list is not set\n  Inbound  access list is BLOCK-GUEST\n\nTopology: Guest users are on VLAN 50 behind another L3 hop; their packets arrive on Gi0/0/0 already sourced from 10.50.x only if routed that way — ops note: guest actually exits via Gi0/0/1 path from Dist, not hairpinning in on Gi0/0/0 as 10.50 source in this design.\n\nPC-GUEST 10.50.0.25: ping 8.8.8.8 OK; HTTP OK",
+    "alternativas": [
+      "Implicit deny está desligado",
+      "Wildcard 0.0.0.255 está errada para /24",
+      "ACL está in na LAN errada para o fluxo real de saída — aplicar out na WAN (Gi0/0/1) no path de Internet",
+      "permit ip any any não existe"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A ACE e o wildcard /24 estão ok, mas a aplicação in em Gi0/0/0 não vê o fluxo de saída guest→Internet no desenho. Coloque a ACL out na WAN (ou no ponto onde o source 10.50 realmente atravessa). Direção/interface erradas = ACL ‘não filtra’.",
+    "part_id": "v2-4.6"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4602: após ‘endurecer’ ACL, o jump host 10.255.1.10 perdeu SSH ao roteador; ping também morre de qualquer origem.",
+    "cli_output": "R1# show access-lists MGMT\nExtended IP access list MGMT\n    10 deny ip any any\n    20 permit tcp 10.255.0.0 0.0.255.255 host 10.10.10.1 eq 22\n    30 permit icmp any any\n    40 permit ip any any\n\nR1# show run interface Loopback0\nip address 10.10.10.1 255.255.255.255\n\nR1# show run interface Gi0/0/0\n ip access-group MGMT in\n\nR1# show access-lists MGMT\nExtended IP access list MGMT\n    10 deny ip any any (188 matches)\n    20 permit tcp 10.255.0.0 0.0.255.255 host 10.10.10.1 eq 22\n    30 permit icmp any any\n    40 permit ip any any\n\nPC-JUMP 10.255.1.10: ssh 10.10.10.1 → timeout",
+    "alternativas": [
+      "Falta de crypto key SSH",
+      "Linha 10 deny ip any any casa primeiro — permits 20–40 nunca são avaliados para esse tráfego",
+      "Wildcard da 10.255 está errada para /16",
+      "access-group in não se aplica a TCP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "First match: deny any na linha 10 engole SSH e ICMP antes dos permits. Hits só na 10 confirmam. Mova o deny genérico para o final (ou remova-o se 40 já libera o resto).",
+    "part_id": "v2-4.6"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4603: ACL deveria liberar só a subnet 10.40.0.0/24, mas hosts 10.40.5.x e até 10.41.x parecem casar demais / comportamento estranho de match.",
+    "cli_output": "SW-L3# show run | section NOC-LAN\nip access-list extended NOC-LAN\n permit ip 10.40.0.0 255.255.255.0 any\n deny ip any any\n\nSW-L3# show access-lists NOC-LAN\nExtended IP access list NOC-LAN\n    10 permit ip 10.40.0.0 255.255.255.0 any\n    20 deny ip any any\n\nEngineer note: intended /24 for 10.40.0.0–10.40.0.255 only\nWildcard mistakenly entered as subnet mask 255.255.255.0\n\nshow ip interface Gi1/0/1 | include access list\n  Inbound access list is NOC-LAN",
+    "alternativas": [
+      "Trocar 255.255.255.0 por wildcard 0.0.0.255 para representar /24 corretamente",
+      "Usar standard ACL com a mesma mask 255.255.255.0 resolve",
+      "Implicit deny está desabilitado",
+      "permit ip any any no topo é obrigatório"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "255.255.255.0 no campo wildcard não é /24: a lógica de bits fica invertida em relação à subnet mask. Para 10.40.0.0/24 use 0.0.0.255 (ou reescreva a ACE). Standard com a mesma mask errada não corrige.",
+    "part_id": "v2-4.6"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4604: ACL BLOCK-SCAN só tem denies de subnets suspeitas; depois disso, hosts legítimos da 10.10.0.0/16 também param de acessar o server.",
+    "cli_output": "R1# show access-lists BLOCK-SCAN\nExtended IP access list BLOCK-SCAN\n    10 deny ip 198.51.100.0 0.0.0.255 host 10.20.5.10\n    20 deny ip 203.0.113.0 0.0.0.255 host 10.20.5.10\n    30 deny tcp any host 10.20.5.10 eq 23\n    (no further lines)\n\nR1# show run interface Gi0/0/1\n description TO-SERVER-FARM\n ip access-group BLOCK-SCAN out\n\nPC-LEGIT 10.10.8.20: ping 10.20.5.10 FAIL; https FAIL\nPC-ATTACK 198.51.100.50: also FAIL (expected)\n\nR1# show access-lists BLOCK-SCAN\n    10 deny ... (matches)\n    20 deny ... (matches)\n    30 deny ... (matches)\n (legitimate traffic produces no permit hits — none exist)",
+    "alternativas": [
+      "Falta PortFast na interface do server",
+      "Direção deveria ser in na mesma interface apenas",
+      "Wildcard das linhas 10–20 está invertida",
+      "Implicit deny no final derruba 10.10.0.0/16 — falta permit ip 10.10.0.0 0.0.255.255 host 10.20.5.10 (e/ou permit ip any any consciente)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Só há denies; o tráfego legítimo não casa e cai no implicit deny. Adicione permits para a LAN legítima antes do fim (ou permit residual). Os denies de scan podem permanecer no topo.",
+    "part_id": "v2-4.6"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4605: pedido era ‘bloquear só HTTP ao server 10.20.5.10 a partir de 10.40.0.0/24’. Implementaram standard perto da origem.",
+    "cli_output": "R-ACCESS# show run | section BAD-HTTP\naccess-list 50 deny 10.40.0.0 0.0.0.255\naccess-list 50 permit any\ninterface Vlan40\n ip address 10.40.0.1 255.255.255.0\n ip access-group 50 in\n\nR-ACCESS# show access-lists 50\nStandard IP access list 50\n    10 deny   10.40.0.0, wildcard bits 0.0.0.255 (120 matches)\n    20 permit any (5 matches)\n\nPC 10.40.0.55: ping 10.20.5.10 FAIL; ssh FAIL; http FAIL\nPC 10.40.0.55: ping 8.8.8.8 FAIL (everything from VLAN40 dying toward R-ACCESS)\n\nRequirement: block only tcp/80 to 10.20.5.10, allow other traffic",
+    "alternativas": [
+      "Manter standard 50 — está perfeita para filtrar só HTTP",
+      "Trocar para extended com deny tcp 10.40.0.0 0.0.0.255 host 10.20.5.10 eq 80 e permits do restante; standard só source derruba tudo da subnet",
+      "Colocar a mesma standard out na Internet resolve a porta 80",
+      "Implicit deny não se aplica a standard"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Standard deny da 10.40.0.0/24 in no SVI nega a origem para qualquer destino/protocolo no path — daí ping/ssh/http morrem. Precisa extended com destination e eq 80. Standard não implementa ‘só HTTP ao server’.",
+    "part_id": "v2-4.6"
+  }
+]

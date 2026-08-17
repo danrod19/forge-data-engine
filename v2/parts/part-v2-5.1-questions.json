@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O digital network assistant do NOC sugere: \"execute shutdown na Port-channel1 para limpar a tabela MAC flapping\". O operador roda show spanning-tree e vê a interface de acesso do host em blocking por inconsistência. Qual a melhor ação?",
+    "alternativas": [
+      "Rejeitar o shutdown do uplink e investigar a porta de acesso/STP com base na evidência",
+      "Aplicar o shutdown no Port-channel1 imediatamente, pois a AI correlacionou o flapping",
+      "Ignorar o STP e limpar a tabela MAC em todos os switches do campus",
+      "Recarregar o core switch para forçar reconvergência L2"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O assistente propôs uma ação de alto impacto no uplink. A evidência de spanning-tree aponta problema na borda (porta em blocking), não necessidade de derrubar o Port-channel. No papel operacional da agentic AI, a recomendação deve ser confrontada com show e topologia; o operador rejeita mudanças destrutivas quando o output indica outra causa.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual afirmação melhor descreve agentic AI em operações de rede no nível CCNA?",
+    "alternativas": [
+      "Modelo treinado localmente em cada switch para prever falhas de hardware",
+      "Assistente que pode planejar passos e usar ferramentas/contexto de rede, além de gerar texto",
+      "Substituto obrigatório do CLI break-glass em qualquer incidente",
+      "Sistema que aplica automaticamente qualquer change sem janela de manutenção"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Agentic AI, no contexto de network operations, é o assistente que planeja, consulta contexto e pode usar ferramentas (coleta de estado, runbooks), não apenas gerar parágrafos. Não implica treinar ML no device, nem substituir o operador ou aplicar changes cegas. O CCNA pede descrever o papel e avaliar recomendações.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Um copiloto resume syslog e afirma que Gi0/1 está com CRC crescente. O operador executa show interfaces Gi0/1 e confirma input errors/CRC. Qual postura correta?",
+    "alternativas": [
+      "Descartar o resumo da AI porque assistentes nunca devem ser usados em TShoot",
+      "Aplicar reload no switch sem checar o link físico",
+      "Aceitar a hipótese de problema de camada física/link e seguir o checklist (cabo, SFP, duplex, erros)",
+      "Trocar a VLAN nativa do trunk core sem olhar contadores"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Quando a sugestão do assistente confere com o output real de show, o operador pode aceitar a hipótese e avançar no checklist clássico. Isso ilustra o uso correto do digital network assistant: acelerar a correlação, não pular validação. CRC/erros de input orientam isolamento L1/L2 do link, não reload imediato nem mudanças de VLAN sem relação.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A AI do plantão propõe o comando: show ip route-map-fast-diagnostic detail all-vrf. O IOS do roteador não reconhece o comando. O que isso exemplifica e o que fazer?",
+    "alternativas": [
+      "Bug de OSPF; aplicar clear ip ospf process",
+      "Falta de licença DNA; ignorar qualquer show",
+      "Necessidade de treinar o modelo no device antes de usar CLI",
+      "Alucinação de CLI; rejeitar o comando e usar shows válidos da plataforma"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Comando inventado ou syntax inválida é risco clássico de alucinação. A postura operacional é rejeitar a linha sugerida e validar com CLI real suportada (show ip route, show ip ospf neighbor, etc.). Não se resolve alucinação com clear de protocolo nem com treino de modelo no equipamento — fora do escopo e da prática segura de NOC.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Incidente: um único host não acessa a aplicação. A agentic AI recomenda clear ip ospf process no ABR em horário de pico. show ip ospf neighbor mostra adjacências FULL estáveis. Qual a melhor decisão?",
+    "alternativas": [
+      "Recusar o clear de OSPF por escopo excessivo e isolar o host (VLAN, porta, IP, gateway, ACL)",
+      "Executar o clear imediatamente para 'reconvergir a rede'",
+      "Desligar todos os uplinks do building switch",
+      "Aceitar o clear porque AI agentic sempre tem prioridade sobre evidência"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sintoma localizado em um host com OSPF saudável não justifica reiniciar o processo de roteamento no ABR. Isso é escopo excessivo e risco de impacto amplo. O operador deve preferir checks locais e rejeitar recomendações de grande blast radius quando a evidência não sustenta falha de adjacência ou de tabela de roteamento global.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual contraste mais preciso entre generative AI e agentic AI em operações de rede?",
+    "alternativas": [
+      "Generative só funciona offline; agentic só funciona com SNMP v1",
+      "Generative gera texto/conteúdo; agentic pode usar ferramentas e encadear passos com contexto de rede",
+      "Generative configura devices; agentic apenas traduz manuais",
+      "Não há diferença operacional relevante no NOC"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Generative AI produz texto e exemplos; agentic AI, no sentido operacional, planeja e pode acionar ou propor uso de ferramentas com contexto (estado, logs, inventário), encadeando etapas de diagnóstico. Ambos podem coexistir em um copiloto, mas a distinção importa no exame e na prática de validação.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O assistente afirma: \"perda de pacotes causada por ACL no data plane do core\". Evidência: ping entre hosts da mesma VLAN ok; falha só no SSH de gestão; show running-config | section line vty mostra access-class restritivo. O que fazer?",
+    "alternativas": [
+      "Remover todas as ACLs de interface do core",
+      "Aplicar default route flutuante para contornar a AI",
+      "Rejeitar a culpa no data plane e investigar plano de gestão (VTY/access-class)",
+      "Executar debug all para validar a hipótese da AI"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A evidência separa planos: conectividade de dados ok e problema no acesso de gestão com access-class em VTY. Contexto incompleto da AI (não considerar plano de gestão) leva a hipótese errada. O operador corrige o foco para linha VTY/ACL de gestão, sem desmontar ACLs de data plane nem usar debug all.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Durante um incidente, a orquestração e o assistente digital ficam indisponíveis. Qual papel do CLI break-glass?",
+    "alternativas": [
+      "Proibir qualquer show até a AI voltar",
+      "Substituir permanentemente Ansible e controller",
+      "Permitir que o modelo reescreva a running-config sem log",
+      "Acesso de emergência ao device para diagnóstico e recuperação com procedimentos manuais"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "CLI break-glass é o acesso local/emergencial quando automação, controller ou assistente falham. O operador retoma show, isolamento e mudanças controladas manualmente. Não se espera ficar parado aguardando a AI, nem abandonar governança de automation no dia a dia.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A AI sugere: interface Gi1/0/48; shutdown. Logs mostram %PM-4-ERR_DISABLE: bpduguard error detected on Gi1/0/10. Qual validação o operador deve priorizar?",
+    "alternativas": [
+      "Investigar Gi1/0/10 (err-disable/BPDU Guard) em vez de derrubar Gi1/0/48 sem relação",
+      "Seguir a AI e desligar Gi1/0/48 por ser 'a porta mais alta'",
+      "Desabilitar Spanning Tree globalmente",
+      "Limpar NVRAM e recarregar o access switch"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O syslog aponta err-disable por BPDU Guard em Gi1/0/10. A sugestão de shutdown em outra porta não está ancorada na evidência. Validar e tratar a interface citada no log (causa, recovery, loop de usuário) é a ação coerente com avaliação de recomendações de agentic AI.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual é um papel típico de um digital network assistant em troubleshooting?",
+    "alternativas": [
+      "Assinar mudanças de produção sem registro de auditoria",
+      "Correlacionar sintomas, resumir logs e sugerir próximos checks/comandos de diagnóstico",
+      "Treinar redes neurais nos roteadores de borda",
+      "Substituir a necessidade de topologia e inventário"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O copiloto de operações ajuda a correlacionar sintomas, resumir syslog e propor hipóteses e comandos de leitura. Não treina modelos no hardware, não elimina a necessidade de topologia e não deve aplicar changes sem governança. O operador permanece responsável pela validação.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Playbook Ansible de coleta de facts falhou em 2 hosts. A AI escreve: \"ignore o RECAP e force ansible-playbook --force-all-write\". Qual a melhor resposta operacional?",
+    "alternativas": [
+      "Aceitar, pois agentic AI substitui inventário e RECAP",
+      "Rodar o playbook em produção com --force sem revisar falhas",
+      "Usar o RECAP/inventário como autoridade e investigar a falha nos 2 hosts antes de qualquer write",
+      "Apagar o inventory.yml e regenerar com texto livre da AI"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Automation determinística (Ansible) usa inventário e RECAP como controle. O assistente pode sugerir próximos passos, mas não anula a governança: falhas de coleta pedem diagnóstico (conectividade, credencial, host key), não write forçado. AI e automation se complementam; automation versionada e auditável manda na execução.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "O assistente recomenda conf t; no router ospf 1 com base apenas em um comentário de ticket antigo. Nenhuma evidência atual de OSPF foi coletada. Qual risco está em jogo?",
+    "alternativas": [
+      "Excesso de autenticação TACACS",
+      "Uso correto de agentic AI com ferramentas",
+      "Vantagem de generative AI sobre show commands",
+      "Contexto incompleto e risco de mudança destrutiva sem validação"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Propor remoção de processo OSPF sem show ip ospf neighbor, logs atuais ou topologia é contexto incompleto e ação potencialmente catastrófica. A prática correta é coletar evidência (ferramentas de leitura) e só então avaliar mudança em janela adequada. AI sugere ≠ aplicar cego.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cenário: AI lista três hipóteses para lentidão (duplex, QoS, saturação de WAN). O operador tem apenas show interfaces do access switch com 0 erros e duplex full. Qual o próximo passo mais alinhado a validação operacional?",
+    "alternativas": [
+      "Coletar mais evidência (utilização WAN, marks QoS, ping/traceroute) antes de aplicar qualquer fix",
+      "Aplicar as três correções da AI ao mesmo tempo",
+      "Desligar QoS em toda a rede porque a AI citou QoS",
+      "Ignorar a AI e recarregar o access switch"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O assistente pode gerar hipóteses; o operador prioriza coleta e eliminação. Com interface de acesso limpa, é preciso ampliar o contexto (caminho, WAN, políticas) com ping/traceroute e shows relevantes. Aplicar três fixes simultâneos ou reload sem causa impede isolamento e aumenta risco.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um gerente pede para 'deixar a AI aplicar sozinha qualquer comando que ela achar necessário' com credencial de enable em todos os devices. Qual problema principal?",
+    "alternativas": [
+      "Melhora a idempotência do Ansible automaticamente",
+      "Viola least privilege e amplia risco de comando destrutivo/escopo excessivo",
+      "Garante zero alucinação de CLI",
+      "É requisito do blueprint 5.1 para aprovação no exame"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Credencial ampla e execução autônoma sem política elevam risco de mudanças indevidas e blast radius. O tópico de agentic AI no CCNA enfatiza papel assistivo e avaliação humana, não autonomia irrestrita. Least privilege e validação permanecem fundamentais.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A AI diz que o prefixo 10.10.10.0/24 sumiu da tabela porque 'o switch de acesso não roda BGP'. show ip route no gateway do host mostra a rota via OSPF. Qual conclusão?",
+    "alternativas": [
+      "Ativar BGP em todos os access switches",
+      "Apagar o processo OSPF e migrar para rotas estáticas",
+      "Rejeitar a explicação da AI: a evidência mostra rota presente via OSPF no gateway",
+      "Confiar na AI e abrir chamado só com o vendor de BGP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A evidência local (show ip route) contradiz a narrativa do assistente. Access switches tipicamente não precisam de BGP para um /24 de usuário se o gateway tem a rota via IGP. O operador valida com a tabela de roteamento real e descarta hipóteses incompatíveis com o output.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual afirmação sobre o uso de agentic AI com controller/SDN está mais correta?",
+    "alternativas": [
+      "O copiloto substitui a política do controller e deve sobrescrever intent sem auditoria",
+      "CLI break-glass torna o controller obsoleto quando existe AI",
+      "Generative AI é obrigatória para qualquer assurance",
+      "O assistente pode resumir assurance/alertas, mas política do controller e topologia real prevalecem"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Controller mantém intent e visão centralizada; o assistente ajuda a resumir e priorizar. A política e o estado real continuam autoridade. CLI break-glass é emergência, não substituto permanente. Automation e AI complementam, não anulam o desenho controlado.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ticket: usuários sem internet. AI: \"problema de DNS; apague ip name-server em todos os roteadores\". Evidência: ping 8.8.8.8 falha; ping ao gateway falha; ARP incompleto no SVI. Qual ação?",
+    "alternativas": [
+      "Não remover name-servers ainda: isolar L2/L3 local (SVI, ARP, gateway) antes de mexer em DNS",
+      "Apagar name-servers globalmente conforme a AI",
+      "Desabilitar DHCP snooping em todo o campus",
+      "Habilitar telnet na VTY para 'testar DNS'"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem reachability ao gateway e com ARP incompleto, o problema não se resolve apagando DNS. A AI pode ter pulado camadas. O operador usa a evidência para focar L2/L3 local. Remover name-server cedo é mudança sem fundamento e pode piorar resolução quando a conectividade voltar.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um engenheiro usa um chatbot genérico (sem inventário nem outputs) e pede 'a config completa do core'. Qual limitação em relação a um assistente agentic com contexto?",
+    "alternativas": [
+      "Chatbot genérico sempre gera CLI 100% validada no device",
+      "Sem contexto de rede e ferramentas, o texto gerado tende a ser genérico e não ancorado no estado real",
+      "Chatbot genérico aplica changes via NETCONF automaticamente",
+      "Não há diferença se ambos usam português"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Generative sem telemetria/estado produz texto genérico e maior risco de config inadequada. Agentic com ferramentas e contexto pode basear hipóteses em dados coletados — ainda assim exige validação humana. O idioma do prompt não elimina a necessidade de evidência.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A AI recomenda write erase e reload 'para limpar estados inconsistentes' após um único alarme de interface flapping que já estabilizou. show logging mostra flap antigo, interfaces up/up. O que fazer?",
+    "alternativas": [
+      "Executar write erase fora de janela se a AI for agentic",
+      "Aceitar porque flapping sempre exige reinstalação de IOS",
+      "Rejeitar write erase/reload: impacto extremo sem evidência atual de falha sistêmica",
+      "Aplicar write erase só no supervisor standby sem backup"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Write erase/reload é ação de último recurso e destrutiva. Com interfaces estáveis e histórico antigo, a recomendação é desproporcional. Avaliação operacional exige proporcionalidade: preferir monitoramento, contadores e causa raiz local em vez de repor o device.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual sequência melhor representa o ciclo de validação de uma recomendação de agentic AI no NOC?",
+    "alternativas": [
+      "Aplicar change → se piorar, abrir ticket → ler show",
+      "Confiar no modelo → pular topologia → documentar depois",
+      "Recarregar device → comparar com AI → fechar incidente",
+      "Ler sugestão → checar impacto/topologia → coletar show/ping → só então considerar mudança"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O ciclo saudável coloca a evidência antes da mudança: entender a sugestão, avaliar blast radius e topologia, validar com comandos de leitura e só então planejar alteração. Inverter a ordem aumenta outage e dificulta rollback consciente.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "O assistente resume: \"OSPF neighbor DOWN com 10.0.0.2\". O operador confere e vê FULL/DR com 10.0.0.2 há horas. Qual a resposta correta?",
+    "alternativas": [
+      "Tratar o resumo como desatualizado/incorreto e confiar no show ip ospf neighbor atual",
+      "Forçar clear ip ospf process para alinhar a AI",
+      "Desligar a interface do neighbor para 'reconstruir o estado'",
+      "Apagar a rota default porque a AI citou DOWN"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Quando o estado ao vivo contradiz o resumo do assistente, prevalece a evidência CLI atual. Pode haver cache, ticket antigo ou contexto incompleto. Não se deve forçar reconvergência para 'agradar' o modelo.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A AI sugere debug ip packet detail em produção em core com alto tráfego para 'confirmar hipótese de ACL'. Qual a melhor atitude?",
+    "alternativas": [
+      "Aceitar debug detail em core sem filtro, pois AI agentic garante segurança",
+      "Preferir métodos de menor impacto (shows de ACL/contadores, captures pontuais) e evitar debug pesado em produção",
+      "Habilitar debug all para acelerar o TShoot",
+      "Desligar CEF para o debug funcionar melhor"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Mesmo recomendações de diagnóstico podem ser perigosas. debug ip packet detail em core pode impactar CPU. O operador escolhe coleta de baixo impacto e filtra escopo. Agentic AI não remove a responsabilidade de avaliar risco do comando sugerido.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "No blueprint CCNA v2.0, o tópico de agentic AI pede principalmente que o candidato:",
+    "alternativas": [
+      "Implemente fine-tuning de LLM em GPU no data center",
+      "Desenvolva um SDK Python de agents multi-hop",
+      "Descreva o papel da agentic AI e avalie recomendações em contexto de operações/TShoot",
+      "Substitua todo troubleshooting manual por modelos generativos offline"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O escopo 200-301 é operacional: descrever o papel e avaliar outputs/recomendações de agentic AI e assistentes digitais. Não inclui treinar modelos, SDKs avançados ou eliminar o TShoot clássico. Foque em validação com evidência de rede.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "AI: \"adicione ip route 0.0.0.0 0.0.0.0 10.9.9.9\" no edge. traceroute e tabela atual já usam default via 10.1.1.1 com conectividade ok; o sintoma é falha de impressora na VLAN 30. Qual decisão?",
+    "alternativas": [
+      "Trocar a default route conforme a AI para 'otimizar'",
+      "Remover OSPF e usar só estáticas",
+      "Criar default route flutuante com AD 1 para forçar 10.9.9.9",
+      "Rejeitar a mudança de default: sintoma é local (VLAN 30); validar gateway/SVI/porta da impressora"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Alterar a default route do edge com rede ok é escopo errado e risco alto. O sintoma aponta segmento da impressora. O operador alinha a ação ao blast radius mínimo e à evidência, rejeitando sugestão desconectada do problema.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual risco de 'contexto incompleto' está melhor exemplificado?",
+    "alternativas": [
+      "A AI analisa só o data plane e culpa o caminho de usuário, mas o falha é VRF/ACL de gestão que ela não viu",
+      "O operador roda show logging com filtro",
+      "O inventário Ansible lista hostnames corretos",
+      "O controller exibe o status de um fabric switch"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Contexto incompleto ocorre quando o assistente não tem visão de VRF de gestão, ACL de VTY, janela de change ou topologia completa e ainda assim emite causa raiz. Separar planos de dados e gestão é habilidade-chave ao avaliar recomendações.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "O digital assistant propõe uma lista de 5 comandos show em ordem (interface → MAC → VLAN → STP → logs) para um problema de host isolado. Nenhum write. O que caracteriza isso?",
+    "alternativas": [
+      "Uso inadequado porque AI nunca deve sugerir CLI",
+      "Uso adequado de assistência: checklist de leitura que o operador ainda valida e executa",
+      "Mudança destrutiva automática no data plane",
+      "Fine-tuning do modelo via SNMP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sugerir sequência de shows de baixo impacto é exatamente o papel útil do assistente: acelerar o checklist. O operador ainda decide, executa e interpreta. Isso não é write automático nem treino de modelo.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "A AI gera um parágrafo excelente explicando EtherChannel, mas sem ver o device. O operador precisa saber por que o port-channel está down. Qual limitação?",
+    "alternativas": [
+      "A explicação teórica já prova que o cabo está quebrado",
+      "Basta colar a explicação no ticket e fechar como resolvido",
+      "Texto generative sem estado do device não substitui show etherchannel summary e logs locais",
+      "O controller proíbe qualquer show quando há texto da AI"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Conteúdo generative ajuda no conceito, mas troubleshooting exige estado: summary do EtherChannel, protocol (LACP), erros de interface e logs. Sem ferramentas/contexto, a AI não fecha o diagnóstico operacional.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após a AI sugerir shutdown em uplink, o operador documenta no ticket: 'sugestão rejeitada; evidência aponta err-disable em porta de acesso'. Qual valor dessa prática?",
+    "alternativas": [
+      "Nenhum; tickets não devem mencionar AI",
+      "Prova que automation deve ser desligada para sempre",
+      "Indica que generative AI é proibida no NOC",
+      "Registra validação humana e melhora aprendizado operacional sem aplicar ação indevida"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Documentar por que uma recomendação foi rejeitada reforça o ciclo AI sugere → humano valida → evidência manda. Ajuda auditoria e postmortem. Não implica banir assistentes nem automation; implica governança.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual combinação melhor descreve o encaixe entre agentic AI, Ansible e CLI?",
+    "alternativas": [
+      "Ansible treina a AI; CLI fica obsoleto; AI aplica write erase diário",
+      "CLI só existe para desligar a AI; Ansible proíbe shows",
+      "AI analisa e sugere; Ansible aplica mudanças com inventário/RECAP e governança; CLI serve de break-glass e validação fina",
+      "Os três fazem a mesma função e são intercambiáveis sem processo"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Papéis distintos e complementares: o assistente acelera análise e hipóteses; automation versionada executa mudanças controladas; CLI valida e recupera em emergência. Entender a separação evita uso cego de qualquer um dos três.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Plantão noturno: AI insiste em 'problema de IPv6 RA' mas o host é IPv4-only e o sintoma é DHCP esgotado na VLAN. show ip dhcp pool confirma zero leases livres. Qual ação?",
+    "alternativas": [
+      "Habilitar IPv6 em todos os hosts para seguir a AI",
+      "Configurar RA Guard global como primeira ação",
+      "Desativar DHCP e migrar para IPs manuais em massa",
+      "Rejeitar o foco em RA IPv6 e tratar o esgotamento do pool DHCP IPv4 conforme a evidência"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A evidência do pool DHCP IPv4 esgotado e o perfil IPv4-only do host invalidam a hipótese de RA IPv6. O operador ancora o TShoot nos fatos e rejeita recomendação desalinhada — exemplo direto de avaliação de saída de agentic AI em operações.",
+    "part_id": "v2-5.1"
+  }
+]

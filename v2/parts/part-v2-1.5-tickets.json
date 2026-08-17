@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1501: AP-SALA-3 ligado (PoE delivering, porta connected) mas não aparece joined no WLC. SSID campus não sobe nessa sala.",
+    "cli_output": "SW-ACC# show interfaces Gi1/0/24 status\nPort      Name         Status       Vlan  Duplex  Speed Type\nGi1/0/24  AP-SALA-3    connected    40    a-full  a-1000 10/100/1000BaseTX\n\nSW-ACC# show run interface Gi1/0/24\ninterface GigabitEthernet1/0/24\n description AP-SALA-3\n switchport mode access\n switchport access vlan 40\n spanning-tree portfast\n no shutdown\n\nSW-ACC# show vlan brief | include 20|40\n20   AP-MGMT                          active\n40   USERS                            active    Gi1/0/24, ...\n\nWLC# show ap summary\nAP Name     Slots  AP Model  Ethernet MAC   Location  Country  IP Address   State\nAP-SALA-1   2      AIR-AP    aaaa.bbbb.0001 FLOOR1    BR       10.20.0.11   Joined\n(no AP-SALA-3)\n\nDesign: AP management VLAN 20 / 10.20.0.0/24 · WLC mgmt 10.20.0.5",
+    "alternativas": [
+      "Corrigir switchport access vlan 20 (management do AP) e validar reachability CAPWAP ao WLC",
+      "Aumentar potência RF no rádio 5 GHz",
+      "Configurar ip nat inside na porta do AP",
+      "Remover PortFast para forçar join"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "PoE e connected ok, mas access vlan 40 (USERS) coloca o AP fora da management 20 onde o WLC e discovery vivem. Sem path CAPWAP correto o AP não junta. RF, NAT e PortFast não movem a VLAN de management.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1502: AP-CORREDOR joined no WLC; SSID CORP anuncia; clientes associam mas não obtêm IP da VLAN 40. Desenho: access management no AP e dados centralizados no WLC.",
+    "cli_output": "WLC# show ap summary\nAP Name        State    IP Address\nAP-CORREDOR    Joined   10.20.0.18\n\nWLC# show wlan summary\nWLAN ID  SSID   Status  Interface\n1        CORP   Enabled none / not mapped\n\nSW-ACC# show interfaces Gi1/0/12 status\nPort      Name          Status     Vlan  Duplex Speed\nGi1/0/12  AP-CORREDOR   connected  20    a-full a-1000\n\nSW-ACC# show run interface Gi1/0/12\ninterface GigabitEthernet1/0/12\n description AP-CORREDOR\n switchport mode access\n switchport access vlan 20\n spanning-tree portfast\n\nSW-ACC# show vlan brief | include 20|40\n20   AP-MGMT   active    Gi1/0/12\n40   USERS     active\n\nClient: associated CORP · DHCP timeout · expected 10.40.0.0/24",
+    "alternativas": [
+      "Trocar o cabo Cat5e por fibra monomodo no AP",
+      "Desligar CAPWAP no WLC para forçar local DHCP",
+      "Bind da WLAN CORP à interface/VLAN 40 e validar DHCP na VLAN de usuários",
+      "Mudar access vlan do AP para 1 (default) resolve DHCP de usuário"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "AP joined e porta management 20 ok; o gap é WLAN sem interface/VLAN. Sem bind à VLAN 40 não há path de dados/DHCP de usuário. Cabo, desligar CAPWAP e access vlan 1 não criam o bind do SSID.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1503: design multi-VLAN no cabo do AP (trunk). AP intermitente no join; management deveria ser VLAN 20 untagged (native). Após mudança de switch, SSID some na ala.",
+    "cli_output": "SW-ACC# show run interface Gi1/0/30\ninterface GigabitEthernet1/0/30\n description AP-ALA-B\n switchport trunk encapsulation dot1q\n switchport mode trunk\n switchport trunk native vlan 1\n switchport trunk allowed vlan 20,40,50\n spanning-tree portfast trunk\n\nSW-ACC# show interfaces trunk\nPort        Mode         Encapsulation  Status        Native vlan\nGi1/0/30    on           802.1q         trunking      1\nPort        Vlans allowed on trunk\nGi1/0/30    20,40,50\n\nSW-ACC# show interfaces Gi1/0/30 status\nGi1/0/30  AP-ALA-B  connected  trunk  a-full  a-1000\n\nWLC# show ap summary\nAP-ALA-B   Not Joined   0.0.0.0\n\nAP expects untagged CAPWAP on VLAN 20 (native 20)",
+    "alternativas": [
+      "Remover VLAN 40 do allowed (piora usuários)",
+      "Habilitar ip routing na access do AP",
+      "Converter o WLC em FlexConnect global sem trunk",
+      "Alinhar switchport trunk native vlan 20 à management do AP e revalidar join"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Native 1 com management untagged esperando 20 causa CAPWAP na VLAN errada. Allowed já tem 20,40,50; o mismatch é native. Corrija native 20. Remover 40 e ip routing na porta do AP não corrigem o untagged management.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1504: AP-SALA-1 joined; WLAN GUEST criado com SSID e PSK, mas não aparece nos clientes e sem contadores de associação. Interface dinâmica do guest não associada.",
+    "cli_output": "WLC# show ap summary\nAP-SALA-1   Joined   10.20.0.11\nAP-SALA-2   Joined   10.20.0.12\n\nWLC# show wlan summary\nWLAN ID  Profile   SSID    Status   Interface\n1        CORP      CORP    Enabled  vlan40\n2        GUEST     GUEST   Enabled  management  (wrong / no guest dyn interface)\n\nWLC# show interface summary\nInterface Name   VLAN Id   IP Address     Status\nmanagement       20        10.20.0.5      Up\nvlan40           40        10.40.0.1      Up\n(no vlan60 guest interface created/bound)\n\nDesign guest: VLAN 60 · DHCP 10.60.0.0/24 · dyn interface vlan60 missing on WLAN GUEST\n\nSW-DIST# show vlan brief | include 60\n60   GUEST   active",
+    "alternativas": [
+      "Desligar todos os APs e recriar SSIDs CORP",
+      "Associar WLAN GUEST à interface dinâmica VLAN 60 (criar/bind) e validar path/DHCP guest",
+      "Mudar native trunk de todos os APs para 60",
+      "Habilitar LAG no access switch do AP para o SSID aparecer"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "APs joined e CORP ok; GUEST aponta para management em vez da VLAN 60. Crie a interface dinâmica guest e faça o bind. Derrubar APs, forçar native 60 e LAG no access do AP não corrigem o bind do WLAN.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1505: engenheiro habilitou LAG no WLC e configurou Port-channel no switch de distribuição. Uplinks do WLC não agregam como esperado; APs flapeiam. Config salva no WLC sem reboot ainda.",
+    "cli_output": "WLC# show lag summary\nLAG Enabled\n(note: change pending / requires reboot on this platform)\n\nDIST# show etherchannel summary\nFlags: D - down  P - bundled in port-channel\nGroup  Port-channel  Protocol    Ports\n1      Po1(SU)         LACP      Gi1/0/1(P)  Gi1/0/2(P)\n\nDIST# show run interface Po1\ninterface Port-channel1\n description WLC-LAG\n switchport mode trunk\n switchport trunk allowed vlan 20,40,50,60\n\nDIST# show interfaces status | include Gi1/0/1|Gi1/0/2|Po1\nGi1/0/1  WLC-1   connected  trunk  a-full a-1000\nGi1/0/2  WLC-2   connected  trunk  a-full a-1000\nPo1      WLC-LAG connected  trunk  a-full a-1000\n\nWLC management path unstable after LAG enable; last change: lag enable + write mem, no reload",
+    "alternativas": [
+      "Remover o Port-channel e usar só access vlan 1 no WLC",
+      "Desabilitar CAPWAP em todos os APs",
+      "Reboot do WLC para aplicar LAG (ideia de prova) e revalidar EtherChannel/trunk com o switch",
+      "Configurar spanning-tree portfast no Po1 do core como único fix"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Switch já mostra Po1 bundlado; o WLC indica LAG enabled com mudança pendente de reboot. Aplique o reload do controller e revalide path. Access vlan 1, matar CAPWAP e PortFast no Po1 não aplicam o LAG no WLC.",
+    "part_id": "v2-1.5"
+  }
+]

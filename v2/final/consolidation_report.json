@@ -1,0 +1,92 @@
+{
+  "generated_at": "2026-08-14T21:53:43.849Z",
+  "script": "v2/scripts/consolidate_v2.mjs",
+  "parts_found": [
+    "v2-1.1",
+    "v2-1.5",
+    "v2-1.6",
+    "v2-1.7",
+    "v2-2.2",
+    "v2-2.4",
+    "v2-2.5",
+    "v2-3.2",
+    "v2-3.3",
+    "v2-3.4",
+    "v2-4.2",
+    "v2-4.3",
+    "v2-4.4",
+    "v2-4.6",
+    "v2-4.7",
+    "v2-5.1",
+    "v2-5.2"
+  ],
+  "parts_found_keys": [
+    "1.1",
+    "1.5",
+    "1.6",
+    "1.7",
+    "2.2",
+    "2.4",
+    "2.5",
+    "3.2",
+    "3.3",
+    "3.4",
+    "4.2",
+    "4.3",
+    "4.4",
+    "4.6",
+    "4.7",
+    "5.1",
+    "5.2"
+  ],
+  "parts_count": 17,
+  "inventory_summary": {
+    "content_files": 17,
+    "questions_files": 17,
+    "tickets_files": 17,
+    "raw_questions": 510,
+    "raw_tickets": 85
+  },
+  "traditional": {
+    "before_filter": 510,
+    "after_filter": 510,
+    "rejected": 0,
+    "deduped_removed": 4,
+    "final_count": 506
+  },
+  "tickets": {
+    "before_filter": 85,
+    "after_filter": 85,
+    "rejected": 0,
+    "deduped_removed": 0,
+    "final_count": 85
+  },
+  "reject_samples": [],
+  "reject_total": 0,
+  "free_vs_premium": {
+    "free": 170,
+    "premium": 336,
+    "free_plus_premium": 506
+  },
+  "outputs": [
+    "v2/final/inventory_report.json",
+    "v2/final/questions_v2_traditional.json",
+    "v2/final/tickets_v2.json",
+    "v2/final/parts_index.json",
+    "v2/final/consolidation_report.json"
+  ],
+  "samples": {
+    "traditional": {
+      "id": 1,
+      "part_id": "v2-1.1",
+      "enunciado": "show interfaces Gi1/0/12 mostra late collisions subindo e o status local em half; o vizinho está a-f"
+    },
+    "ticket": {
+      "id": 1,
+      "part_id": "v2-1.1",
+      "sintoma": "NOC-1101: servidor de arquivos lento e timeouts. Após hardcode de duplex no switch, o problema pioro"
+    }
+  },
+  "parts_untouched": true,
+  "confirmation": "v2/parts/ não foi modificado"
+}

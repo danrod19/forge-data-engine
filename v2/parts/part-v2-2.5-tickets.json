@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2501: tráfego da VLAN 40 sobe pelo access do prédio A; path subótimo. Root não é o core.",
+    "cli_output": "CORE# show spanning-tree vlan 40 | include Root ID|Bridge ID|Priority\nRoot ID    Priority    32768\n           Address     aabb.cc00.0001\nBridge ID  Priority    32768\n           Address     aabb.cc00.0001\n\nACC-A# show spanning-tree vlan 40 | include Root ID|Bridge ID|Priority\nRoot ID    Priority    24576\n           Address     aabb.cc11.aaaa\nBridge ID  Priority    24576\n           Address     aabb.cc11.aaaa\n\nACC-A# show run | include spanning-tree vlan 40\nspanning-tree vlan 40 priority 24576\n\nCORE# show run | include spanning-tree vlan 40\n (no priority command — default 32768)\n\nDesign intent: CORE should be root for VLAN 40",
+    "alternativas": [
+      "BPDU Guard no CORE",
+      "PortFast no uplink do CORE",
+      "ACC-A venceu a eleição (priority 24576 < 32768) — baixar priority no CORE (root primary) e subir no access",
+      "DHCP snooping trust ausente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Root ID em ACC-A com priority 24576 explica o root no access. Configure root primary no CORE (priority menor) e remova a priority baixa do access. Não é snooping nem PortFast no core uplink.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2502: após 'otimizar' uplinks, tempestade de broadcast intermitente entre SW-A e SW-B.",
+    "cli_output": "SW-A# show run interface Gi1/0/48\ninterface GigabitEthernet1/0/48\n description UPLINK-TO-SW-B\n switchport mode trunk\n spanning-tree portfast\n spanning-tree bpduguard enable\n\nSW-A# show spanning-tree interface Gi1/0/48\nVlan Role Sts Cost  Prio.Nbr Type\n---- ---- --- ----- -------- ----\nVLAN0040 Desg BLK 19    128.48  P2p Edge\n% intermittent err-disable / flapping observed\n\nSW-B# show spanning-tree vlan 40 | include Root ID\nRoot ID Priority 32768 Address aabb.cc00.00bb\n\nLog SW-A:\n%SPANTREE-2-BLOCK_BPDUGUARD: Received BPDU on port Gi1/0/48 with BPDU Guard enabled\n%PM-4-ERR_DISABLE: bpduguard error detected on Gi1/0/48",
+    "alternativas": [
+      "Manter PortFast+Guard no uplink — é best practice inter-switch",
+      "Remover PortFast e BPDU Guard do uplink trunk; edge fica só em access de host",
+      "Desligar STP na VLAN 40",
+      "Configurar o uplink como access vlan 1"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "PortFast+BPDU Guard em uplink entre switches é misconfig: BPDUs legítimos do peer disparam err-disable e a topologia fica instável. Tire edge features do inter-switch. Não desligue STP.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2503: mesa do usuário caiu; porta vermelha. Notebook estava ok; alguém pluggou um switch de 5 portas.",
+    "cli_output": "SW# show interfaces Gi1/0/12 status\nPort      Name      Status         Vlan Duplex Speed\nGi1/0/12  MESA-12   err-disabled   40   auto   auto\n\nSW# show run interface Gi1/0/12\ninterface GigabitEthernet1/0/12\n switchport mode access\n switchport access vlan 40\n spanning-tree portfast\n spanning-tree bpduguard enable\n\nSW# show logging | include Gi1/0/12|BPDU\n%SPANTREE-2-BLOCK_BPDUGUARD: Received BPDU on port Gi1/0/12 with BPDU Guard enabled\n%PM-4-ERR_DISABLE: bpduguard error detected on Gi1/0/12, putting Gi1/0/12 in err-disable state\n\nSW# show spanning-tree interface Gi1/0/12\n% no spanning tree info (err-disabled)",
+    "alternativas": [
+      "Root priority errada no core apenas",
+      "Falta de ip helper-address",
+      "SFP optical fault",
+      "BPDU Guard derrubou a access ao receber BPDU do mini-switch — remover o device e recuperar a porta"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Log BPDU Guard + PortFast na access + err-disabled fecham o diagnóstico. Remova o switch de mesa e reative a porta. Helper e root do core não geram esse log.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2504: técnico de campo diz que o segundo uplink 'está morto' e quer trocar o cabo. Evidência:",
+    "cli_output": "SW-ACC# show interfaces Gi1/0/47 status\nPort      Name         Status    Vlan  Duplex Speed\nGi1/0/47  UPLINK-B     connected trunk a-full a-1000\n\nSW-ACC# show spanning-tree vlan 40 interface Gi1/0/47\nVlan Role Sts  Cost  Prio.Nbr Type\n---- ---- ---- ----- -------- ----\n  40 Altn BLK  19    128.47   P2p\n\nSW-ACC# show spanning-tree vlan 40 interface Gi1/0/48\nVlan Role Sts  Cost  Prio.Nbr Type\n---- ---- ---- ----- -------- ----\n  40 Root FWD  19    128.48   P2p\n\nSW-ACC# show spanning-tree vlan 40 | include Root ID\nRoot ID Priority 24576 Address aabb.cc00.core\n\nPing to gateway via active topology: OK",
+    "alternativas": [
+      "Trocar o cabo de Gi1/0/47 imediatamente — BLK significa L1 down",
+      "Desligar STP para 'ativar' o segundo uplink",
+      "Porta alternate blocked com link up é normal — caminho de backup; não é cabo morto",
+      "Configurar PortFast no uplink B"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Connected + Altn BLK com Root FWD no outro uplink é topologia STP saudável. O segundo path fica de backup. Trocar cabo ou PortFast no uplink piora. Explique o papel alternate.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2505: após change, CPU alta, MAC flapping VLAN 50, usuários offline. Dois trunks paralelos no access.",
+    "cli_output": "SW-ACC# show run | include spanning-tree vlan 50\nno spanning-tree vlan 50\n\nSW-ACC# show mac address-table dynamic vlan 50 | count\n% high move count / flapping between Gi1/0/47 and Gi1/0/48 (ops note)\n\nSW-ACC# show interfaces Gi1/0/47 status\nGi1/0/47  UPLINK-A  connected  trunk a-full a-1000\nSW-ACC# show interfaces Gi1/0/48 status\nGi1/0/48  UPLINK-B  connected  trunk a-full a-1000\n\nSW-DIST# show spanning-tree vlan 50\n% Spanning tree instance(s) for vlan does not exist. / or STP off on peer for vlan 50\n\nLog users: broadcast storm / network slow\nChange ticket: 'disabled STP on vlan 50 to fix blocked port complaints'",
+    "alternativas": [
+      "Reabilitar spanning-tree na VLAN 50 e deixar o STP bloquear um path — loops com dois trunks ativos",
+      "Manter STP off e adicionar mais um trunk",
+      "Só aumentar a priority para 61440 em todos",
+      "Só configurar BPDU Guard nos uplinks e manter STP off"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "no spanning-tree vlan 50 com dois uplinks connected cria loop L2 (flapping/storm). A correção é reabilitar STP e aceitar o bloqueio de um path. Mais trunks sem STP piora. BPDU Guard nos uplinks não substitui a árvore.",
+    "part_id": "v2-2.5"
+  }
+]

@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Em redes tradicionais no discurso do CCNA, o control plane é tipicamente:",
+    "alternativas": [
+      "Distribuído — cada device executa protocolos e toma decisões localmente",
+      "Inexistente — só há data plane",
+      "Somente no smartphone do usuário",
+      "Exclusivo de servidores DNS públicos"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Cada roteador/switch roda seu OSPF, STP, etc., de forma distribuída. O data plane existe junto. Controller-based centraliza a orquestração de policy. DNS público não define o control plane da campus network.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Arquitetura controller-based destaca-se por:",
+    "alternativas": [
+      "Eliminar todos os switches físicos",
+      "Centralizar a inteligência de policy e a visão da rede em um controller",
+      "Proibir qualquer data plane nos devices",
+      "Substituir Ethernet por apenas Wi-Fi Open"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O controller coordena inventário, policy e automação; devices continuam encaminhando. Não some o hardware nem o data plane. Open Wi-Fi não é requisito SDN.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O data plane é responsável por:",
+    "alternativas": [
+      "Somente autenticação RADIUS de admin",
+      "Somente gerar chaves SSH",
+      "Encaminhar frames/pacotes nas interfaces com base nas tabelas programadas",
+      "Somente hospedar o portal northbound"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Data plane = forwarding. Control plane popula decisões; management plane cobre SSH/API de gestão. Portal northbound é eixo de aplicação/controller, não o encaminhamento do usuário na porta.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O management plane inclui tipicamente:",
+    "alternativas": [
+      "Apenas o hash do OSPF LSA",
+      "Apenas a fila de prioridade de voz sem gestão",
+      "Apenas o bit de CoS no tronco sem SSH",
+      "Acesso e gestão do device — SSH, SNMP, APIs de inventário/gestão"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Management plane é como se opera o box. OSPF é control plane; QoS de voz no data/control de policy. Sintoma clássico: usuário navega (data ok) mas admin não entra por SSH (management).",
+    "part_id": "6.1"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Southbound, no modelo SDN do exame, é a interface:",
+    "alternativas": [
+      "Do controller em direção aos network devices",
+      "Do browser do usuário final para o Google",
+      "Somente entre dois APs em mesh sem controller",
+      "Somente do smartphone para a App Store"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Southbound programa e monitora devices (APIs/protocolos de device; OpenFlow é ideia conceitual). Northbound é apps → controller. Não confunda com tráfego genérico de Internet do usuário.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Northbound refere-se a:",
+    "alternativas": [
+      "Somente cabos de console RJ-45",
+      "Aplicações/orquestração consumindo a API do controller",
+      "Somente o protocolo STP entre switches",
+      "Somente o data plane de uplink 40G"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Scripts, portais e orquestradores falam northbound com o controller. STP e data plane não definem northbound. Console é management local, não a API do controller.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Benefício central de um controller em operação multi-site:",
+    "alternativas": [
+      "Garantir que cada site invente VLANs diferentes sem template",
+      "Eliminar a necessidade de qualquer underlay IP",
+      "Consistência de policy, inventário central e automação de mudanças",
+      "Proibir assurance e health monitoring"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "DNA/controller no CCNA: inventário, policy, assurance. Underlay continua necessário. Drift manual é o oposto do benefício. Assurance é feature, não algo a proibir.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Afirmação correta sobre data plane em redes SDN/controller-based:",
+    "alternativas": [
+      "O data plane some e só o controller encaminha todos os frames de usuário",
+      "Switches não precisam de interfaces físicas",
+      "Não existe forwarding em hardware",
+      "Devices continuam encaminhando tráfego; o data plane não desaparece"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Mito clássico: achar que o controller vira o único data plane. Na prática campus, boxes ainda fazem forwarding. O controller orquestra. Interfaces físicas e ASICs seguem no jogo.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Control plane, em uma frase de prova:",
+    "alternativas": [
+      "É o plano que toma decisões de encaminhamento e roda protocolos (rotas, topologia, tabelas lógicas)",
+      "É apenas o cabo de fibra do core",
+      "É somente o portal de RH da empresa",
+      "É o mesmo que power supply redundancy"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Control plane decide o “como encaminhar”. Data plane executa. Management opera o device. Cabo e PSU não são control plane de rede.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "DNA Center no nível conceitual do CCNA é associado a:",
+    "alternativas": [
+      "Inventário, aplicação de policy e assurance da rede gerenciada",
+      "Somente criptografia WEP",
+      "Somente cabos crossover",
+      "Somente configuração de relógio de parede"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Três palavras de prova: inventário, policy, assurance. Não é WEP nem mídia física. O 6.1 não exige lab profundo de fabric — o papel operacional do controller.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dois switches “idênticos” em filiais: VLAN de voz e ACL divergem sem processo de template. Diagnóstico alinhado ao 6.1?",
+    "alternativas": [
+      "Drift de config manual — falta de policy centralizada/controller ou automação consistente",
+      "Prova de que o data plane sumiu nos dois sites",
+      "Prova de que northbound é o mesmo que southbound",
+      "Prova de que OpenFlow é obrigatório em todo access"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Inconsistência hop-a-hop é o sintoma que o controller/templates resolvem. Data plane não “some” por VLAN diferente. North≠south. OpenFlow não é requisito universal no campus Cisco do exame.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Usuários navegam; admin não alcança o device por SSH nem SNMP. Eixo de plano mais preciso?",
+    "alternativas": [
+      "Somente data plane de usuário quebrado",
+      "Management plane (gestão) degradado — data plane pode estar ok",
+      "Somente underlay óptico 100% cortado (sem tráfego de user)",
+      "Somente northbound de app de folha de pagamento"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Tráfego de usuário ok isola o data plane. SSH/SNMP são management. Não confunda com app northbound do controller. Underlay cortado derrubaria também o user em muitos casos.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Orquestrador recebe HTTP 503/timeout na API do controller; devices encaminham tráfego. Isolamento?",
+    "alternativas": [
+      "Falha de data plane em todas as portas access",
+      "Falha de STP root em todo o campus",
+      "Problema no caminho northbound (app ↔ controller), não necessariamente no forwarding de usuário",
+      "Prova de que southbound OpenFlow derrubou o Wi-Fi"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "API do controller é northbound. User data plane pode seguir. Não generalize STP ou Wi-Fi sem evidência. Teste reachability/credencial/health do controller.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Controller mostra device offline no inventário; ping ao IP de gestão falha. Eixo?",
+    "alternativas": [
+      "Somente bug de cipher WPA3",
+      "Somente mismatch de PSK wireless",
+      "Somente accounting TACACS de show run",
+      "Southbound/gestão do device — reachability ou gestão do box (inventário/controller não fala com o device)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Device offline no inventário + ping de gestão falho aponta path/management/southbound. Wireless PSK e TACACS de comando são outros eixos se o IP de gestão nem responde.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Controller cai; switches mantêm última config e usuários continuam com IP e gateway. Interpretação?",
+    "alternativas": [
+      "Impossível: sem controller o data plane para sempre",
+      "Impossível: VLANs apagam sozinhas em 3 segundos",
+      "Comportamento plausível: data plane local segue; novas policies centralizadas e automação param até o controller voltar",
+      "Prova de que management plane é o data plane"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Device órfão costuma encaminhar com o estado já programado. O que some é a orquestração central. Não misture planos. O content enfatiza que o data plane não depende 100% do controller a cada frame.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "OpenFlow no CCNA 6.1 deve ser tratado principalmente como:",
+    "alternativas": [
+      "Exemplo conceitual de comunicação southbound controller–device (ideia histórica/SDN)",
+      "Único protocolo permitido em DNA Center",
+      "Substituto obrigatório do Ethernet",
+      "Nome do northbound REST de todo fabricante"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O exame cita OpenFlow como conceito de southbound, sem lab profundo. DNA usa modelos/APIs próprios. Ethernet permanece. Northbound típico é API REST de apps, não “OpenFlow north”.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual contraste resume traditional vs controller-based?",
+    "alternativas": [
+      "Traditional nunca tem data plane; controller nunca tem management",
+      "Traditional centraliza tudo em um único ASIC global; controller distribui OSPF por usuário",
+      "Traditional: decisões de control plane por device; controller-based: policy/visão central no controller",
+      "Ambos proíbem automação e inventário"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "É o contraste de prova. Data/management existem nos dois mundos. Automação é benefício do controller, não proibição. Evite caricaturas sobre ASIC global.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Adjacência OSPF cai e a rota some; interfaces de usuário up e ping local ok. Plano mais afetado?",
+    "alternativas": [
+      "Somente management plane de Telnet",
+      "Control plane (decisão/protocolo) degradado — data plane local pode ainda responder na subnet",
+      "Somente northbound de folha de pagamento",
+      "Somente PSU do monitor do NOC"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "OSPF/rota = control plane. Ping na subnet connected mostra data plane local. Management e northbound são eixos diferentes. O 6.1 treina a separar os planos no diagnóstico.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "App de change management envia intent ao controller; o controller aplica nos switches. Caminho conceitual?",
+    "alternativas": [
+      "Northbound (app → controller) e depois southbound (controller → devices)",
+      "Somente southbound do app direto ao switch sem controller",
+      "Somente data plane do usuário final",
+      "Somente Spanning Tree BPDU guard"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Orquestração entra northbound; programação dos boxes é southbound. App não costuma ser “southbound do switch” no modelo de prova. Data plane e STP não descrevem o fluxo de intent.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Assurance no vocabulário de controller Cisco (ideia) significa:",
+    "alternativas": [
+      "Apagar inventário automaticamente",
+      "Desligar o data plane à noite",
+      "Proibir APIs northbound",
+      "Visibilidade de saúde/insights da rede para operar e diagnosticar"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Assurance = health e insights. Inventário e policy são os outros pilares. Não desliga forwarding nem proíbe APIs. Útil para contrastar com CLI hop-a-hop cego.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que policy centralizada reduz drift?",
+    "alternativas": [
+      "Porque cada técnico edita running sem template e isso aumenta consistência",
+      "Porque o controller aplica a mesma intent/template a muitos devices, evitando configs manuais divergentes",
+      "Porque o data plane some e não há o que configurar",
+      "Porque northbound e southbound são a mesma porta física"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Templates/intent iguais combatem divergência humana. CLI manual hop-a-hop aumenta drift. Data plane permanece. North≠south. Cenário clássico do content 6.1.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Device “órfão” sem controller, com config local antiga. Risco operacional principal?",
+    "alternativas": [
+      "Nenhum: novas policies globais ainda chegam por mágica",
+      "Nenhum: inventário central continua 100% atualizado",
+      "Continua encaminhando com estado local, mas fica fora da orquestração/policy/assurance centrais",
+      "O switch vira automaticamente um RADIUS server"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Forwarding local pode seguir; o gap é gestão e consistência. Inventário/policy param de atualizar. Não vira RADIUS. Esse ticket conceitual aparece no 6.1.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual par está correto?",
+    "alternativas": [
+      "Northbound = controller → switch; southbound = app → controller",
+      "Northbound = app → controller; southbound = controller → device",
+      "Ambos significam apenas console cable",
+      "Ambos eliminam o management plane"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Memorização obrigatória do módulo. Inverter north/south é pegadinha clássica. Console é management local. Management plane continua existindo.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mínimo do content 6.1 para isolar incidente “automação vs rede”:",
+    "alternativas": [
+      "Só trocar o SFP sem classificar o plano",
+      "Só aumentar potência Wi-Fi",
+      "Só desligar PortFast em uplinks",
+      "Classificar data/control/management → north vs south → drift manual vs controller/device offline"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O método evita culpar o rádio ou o SFP quando a API do controller está 401. SFP/Wi-Fi/PortFast podem entrar depois, no eixo certo. Siga o study note de checklist.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Tráfego de usuário entre VLANs falha; controller e APIs ok; rota entre SVIs ausente no L3. Plano dominante?",
+    "alternativas": [
+      "Somente northbound de app de RH",
+      "Somente inventário DNA sem L3",
+      "Encaminhamento/control de roteamento (path L3) — não é falha de API northbound do controller",
+      "Somente southbound de OpenFlow histórico sem IP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Sintoma inter-VLAN sem rota é L3/control-data de roteamento. APIs ok empurram o diagnóstico para underlay/roteamento, não northbound. DNA inventário não substitui rota entre SVIs.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Management plane vs control plane — exemplo correto de isolamento:",
+    "alternativas": [
+      "SSH falha mas OSPF Full e pings de user ok → management, não control plane de roteamento",
+      "SSH falha prova que o data plane morreu sempre",
+      "OSPF Full prova que o management plane está down",
+      "Ping de user ok prova que o controller northbound está up"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "SSH = management; OSPF = control; ping user = data. Um pode falhar sem os outros. Controller northbound não é medido por ping de VLAN de usuário sozinho.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Automação em massa de banners e AAA em 200 switches via controller. Qual benefício está em jogo?",
+    "alternativas": [
+      "Aumentar drift propositalmente",
+      "Eliminar a necessidade de qualquer autenticação",
+      "Forçar OpenFlow em impressoras",
+      "Velocidade e consistência de mudança (policy/templates) em escala"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Automação + consistência são o valor do controller. Drift é o inimigo. AAA continua necessário. Impressoras não definem southbound SDN do campus no discurso do exame.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual afirmação é mito a rejeitar no 6.1?",
+    "alternativas": [
+      "Controller ajuda no inventário central",
+      "Data plane de encaminhamento deixa de existir quando há controller",
+      "Southbound fala com devices",
+      "Northbound serve aplicações"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O mito é a extinção do data plane quando existe controller. Switches e routers continuam encaminhando frames e pacotes; o controller orquestra policy e visão. Inventário, southbound e northbound são conceitos válidos do content 6.1.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Credenciais de discovery do controller erradas; devices pingáveis na VLAN de gestão. Sintoma no inventário?",
+    "alternativas": [
+      "Inventário completo e policy aplicada com sucesso",
+      "Devices podem ficar unmanaged/offline do ponto de vista do controller apesar do ping ICMP",
+      "Data plane de todos os users cai obrigatoriamente",
+      "Northbound de terceiros passa a ser southbound"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Reachability L3 ≠ onboarding com SNMP/SSH/API correto. Inventário falha no eixo management/southbound de credencial. User data plane pode seguir. North não vira south por isso.",
+    "part_id": "6.1"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor uso combinado de status do controller, inventário de devices e teste de ping de usuário?",
+    "alternativas": [
+      "Substituir qualquer análise de cabos forever",
+      "Só validar o root bridge",
+      "Apagar VLANs automaticamente",
+      "Separar se a falha é data plane de usuário, southbound/gestão do device ou northbound de automação"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Ping de user, inventário e API do controller medem eixos diferentes. Juntos evitam “reiniciar o core” por erro 401 no portal. Cabos e STP entram no eixo certo depois. É o fechamento do checklist 6.1.",
+    "part_id": "6.1"
+  }
+]

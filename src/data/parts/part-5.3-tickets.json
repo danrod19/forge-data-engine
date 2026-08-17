@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5301 — Mesa 14 “caiu a rede”. LED da porta apagado após usuário ligar um switch de mesa barato.",
+    "cli_output": "SW1# show interfaces status err-disabled\nPort      Name               Status       Reason\nGi1/0/14  MESA-14            err-disabled psecure-violation\n\nSW1# show port-security interface GigabitEthernet1/0/14\nPort Security              : Enabled\nPort Status                : Secure-shutdown\nViolation Mode             : Shutdown\nMaximum MAC Addresses      : 1\nTotal MAC Addresses        : 1\nConfigured MAC Addresses   : 0\nSticky MAC Addresses       : 1\nLast Source Address:Vlan   : 0011.2233.4455:20\nSecurity Violation Count   : 1\n\nSW1# show port-security address | include Gi1/0/14\nGi1/0/14  0011.2233.4455  SecureSticky  20\n\nSW1# show run interface GigabitEthernet1/0/14\ninterface GigabitEthernet1/0/14\n switchport mode access\n switchport access vlan 20\n switchport port-security\n switchport port-security maximum 1\n switchport port-security mac-address sticky\n switchport port-security violation shutdown",
+    "alternativas": [
+      "DHCP snooping untrusted derrubou a porta para err-disabled",
+      "DAI trust faltando causa Secure-shutdown",
+      "Violation Mode Restrict com maximum 50 no output",
+      "Port-security violation shutdown (maximum 1 + sticky) — err-disabled psecure-violation após MAC extra do hub/switch de mesa"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "status err-disabled psecure-violation; Secure-shutdown; maximum 1; sticky; violation shutdown. Segundo device no hub viola. Não é show de snooping/DAI. Remova o hub, limpe sticky se preciso, shut/no shut.",
+    "part_id": "5.3"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5302 — Softphone + PC na mesma porta via hub; maximum 2 com sticky. Após notebook de visita, violações sobem e o tráfego do visitante some (porta ainda up).",
+    "cli_output": "SW1# show port-security interface GigabitEthernet1/0/22\nPort Security              : Enabled\nPort Status                : Secure-up\nViolation Mode             : Restrict\nMaximum MAC Addresses      : 2\nTotal MAC Addresses        : 2\nSticky MAC Addresses       : 2\nLast Source Address:Vlan   : aabb.ccdd.eeff:30\nSecurity Violation Count   : 17\n\nSW1# show port-security address | include Gi1/0/22\nGi1/0/22  000a.0b0c.0d0e  SecureSticky  30\nGi1/0/22  0001.0203.0405  SecureSticky  30\n\nSW1# show run interface GigabitEthernet1/0/22\ninterface GigabitEthernet1/0/22\n switchport mode access\n switchport access vlan 30\n switchport port-security\n switchport port-security maximum 2\n switchport port-security mac-address sticky\n switchport port-security violation restrict\n\nSW1# show interfaces status | include Gi1/0/22\nGi1/0/22  MESA-22     connected    30         a-full a-100 10/100/1000BaseTX",
+    "alternativas": [
+      "Porta err-disabled no status (contradiz connected)",
+      "Maximum 2 atingido com 2 sticky; violation restrict dropa MAC extra (visitante) sem derrubar a porta — count 17",
+      "Total MAC Addresses 0 no show",
+      "Violation Mode Shutdown no running"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Secure-up, connected, maximum=total=2 sticky, restrict, violation count 17. Terceiro MAC (visita) é dropado, porta up. Não é shutdown/err-disabled. Ajuste maximum ou remova sticky antigos se o design permitir softphone+PC+visita.",
+    "part_id": "5.3"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5303 — Após “ligar segurança DHCP”, PCs da VLAN 40 em APIPA. Servidor DHCP 10.99.0.10 no core.",
+    "cli_output": "SW1# show ip dhcp snooping\nSwitch DHCP snooping is enabled\nDHCP snooping is configured on following VLANs:\n40\nDHCP snooping is operational on following VLANs:\n40\nDHCP snooping is configured on the following L3 Interfaces:\nInsertion of option 82 is enabled\n\nSW1# show run interface GigabitEthernet1/0/48\ninterface GigabitEthernet1/0/48\n description UPLINK-CORE\n switchport mode trunk\n ! sem ip dhcp snooping trust\n\nSW1# show run interface GigabitEthernet1/0/10\ninterface GigabitEthernet1/0/10\n switchport access vlan 40\n switchport mode access\n ! untrusted (default)\n\nSW1# show ip dhcp snooping binding\nMacAddress          IpAddress        Lease(sec)  Type           VLAN  Interface\n------------------  ---------------  ----------  -------------  ----  --------------------\n! (vazio)\n\nSW1# show ip dhcp snooping | include Trust\n! none listed as trusted in operational summary (lab)\n\nPC# ipconfig\n   IPv4 Address. . . . . . . . . . . : 169.254.22.10",
+    "alternativas": [
+      "Binding cheia prova leases ok",
+      "Uplink Gi1/0/48 trusted no running",
+      "Snooping VLAN 40 on, uplink sem trust, binding vazia, APIPA — offers do servidor dropados no path untrusted",
+      "Port-security err-disabled em todas as portas da VLAN 40 no output"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Snooping enabled na VLAN 40; uplink trunk sem trust; binding vazia; cliente em 169.254. Falta ip dhcp snooping trust no uplink (e caminho ao 10.99.0.10). Não há evidência de err-disabled em massa. Configure trust e reteste DORA.",
+    "part_id": "5.3"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5304 — “DHCP de testes” no armário (PC com ISC DHCP) na VLAN 20; produção sem lease. Snooping ligado.",
+    "cli_output": "SW1# show ip dhcp snooping\nSwitch DHCP snooping is enabled\nDHCP snooping is configured on following VLANs:\n20\n\nSW1# show run interface GigabitEthernet1/0/7\ninterface GigabitEthernet1/0/7\n description ROGUE-LAB-PC\n switchport access vlan 20\n switchport mode access\n ! untrusted — sem ip dhcp snooping trust\n\nSW1# show run interface GigabitEthernet1/0/48\ninterface GigabitEthernet1/0/48\n description UPLINK\n switchport mode trunk\n ip dhcp snooping trust\n\nSW1# show ip dhcp snooping binding\nMacAddress          IpAddress        Lease(sec)  Type           VLAN  Interface\n0011.2233.4455      10.20.20.50      86400       dhcp-snooping  20    Gi1/0/11\n\nSW1# show logging | include DHCP_SNOOPING\n%DHCP_SNOOPING-5-DHCP_SNOOPING_UNTRUSTED_PORT: [shortened] drop offer on Gi1/0/7\n\n! Servidor oficial no core (via Gi1/0/48 trusted) — leases ok em outras mesas\n! PC rogue em Gi1/0/7 tenta oferecer 10.20.20.x",
+    "alternativas": [
+      "Offers do servidor no access untrusted (Gi1/0/7) são dropados; binding mostra lease legítimo em outra porta",
+      "Uplink sem trust — contradiz ip dhcp snooping trust em Gi1/0/48",
+      "Snooping desabilitado no show ip dhcp snooping",
+      "Binding vazia globalmente no output"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Log UNTRUSTED_PORT drop offer em Gi1/0/7; access untrusted. Uplink trusted; binding com lease em Gi1/0/11. Snooping on. O “servidor” no access é tratado como rogue — comportamento correto do feature.",
+    "part_id": "5.3"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5305 — Host 10.30.30.88/24 estático (impressora) não comunica após “ativar ARP inspection”. PCs com DHCP ok.",
+    "cli_output": "SW1# show ip arp inspection vlan 30\nSource Mac Validation      : Disabled\nDestination Mac Validation : Disabled\nIP Address Validation      : Disabled\n\nVlan     Configuration    Operation   ACL Match          Static ACL\n----     -------------    ---------   ---------          ----------\n30       Enabled          Active\n\nSW1# show ip dhcp snooping binding | include 10.30.30.88\n! (sem linha para 10.30.30.88)\n\nSW1# show ip dhcp snooping binding | count\nNumber of bindings: 24\n\nSW1# show ip arp inspection statistics vlan 30\nVlan      Forwarded        Dropped\n----      ---------        -------\n30        10220            188\n\nSW1# show run interface GigabitEthernet1/0/33\ninterface GigabitEthernet1/0/33\n description PRINTER-STATIC\n switchport access vlan 30\n switchport mode access\n ! sem ip arp inspection trust\n\nSW1# show run interface GigabitEthernet1/0/48\ninterface GigabitEthernet1/0/48\n ip dhcp snooping trust\n ip arp inspection trust\n\n! Impressora: IP estático configurado na NIC; nunca usou DHCP",
+    "alternativas": [
+      "DAI VLAN 30 off no show (Configuration Disabled)",
+      "Binding contém 10.30.30.88 explicitamente",
+      "Uplink sem arp inspection trust",
+      "DAI ativo na VLAN 30; impressora estática sem binding — ARP dropado na porta untrusted (drops 188); uplink trusted ok"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "DAI Enabled/Active na 30; sem binding para .88; porta access untrusted; statistics com Dropped. Uplink com inspection trust. PCs DHCP têm binding (24 entries). Crie binding/ARP ACL estática ou redesign do IP da impressora via DHCP reservation.",
+    "part_id": "5.3"
+  }
+]

@@ -1,0 +1,135 @@
+{
+  "part_id": "aws-1.4",
+  "title": "EC2 + EBS foundations (compute, volumes, snapshots, custo)",
+  "blueprint_module": "3.0",
+  "blueprint_topics": [
+    "3.2",
+    "2.2",
+    "1.2"
+  ],
+  "verb": "Design",
+  "weight_percent": 24,
+  "topic_list": [
+    "AMI e launch: imagem, tipo de instância por propósito (general/compute/memory ideia)",
+    "Lifecycle: start, stop, reboot, terminate; hibernate (ideia)",
+    "EBS: volumes de bloco em uma AZ; gp3/io2 ideia, size e IOPS",
+    "Root volume vs data volumes; DeleteOnTermination ideia",
+    "Snapshots EBS → restore de volume / base de AMI",
+    "Rede da instance: IP privado, public IP, Elastic IP (cruzar VPC)",
+    "Security Group na ENI (cruzar 1.2 sem repetir part inteira)",
+    "Instance profile / IAM role na EC2 (cruzar 1.1)",
+    "User data (bootstrap ideia); IMDSv2 (segurança de credenciais no host)",
+    "Purchase options: On-Demand, Reserved/Savings Plans ideia, Spot (interrupção)",
+    "TShoot: unreachable (SG/subnet/rota), volume wrong AZ, sem role, estado instance",
+    "NÃO: ECS/EKS, Beanstalk full, Dedicated Host lab, ASG policies detalhadas, placement groups deep"
+  ],
+  "study_notes": [
+    {
+      "heading": "EC2 no mapa SAA-C03",
+      "bullets": [
+        "EC2 é compute de máquina virtual na AZ escolhida; AMI define o SO/software base no launch.",
+        "Cruza domínio de alto desempenho/resiliência (tipo, multi-AZ de app) com seguro (SG, IMDSv2, instance profile) e custo (On-Demand/RI/Spot).",
+        "EBS é storage de bloco acoplado à AZ do volume — não é S3 object storage."
+      ],
+      "exam_tips": [
+        "Volume EBS e instance em AZs diferentes → attach falha; não 'só aumentar IOPS'."
+      ]
+    },
+    {
+      "heading": "AMI, tipos e lifecycle",
+      "bullets": [
+        "AMI: template para launch; pode vir de snapshot do root + data volumes.",
+        "Tipos por propósito (ideia): general purpose (m), compute (c), memory (r) — escolha por workload, sem decorar catálogo.",
+        "Stop: instance para, EBS persiste (cobrança de storage); terminate: instance removida e root pode ser apagado se DeleteOnTermination.",
+        "Hibernate (ideia): salva RAM no root e retoma depois — casos específicos, não default de TShoot."
+      ],
+      "exam_tips": [
+        "Stop ≠ terminate: dados em EBS e billing diferem; terminate + DeleteOnTermination pode apagar root."
+      ]
+    },
+    {
+      "heading": "EBS, snapshots e AZ",
+      "bullets": [
+        "Volume EBS existe em uma AZ; attach só a instance na mesma AZ.",
+        "gp3: equilíbrio custo/IOPS configurável (ideia); io2: IOPS altos e durabilidade para latência crítica.",
+        "Snapshot: backup point-in-time no S3 (serviço); restore cria volume na AZ escolhida; AMI usa snapshots.",
+        "Root vs data: root tem o SO; data volumes para dados — planeje backup e DeleteOnTermination por volume."
+      ],
+      "exam_tips": [
+        "Snapshot não é o volume montado; restore gera novo volume (mesma ou outra AZ da região)."
+      ]
+    },
+    {
+      "heading": "Rede, SG e instance profile",
+      "bullets": [
+        "Toda instance tem IP privado na subnet; public IP/EIP se o design de subnet/IP exigir.",
+        "SG na ENI filtra tráfego — TShoot de timeout costuma ser SG/rota/NACL (part 1.2).",
+        "Instance profile associa role: APIs AWS (S3, etc.) sem access key no disco.",
+        "IMDSv2 (ideia): exige session token no metadata — mitiga SSRF roubando role credentials."
+      ],
+      "exam_tips": [
+        "AccessDenied a S3 na app EC2 com rede OK → confira instance profile e policies da role."
+      ]
+    },
+    {
+      "heading": "Custo: On-Demand, RI/SP, Spot",
+      "bullets": [
+        "On-Demand: flexível, sem compromisso, preço mais alto por hora típico.",
+        "Reserved / Savings Plans (ideia): desconto com compromisso de uso — steady state.",
+        "Spot: capacidade ociosa com desconto; pode ser interrompida com aviso — workloads tolerantes a falha.",
+        "Não use Spot sozinho para estado único crítico sem arquitetura de interrupção."
+      ],
+      "exam_tips": [
+        "Batch/stateless + custo → Spot candidato; banco single-node crítico → On-Demand/RI, não Spot puro."
+      ]
+    },
+    {
+      "heading": "TShoot EC2/EBS checklist",
+      "bullets": [
+        "Estado: pending/running/stopping/stopped/terminated — terminate não 'sobe' com start.",
+        "Unreachable: SG inbound, subnet/rota/IGW-NAT, NACL, status checks.",
+        "Attach volume: mesma AZ; device name; instance running/stopped conforme API.",
+        "Sem permissão AWS API: instance profile, trust EC2, policies da role."
+      ],
+      "exam_tips": [
+        "describe-instances + describe-volumes + describe-security-groups resolvem a maioria dos tickets."
+      ]
+    },
+    {
+      "heading": "Anti-patterns de prova (EC2/EBS)",
+      "bullets": [
+        "Access key de user no user-data em vez de instance profile.",
+        "Assumir que EBS multi-AZ attach em uma instance (volume é single-AZ).",
+        "Terminate 'para economizar' sem snapshot e com DeleteOnTermination apagando dados.",
+        "Spot único sem retry para workload que não tolera interrupção.",
+        "Culpar só a AMI quando o path é SG ou volume na AZ errada."
+      ],
+      "exam_tips": [
+        "Sempre separe: compute state · storage AZ · rede/SG · IAM role · modelo de compra."
+      ]
+    }
+  ],
+  "key_commands": [
+    "aws ec2 describe-instances --instance-ids <i-...>",
+    "aws ec2 describe-instance-status",
+    "aws ec2 describe-volumes --volume-ids <vol-...>",
+    "aws ec2 attach-volume --volume-id <vol> --instance-id <i> --device /dev/sdf",
+    "aws ec2 create-snapshot --volume-id <vol>",
+    "aws ec2 create-image --instance-id <i> (AMI)",
+    "aws ec2 describe-security-groups --group-ids <sg>",
+    "aws ec2 describe-iam-instance-profile-associations",
+    "aws ec2 stop-instances / start-instances / terminate-instances",
+    "aws sts get-caller-identity (da role da instance, se houver)"
+  ],
+  "must_know": [
+    "EBS volume é de uma AZ; attach só na mesma AZ da instance.",
+    "Stop preserva EBS; terminate pode apagar root se DeleteOnTermination true.",
+    "Snapshots permitem restore/AMI; não substituem multi-AZ de app sozinhos.",
+    "Instance profile = role na EC2 para APIs AWS sem keys no disco.",
+    "Timeout de app: SG/rota/NACL antes de culpar a AMI.",
+    "On-Demand flexível; RI/SP desconto steady; Spot barato e interruptível.",
+    "IMDSv2 e least privilege na role reduzem roubo de credenciais no host.",
+    "Fora: ECS/EKS, ASG policies deep, Dedicated Host lab, placement groups deep."
+  ],
+  "reuse_from_v1": null
+}

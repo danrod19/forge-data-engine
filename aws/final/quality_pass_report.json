@@ -1,0 +1,260 @@
+{
+  "generated_at": "2026-08-15T02:53:22.238Z",
+  "script": "aws/scripts/quality_pass_final_aws.mjs",
+  "inventory": {
+    "questions": [
+      "parts/part-aws-1.1-questions.json",
+      "parts/part-aws-1.2-questions.json",
+      "parts/part-aws-1.3-questions.json",
+      "parts/part-aws-1.4-questions.json",
+      "parts/part-aws-1.5-questions.json",
+      "parts/part-aws-1.6-questions.json",
+      "parts/part-aws-1.7-questions.json",
+      "parts/part-aws-1.8-questions.json",
+      "parts/part-aws-1.9-questions.json",
+      "parts/part-aws-1.10-questions.json",
+      "parts/part-aws-1.11-questions.json",
+      "parts/part-aws-1.12-questions.json"
+    ],
+    "tickets": [
+      "parts/part-aws-1.1-tickets.json",
+      "parts/part-aws-1.2-tickets.json",
+      "parts/part-aws-1.3-tickets.json",
+      "parts/part-aws-1.4-tickets.json",
+      "parts/part-aws-1.5-tickets.json",
+      "parts/part-aws-1.6-tickets.json",
+      "parts/part-aws-1.7-tickets.json",
+      "parts/part-aws-1.8-tickets.json",
+      "parts/part-aws-1.9-tickets.json",
+      "parts/part-aws-1.10-tickets.json",
+      "parts/part-aws-1.11-tickets.json",
+      "parts/part-aws-1.12-tickets.json"
+    ],
+    "missing": []
+  },
+  "parts": 12,
+  "per_part": {
+    "aws-1.1": {
+      "questions": 30,
+      "tickets": 5,
+      "stripped": 1,
+      "rewritten": 1
+    },
+    "aws-1.2": {
+      "questions": 30,
+      "tickets": 5,
+      "stripped": 19,
+      "rewritten": 19
+    },
+    "aws-1.3": {
+      "questions": 30,
+      "tickets": 5,
+      "stripped": 12,
+      "rewritten": 12
+    },
+    "aws-1.4": {
+      "questions": 30,
+      "tickets": 5,
+      "stripped": 12,
+      "rewritten": 12
+    },
+    "aws-1.5": {
+      "questions": 30,
+      "tickets": 5,
+      "stripped": 23,
+      "rewritten": 23
+    },
+    "aws-1.6": {
+      "questions": 30,
+      "tickets": 5,
+      "stripped": 20,
+      "rewritten": 20
+    },
+    "aws-1.7": {
+      "questions": 30,
+      "tickets": 5,
+      "stripped": 31,
+      "rewritten": 29
+    },
+    "aws-1.8": {
+      "questions": 30,
+      "tickets": 5,
+      "stripped": 29,
+      "rewritten": 27
+    },
+    "aws-1.9": {
+      "questions": 30,
+      "tickets": 5,
+      "stripped": 29,
+      "rewritten": 24
+    },
+    "aws-1.10": {
+      "questions": 30,
+      "tickets": 5,
+      "stripped": 32,
+      "rewritten": 31
+    },
+    "aws-1.11": {
+      "questions": 30,
+      "tickets": 5,
+      "stripped": 35,
+      "rewritten": 35
+    },
+    "aws-1.12": {
+      "questions": 30,
+      "tickets": 5,
+      "stripped": 34,
+      "rewritten": 34
+    }
+  },
+  "traditional_total": 360,
+  "tickets_total": 60,
+  "strips_approx": 289,
+  "expls_rewritten_for_min_length": 267,
+  "traditional_deduped": 0,
+  "tickets_deduped": 0,
+  "schema_issues": [],
+  "structural_pads_found": [
+    {
+      "sentence": "tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+      "n": 19
+    },
+    {
+      "sentence": "tip de prova: foque no sintoma e no serviço citados (part aws-1.3), não em controles de outro domínio.",
+      "n": 12
+    },
+    {
+      "sentence": "tip de prova: foque no sintoma e no serviço citados (part aws-1.4), não em controles de outro domínio.",
+      "n": 12
+    },
+    {
+      "sentence": "tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+      "n": 23
+    },
+    {
+      "sentence": "tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+      "n": 20
+    },
+    {
+      "sentence": "tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+      "n": 27
+    },
+    {
+      "sentence": "tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+      "n": 25
+    },
+    {
+      "sentence": "tip de prova: foque no sintoma e no serviço citados (part aws-1.9), não em controles de outro domínio.",
+      "n": 24
+    },
+    {
+      "sentence": "tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+      "n": 27
+    },
+    {
+      "sentence": "tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+      "n": 30
+    },
+    {
+      "sentence": "tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+      "n": 29
+    },
+    {
+      "sentence": "as demais opções não explicam a evidência cli: ignore mudanças cosméticas de região, sg inexistente em serviço gerenciad",
+      "n": 12
+    },
+    {
+      "sentence": "tip de prova: ancore a resposta em uma linha do output (deny, rota ausente, policy principal, delete marker, lifecycle a",
+      "n": 12
+    },
+    {
+      "sentence": "tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.11.",
+      "n": 5
+    },
+    {
+      "sentence": "tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.12.",
+      "n": 5
+    }
+  ],
+  "pad_hits_final": {
+    "traditional": {
+      "No SAA, amarre": 0,
+      "Confirme também listener": 0,
+      "Revise o requisito desta questão": 0,
+      "Fundamente com o serviço": 0,
+      "descarte opções": 0,
+      "descarte distractors": 0,
+      "distractor ignora": 0,
+      "No cenário de": 0,
+      "opção fraca ignora": 0,
+      "Distractor fraco": 0,
+      "Em Lambda #": 0,
+      "Access pattern #": 0,
+      "No desenho de tabela": 0,
+      "Dimensões erradas deixam a métrica": 0,
+      "Retention de log group impacta custo": 0,
+      "Action SNS/ASG só corre se o alarme": 0,
+      "Statistic Avg vs Sum muda o significado": 0,
+      "Periodo e datapoints definem se o alarme": 0,
+      "Metric filter + alarm cobrem erro": 0,
+      "valide role, timeout, concurrency e path de rede": 0,
+      "modele PK/SK e RCU/WCU antes de escalar com Scan": 0,
+      "Evidência da Q": 0,
+      "Detalhe operacional #": 0,
+      "antes de generalizar o serviço": 0,
+      "Contexto ... #N": 0
+    },
+    "tickets": {
+      "No SAA, amarre": 0,
+      "Confirme também listener": 0,
+      "Revise o requisito desta questão": 0,
+      "Fundamente com o serviço": 0,
+      "descarte opções": 0,
+      "descarte distractors": 0,
+      "distractor ignora": 0,
+      "No cenário de": 0,
+      "opção fraca ignora": 0,
+      "Distractor fraco": 0,
+      "Em Lambda #": 0,
+      "Access pattern #": 0,
+      "No desenho de tabela": 0,
+      "Dimensões erradas deixam a métrica": 0,
+      "Retention de log group impacta custo": 0,
+      "Action SNS/ASG só corre se o alarme": 0,
+      "Statistic Avg vs Sum muda o significado": 0,
+      "Periodo e datapoints definem se o alarme": 0,
+      "Metric filter + alarm cobrem erro": 0,
+      "valide role, timeout, concurrency e path de rede": 0,
+      "modele PK/SK e RCU/WCU antes de escalar com Scan": 0,
+      "Evidência da Q": 0,
+      "Detalhe operacional #": 0,
+      "antes de generalizar o serviço": 0,
+      "Contexto ... #N": 0
+    },
+    "any": false
+  },
+  "remaining_pad_list": [],
+  "traditional_expl": {
+    "min": 220,
+    "avg": 362,
+    "max": 484,
+    "short_under_220": 0
+  },
+  "ticket_expl": {
+    "min": 200,
+    "avg": 309,
+    "max": 473,
+    "short_under_200": 0
+  },
+  "free": 120,
+  "premium": 240,
+  "outputs": [
+    "aws/final/questions_traditional_FINAL.json",
+    "aws/final/tickets_FINAL.json",
+    "aws/final/quality_pass_report.json",
+    "aws/final/questions_aws_traditional.json",
+    "aws/final/tickets_aws.json",
+    "aws/final/parts_index.json"
+  ],
+  "ok": true
+}

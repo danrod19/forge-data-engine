@@ -1,0 +1,133 @@
+{
+  "part_id": "2.5",
+  "title": "WLAN, WLC, CAPWAP e acesso sem fio",
+  "blueprint_module": "2.0",
+  "weight_percent": 20,
+  "topic_list": [
+    "AP autônomo vs lightweight + WLC",
+    "CAPWAP: túnel AP↔WLC e discovery/join",
+    "Split-MAC: controle no WLC, dados no AP (visão CCNA)",
+    "Modes de AP: local, FlexConnect, monitor (leve)",
+    "SSID, WLAN e binding de interface/VLAN no WLC",
+    "Associação do cliente: autenticação vs encriptação (intro)",
+    "RF: 2,4 GHz vs 5 GHz e canais 1/6/11",
+    "Interferência, potência e densificação",
+    "LAG no WLC (conceito de uplink)",
+    "Verificações típicas de join, WLAN e rádio",
+    "Falhas clássicas: CAPWAP down, VLAN errada, SSID off"
+  ],
+  "study_notes": [
+    {
+      "heading": "Arquiteturas: autônomo vs centralizado",
+      "bullets": [
+        "AP autônomo (standalone): o próprio AP termina o SSID, segurança e bridge para a LAN — gestão por AP.",
+        "Arquitetura centralizada: APs lightweight + Wireless LAN Controller (WLC) concentram política, RF e WLANs.",
+        "No modelo centralizado, o AP “join” na WLC e passa a operar sob a config empurrada pelo controller.",
+        "Benefícios do modelo WLC: consistência de SSID, roaming, RF central, inventário e templates.",
+        "No CCNA, o desenho corporativo padrão de estudo é lightweight + WLC, não dezenas de APs autônomos isolados."
+      ],
+      "exam_tips": [
+        "Autônomo = config no AP. Lightweight = join na WLC + CAPWAP."
+      ]
+    },
+    {
+      "heading": "CAPWAP, discovery e join",
+      "bullets": [
+        "CAPWAP (Control and Provisioning of Wireless Access Points) é o túnel/controle entre AP e WLC (UDP, com DTLS na prática moderna).",
+        "O AP precisa descobrir a WLC (discovery): opções conceituais incluem DHCP option, DNS, broadcast/local subnet, priming, ou endereço configurado.",
+        "Depois do discovery vem o join: autenticação/confiança, download de imagem/config se necessário e operação sob a WLC.",
+        "CAPWAP down / AP not joined: sem WLC alcançável (IP, rota, ACL, firewall UDP), cert/time, ou AP em VLAN de management errada.",
+        "Sem join, SSID corporativo centralizado não sobe no AP como no design esperado."
+      ],
+      "exam_tips": [
+        "Fluxo mental: AP tem IP/gateway? alcança WLC? discovery ok? join ok? só então WLAN no ar."
+      ]
+    },
+    {
+      "heading": "Split-MAC e modes de AP",
+      "bullets": [
+        "Split-MAC (visão CCNA): funções de controle/management ficam na WLC; o AP trata o RF e o tráfego de dados no ar (com variações por mode).",
+        "AP mode Local: tráfego de cliente tipicamente tunelado à WLC (central switching) no modelo clássico de campus.",
+        "FlexConnect: permite switching local no branch (SSID→VLAN local) com WLC central para controle — útil em WAN com latência.",
+        "Monitor/sniffer (leve): AP dedicado a RF/espectro, não a servir clientes como access normal.",
+        "Trocar mode sem planejar VLAN/WAN quebra a expectativa de onde o tráfego é comutado."
+      ],
+      "exam_tips": [
+        "Local ≈ centralizado na WLC. FlexConnect ≈ branch com comutação local possível."
+      ]
+    },
+    {
+      "heading": "SSID, WLAN e VLAN no WLC",
+      "bullets": [
+        "SSID é o nome da rede que o cliente vê; WLAN é o objeto de config na WLC (SSID + segurança + rádio + interface).",
+        "A WLAN é mapeada a uma interface dinâmica/management da WLC que aponta para uma VLAN de usuário no switch.",
+        "SSID na VLAN errada: cliente associa e até pega IP “errado” ou não alcança o gateway da rede pretendida.",
+        "WLAN disabled / SSID não broadcast / security mismatch: cliente não associa ou falha em autenticar.",
+        "Autenticação (quem é você) ≠ encriptação (sigilo do ar): na intro CCNA, WPA2-PSK autentica com PSK e cifra o tráfego; open não autentica de verdade."
+      ],
+      "exam_tips": [
+        "Associação ≠ “já tem a VLAN certa”. Confira interface/VLAN da WLAN no WLC + trunk allowed até o AP/WLC."
+      ]
+    },
+    {
+      "heading": "RF: bandas, canais e interferência",
+      "bullets": [
+        "2,4 GHz: maior alcance relativo, mais congestionada; canais non-overlapping clássicos 1, 6 e 11.",
+        "5 GHz: mais canais, em geral melhor capacidade e menos interferência doméstica típica; alcance relativo menor.",
+        "Co-channel interference: APs vizinhos no mesmo canal com células sobrepostas degradam desempenho.",
+        "Potência alta demais aumenta sobreposição e “cell sticky”; potência baixa demais gera buracos de cobertura.",
+        "Sintomas RF: associa com sinal fraco, retentativas, taxa baixa, queixas só em horários de pico no 2,4 GHz."
+      ],
+      "exam_tips": [
+        "1/6/11 em 2,4 GHz. Não coloque todos os APs no canal 6 com potência máxima no open space."
+      ]
+    },
+    {
+      "heading": "LAG no WLC e uplinks",
+      "bullets": [
+        "LAG (Link Aggregation) no WLC: agrega portas de distribuição da controller para o switch (mais banda/HA no uplink cabeado da WLC).",
+        "LAG não substitui o CAPWAP do AP; é o caminho WLC↔switch de distribuição.",
+        "Sem LAG, ainda pode haver portas físicas individuais; com LAG, o switch peer precisa de EtherChannel compatível.",
+        "Falha de uplink da WLC derruba o controle central — APs local mode sofrem; FlexConnect pode manter algum serviço local se desenhado para isso."
+      ],
+      "exam_tips": [
+        "LAG = uplink da WLC. CAPWAP = AP↔WLC. Não misture os dois problemas."
+      ]
+    },
+    {
+      "heading": "Verificação e troubleshooting",
+      "bullets": [
+        "No WLC (GUI/CLI conceitual CCNA): AP join status, WLAN enabled, interface/VLAN, RRM/canal, clients.",
+        "No switch: VLAN de management do AP, trunk allowed, PoE no access do AP, rota até a WLC.",
+        "AP not joined: L3 até WLC, option 43/DNS, time/cert, imagem, ACL bloqueando CAPWAP.",
+        "Cliente não associa: SSID typo, WLAN disabled, banda errada, security (PSK/802.1X) incompatível, RF sem cobertura.",
+        "Cliente associa mas sem serviço: VLAN/interface errada, DHCP, ACL, gateway — já é caminho de dados pós-associação.",
+        "Comandos/leituras típicas de exame: show ap summary, show wlan summary, show wireless client, status de CAPWAP (nomes variam por plataforma AireOS/IOS-XE — foque o significado)."
+      ],
+      "exam_tips": [
+        "Separe: (1) AP join (2) WLAN no ar (3) associação do cliente (4) IP/VLAN de dados."
+      ]
+    }
+  ],
+  "key_commands": [
+    "show ap summary",
+    "show ap join stats summary",
+    "show wlan summary",
+    "show wireless interface summary",
+    "show capwap client rcb",
+    "show ap config general <ap-name>",
+    "show client summary",
+    "show interface <ap-manager/dynamic>",
+    "ping <wlc-ip> (do AP/switch de management)",
+    "show power inline (PoE no access do AP)"
+  ],
+  "must_know": [
+    "Lightweight AP precisa descobrir e fazer join na WLC via CAPWAP; sem join não há operação centralizada normal.",
+    "Split-MAC: controle/política na WLC; RF e dados no ar no AP (com nuances por mode).",
+    "Local mode vs FlexConnect: central switching vs opção de switching local no branch.",
+    "WLAN/SSID mapeia para interface/VLAN na WLC — VLAN errada = serviço quebrado mesmo com associação.",
+    "2,4 GHz: canais non-overlapping 1/6/11; 5 GHz oferece mais canais e capacidade típica.",
+    "Autenticação e encriptação são conceitos distintos; security mismatch impede associação.",
+    "LAG agrega uplink da WLC ao switch; não confunda com CAPWAP do AP."
+  ]
+}

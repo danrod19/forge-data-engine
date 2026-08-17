@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ALB internet-facing precisa de path à Internet na VPC. O que caracteriza a subnet pública do ALB?",
+    "alternativas": [
+      "Route table com 0.0.0.0/0 → Internet Gateway e design de exposição controlada",
+      "Impossibilidade de ter rota local do CIDR da VPC",
+      "Obrigação de NAT Gateway em toda subnet pública",
+      "NACL que só permite Deny e nunca Allow"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Subnet pública tem default route para IGW; a rota local do VPC continua existindo para tráfego interno. NAT é típico de saída de privadas, não define 'pública'. Tip de prova: pública = 0.0.0.0/0 → igw; privada típica = 0.0.0.0/0 → nat.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "EC2 em subnet privada (sem IP público) precisa baixar patches da Internet. Qual componente de saída é o desenho usual?",
+    "alternativas": [
+      "Internet Gateway anexado diretamente só à ENI privada como default",
+      "NAT Gateway em subnet pública e rota 0.0.0.0/0 da privada para o NAT",
+      "Security Group com 'Deny explícito' de todo outbound",
+      "Transit Gateway obrigatório mesmo em single-VPC simples"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Privadas saem via NAT (target na RT) mantendo a instância sem IP público. IGW na ENI privada não é o padrão; SG não usa Deny explícito como NACL. Tip de prova: privada + updates = NAT + rota; não 'só abrir SG'. (aws-1.2 #2)",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Health check do ALB falha com timeout; SG do target allow 8080 do ALB, mas NACL da subnet tem Deny 8080. Qual diferença SG vs NACL explica o caso?",
+    "alternativas": [
+      "SG é only Deny e NACL é only Allow",
+      "Ambos são stateless e idênticos na avaliação",
+      "SG é stateful allow-only na ENI; NACL é stateless na subnet e pode Deny — ambas as camadas precisam permitir",
+      "NACL só existe em AWS Outposts e pode ser ignorada"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: SG é stateful allow-only na ENI; NACL é stateless na subnet e pode Deny — ambas as camadas precisam permitir. Isso resolve o cenário: Health check do ALB falha com timeout; SG do target allow 8080 do ALB, mas NACL … O distractor «SG é only Deny e NACL é only Allow» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Requisito: banco RDS não acessível da Internet pública. Qual design de rede atende?",
+    "alternativas": [
+      "Subnet pública com Elastic IP no RDS",
+      "SG do banco com 0.0.0.0/0 na porta do engine",
+      "Rota 0.0.0.0/0 → IGW na subnet do banco",
+      "Subnet privada, sem IP público, SG permitindo só o tier de aplicação"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Dados em privada com SG source = SG/CIDR do app minimizam superfície. EIP, 0.0.0.0/0 e IGW na subnet do DB expõem indevidamente. Tip de prova: 'sem acesso Internet ao banco' → private + SG restrito + sem EIP. (aws-1.2 #4)",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Planejando multi-AZ, quantas Availability Zones uma única subnet cobre?",
+    "alternativas": [
+      "Exatamente uma AZ",
+      "Sempre todas as AZs da Região ao mesmo tempo",
+      "Nenhuma — subnets são globais como IAM",
+      "Apenas Local Zones, nunca AZs regionais"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Exatamente uma AZ. Isso resolve o cenário: Planejando multi-AZ, quantas Availability Zones uma única subnet cobre?… O distractor «Sempre todas as AZs da Região ao mesmo tempo» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "EC2 com IP público em subnet 'pública' não sai para a Internet; SG egress allow all. Hipótese mais forte?",
+    "alternativas": [
+      "Falta de IAM role na instância para 'liberar TCP'",
+      "Route table sem 0.0.0.0/0 → IGW ou IGW não anexado à VPC",
+      "S3 versioning desligado na conta",
+      "Ausência de alarme CloudWatch na CPU"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Com SG aberto e IP público, o path clássico que falta é rota/IGW. IAM role não cria rota de internet; versioning e alarmes não explicam timeout de rede. Tip de prova: pública sem internet → describe-route-tables e IGW attachment.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Cliente HTTPS funciona na ida mas respostas falham após endurecer NACL. Por que NACL ser stateless importa?",
+    "alternativas": [
+      "Porque NACL só protege o Internet Gateway e ignora subnets",
+      "Porque NACL ignora portas efêmeras sempre por design imutável",
+      "Porque o retorno precisa de regra Allow separada (ida e volta), inclusive portas efêmeras",
+      "Porque NACL substitui completamente o Security Group"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Stateless exige allow nas duas direções; falta de allow de retorno em portas altas quebra sessões mesmo com SG stateful ok. NACL não substitui SG. Tip de prova: timeout assimétrico após NACL → regras de retorno/efêmeras.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "SG do app não tem inbound 8080; processo escuta em 8080. Efeito típico do health check do ALB?",
+    "alternativas": [
+      "Tráfego 8080 é permitido por default em todo SG",
+      "A NACL vira allow all automaticamente",
+      "A rota 0.0.0.0/0 é removida da subnet",
+      "Conexões inbound na 8080 são negadas (deny implícito do SG) → health timeout"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Conexões inbound na 8080 são negadas (deny implícito do SG) → health timeout. Isso resolve o cenário: SG do app não tem inbound 8080; processo escuta em 8080. Efeito típico do health… O distractor «Tráfego 8080 é permitido por default em todo SG» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Onde implantar o NAT Gateway no desenho clássico public/private?",
+    "alternativas": [
+      "Em subnet pública (com path ao IGW) para servir como target de saída das privadas",
+      "Somente dentro da instância RDS Multi-AZ",
+      "No usuário root IAM como 'anexo de rede'",
+      "Obrigatoriamente em outra Região para cada VPC"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Em subnet pública (com path ao IGW) para servir como target de saída das privadas. Isso resolve o cenário: Onde implantar o NAT Gateway no desenho clássico public/private?… O distractor «Somente dentro da instância RDS Multi-AZ» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Dois app tiers na mesma VPC precisam se falar sem Internet. Para que serve a rota local (CIDR da VPC)?",
+    "alternativas": [
+      "Substituir regras de Security Group entre tiers",
+      "Entregar tráfego entre recursos no CIDR da VPC sem passar pelo IGW",
+      "Forçar todo o tráfego interno para a Internet e de volta",
+      "Desabilitar multi-AZ automaticamente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Entregar tráfego entre recursos no CIDR da VPC sem passar pelo IGW. Isso resolve o cenário: Dois app tiers na mesma VPC precisam se falar sem Internet. Para que serve a rot… O distractor «Substituir regras de Security Group entre tiers» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SG do target allow 443 do ALB; NACL da subnet tem Deny inbound 443 com número de regra menor que o Allow. Sintoma esperado?",
+    "alternativas": [
+      "Sempre funciona porque SG tem precedência absoluta sobre NACL",
+      "AccessDenied de IAM no listener do ALB",
+      "Tráfego 443 pode ser bloqueado na subnet pelo NACL apesar do SG allow",
+      "O IGW é removido automaticamente pela AWS"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Tráfego 443 pode ser bloqueado na subnet pelo NACL apesar do SG allow. Isso resolve o cenário: SG do target allow 443 do ALB; NACL da subnet tem Deny inbound 443 com número de… O distractor «Sempre funciona porque SG tem precedência absoluta sobre NACL» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "App stateless atrás de ALB com requisito multi-AZ. Qual desenho mínimo de subnets de app?",
+    "alternativas": [
+      "Uma única subnet privada em uma AZ",
+      "Pelo menos duas subnets privadas em AZs diferentes (+ ALB em públicas multi-AZ)",
+      "Somente subnets em Local Zones sem AZ regional",
+      "Zero subnets se os objetos estiverem no S3"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Pelo menos duas subnets privadas em AZs diferentes (+ ALB em públicas multi-AZ). Isso resolve o cenário: App stateless atrás de ALB com requisito multi-AZ. Qual desenho mínimo de subnet… O distractor «Uma única subnet privada em uma AZ» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Subnet chamada 'private' tem 0.0.0.0/0 → igw em vez de nat. Qual risco de design?",
+    "alternativas": [
+      "Design incorreto típico: default route IGW é padrão de pública; saída/exposição fica mal definida para 'privada'",
+      "Melhora automática a performance do KMS",
+      "É obrigatório para RDS Multi-AZ funcionar",
+      "Desliga permanentemente a NACL da subnet"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Design incorreto típico: default route IGW é padrão de pública; saída/exposição fica mal definida para 'privada'. Isso resolve o cenário: Subnet chamada 'private' tem 0.0.0.0/0 → igw em vez de nat. Qual risco de design… O distractor «Melhora automática a performance do KMS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SSH no bastion: cliente reporta timeout (não connection refused). Interpretação inicial de rede?",
+    "alternativas": [
+      "O daemon SSH com certeza recusou ativamente a conexão",
+      "Mais compatível com filtragem de path (SG/NACL/rota) do que serviço recusando na porta",
+      "Sempre é bucket policy do S3 de logs",
+      "Sempre falta Elastic IP no NAT Gateway"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Timeout sugere pacotes filtrados no caminho; connection refused sugere host alcançado e porta fechada. S3 e EIP do NAT não são a primeira hipótese de SSH bastion. Tip de prova: timeout vs refused separa firewall/path de processo down.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual comando CLI lista rotas e associações de subnet em uma VPC?",
+    "alternativas": [
+      "aws iam list-users",
+      "aws s3 ls",
+      "aws ec2 describe-route-tables --filters Name=vpc-id,Values=<vpc-id>",
+      "aws sts get-session-token sem papel de rede"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: aws ec2 describe-route-tables --filters Name=vpc-id,Values=<vpc-id>. Isso resolve o cenário: Qual comando CLI lista rotas e associações de subnet em uma VPC?… O distractor «aws iam list-users» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ALB em públicas multi-AZ; targets EC2 em privadas. Como o target responde ao ALB na VPC?",
+    "alternativas": [
+      "Cada target precisa de IP público e rota IGW para falar com o ALB",
+      "Tráfego permanece na VPC (rota local); SG do target deve permitir a porta a partir do SG/CIDR do ALB",
+      "É obrigatório NAT em cada target só para health check do ALB",
+      "NACL deve Deny all entre públicas e privadas"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Tráfego permanece na VPC (rota local); SG do target deve permitir a porta a partir do SG/CIDR do ALB. Isso resolve o cenário: ALB em públicas multi-AZ; targets EC2 em privadas. Como o target responde ao ALB… O distractor «Cada target precisa de IP público e rota IGW para falar com o ALB» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SG: outbound allow all; inbound só TCP 443 de 10.0.0.0/8. Efeito prático?",
+    "alternativas": [
+      "Nega todo retorno de 443 porque SG seria 'stateless invertido'",
+      "Bloqueia obrigatoriamente o DNS da Amazon",
+      "Permite iniciar saídas e aceita 443 só de 10.0.0.0/8; retornos de sessões permitidas seguem o modelo stateful",
+      "Abre 443 da Internet inteira (0.0.0.0/0)"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Permite iniciar saídas e aceita 443 só de 10.0.0.0/8; retornos de sessões permitidas seguem o modelo stateful. Isso resolve o cenário: SG: outbound allow all; inbound só TCP 443 de 10.0.0.0/8. Efeito prático?… O distractor «Nega todo retorno de 443 porque SG seria 'stateless invertido'» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "RFP exige sobreviver à queda de uma AZ. Qual anti-padrão de inventário?",
+    "alternativas": [
+      "Subnets e app em pelo menos duas AZ",
+      "ALB cobrindo múltiplas AZ",
+      "RDS Multi-AZ quando o engine exige HA de banco",
+      "Todos os recursos de produção apenas na AZ-a"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Todos os recursos de produção apenas na AZ-a. Isso resolve o cenário: RFP exige sobreviver à queda de uma AZ. Qual anti-padrão de inventário?… O distractor «Subnets e app em pelo menos duas AZ» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que usar custom route tables além da main na VPC?",
+    "alternativas": [
+      "Main é o default; subnets sem associação usam a main — custom segmenta pública (IGW) vs privada (NAT)",
+      "Custom route tables não podem ter rota 0.0.0.0/0",
+      "Main não pode ter rota local do CIDR",
+      "Só a main pode apontar para NAT Gateway"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Separar RTs por tipo de subnet evita que privadas herdem IGW da main por engano. Custom pode ter igw ou nat; rota local existe nas RTs da VPC. Tip de prova: privada na main com 0.0.0.0/0→igw = vazamento de design. (aws-1.2 #19)",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo da part VPC foundations (aws-1.2)?",
+    "alternativas": [
+      "Security Groups e NACLs",
+      "NAT Gateway e IGW",
+      "Subnets multi-AZ",
+      "Transit Gateway deep, PrivateLink lab completo e Client VPN detalhado"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Transit Gateway deep, PrivateLink lab completo e Client VPN detalhado. Isso resolve o cenário: Fora de escopo profundo da part VPC foundations (aws-1.2)?… O distractor «Security Groups e NACLs» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "NAT em AZ-a; privada só em AZ-b com 0.0.0.0/0 → esse NAT. Qual consideração de design?",
+    "alternativas": [
+      "Funciona, mas cria dependência cross-AZ (custo/latência) e fragilidade de HA do egress",
+      "É proibido em todas as contas AWS sem exceção",
+      "Elimina a necessidade de route tables",
+      "Torna a subnet automaticamente pública com EIP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Rota cross-AZ para NAT é possível, porém não ideal para HA e custo de transferência entre AZs. Não é proibição universal nem remove RTs. Tip de prova: HA de egress → NAT (ou padrão moderno) por AZ quando o requisito for rigoroso.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Como restringir SSH do bastion apenas ao IP do escritório?",
+    "alternativas": [
+      "Abrir 0.0.0.0/0 na 22 e confiar só em NACL genérica",
+      "SG inbound TCP 22 com Source = CIDR do escritório (e considerar SSM em designs sem 22)",
+      "Colocar Elastic IP no RDS Multi-AZ",
+      "Remover o IGW de toda a VPC para 'proteger' o bastion"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Least privilege de rede usa Source CIDR (ou SSM Session Manager sem expor 22). 0.0.0.0/0 é fraco; EIP no RDS e remover IGW não segmentam o SSH do bastion com precisão. Tip de prova: bastion 22 → Source corporativo, nunca 0.0.0.0/0 em produção séria.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dois recursos na mesma VPC, subnets diferentes, sem IGW anexado. Eles se comunicam?",
+    "alternativas": [
+      "Nunca, porque não há Internet",
+      "Somente se ambos tiverem NAT Gateway",
+      "Sim, via rota local do CIDR da VPC se SG/NACL permitirem",
+      "Somente com Transit Gateway obrigatório"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Sim, via rota local do CIDR da VPC se SG/NACL permitirem. Isso resolve o cenário: Dois recursos na mesma VPC, subnets diferentes, sem IGW anexado. Eles se comunic… O distractor «Nunca, porque não há Internet» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "NACL default de uma VPC nova (comportamento clássico de prova):",
+    "alternativas": [
+      "Deny all em tudo de forma permanente e imutável",
+      "Allow all inbound e outbound (pode ser customizada depois para endurecer)",
+      "Só Allow HTTP 80 e nada mais",
+      "Copia automaticamente todas as regras dos Security Groups"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Allow all inbound e outbound (pode ser customizada depois para endurecer). Isso resolve o cenário: NACL default de uma VPC nova (comportamento clássico de prova):… O distractor «Deny all em tudo de forma permanente e imutável» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "App em privada não alcança repositórios na Internet. Ordem mental de Diagnose?",
+    "alternativas": [
+      "NAT available → rota 0.0.0.0/0 da private RT → SG outbound → NACL → só então app/DNS",
+      "Só recriar a VPC inteira como primeiro passo",
+      "Só trocar o hostname da EC2",
+      "Só desligar o CloudTrail da conta"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Isole o path de saída antes de culpar a aplicação. Recriar VPC ou mexer em hostname/CloudTrail não é o primeiro passo eficiente. Tip de prova: privada sem egress → NAT + rota antes de debug de pacote da app. (aws-1.2 #25)",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Banco em subnet privada com rota NAT e alguém propõe Elastic IP na instância DB. Avaliação de design seguro?",
+    "alternativas": [
+      "EIP no DB é obrigatório para Multi-AZ",
+      "EIP melhora a rotação de chaves KMS",
+      "Geralmente desnecessário e confunde o design; DB fica em privada sem EIP, acessado só pelo app tier",
+      "EIP substitui o Security Group do banco"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Geralmente desnecessário e confunde o design; DB fica em privada sem EIP, acessado só pelo app tier. Isso resolve o cenário: Banco em subnet privada com rota NAT e alguém propõe Elastic IP na instância DB.… O distractor «EIP no DB é obrigatório para Multi-AZ» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Três tiers (web, app, data). Qual padrão de SG reflete least privilege?",
+    "alternativas": [
+      "Um único SG 0.0.0.0/0 em todas as portas para os três tiers",
+      "Mesmo SG com allow all entre todos sem referência de origem",
+      "NACL Deny all entre tiers e zero Security Groups",
+      "SG do data permite só o SG do app na porta do DB; app permite o SG do web/ALB; borda expõe o mínimo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: SG do data permite só o SG do app na porta do DB; app permite o SG do web/ALB; borda expõe o mínimo. Isso resolve o cenário: Três tiers (web, app, data). Qual padrão de SG reflete least privilege?… O distractor «Um único SG 0.0.0.0/0 em todas as portas para os três tiers» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "IGW attached à VPC, mas nenhuma route table tem 0.0.0.0/0 → igw. Efeito?",
+    "alternativas": [
+      "Todas as subnets ficam públicas automaticamente",
+      "O NAT Gateway some da conta",
+      "O CIDR da VPC é anunciado na Internet pública",
+      "Sem rota, as subnets não usam o IGW — path de internet incompleto"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Sem rota, as subnets não usam o IGW — path de internet incompleto. Isso resolve o cenário: IGW attached à VPC, mas nenhuma route table tem 0.0.0.0/0 → igw. Efeito?… O distractor «Todas as subnets ficam públicas automaticamente» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist de design seguro de VPC (tarefa 1.2) nesta part?",
+    "alternativas": [
+      "Subnets public/private multi-AZ, rotas IGW/NAT corretas, SG least privilege, NACL ciente, dados sem IP público",
+      "Tudo em uma subnet pública com SG 0.0.0.0/0",
+      "Somente NACL e zero Security Groups",
+      "Somente Transit Gateway sem VPC de aplicação"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Subnets public/private multi-AZ, rotas IGW/NAT corretas, SG least privilege, NACL ciente, dados sem IP público. Isso resolve o cenário: Checklist de design seguro de VPC (tarefa 1.2) nesta part?… O distractor «Tudo em uma subnet pública com SG 0.0.0.0/0» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.2), não em controles de outro domínio.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Usuários HTTPS na Internet; app EC2 em privada. Componentes típicos do desenho?",
+    "alternativas": [
+      "EIP em cada app instance e porta 22 aberta a 0.0.0.0/0",
+      "Somente NACL Deny all em todas as subnets",
+      "Access key de IAM user no user-data de cada app",
+      "ALB em públicas multi-AZ, targets em privadas, SG em camadas, NAT se a app precisa de egress"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Padrão web seguro: balanceador na borda pública, app privada, SG por tier, NAT para saída. EIP+22 aberta e deny all não são o design Associate típico. Tip de prova: Internet users → ALB pública; app → privada. (aws-1.2 #30)",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  }
+]

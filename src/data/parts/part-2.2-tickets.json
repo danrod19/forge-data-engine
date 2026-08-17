@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8301 — Notebook do financeiro “não abre o sistema”. IP está em 10.10.10.x mas o usuário não alcança o gateway 10.10.10.1. Helpdesk jura que o cabo está certo.",
+    "cli_output": "PC-FIN> ipconfig\n   IPv4 Address. . . . . . . . . . . : 10.10.10.44\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.10.10.1\n\nPC-FIN> ping 10.10.10.1\nEsgotado o tempo limite do pedido.\n\nAccessA# show vlan brief\n\nVLAN Name                             Status    Ports\n---- -------------------------------- --------- -------------------------------\n1    default                          active    Gi1/0/1, Gi1/0/2, Gi1/0/3\n10   USERS                            active    Gi1/0/5, Gi1/0/6, Gi1/0/7\n20   FINANCE                          active    Gi1/0/10, Gi1/0/11\n30   PRINT                            active    Gi1/0/15\n\nAccessA# show interfaces Gi1/0/12 switchport\nName: Gi1/0/12\nSwitchport: Enabled\nAdministrative Mode: static access\nOperational Mode: static access\nAccess Mode VLAN: 20 (FINANCE)\nTrunking Native Mode VLAN: 1 (default)\n\nAccessA# show interfaces status | include Gi1/0/12\nGi1/0/12  PC-FIN   connected  20  a-full  a-1000  10/100/1000BaseTX\n\nDist# show ip interface brief | include Vlan10|Vlan20\nVlan10   10.10.10.1   YES manual  up  up\nVlan20   10.10.20.1   YES manual  up  up",
+    "alternativas": [
+      "Gi1/0/12 está access VLAN 20 (FINANCE) com status connected, mas o IP/gateway do PC são da lógica 10.10.10.0/24 (SVI Vlan10) — membership VLAN errada em relação ao endereçamento",
+      "show vlan brief lista Gi1/0/12 na VLAN 10 USERS, logo o access está correto",
+      "Operational Mode trunk com native 20 explica o IP 10.10.10.44",
+      "Vlan10 down no Dist prova que o problema é só allowed no PC"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "switchport e status mostram access VLAN 20; o PC usa 10.10.10.x/gateway .1 da SVI VLAN 10. show vlan brief não coloca Gi1/0/12 em USERS. Mode é access, não trunk. Vlan10 está up/up — o desalinhamento é access VLAN vs IP.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8302 — Após troca de switch de agregação, CDP e alguns serviços “misturam” VLANs no uplink. Dados tagged parecem ok; untagged confunde o NOC.",
+    "cli_output": "SW-Access# show interfaces trunk\nPort        Mode         Encapsulation  Status        Native vlan\nGi1/0/48    on           802.1q         trunking      1\nPort        Vlans allowed on trunk\nGi1/0/48    1,10,20,30\nPort        Vlans allowed and active in management domain\nGi1/0/48    1,10,20,30\n\nSW-Dist# show interfaces trunk\nPort        Mode         Encapsulation  Status        Native vlan\nGi1/0/1     on           802.1q         trunking      99\nPort        Vlans allowed on trunk\nGi1/0/1     1,10,20,30\nPort        Vlans allowed and active in management domain\nGi1/0/1     1,10,20,30\n\nSW-Access# show interfaces Gi1/0/48 switchport | include Native|Operational|Administrative\nAdministrative Mode: trunk\nOperational Mode: trunk\nTrunking Native Mode VLAN: 1 (default)\n\nSW-Dist# show interfaces Gi1/0/1 switchport | include Native|Operational\nOperational Mode: trunk\nTrunking Native Mode VLAN: 99 (MGMT)",
+    "alternativas": [
+      "Allowed diferente nos dois lados: Access tem 1,10,20,30 e Dist não lista 10",
+      "Operational Mode access em ambos explica o untagged",
+      "Native mismatch: Access native 1 vs Dist native 99 no mesmo trunk 802.1Q — untagged cai em VLANs distintas",
+      "Encapsulamento 802.1q ausente no Access prova ISL obrigatório"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "show interfaces trunk mostra native 1 de um lado e 99 do outro, com allowed alinhado. Isso é native mismatch. Allowed não diverge. Mode é trunk nos dois. 802.1q está presente.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8303 — Câmeras na VLAN 40 falam entre si no mesmo switch de acesso, mas o NVR no prédio B (mesma VLAN 40) não grava. Cabos e IPs conferidos.",
+    "cli_output": "SW-A# show vlan brief | include 40|Gi1/0/7\n40   CAMERAS   active    Gi1/0/7, Gi1/0/8, Gi1/0/9\n\nSW-B# show vlan brief | include 40|Gi1/0/3\n40   CAMERAS   active    Gi1/0/3\n\nSW-A# show interfaces trunk\nPort        Mode   Encapsulation  Status     Native vlan\nGi1/0/48    on     802.1q         trunking   1\nPort        Vlans allowed on trunk\nGi1/0/48    1,10,20,30\nPort        Vlans allowed and active in management domain\nGi1/0/48    1,10,20,30\n\nSW-B# show interfaces trunk\nPort        Mode   Encapsulation  Status     Native vlan\nGi1/0/1     on     802.1q         trunking   1\nPort        Vlans allowed on trunk\nGi1/0/1     1,10,20,30\nPort        Vlans allowed and active in management domain\nGi1/0/1     1,10,20,30\n\n# câmeras e NVR com access vlan 40 OK localmente em cada prédio",
+    "alternativas": [
+      "Native 1 diferente entre A e B no output",
+      "VLAN 40 não está no allowed do trunk (só 1,10,20,30) — por isso não cruza o uplink entre prédios",
+      "show vlan brief prova que a VLAN 40 não existe em SW-A",
+      "Operational trunk ausente: Status notconnect no uplink"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "VLAN 40 existe e tem portas access, mas allowed do trunk omite 40 nos dois lados. Native está 1=1. Trunking status ok no recorte. Falta allowed 40 no uplink.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8304 — “O trunk novo só deixa passar a VLAN nativa”. VLANs 10 e 20 morrem no enlace entre Access e um mini-switch de mesa mal configurado.",
+    "cli_output": "AccessCore# show interfaces Gi1/0/24 switchport\nAdministrative Mode: trunk\nOperational Mode: trunk\nTrunking Native Mode VLAN: 10 (USERS)\nTrunking VLANs Enabled: 10,20,30\n\nAccessCore# show interfaces trunk | begin Gi1/0/24\nPort        Mode         Encapsulation  Status        Native vlan\nGi1/0/24    on           802.1q         trunking      10\nPort        Vlans allowed on trunk\nGi1/0/24    10,20,30\n\nDeskSW# show interfaces Gi0/1 switchport\nAdministrative Mode: static access\nOperational Mode: static access\nAccess Mode VLAN: 10 (USERS)\nTrunking Native Mode VLAN: 1 (default)\n\nDeskSW# show interfaces Gi0/1 status\nPort      Name       Status       Vlan  Duplex  Speed  Type\nGi0/1     uplink     connected    10    a-full  a-1000 10/100/1000BaseTX\n\nDeskSW# show interfaces trunk\n\nAccessCore# (nota) only untagged/VLAN10 traffic observed toward DeskSW",
+    "alternativas": [
+      "DeskSW em static access VLAN 10 enquanto AccessCore está operational trunk — só a VLAN 10 (access/untagged) comporta-se de forma consistente; 20/30 não multiplexam",
+      "Ambos os lados estão em Operational Mode trunk com allowed 10,20,30",
+      "Native mismatch 10 vs 99 é a linha dominante no DeskSW",
+      "show interfaces trunk no DeskSW lista Gi0/1 com 20 e 30 active"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "AccessCore trunk vs DeskSW access VLAN 10 explica o sintoma “só a nativa/access passa”. DeskSW não mostra trunk. Não há native 99 no recorte. show interfaces trunk no DeskSW está vazio.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8305 — Time de rede “liberou a VLAN 50 no trunk”, mas o servidor no switch remoto continua isolado. Allowed já foi alterado nos dois uplinks.",
+    "cli_output": "SW1# show interfaces trunk\nPort        Mode   Encapsulation  Status     Native vlan\nGi1/0/48    on     802.1q         trunking   1\nPort        Vlans allowed on trunk\nGi1/0/48    1,10,20,50\nPort        Vlans allowed and active in management domain\nGi1/0/48    1,10,20\n\nSW1# show vlan brief | include 50\n50   APP-DMZ   active    Gi1/0/5\n\nSW2# show interfaces trunk\nPort        Mode   Encapsulation  Status     Native vlan\nGi1/0/1     on     802.1q         trunking   1\nPort        Vlans allowed on trunk\nGi1/0/1     1,10,20,50\nPort        Vlans allowed and active in management domain\nGi1/0/1     1,10,20\n\nSW2# show vlan brief | include 50\n\nSW2# show interfaces Gi1/0/8 switchport | include Access Mode|Operational\nOperational Mode: static access\nAccess Mode VLAN: 50 (Inactive)\n\n# SW2 nunca teve o comando vlan 50 / a VLAN não aparece no brief",
+    "alternativas": [
+      "Native 1 vs 1 nos trunks prova mismatch de untagged",
+      "Allowed em SW1 não contém 50 no output",
+      "Operational Mode access no uplink Gi1/0/48 de SW1",
+      "VLAN 50 está allowed mas não active no trunk: em SW2 a VLAN 50 não existe (brief vazio, access Inactive) — allowed não cria a VLAN no switch remoto"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Allowed lista 50, mas allowed-and-active omite 50; SW2 não tem VLAN 50 no brief e a access está Inactive. Native está alinhada. Uplink SW1 é trunk. Falta criar/ativar a VLAN no remoto.",
+    "part_id": "2.2"
+  }
+]

@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Checkout web gera picos 10× no fim de semana; o processamento de pagamento é mais lento. Qual padrão absorve o pico entre API e workers?",
+    "alternativas": [
+      "Fila Amazon SQS entre API (producer) e workers (consumers) como buffer",
+      "Chamada síncrona HTTP bloqueante a cada worker sem fila",
+      "Aumentar só o TTL do CloudFront do HTML de checkout",
+      "Abrir 0.0.0.0/0 no SG do RDS e remover o ASG"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "SQS desacopla o producer do consumer e segura mensagens durante picos; HTTP síncrono propaga o pico e gera timeout. CloudFront não bufferiza jobs de pagamento. Tip de prova: picos entre tiers assíncronos → SQS como buffer, não chamada síncrona rígida.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Pedidos por cliente devem ser processados na ordem exata de envio, com deduplicação. Qual fila?",
+    "alternativas": [
+      "SQS standard com long polling apenas",
+      "SNS topic sem SQS",
+      "SQS FIFO com MessageGroupId por cliente e deduplicação configurada",
+      "EventBridge default bus sem fila (fora do foco, e não é fila FIFO de pedidos)"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: SQS FIFO com MessageGroupId por cliente e deduplicação configurada. Isso resolve o cenário: Pedidos por cliente devem ser processados na ordem exata de envio, com deduplica… O distractor «SQS standard com long polling apenas» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Worker recebe mensagem, processa 3 minutos, mas visibility timeout é 30s. Sintoma clássico?",
+    "alternativas": [
+      "Outro consumer pode receber a mesma mensagem de novo antes do DeleteMessage",
+      "A fila vira FIFO automaticamente",
+      "O SNS cancela a subscription",
+      "O ALB retorna 503 por definição de SQS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem delete e com visibility expirada, a msg fica visível de novo → reprocessamento/duplicata. Não muda tipo de fila nem cria 503 de ALB. Tip de prova: processamento longo + visibility curto → mensagem reaparece; aumente timeout ou estenda visibility.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Após 5 receives sem delete bem-sucedido, a mensagem some da fila principal e aparece em outra. Mecanismo?",
+    "alternativas": [
+      "Weighted routing do Route 53",
+      "Dead-letter queue com maxReceiveCount=5 (redrive policy)",
+      "Multi-AZ do RDS",
+      "CloudFront invalidation"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Dead-letter queue com maxReceiveCount=5 (redrive policy). Isso resolve o cenário: Após 5 receives sem delete bem-sucedido, a mensagem some da fila principal e apa… O distractor «Weighted routing do Route 53» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Um evento 'OrderPlaced' deve acionar e-mail, fila de fulfillment e Lambda de analytics. Padrão?",
+    "alternativas": [
+      "SNS topic com fan-out para email, SQS e Lambda subscriptions",
+      "Uma única fila SQS lida por três consumers competindo sem fan-out lógico",
+      "Um bucket S3 com Principal * GetObject",
+      "Um Security Group com três portas abertas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: SNS topic com fan-out para email, SQS e Lambda subscriptions. Isso resolve o cenário: Um evento 'OrderPlaced' deve acionar e-mail, fila de fulfillment e Lambda de ana… O distractor «Uma única fila SQS lida por três consumers competindo sem fan-out lógico» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Multi-constraint: picos de 50k msgs/min, sem ordem global, consumers idempotentes, e poison messages isolados. Desenho?",
+    "alternativas": [
+      "SQS FIFO single group + sem DLQ",
+      "SQS standard de alto throughput + DLQ (maxReceiveCount) + consumers idempotentes",
+      "SNS email only sem fila",
+      "Chamadas síncronas encadeadas a 50k/s"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Standard escala para picos; DLQ isola poison; idempotência lida com at-least-once. FIFO single group limita throughput e ordem global não é requisito. Tip de prova: alto volume sem ordem estrita → standard + DLQ + idempotência.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Long polling (WaitTimeSeconds > 0) na ReceiveMessage reduz o quê?",
+    "alternativas": [
+      "Número de receives vazios e custo/chatter de short polling agressivo",
+      "A necessidade de IAM na fila",
+      "O tamanho máximo da mensagem para 0",
+      "A obrigação de DeleteMessage"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Número de receives vazios e custo/chatter de short polling agressivo. Isso resolve o cenário: Long polling (WaitTimeSeconds > 0) na ReceiveMessage reduz o quê?… O distractor «A necessidade de IAM na fila» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Role do consumer tem só sqs:ReceiveMessage; após processar, a msg volta sempre. O que falta além de visibility?",
+    "alternativas": [
+      "Permissão e chamada sqs:DeleteMessage (e delete com ReceiptHandle correto)",
+      "sns:Publish na mesma role obrigatoriamente",
+      "ec2:TerminateInstances",
+      "s3:ListAllMyBuckets"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Permissão e chamada sqs:DeleteMessage (e delete com ReceiptHandle correto). Isso resolve o cenário: Role do consumer tem só sqs:ReceiveMessage; após processar, a msg volta sempre. … O distractor «sns:Publish na mesma role obrigatoriamente» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "AccessDenied em SendMessage na API. get-caller-identity mostra a role correta. Causa típica?",
+    "alternativas": [
+      "Visibility timeout = 0",
+      "FIFO sem ContentBasedDeduplication apenas",
+      "DLQ com maxReceiveCount 1",
+      "Identity policy da role sem sqs:SendMessage no ARN da fila (ou resource policy negando)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Identity policy da role sem sqs:SendMessage no ARN da fila (ou resource policy negando). Isso resolve o cenário: AccessDenied em SendMessage na API. get-caller-identity mostra a role correta. C… O distractor «Visibility timeout = 0» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "SSE-SQS / KMS na fila (ideia): o que protege?",
+    "alternativas": [
+      "Criptografia em repouso das mensagens na fila (e trânsito via TLS nos endpoints)",
+      "Autenticação do usuário root sem MFA",
+      "Ordem global em filas standard",
+      "Fan-out automático para todos os tópicos SNS da conta"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Criptografia em repouso das mensagens na fila (e trânsito via TLS nos endpoints). Isso resolve o cenário: SSE-SQS / KMS na fila (ideia): o que protege?… O distractor «Autenticação do usuário root sem MFA» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SNS publica OK, mas a fila subscriber nunca recebe. Subscription está 'Confirmed'. Próximo check?",
+    "alternativas": [
+      "Queue policy permitindo Principal sns.amazonaws.com SendMessage na fila com SourceArn do topic",
+      "Aumentar o DefaultTTL do CloudFront",
+      "Habilitar Multi-AZ no tópico SNS (conceito inexistente como Multi-AZ de RDS)",
+      "Trocar a fila para FIFO sem recriar subscription"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Queue policy permitindo Principal sns.amazonaws.com SendMessage na fila com SourceArn do topic. Isso resolve o cenário: SNS publica OK, mas a fila subscriber nunca recebe. Subscription está 'Confirmed… O distractor «Aumentar o DefaultTTL do CloudFront» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Telemetria IoT 100k msgs/s sem ordem. Alguém propôs FIFO. Avaliação?",
+    "alternativas": [
+      "FIFO é obrigatório para qualquer IoT",
+      "Standard é o encaixe típico por throughput; FIFO adiciona limites e custo de modelo sem benefício de ordem",
+      "SNS não pode publicar em standard",
+      "DLQ só existe em FIFO"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Standard é o encaixe típico por throughput; FIFO adiciona limites e custo de modelo sem benefício de ordem. Isso resolve o cenário: Telemetria IoT 100k msgs/s sem ordem. Alguém propôs FIFO. Avaliação?… O distractor «FIFO é obrigatório para qualquer IoT» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Multi-constraint: fan-out para 3 times (billing, shipping, fraud) com isolamento de falha e poison messages por time. Desenho?",
+    "alternativas": [
+      "Um SNS topic → 3 filas SQS (uma por time), cada uma com sua DLQ",
+      "Uma única fila SQS lida pelos 3 times sem separação",
+      "Três publishes síncronos HTTP sem retry",
+      "Um ALB com sticky session para mensagens"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Um SNS topic → 3 filas SQS (uma por time), cada uma com sua DLQ. Isso resolve o cenário: Multi-constraint: fan-out para 3 times (billing, shipping, fraud) com isolamento… O distractor «Uma única fila SQS lida pelos 3 times sem separação» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ChangeMessageVisibility serve para quê durante um job longo?",
+    "alternativas": [
+      "Converter standard em FIFO in-place",
+      "Criar o tópico SNS",
+      "Invalidar o CloudFront",
+      "Estender o invisibilidade da mensagem enquanto o processamento continua (evitar reentrega precoce)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Estender o invisibilidade da mensagem enquanto o processamento continua (evitar reentrega precoce). Isso resolve o cenário: ChangeMessageVisibility serve para quê durante um job longo?… O distractor «Converter standard em FIFO in-place» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Message retention period na fila: efeito prático?",
+    "alternativas": [
+      "Tempo de cache do CloudFront",
+      "TTL do certificado ACM",
+      "Intervalo obrigatório entre publishes SNS",
+      "Tempo máximo que a mensagem pode permanecer na fila se não for consumida/deletada"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Tempo máximo que a mensagem pode permanecer na fila se não for consumida/deletada. Isso resolve o cenário: Message retention period na fila: efeito prático?… O distractor «Tempo de cache do CloudFront» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Redrive da DLQ de volta à fila principal: cuidado principal?",
+    "alternativas": [
+      "Redrive apaga o tópico SNS automaticamente",
+      "Redrive exige PubliclyAccessible na fila",
+      "Redrive só funciona com CNAME no apex",
+      "Reprocessar poison messages sem corrigir o bug pode encher a DLQ de novo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Reprocessar poison messages sem corrigir o bug pode encher a DLQ de novo. Isso resolve o cenário: Redrive da DLQ de volta à fila principal: cuidado principal?… O distractor «Redrive apaga o tópico SNS automaticamente» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Producer EC2 usa instance profile. Qual action mínima para enviar à fila?",
+    "alternativas": [
+      "sqs:DeleteMessageStack (ação inventada) apenas",
+      "sns:ConfirmSubscription apenas",
+      "sqs:SendMessage (e resource no ARN da fila) na role do instance profile",
+      "ec2:CreateTags apenas"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: sqs:SendMessage (e resource no ARN da fila) na role do instance profile. Isso resolve o cenário: Producer EC2 usa instance profile. Qual action mínima para enviar à fila?… O distractor «sqs:DeleteMessageStack (ação inventada) apenas» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "At-least-once delivery no SQS standard implica o quê no consumer?",
+    "alternativas": [
+      "Que a ordem global é sempre garantida",
+      "Que DeleteMessage é opcional",
+      "Desenhar idempotência / dedup de negócio porque a mesma msg pode ser entregue mais de uma vez",
+      "Que DLQ é proibida"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Desenhar idempotência / dedup de negócio porque a mesma msg pode ser entregue mais de uma vez. Isso resolve o cenário: At-least-once delivery no SQS standard implica o quê no consumer?… O distractor «Que a ordem global é sempre garantida» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SNS filter policy (menção leve, fora de lab): ideia?",
+    "alternativas": [
+      "Substitui a DLQ da SQS",
+      "Força FIFO em todas as filas",
+      "Subscriber recebe só mensagens cujos atributos batem com a filter policy",
+      "Remove a necessidade de IAM"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Subscriber recebe só mensagens cujos atributos batem com a filter policy. Isso resolve o cenário: SNS filter policy (menção leve, fora de lab): ideia?… O distractor «Substitui a DLQ da SQS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo desta part SQS/SNS?",
+    "alternativas": [
+      "Standard vs FIFO e visibility",
+      "DLQ e redrive",
+      "SNS fan-out para SQS",
+      "Amazon MQ/Kafka full, Kinesis deep, Step Functions lab e EventBridge pipes deep"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Amazon MQ/Kafka full, Kinesis deep, Step Functions lab e EventBridge pipes deep. Isso resolve o cenário: Fora de escopo profundo desta part SQS/SNS?… O distractor «Standard vs FIFO e visibility» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Batch ReceiveMessage de 10 msgs; visibility 60s; 2 msgs falham e não são deletadas. O que ocorre com as 2?",
+    "alternativas": [
+      "São apagadas automaticamente por serem batch",
+      "Viram publicações SNS",
+      "Após o timeout de visibility, ficam disponíveis de novo (ou vão à DLQ se maxReceiveCount estourar em retries)",
+      "Aumentam o weight do Route 53"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Após o timeout de visibility, ficam disponíveis de novo (ou vão à DLQ se maxReceiveCount estourar em retries). Isso resolve o cenário: Batch ReceiveMessage de 10 msgs; visibility 60s; 2 msgs falham e não são deletad… O distractor «São apagadas automaticamente por serem batch» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fila FIFO com um único MessageGroupId para todo o tráfego global. Efeito colateral?",
+    "alternativas": [
+      "Aumenta o limite de standard queues",
+      "Desliga a DLQ",
+      "Serializa forte o throughput daquele group (hot group) e pode limitar paralelismo",
+      "Converte a conta para organization trail"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Serializa forte o throughput daquele group (hot group) e pode limitar paralelismo. Isso resolve o cenário: Fila FIFO com um único MessageGroupId para todo o tráfego global. Efeito colater… O distractor «Aumenta o limite de standard queues» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Delay seconds / timer de mensagem (ideia): uso?",
+    "alternativas": [
+      "Aumentar o IOPS do EBS",
+      "Forçar HTTPS no ALB",
+      "Adiar a disponibilidade da mensagem por um intervalo antes do consumer ver",
+      "Criar hosted zone"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Adiar a disponibilidade da mensagem por um intervalo antes do consumer ver. Isso resolve o cenário: Delay seconds / timer de mensagem (ideia): uso?… O distractor «Aumentar o IOPS do EBS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dead-letter queue deve ser do mesmo tipo (standard/FIFO) que a source (regra prática AWS)?",
+    "alternativas": [
+      "Sempre standard mesmo se a source for FIFO",
+      "Sim — DLQ FIFO para source FIFO; standard para standard (compatibilidade de redrive)",
+      "Sempre FIFO mesmo se a source for standard",
+      "DLQ só pode ser tópico SNS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Sim — DLQ FIFO para source FIFO; standard para standard (compatibilidade de redrive). Isso resolve o cenário: Dead-letter queue deve ser do mesmo tipo (standard/FIFO) que a source (regra prá… O distractor «Sempre standard mesmo se a source for FIFO» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Consumers em ASG atrás de fila: como o ASG escala (ideia)?",
+    "alternativas": [
+      "Somente CPU do RDS",
+      "Métrica de profundidade da fila / idade da msg (approx) para desired capacity",
+      "Somente contagem de buckets S3",
+      "Somente número de hosted zones"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Métrica de profundidade da fila / idade da msg (approx) para desired capacity. Isso resolve o cenário: Consumers em ASG atrás de fila: como o ASG escala (ideia)?… O distractor «Somente CPU do RDS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "sns:Publish AccessDenied na role da API. Fix?",
+    "alternativas": [
+      "Allow sqs:DeleteMessageStack inventada",
+      "Allow sns:Publish no ARN do topic na role da API",
+      "Abrir porta 587 no SG do SNS (serviço gerenciado sem SG de VPC típico assim)",
+      "Criar CNAME no apex para o topic"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Allow sns:Publish no ARN do topic na role da API. Isso resolve o cenário: sns:Publish AccessDenied na role da API. Fix?… O distractor «Allow sqs:DeleteMessageStack inventada» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que combinar SNS + SQS em vez de só SNS HTTP ao endpoint frágil?",
+    "alternativas": [
+      "HTTP é proibido em toda a AWS",
+      "SQS bufferiza e reentrega se o consumer HTTP estiver fora; desacopla picos e falhas temporárias",
+      "SQS remove a necessidade de IAM",
+      "SNS não suporta múltiplos subscribers"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: SQS bufferiza e reentrega se o consumer HTTP estiver fora; desacopla picos e falhas temporárias. Isso resolve o cenário: Por que combinar SNS + SQS em vez de só SNS HTTP ao endpoint frágil?… O distractor «HTTP é proibido em toda a AWS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Message group id A processa msg1 depois msg2; group B em paralelo. Modelo FIFO?",
+    "alternativas": [
+      "Ordem global entre todos os groups sempre",
+      "Ordem garantida dentro do group; groups diferentes podem processar em paralelo",
+      "Groups desabilitam DeleteMessage",
+      "Groups só existem em standard queues"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Ordem garantida dentro do group; groups diferentes podem processar em paralelo. Isso resolve o cenário: Message group id A processa msg1 depois msg2; group B em paralelo. Modelo FIFO?… O distractor «Ordem global entre todos os groups sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.8), não em controles de outro domínio.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mental TShoot SQS/SNS nesta part?",
+    "alternativas": [
+      "Só recriar a VPC",
+      "Só aumentar o tamanho do EBS root",
+      "Só desligar o versioning S3",
+      "IAM send/receive/publish → visibility/Delete → DLQ maxReceiveCount → subscription/queue policy SNS→SQS → tipo FIFO vs standard"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Ordem isola permissão, reentrega, poison, fan-out e tipo de fila. VPC/EBS/S3 versioning não explicam msg reaparecendo. Tip de prova: msg some/reaparece → visibility/Delete/DLQ; AccessDenied → IAM; fan-out morto → policy da fila.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo de desacoplamento SQS/SNS no SAA-C03:",
+    "alternativas": [
+      "Tudo síncrono sem fila e sem DLQ em picos",
+      "FIFO para todo telemetria 100k/s e visibility 5s em jobs de 10 min",
+      "SNS→HTTP único sem buffer e Principal * na fila",
+      "Standard/FIFO conforme ordem, visibility alinhada ao processamento, DLQ, SNS fan-out com queue policy e IAM least privilege"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Bom design combina tipo de fila certo, visibility/DLQ, fan-out com policies e IAM mínimo. Visibility curta em jobs longos e FIFO indevido são anti-patterns. Tip de prova: se a opção equilibra tipo de fila, visibility/DLQ e SNS→SQS com IAM, costuma ser a correta.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  }
+]

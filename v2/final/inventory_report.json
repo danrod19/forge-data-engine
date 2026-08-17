@@ -1,0 +1,293 @@
+{
+  "generated_at": "2026-08-14T21:53:43.824Z",
+  "parts_dir": "v2/parts",
+  "files_total": 51,
+  "content_files": 17,
+  "questions_files": 17,
+  "tickets_files": 17,
+  "parts_expected": [
+    "5.1",
+    "5.2",
+    "1.1",
+    "4.4",
+    "1.7",
+    "1.6",
+    "2.2",
+    "2.4",
+    "3.3",
+    "4.7",
+    "4.2"
+  ],
+  "parts_found_keys": [
+    "1.1",
+    "1.5",
+    "1.6",
+    "1.7",
+    "2.2",
+    "2.4",
+    "2.5",
+    "3.2",
+    "3.3",
+    "3.4",
+    "4.2",
+    "4.3",
+    "4.4",
+    "4.6",
+    "4.7",
+    "5.1",
+    "5.2"
+  ],
+  "missing_expected": [],
+  "extra_parts": [
+    "1.5",
+    "2.5",
+    "3.2",
+    "3.4",
+    "4.3",
+    "4.6"
+  ],
+  "parts": [
+    {
+      "part_key": "1.1",
+      "part_id": "v2-1.1",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-1.1-content.json",
+        "questions": "part-v2-1.1-questions.json",
+        "tickets": "part-v2-1.1-tickets.json"
+      }
+    },
+    {
+      "part_key": "1.5",
+      "part_id": "v2-1.5",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-1.5-content.json",
+        "questions": "part-v2-1.5-questions.json",
+        "tickets": "part-v2-1.5-tickets.json"
+      }
+    },
+    {
+      "part_key": "1.6",
+      "part_id": "v2-1.6",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-1.6-content.json",
+        "questions": "part-v2-1.6-questions.json",
+        "tickets": "part-v2-1.6-tickets.json"
+      }
+    },
+    {
+      "part_key": "1.7",
+      "part_id": "v2-1.7",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-1.7-content.json",
+        "questions": "part-v2-1.7-questions.json",
+        "tickets": "part-v2-1.7-tickets.json"
+      }
+    },
+    {
+      "part_key": "2.2",
+      "part_id": "v2-2.2",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-2.2-content.json",
+        "questions": "part-v2-2.2-questions.json",
+        "tickets": "part-v2-2.2-tickets.json"
+      }
+    },
+    {
+      "part_key": "2.4",
+      "part_id": "v2-2.4",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-2.4-content.json",
+        "questions": "part-v2-2.4-questions.json",
+        "tickets": "part-v2-2.4-tickets.json"
+      }
+    },
+    {
+      "part_key": "2.5",
+      "part_id": "v2-2.5",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-2.5-content.json",
+        "questions": "part-v2-2.5-questions.json",
+        "tickets": "part-v2-2.5-tickets.json"
+      }
+    },
+    {
+      "part_key": "3.2",
+      "part_id": "v2-3.2",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-3.2-content.json",
+        "questions": "part-v2-3.2-questions.json",
+        "tickets": "part-v2-3.2-tickets.json"
+      }
+    },
+    {
+      "part_key": "3.3",
+      "part_id": "v2-3.3",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-3.3-content.json",
+        "questions": "part-v2-3.3-questions.json",
+        "tickets": "part-v2-3.3-tickets.json"
+      }
+    },
+    {
+      "part_key": "3.4",
+      "part_id": "v2-3.4",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-3.4-content.json",
+        "questions": "part-v2-3.4-questions.json",
+        "tickets": "part-v2-3.4-tickets.json"
+      }
+    },
+    {
+      "part_key": "4.2",
+      "part_id": "v2-4.2",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-4.2-content.json",
+        "questions": "part-v2-4.2-questions.json",
+        "tickets": "part-v2-4.2-tickets.json"
+      }
+    },
+    {
+      "part_key": "4.3",
+      "part_id": "v2-4.3",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-4.3-content.json",
+        "questions": "part-v2-4.3-questions.json",
+        "tickets": "part-v2-4.3-tickets.json"
+      }
+    },
+    {
+      "part_key": "4.4",
+      "part_id": "v2-4.4",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-4.4-content.json",
+        "questions": "part-v2-4.4-questions.json",
+        "tickets": "part-v2-4.4-tickets.json"
+      }
+    },
+    {
+      "part_key": "4.6",
+      "part_id": "v2-4.6",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-4.6-content.json",
+        "questions": "part-v2-4.6-questions.json",
+        "tickets": "part-v2-4.6-tickets.json"
+      }
+    },
+    {
+      "part_key": "4.7",
+      "part_id": "v2-4.7",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-4.7-content.json",
+        "questions": "part-v2-4.7-questions.json",
+        "tickets": "part-v2-4.7-tickets.json"
+      }
+    },
+    {
+      "part_key": "5.1",
+      "part_id": "v2-5.1",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-5.1-content.json",
+        "questions": "part-v2-5.1-questions.json",
+        "tickets": "part-v2-5.1-tickets.json"
+      }
+    },
+    {
+      "part_key": "5.2",
+      "part_id": "v2-5.2",
+      "has_content": true,
+      "has_questions": true,
+      "has_tickets": true,
+      "questions_count": 30,
+      "tickets_count": 5,
+      "files": {
+        "content": "part-v2-5.2-content.json",
+        "questions": "part-v2-5.2-questions.json",
+        "tickets": "part-v2-5.2-tickets.json"
+      }
+    }
+  ],
+  "totals_raw": {
+    "questions": 510,
+    "tickets": 85
+  }
+}

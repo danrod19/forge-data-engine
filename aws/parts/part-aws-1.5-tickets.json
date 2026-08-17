@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1501: ALB api-prod com 502/503; targets Unhealthy. App sobe na 8080 (SSM).",
+    "cli_output": "$ aws elbv2 describe-target-health --target-group-arn arn:aws:elasticloadbalancing:us-east-1:111122223333:targetgroup/api/abc\nTarget i-0a1:8080  State: unhealthy  Reason: Target.FailedHealthChecks\nTarget i-0a2:8080  State: unhealthy  Reason: Target.FailedHealthChecks\n\n$ aws elbv2 describe-target-groups --target-group-arns arn:...:targetgroup/api/abc\nPort: 8080\nHealthCheckPath: /healthz\nHealthCheckPort: traffic-port\nMatcher.HttpCode: 200\n\n# Na instance i-0a1:\n$ curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:8080/healthz\n404\n$ curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:8080/ready\n200\n\n$ aws ec2 describe-security-groups --group-ids sg-app\nInbound: TCP 8080 Source sg-alb\nOutbound: all",
+    "alternativas": [
+      "Abrir 22 0.0.0.0/0 no sg-app",
+      "Corrigir HealthCheckPath para /ready (ou implementar /healthz 200) — path atual retorna 404",
+      "Remover o ALB e usar EIP",
+      "Aumentar max do ASG sem corrigir health"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "SG e porta ok; curl local mostra /healthz 404 e /ready 200 — o TG marca unhealthy por matcher 200. Ajustar path ou endpoint resolve. max ASG e EIP não consertam 404 de health. Tip de prova: FailedHealthChecks + 404 no path → alinhe health path à app.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1502: Clientes recebem 503 no ALB shop-alb. Pico de tráfego zero (madrugada).",
+    "cli_output": "$ aws elbv2 describe-load-balancers --names shop-alb\nState: active  Scheme: internet-facing\nAvailabilityZones: us-east-1a, us-east-1b\n\n$ aws elbv2 describe-target-health --target-group-arn arn:...:targetgroup/shop/xyz\n(no targets / empty)\n\n$ aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names shop-asg\nMinSize: 0\nDesiredCapacity: 0\nMaxSize: 12\nTargetGroupARNs: [arn:...:targetgroup/shop/xyz]\nVPCZoneIdentifier: subnet-0priva,subnet-0privb\n\n$ aws autoscaling describe-scaling-activities --auto-scaling-group-name shop-asg --max-records 3\nStatusCode: Successful  Description: Setting desired capacity to 0\nCause: scheduled action night-scale-in (stale) left desired at 0 past morning\n\n$ aws elbv2 describe-listeners --load-balancer-arn arn:...:loadbalancer/app/shop-alb/...\nListener 443 default action forward shop TG",
+    "alternativas": [
+      "Recriar o certificado ACM",
+      "Desligar cross-zone load balancing",
+      "Subir DesiredCapacity/MinSize do shop-asg (ex. min=2) — TG vazio com desired 0 explica 503",
+      "Trocar ALB por NAT Gateway"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Listener e ALB active, mas TG sem targets e ASG desired/min 0 após scale-in noturno stale — zero backends = 503. ACM e NAT não criam instances. Tip de prova: 503 + empty target health + desired 0 → restore capacity do ASG.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1503: ASG web-asg não lança instances após desired=4; ALB sem backends novos.",
+    "cli_output": "$ aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names web-asg\nDesiredCapacity: 4\nMinSize: 2\nMaxSize: 8\nInstances: []\nVPCZoneIdentifier: subnet-0fulla\nHealthCheckType: ELB\n\n$ aws autoscaling describe-scaling-activities --auto-scaling-group-name web-asg --max-records 5\nStatusCode: Failed\nStatusMessage: Launching a new EC2 instance. Status Reason: There are not enough free addresses in subnet subnet-0fulla to satisfy the requested number of instances.\nDescription: Launching a new EC2 instance.  Failure...\n\n$ aws ec2 describe-subnets --subnet-ids subnet-0fulla\nAvailabilityZone: us-east-1a\nAvailableIpAddressCount: 0\nCidrBlock: 10.0.10.0/28\n\n$ aws ec2 describe-launch-template-versions --launch-template-id lt-0web --versions '$Latest'\nImageId: ami-0ok  InstanceType: t3.small  SecurityGroupIds: [sg-app]",
+    "alternativas": [
+      "Culpar só a AMI e trocar para Windows sem olhar IPs",
+      "Adicionar subnet(s) com IPs livres ao ASG (multi-AZ) ou expandir CIDR — AvailableIpAddressCount 0 na única subnet",
+      "Remover o target group",
+      "Setar desired=0 para 'limpar o erro'"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Scaling activity Failed por falta de endereços e /28 com 0 IPs livres na única subnet. LT/AMI ok. Ampliar subnets/CIDR ou multi-AZ resolve capacity de rede. Tip de prova: ASG Failed free addresses → subnet IP exhaustion.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1504: Timeout de usuários na app; ALB access logs mostram forward ao target mas sem resposta. Status checks da EC2 ok.",
+    "cli_output": "$ aws elbv2 describe-target-health --target-group-arn arn:...:targetgroup/pay/1\ni-0pay1:8443  State: unhealthy  Reason: Target.Timeout\ni-0pay2:8443  State: unhealthy  Reason: Target.Timeout\n\n$ aws ec2 describe-security-groups --group-ids sg-alb\nInbound: TCP 443 0.0.0.0/0\nOutbound: all\n\n$ aws ec2 describe-security-groups --group-ids sg-pay\nInbound:\n  TCP 22  Source 10.0.0.0/16\n  TCP 8443 Source 10.0.0.0/8\n  (no reference to sg-alb)\nOutbound: all\n\n$ aws ec2 describe-instances --instance-ids i-0pay1\nState: running  Subnet: subnet-0privb (private)\n# SSM: ss -lntp | grep 8443 → LISTEN\n\n$ aws elbv2 describe-target-groups --target-group-arns arn:...:targetgroup/pay/1\nPort: 8443  HealthCheckProtocol: HTTPS  HealthCheckPath: /health",
+    "alternativas": [
+      "Permitir no sg-pay TCP 8443 com Source = sg-alb (e revisar se 10.0.0.0/8 realmente cobre as ENIs do ALB)",
+      "Aumentar o tamanho do volume root",
+      "Desligar o listener 443",
+      "Converter o ASG para single-AZ"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Process listen e timeout de health apontam filtragem: sg-pay não referencia sg-alb na 8443 (CIDR 10.0.0.0/8 pode não cobrir IPs do ALB conforme VPC). Root volume e single-AZ não abrem o path. Tip de prova: Target.Timeout com app LISTEN → SG source = sg do ALB.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1505: Após scale-in noturno, jobs long-running morreram; além disso, post-mortem de AZ failure mostrou ASG só em 1a.",
+    "cli_output": "$ aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names batch-asg\nMinSize: 1\nDesiredCapacity: 1\nMaxSize: 6\nVPCZoneIdentifier: subnet-0priva\nDefaultCooldown: 60\nTargetGroupARNs: [arn:...:targetgroup/batch/9]\nHealthCheckType: EC2\n\n$ aws elbv2 describe-target-groups --target-group-arns arn:...:targetgroup/batch/9\nDeregistrationDelayTimeoutSeconds: 30\n\n# CloudTrail / ASG activity:\nSuccessful: Terminating EC2 instance i-0job9  Cause: scale-in to desired 1\n# Job logs on i-0job9: killed mid-run; connection reset from ALB after 30s\n\n$ aws elbv2 describe-load-balancers --names batch-alb\nAvailabilityZones: us-east-1a, us-east-1b\n\n$ aws ec2 describe-subnets --subnet-ids subnet-0priva\nAZ: us-east-1a",
+    "alternativas": [
+      "Aumentar deregistration delay e colocar o ASG em subnets multi-AZ (ex. 1a+1b) com min≥2 se HA for requisito",
+      "Setar desired=0 permanentemente",
+      "Remover o ALB multi-AZ",
+      "Desabilitar todos os security groups"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Duas falhas na evidência: draining 30s corta job longo no scale-in; ASG só em 1a é SPOF apesar do ALB multi-AZ. Aumentar deregistration delay e multi-AZ/min cobre ambos. desired 0 piora. Tip de prova: scale-in kill + single subnet AZ → draining e VPCZoneIdentifier multi-AZ.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  }
+]

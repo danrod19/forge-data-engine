@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "API precisa buscar todos os pedidos de um customerId ordenados por data. Qual modelo de chave encaixa?",
+    "alternativas": [
+      "PK = customerId e SK = orderDate (ou orderId com data) permitindo Query na partição do cliente",
+      "PK = status (OPEN/CLOSED) apenas, sem SK",
+      "Somente Scan com FilterExpression em produção como path principal",
+      "PK aleatório por request sem relação com customerId"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: PK = customerId e SK = orderDate (ou orderId com data) permitindo Query na partição do cliente. Isso resolve o cenário: API precisa buscar todos os pedidos de um customerId ordenados por data. Qual mo… O distractor «PK = status (OPEN/CLOSED) apenas, sem SK» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Tráfego da tabela é imprevisível (0 a picos 10×). Modo de capacidade alinhado a custo/ops?",
+    "alternativas": [
+      "Provisioned fixo no mínimo 1 RCU sempre",
+      "On-demand (pay-per-request) para absorver picos sem capacity planning rígido",
+      "Desligar a tabela à noite manualmente",
+      "Usar só Scan para reduzir RCU"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: On-demand (pay-per-request) para absorver picos sem capacity planning rígido. Isso resolve o cenário: Tráfego da tabela é imprevisível (0 a picos 10×). Modo de capacidade alinhado a … O distractor «Provisioned fixo no mínimo 1 RCU sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "CloudWatch mostra ProvisionedThroughputExceeded em PutItem. Causa típica?",
+    "alternativas": [
+      "WCU provisionados insuficientes e/ou hot partition na mesma PK",
+      "Falta de Elastic IP na tabela",
+      "CNAME no apex do Route 53",
+      "Security Group 0.0.0.0/0 ausente (DynamoDB não usa SG de VPC da mesma forma que EC2)"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: WCU provisionados insuficientes e/ou hot partition na mesma PK. Isso resolve o cenário: CloudWatch mostra ProvisionedThroughputExceeded em PutItem. Causa típica?… O distractor «Falta de Elastic IP na tabela» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Access pattern novo: buscar item por email. A tabela só tem PK=userId. Próximo passo de modelo?",
+    "alternativas": [
+      "Criar GSI com PK=email (e projetar atributos necessários)",
+      "Fazer Scan em toda request de login",
+      "Trocar o ALB para NLB",
+      "Aumentar só o timeout da Lambda sem índice"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Criar GSI com PK=email (e projetar atributos necessários). Isso resolve o cenário: Access pattern novo: buscar item por email. A tabela só tem PK=userId. Próximo p… O distractor «Fazer Scan em toda request de login» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Query vs Scan: qual a diferença operacional crítica?",
+    "alternativas": [
+      "Query usa key condition na partição; Scan lê potencialmente toda a tabela (mais RCU e latência em escala)",
+      "Scan é sempre grátis",
+      "Query só funciona em S3",
+      "Scan garante strongly consistent em GSI sempre"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Query usa key condition na partição; Scan lê potencialmente toda a tabela (mais RCU e latência em escala). Isso resolve o cenário: Query vs Scan: qual a diferença operacional crítica?… O distractor «Scan é sempre grátis» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Multi-constraint: latência de leitura baixa no path principal, custo controlado em tráfego steady, e Query por orderId e por customerId. Desenho?",
+    "alternativas": [
+      "Tabela com PK/SK para o padrão dominante + GSI para o segundo + provisioned com auto scaling (ou rightsized) em vez de Scan",
+      "Só Scan on-demand em tudo",
+      "Duas tabelas SQL no EC2 single-AZ",
+      "Um item gigante com todos os clientes"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Tabela com PK/SK para o padrão dominante + GSI para o segundo + provisioned com auto scaling (ou rightsized) em vez de Scan. Isso resolve o cenário: Multi-constraint: latência de leitura baixa no path principal, custo controlado … O distractor «Só Scan on-demand em tudo» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Strongly consistent read (ideia): trade-off?",
+    "alternativas": [
+      "Lê o valor mais recente na tabela base com mais consumo de RCU; eventual é default mais barato/rápido em alguns casos",
+      "É grátis e sempre no GSI",
+      "Desliga o throttle",
+      "Obriga on-demand"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Lê o valor mais recente na tabela base com mais consumo de RCU; eventual é default mais barato/rápido em alguns casos. Isso resolve o cenário: Strongly consistent read (ideia): trade-off?… O distractor «É grátis e sempre no GSI» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "LSI (ideia): quando usar em vez de GSI?",
+    "alternativas": [
+      "Mesma partition key, outra ordenação/sort key, definida na criação da tabela",
+      "Quando se precisa de PK totalmente diferente (aí é GSI)",
+      "Para substituir IAM",
+      "Para cifrar o item sem KMS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Mesma partition key, outra ordenação/sort key, definida na criação da tabela. Isso resolve o cenário: LSI (ideia): quando usar em vez de GSI?… O distractor «Quando se precisa de PK totalmente diferente (aí é GSI)» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "TTL em atributo expira_em: efeito?",
+    "alternativas": [
+      "Itens elegíveis são removidos posteriormente (best-effort) sem custo de delete app — limpeza de sessão/cache",
+      "Apaga a tabela inteira à meia-noite",
+      "Aumenta WCU automaticamente para 40k",
+      "Converte a tabela em SQL"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Itens elegíveis são removidos posteriormente (best-effort) sem custo de delete app — limpeza de sessão/cache. Isso resolve o cenário: TTL em atributo expira_em: efeito?… O distractor «Apaga a tabela inteira à meia-noite» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Streams + Lambda (ideia): caso de uso?",
+    "alternativas": [
+      "Substituir a partition key",
+      "Desligar encryption",
+      "Criar o VPC peering automático",
+      "Reagir a inserts/updates/deletes (ex. invalidar cache, fan-out) de forma event-driven"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Reagir a inserts/updates/deletes (ex. invalidar cache, fan-out) de forma event-driven. Isso resolve o cenário: Streams + Lambda (ideia): caso de uso?… O distractor «Substituir a partition key» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Role da Lambda só tem dynamodb:GetItem; o código faz Query. Sintoma?",
+    "alternativas": [
+      "Throttle de RCU apenas",
+      "TTL apaga a role",
+      "GSI some sozinho",
+      "AccessDenied em dynamodb:Query — action distinta de GetItem"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: AccessDenied em dynamodb:Query — action distinta de GetItem. Isso resolve o cenário: Role da Lambda só tem dynamodb:GetItem; o código faz Query. Sintoma?… O distractor «Throttle de RCU apenas» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Hot partition: 90% dos writes usam PK=STATUS#OPEN. Efeito?",
+    "alternativas": [
+      "Distribuição perfeita automática sempre",
+      "Conversão para on-demand resolve modelagem de chave sempre",
+      "Scan fica grátis",
+      "Throttle/latência nessa partição mesmo com WCU total 'teoricamente' suficiente"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Throttle/latência nessa partição mesmo com WCU total 'teoricamente' suficiente. Isso resolve o cenário: Hot partition: 90% dos writes usam PK=STATUS#OPEN. Efeito?… O distractor «Distribuição perfeita automática sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Multi-constraint: custo mínimo em tráfego muito baixo e spiky, e Query por deviceId. Escolha?",
+    "alternativas": [
+      "Provisioned 4000 WCU 24×7 com Scan",
+      "Global table em 10 regiões sem requisito",
+      "DAX obrigatório no piloto",
+      "Tabela com PK=deviceId (SK se precisar) em on-demand; evitar Scan e over-provision 1000 WCU ociosos"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Tabela com PK=deviceId (SK se precisar) em on-demand; evitar Scan e over-provision 1000 WCU ociosos. Isso resolve o cenário: Multi-constraint: custo mínimo em tráfego muito baixo e spiky, e Query por devic… O distractor «Provisioned 4000 WCU 24×7 com Scan» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Eventually consistent read logo após PutItem em outra região de réplica (ideia global tables fora de lab): expectativa?",
+    "alternativas": [
+      "Sempre lê o novo valor em 0 ms globalmente",
+      "PutItem falha se eventual",
+      "Pode ler valor antigo por um curto período até a propagação; strong read na réplica tem regras específicas",
+      "RCU vira zero"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Pode ler valor antigo por um curto período até a propagação; strong read na réplica tem regras específicas. Isso resolve o cenário: Eventually consistent read logo após PutItem em outra região de réplica (ideia g… O distractor «Sempre lê o novo valor em 0 ms globalmente» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Encryption at rest com CMK customer: além de dynamodb:GetItem, o que a role pode precisar?",
+    "alternativas": [
+      "sns:Subscribe obrigatório",
+      "route53:ListHostedZones",
+      "kms:Decrypt (e correlatas) na CMK se a tabela usa customer managed key",
+      "ec2:TerminateInstances"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: kms:Decrypt (e correlatas) na CMK se a tabela usa customer managed key. Isso resolve o cenário: Encryption at rest com CMK customer: além de dynamodb:GetItem, o que a role pode… O distractor «sns:Subscribe obrigatório» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Billing mode PROVISIONED com Auto Scaling de capacidade (ideia): benefício?",
+    "alternativas": [
+      "Elimina a need de PK",
+      "Torna Scan gratuito",
+      "Ajusta RCU/WCU a métricas de consumo, reduzindo throttle e ociosidade extrema",
+      "Desliga IAM"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Ajusta RCU/WCU a métricas de consumo, reduzindo throttle e ociosidade extrema. Isso resolve o cenário: Billing mode PROVISIONED com Auto Scaling de capacidade (ideia): benefício?… O distractor «Elimina a need de PK» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "FilterExpression em Query: o que ainda é consumido?",
+    "alternativas": [
+      "Zero RCU sempre",
+      "Apenas WCU",
+      "RCU dos itens lidos antes do filtro — Filter não reduz leituras da partição já recuperadas",
+      "Nada se houver GSI"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: RCU dos itens lidos antes do filtro — Filter não reduz leituras da partição já recuperadas. Isso resolve o cenário: FilterExpression em Query: o que ainda é consumido?… O distractor «Zero RCU sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Projection ALL vs KEYS_ONLY em GSI (ideia de custo/storage)?",
+    "alternativas": [
+      "KEYS_ONLY desliga Query",
+      "ALL remove a tabela base",
+      "KEYS_ONLY projeta só chaves (mais leve); ALL copia mais atributos (mais storage/custo de índice)",
+      "Projection define o IAM"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: KEYS_ONLY projeta só chaves (mais leve); ALL copia mais atributos (mais storage/custo de índice). Isso resolve o cenário: Projection ALL vs KEYS_ONLY em GSI (ideia de custo/storage)?… O distractor «KEYS_ONLY desliga Query» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Point-in-time recovery (PITR) DynamoDB (ideia): para quê?",
+    "alternativas": [
+      "Aumentar RCU grátis",
+      "Criar GSI automático",
+      "Restaurar a tabela a um segundo nos últimos 35 dias (ideia de proteção contra delete/corrupção)",
+      "Substituir Multi-AZ (já built-in)"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Restaurar a tabela a um segundo nos últimos 35 dias (ideia de proteção contra delete/corrupção). Isso resolve o cenário: Point-in-time recovery (PITR) DynamoDB (ideia): para quê?… O distractor «Aumentar RCU grátis» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo desta part DynamoDB foundations?",
+    "alternativas": [
+      "PK/SK e Query vs Scan",
+      "RCU/WCU e on-demand",
+      "GSI ideia e throttle",
+      "DAX lab, PartiQL deep, transactions lab completo e Global Tables multi-Region lab full"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: DAX lab, PartiQL deep, transactions lab completo e Global Tables multi-Region lab full. Isso resolve o cenário: Fora de escopo profundo desta part DynamoDB foundations?… O distractor «PK/SK e Query vs Scan» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "BatchWriteItem partial failure (ideia): o que fazer?",
+    "alternativas": [
+      "Ignorar e aumentar só o timeout da Lambda",
+      "Apagar a tabela",
+      "Retentar os UnprocessedItems com backoff; não assumir que o batch inteiro gravou",
+      "Trocar para Scan"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Retentar os UnprocessedItems com backoff; não assumir que o batch inteiro gravou. Isso resolve o cenário: BatchWriteItem partial failure (ideia): o que fazer?… O distractor «Ignorar e aumentar só o timeout da Lambda» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "IAM least privilege para API que só lê um item por id:",
+    "alternativas": [
+      "dynamodb:* em Resource *",
+      "dynamodb:GetItem no ARN da tabela (e condição de key se usar conditions avançadas)",
+      "AdministratorAccess",
+      "s3:* em Resource *"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: dynamodb:GetItem no ARN da tabela (e condição de key se usar conditions avançadas). Isso resolve o cenário: IAM least privilege para API que só lê um item por id:… O distractor «dynamodb:* em Resource *» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "On-demand tabela com custo surpresa alto: causa comum?",
+    "alternativas": [
+      "Falta de Elastic IP",
+      "Scan/Query amplos ou tráfego muito acima do esperado — on-demand cobra por request unit",
+      "TTL desligado apenas",
+      "Alias Route 53"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Scan/Query amplos ou tráfego muito acima do esperado — on-demand cobra por request unit. Isso resolve o cenário: On-demand tabela com custo surpresa alto: causa comum?… O distractor «Falta de Elastic IP» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Composite sort key userId#timestamp: benefício?",
+    "alternativas": [
+      "Substitui a need de encryption",
+      "Permite ranges e hierarquia na SK dentro da mesma PK (Query begins_with/between)",
+      "Desliga throttle para sempre",
+      "Cria Multi-Region automático"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Permite ranges e hierarquia na SK dentro da mesma PK (Query begins_with/between). Isso resolve o cenário: Composite sort key userId#timestamp: benefício?… O distractor «Substitui a need de encryption» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Adaptive capacity (ideia): o que ajuda e o que não resolve sozinho?",
+    "alternativas": [
+      "Elimina a need de GSI sempre",
+      "Ajuda desbalanceamento temporário entre partições; não corrige PK de baixíssima cardinalidade crônica",
+      "Remove IAM",
+      "Torna Scan O(1)"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Ajuda desbalanceamento temporário entre partições; não corrige PK de baixíssima cardinalidade crônica. Isso resolve o cenário: Adaptive capacity (ideia): o que ajuda e o que não resolve sozinho?… O distractor «Elimina a need de GSI sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Global secondary index eventual: app escreve e logo Query no GSI. Risco?",
+    "alternativas": [
+      "A tabela base apaga o item",
+      "Pode não ver o item imediatamente (eventual consistency do GSI)",
+      "WCU vira zero",
+      "A PK da base muda sozinha"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Pode não ver o item imediatamente (eventual consistency do GSI). Isso resolve o cenário: Global secondary index eventual: app escreve e logo Query no GSI. Risco?… O distractor «A tabela base apaga o item» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "describe-table BillingModeSummary PAY_PER_REQUEST. O que NÃO se define?",
+    "alternativas": [
+      "Nome da tabela",
+      "RCU/WCU provisionados fixos da tabela base (on-demand não usa provisioned clássico)",
+      "Key schema",
+      "Stream specification se habilitado"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: RCU/WCU provisionados fixos da tabela base (on-demand não usa provisioned clássico). Isso resolve o cenário: describe-table BillingModeSummary PAY_PER_REQUEST. O que NÃO se define?… O distractor «Nome da tabela» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Condicional PutItem attribute_not_exists(PK): uso?",
+    "alternativas": [
+      "Aumentar RCU",
+      "Criar item só se a chave não existir (evita overwrite acidental / lock otimista simples)",
+      "Criar GSI",
+      "Abrir o Security Group"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Criar item só se a chave não existir (evita overwrite acidental / lock otimista simples). Isso resolve o cenário: Condicional PutItem attribute_not_exists(PK): uso?… O distractor «Aumentar RCU» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mental TShoot DynamoDB nesta part?",
+    "alternativas": [
+      "Só recriar a VPC",
+      "Só aumentar o ASG web",
+      "Só desligar o CloudFront",
+      "Erro tipo (throttle vs AccessDenied vs Validation) → capacidade/hot key → Query vs Scan → GSI → IAM actions/ARN → encryption/KMS"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Erro tipo (throttle vs AccessDenied vs Validation) → capacidade/hot key → Query vs Scan → GSI → IAM actions/ARN → encryption/KMS. Isso resolve o cenário: Checklist mental TShoot DynamoDB nesta part?… O distractor «Só recriar a VPC» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo DynamoDB foundations no SAA-C03:",
+    "alternativas": [
+      "Scan full + PK=status + provisioned 1 WCU + dynamodb:* na role",
+      "Só on-demand sem modelar chave",
+      "GSI para tudo sem Query na base",
+      "Chaves por access pattern, Query>Scan, capacidade certa (on-demand/provisioned), GSI quando preciso, IAM mínimo e throttle/hot key conscientes"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Chaves por access pattern, Query>Scan, capacidade certa (on-demand/provisioned), GSI quando preciso, IAM mínimo e throttle/hot key conscientes. Isso resolve o cenário: Resumo DynamoDB foundations no SAA-C03:… O distractor «Scan full + PK=status + provisioned 1 WCU + dynamodb:* na role» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.11), não em controles de outro domínio.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  }
+]

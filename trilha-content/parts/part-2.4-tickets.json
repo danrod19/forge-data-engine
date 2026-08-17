@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8501 — EtherChannel entre Access e Dist “não forma”. Cabos novos, LEDs acesos. Time culpou o patch panel.",
+    "cli_output": "Access# show running-config | section GigabitEthernet1/0/47|GigabitEthernet1/0/48|Port-channel1\ninterface Port-channel1\n switchport mode trunk\ninterface GigabitEthernet1/0/47\n channel-group 1 mode desirable\ninterface GigabitEthernet1/0/48\n channel-group 1 mode desirable\n\nDist# show running-config | section GigabitEthernet1/0/1|GigabitEthernet1/0/2|Port-channel1\ninterface Port-channel1\n switchport mode trunk\ninterface GigabitEthernet1/0/1\n channel-group 1 mode passive\ninterface GigabitEthernet1/0/2\n channel-group 1 mode passive\n\nAccess# show etherchannel summary\nFlags:  D - down        P - bundled in port-channel\n        I - stand-alone\nNumber of channel-groups in use: 1\nGroup  Port-channel  Protocol    Ports\n------+-------------+-----------+-----------------------------------------------\n1      Po1(SD)         PAgP        Gi1/0/47(I)   Gi1/0/48(I)\n\nDist# show etherchannel summary\n1      Po1(SD)         LACP        Gi1/0/1(I)    Gi1/0/2(I)",
+    "alternativas": [
+      "Speed 100M vs 1G é a única linha do summary",
+      "Modes incompatíveis: Access PAgP desirable vs Dist LACP passive — Po1 SD e membros stand-alone (I)",
+      "Ambos os lados mostram Protocol LACP e ports em P",
+      "Po1(P) com todos bundled no Access"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "desirable/PAgP de um lado e passive/LACP do outro; summary com Protocol diferente e flags I/SD. Não há P bundled. Speed não aparece como causa no recorte.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8502 — Um lado foi “forçado on” no baseline e o outro ficou em LACP active. Bundle morto após migração.",
+    "cli_output": "SW-A# show run | include channel-group\n channel-group 2 mode on\n channel-group 2 mode on\n\nSW-B# show run | include channel-group\n channel-group 2 mode active\n channel-group 2 mode active\n\nSW-A# show etherchannel summary\n2      Po2(SD)         -           Gi1/0/1(I)  Gi1/0/2(I)\n\nSW-B# show etherchannel summary\n2      Po2(SD)         LACP        Gi1/0/1(I)  Gi1/0/2(I)\n\nSW-A# show interfaces Gi1/0/1 etherchannel\n                 Age of the Port in the current state: 00:12:01\n                 Port-channel not enabled / not bundled",
+    "alternativas": [
+      "on no SW-A e LACP active no SW-B: estático vs negociação — Po2 SD e membros I; alinhar on+on ou active+active/passive",
+      "Protocol LACP nos dois summaries com ports P",
+      "mode on + mode active é o par LACP recomendado multi-vendor",
+      "Port-channel not enabled só indica native mismatch 99"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "on vs active, Protocol “-” vs LACP, membros I e Po SD. Não há ports P. on+active não é o par recomendado. A saída não aponta native 99.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8503 — LACP active/active configurado, mas só um uplink entra no Po. O segundo fica “sozinho”.",
+    "cli_output": "Agg# show etherchannel summary\n1      Po1(SU)         LACP        Gi1/0/1(P)  Gi1/0/2(I)\n\nAgg# show interfaces status | include Gi1/0/1|Gi1/0/2\nGi1/0/1  member-a   connected  trunk  a-full  a-1000  10/100/1000BaseTX\nGi1/0/2  member-b   connected  trunk  a-full   a-100  10/100/1000BaseTX\n\nAgg# show interfaces Gi1/0/1 switchport | include Administrative|Operational|Native|Trunking VLANs\nAdministrative Mode: trunk\nOperational Mode: trunk\nTrunking Native Mode VLAN: 1\nTrunking VLANs Enabled: 1,10,20,30\n\nAgg# show interfaces Gi1/0/2 switchport | include Administrative|Operational|Native|Trunking VLANs|Speed\nAdministrative Mode: trunk\nOperational Mode: trunk\nTrunking Native Mode VLAN: 1\nTrunking VLANs Enabled: 1,10,20,30\n\nAgg# show interfaces Gi1/0/2 | include BW|duplex|Speed\n  Full-duplex, 100Mb/s, media type is 10/100/1000BaseTX\n\nAgg# show interfaces Gi1/0/1 | include BW|duplex|Speed\n  Full-duplex, 1000Mb/s, media type is 10/100/1000BaseTX",
+    "alternativas": [
+      "Native 99 vs 1 entre membros no output",
+      "Gi1/0/2 em mode access vlan 10",
+      "Protocol PAgP no summary com Po down",
+      "Mismatch de speed: Gi1/0/1 a-1000/1000Mb e Gi1/0/2 a-100/100Mb — Gi1/0/1 em P e Gi1/0/2 stand-alone (I) no summary"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Summary Po1 SU LACP com um P e um I; status/speed 1G vs 100M. Native e allowed iguais no recorte. Não é access nem PAgP down.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8504 — “O Port-Channel está up”, mas a capacidade parece de um único cabo. Redundância falhou no teste de puxar um link.",
+    "cli_output": "Core# show etherchannel summary\nFlags:  D - down        P - bundled in port-channel\n        s - suspended   H - Hot-standby (LACP only)\n        I - stand-alone\nNumber of channel-groups in use: 1\nGroup  Port-channel  Protocol    Ports\n------+-------------+-----------+-----------------------------------------------\n3      Po3(SU)         LACP        Gi1/0/10(P)  Gi1/0/11(s)  Gi1/0/12(I)  Gi1/0/13(I)\n\nCore# show etherchannel port-channel\n                Channel-group listing:\n                ----------------------\nGroup: 3\n----------\n                Port-channels in the group:\n                ---------------------------\nPort-channel: Po3    (Primary Aggregator)\nAge of the Port-channel   = 0d:04h:12m:01s\nLogical slot/port   = 10/3          Number of ports = 1\nGC                  = 0x00020001      HotStandBy port = null\nPort state          = Port-channel Ag-Inuse\nProtocol            =   LACP\nPorts in the Port-channel:\nIndex   Load   Port     EC state\n------+------+------+------------\n  0     00     Gi1/0/10  Active\n\nCore# show interfaces port-channel 3 | include line protocol|BW|Members\nPort-channel3 is up, line protocol is up (connected)\n  BW 1000000 Kbit/sec",
+    "alternativas": [
+      "Quatro ports em P no summary com Number of ports = 4",
+      "Bundle parcial: Po3 SU com Number of ports = 1, só Gi1/0/10 Active/P; demais s/I — HA e banda limitadas a um link",
+      "Po3 down (SD) no summary",
+      "LACP ausente: Protocol - no port-channel"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Summary e port-channel mostram 1 membro ativo no Po apesar de 4 candidatos. Não são 4 em P, nem Po SD, e Protocol é LACP.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8505 — Backup noturno satura Gi1/0/1 do EtherChannel enquanto Gi1/0/2 fica quase idle. NOC acha que o bundle “está quebrado”.",
+    "cli_output": "Edge# show etherchannel summary\n1      Po1(SU)         LACP        Gi1/0/1(P)  Gi1/0/2(P)\n\nEdge# show etherchannel load-balance\nEtherChannel Load-Balancing Configuration:\n        src-dst-ip\n\nEdge# show interfaces Gi1/0/1 | include rate\n  30 second input rate 820000000 bits/sec, 72000 packets/sec\n  30 second output rate 15000000 bits/sec, 1200 packets/sec\n\nEdge# show interfaces Gi1/0/2 | include rate\n  30 second input rate 8000000 bits/sec, 900 packets/sec\n  30 second output rate 6000000 bits/sec, 700 packets/sec\n\nEdge# show spanning-tree vlan 10 | include Po1|Root\n  Root ID    Priority    24576\n  ...\n  Po1                 Root FWD 3         128.65   P2p\n\n# job de backup: poucos fluxos TCP grandes server→storage (mesmo par IP)",
+    "alternativas": [
+      "Gi1/0/2 em I (stand-alone) no summary",
+      "Po1 não existe para o STP (sem linha Po1)",
+      "load-balance src-dst-ip com ambos P no Po1: fluxos iguais hasheiam no mesmo membro — assimetria de rate não prova bundle down",
+      "LACP passive+passive explícito no summary Protocol"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Dois membros P, Po1 SU, hash src-dst-ip e rates desiguais batem com elephant flows no mesmo hash. Gi1/0/2 não está I. Po1 aparece no STP. Protocol é LACP, não passive+passive escrito.",
+    "part_id": "2.4"
+  }
+]

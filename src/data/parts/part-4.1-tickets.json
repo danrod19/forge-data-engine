@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4101 — Usuários da LAN não saem à Internet após “ativar NAT”. Pool e ACL foram colados do lab, mas ninguém traduz.",
+    "cli_output": "R1# show run | include nat\nip nat pool NET 203.0.113.10 203.0.113.20 netmask 255.255.255.0\nip nat inside source list 1 pool NET overload\naccess-list 1 permit 192.168.1.0 0.0.0.255\n\nR1# show run interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n ip address 192.168.1.1 255.255.255.0\n ! sem ip nat inside\n\nR1# show run interface GigabitEthernet0/1\ninterface GigabitEthernet0/1\n ip address 203.0.113.1 255.255.255.0\n ! sem ip nat outside\n\nR1# show ip nat translations\n\nR1# show ip nat statistics\nTotal active translations: 0 (0 static, 0 dynamic; 0 extended)\nOutside interfaces:\nInside interfaces:\nHits: 0  Misses: 0\n\nR1# show ip interface brief\nGigabitEthernet0/0   192.168.1.1   YES manual up  up\nGigabitEthernet0/1   203.0.113.1   YES manual up  up",
+    "alternativas": [
+      "Pool NET está vazio na configuração",
+      "ACL 1 nega 192.168.1.0/24 explicitamente",
+      "Interfaces up/up sem IP",
+      "Falta ip nat inside em Gi0/0 e ip nat outside em Gi0/1 — statistics sem inside/outside; 0 translations"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Policy list+pool+overload e ACL permit da LAN existem, mas as interfaces não têm ip nat inside/outside. Statistics lista Outside/Inside interfaces vazias e 0 translations. Brief mostra up/up com IP. Pool e ACL não são o gap — falta a marcação de interfaces no fluxo.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4102 — Hosts 10.10.10.x não navegam. Outro site 10.20.20.0/24 no mesmo roteador traduz. Técnico jura que o NAT “está igual”.",
+    "cli_output": "R1# show run | include nat|access-list\nip nat inside source list 7 interface GigabitEthernet0/1 overload\naccess-list 7 permit 10.20.20.0 0.0.0.255\nip nat inside\nip nat outside\n\nR1# show run interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n ip address 10.10.10.1 255.255.255.0\n ip nat inside\n\nR1# show run interface GigabitEthernet0/2\ninterface GigabitEthernet0/2\n ip address 10.20.20.1 255.255.255.0\n ip nat inside\n\nR1# show run interface GigabitEthernet0/1\ninterface GigabitEthernet0/1\n ip address 198.51.100.1 255.255.255.252\n ip nat outside\n\nR1# show ip nat translations\nPro Inside global      Inside local       Outside local      Outside global\ntcp 198.51.100.1:1025  10.20.20.50:51515  93.184.216.34:443  93.184.216.34:443\n\nR1# ping\n! origem simulada 10.10.10.50 — sem nova translation para 10.10.10.0/24\nR1# show ip nat statistics\nHits: 128  Misses: 40\nExpired translations: 12",
+    "alternativas": [
+      "Falta ip nat outside na WAN",
+      "ACL 7 só permite 10.20.20.0/24 — 10.10.10.0/24 não é elegível à list; translations só de 10.20.20.50",
+      "Gi0/0 está down no brief",
+      "Overload ausente no show run"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Inside/outside e overload estão presentes; translation só para 10.20.20.50. ACL 7 permit apenas 10.20.20.0/24 — a LAN 10.10.10.0/24 não casa a list. WAN tem outside. O gap é a ACL da list, não a marcação de interface nem falta de overload.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4103 — Só os quatro primeiros notebooks saem; o quinto e seguintes falham em horário de pico. Não há overload na config de pool.",
+    "cli_output": "Edge# show run | include nat|access-list|ip nat pool\nip nat pool SMALL 203.0.113.10 203.0.113.13 netmask 255.255.255.0\nip nat inside source list 1 pool SMALL\naccess-list 1 permit 192.168.50.0 0.0.0.255\n\nEdge# show ip nat translations\nPro Inside global      Inside local       Outside local      Outside global\n--- 203.0.113.10       192.168.50.11      ---                ---\n--- 203.0.113.11       192.168.50.12      ---                ---\n--- 203.0.113.12       192.168.50.13      ---                ---\n--- 203.0.113.13       192.168.50.14      ---                ---\n\nEdge# show ip nat statistics\nTotal active translations: 4 (0 static, 4 dynamic; 0 extended)\nHits: 900  Misses: 220\nPool SMALL: netmask 255.255.255.0\n    start 203.0.113.10 end 203.0.113.13\n    type generic, total addresses 4, allocated 4 (100%), misses 220\nOutside interfaces:\n  GigabitEthernet0/1\nInside interfaces:\n  GigabitEthernet0/0\n\nEdge# show run interface GigabitEthernet0/0\n ip nat inside\nEdge# show run interface GigabitEthernet0/1\n ip nat outside",
+    "alternativas": [
+      "ACL 1 está vazia",
+      "Falta ip nat inside/outside",
+      "Dynamic pool de 4 IPs 100% allocated, sem overload — pool esgotado; misses no statistics",
+      "Static 1:1 em excesso ocupa o pool"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Pool SMALL tem 4 endereços e allocated 100% com 4 dynamics 1:1; misses 220. Comando source list pool SEM overload. Inside/outside ok; ACL permite a LAN; 0 static. Novos hosts falham até liberar IP ou até adicionar overload/ampliar pool.",
+    "part_id": "4.1"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4104 — Funcionários navegam (PAT ok). Clientes externos não abrem https no servidor interno 10.30.30.50. “Internet do escritório funciona”.",
+    "cli_output": "R1# show run | include nat\nip nat inside source list 1 interface GigabitEthernet0/1 overload\naccess-list 1 permit 10.30.30.0 0.0.0.255\n! sem ip nat inside source static\n\nR1# show ip nat translations\nPro Inside global         Inside local       Outside local      Outside global\ntcp 198.51.100.1:49152    10.30.30.20:51500  93.184.216.34:443  93.184.216.34:443\ntcp 198.51.100.1:49153    10.30.30.21:52001  8.8.8.8:53         8.8.8.8:53\n! nenhuma linha estática 10.30.30.50 ↔ IP público fixo\n\nR1# show ip nat statistics\nTotal active translations: 2 (0 static, 2 dynamic; 2 extended)\nOutside interfaces:\n  GigabitEthernet0/1\nInside interfaces:\n  GigabitEthernet0/0\n\nR1# show run interface GigabitEthernet0/0\n ip address 10.30.30.1 255.255.255.0\n ip nat inside\nR1# show run interface GigabitEthernet0/1\n ip address 198.51.100.1 255.255.255.252\n ip nat outside\n\nR1# show ip interface brief | include GigabitEthernet0/0|GigabitEthernet0/1\nGigabitEthernet0/0   10.30.30.1     YES manual up  up\nGigabitEthernet0/1   198.51.100.1   YES manual up  up",
+    "alternativas": [
+      "PAT/overload e inside/outside ok para saída; falta static 1:1 do servidor 10.30.30.50 para inside global público (0 static no statistics)",
+      "Falta ip nat outside — por isso o PAT aparece nas translations",
+      "Pool esgotado impede qualquer PAT",
+      "ACL 1 bloqueia toda a 10.30.30.0/24 e mesmo assim há translations de .20/.21"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Translations dinâmicas estendidas mostram PAT de saída funcionando; statistics: 0 static. Não há ip nat inside source static para 10.30.30.50. Inside/outside presentes. Inbound a servidor interno não é resolvido só com overload — falta o mapeamento 1:1 (e permissões de caminho).",
+    "part_id": "4.1"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4105 — Auditor pergunta “qual IP o usuário 192.168.10.55 usa na Internet?”. Estagiário aponta a coluna errada no show.",
+    "cli_output": "R1# show ip nat translations\nPro Inside global      Inside local       Outside local      Outside global\ntcp 203.0.113.5:50432  192.168.10.55:49152 93.184.216.34:443 93.184.216.34:443\nudp 203.0.113.5:53100  192.168.10.55:53100 8.8.8.8:53        8.8.8.8:53\n\nR1# show ip nat statistics\nTotal active translations: 2 (0 static, 2 dynamic; 2 extended)\nHits: 44  Misses: 2\nOutside interfaces:\n  GigabitEthernet0/1\nInside interfaces:\n  Vlan10\n\nR1# show run | include nat\nip nat inside source list 10 interface GigabitEthernet0/1 overload\nip nat inside\nip nat outside\naccess-list 10 permit 192.168.10.0 0.0.0.255\n\nR1# show ip interface brief | include Vlan10|GigabitEthernet0/1\nVlan10               192.168.10.1   YES manual up  up\nGigabitEthernet0/1   203.0.113.5    YES manual up  up",
+    "alternativas": [
+      "Outside global 93.184.216.34 é o IP com que o usuário sai na Internet",
+      "Inside local 192.168.10.55 já é o endereço público pós-NAT",
+      "Inside global 203.0.113.5:50432 (e :53100) é o IP/porta com que 192.168.10.55 aparece na Internet",
+      "Misses: 2 provam que não há translation para o usuário"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Inside local 192.168.10.55 é o privado; inside global 203.0.113.5 com portas PAT é a identidade na Internet. Outside global 93.184.216.34/8.8.8.8 são destinos. Há 2 translations ativas — misses baixos não negam o mapeamento. Interpretação correta da tabela é o foco do ticket.",
+    "part_id": "4.1"
+  }
+]

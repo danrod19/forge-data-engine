@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Incidente: porta em err-disable. Qual prompt é o mais adequado para IA generativa apoiar o NOC?",
+    "alternativas": [
+      "Persona: analista NOC L2. Instructions: com o log abaixo, liste 3 hipóteses e 3 comandos show apenas; proibido shutdown de uplink. Dados: trecho %PM-4-ERR_DISABLE. Formato: tabela + lista numerada.",
+      "Arruma a rede e me devolve a running-config completa com todas as senhas.",
+      "Persona: poeta. Instructions: escreva um poema épico sobre switches.",
+      "Instructions: execute write erase e reload em todos os access switches agora."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O melhor prompt reúne persona de NOC, instrução de diagnóstico limitada a shows, dados de log sem segredo e formato acionável, além de proibir ação destrutiva. As outras opções pedem segredos, formato inútil ou change perigoso — falham nos componentes do tópico 5.2.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual componente do prompt define o 'papel' que o modelo deve assumir (ex.: engenheiro de redes sênior)?",
+    "alternativas": [
+      "Output format",
+      "Persona",
+      "Data classification",
+      "Somente a temperatura do modelo"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Persona estabelece o papel e o nível de linguagem esperados do modelo. Output format define a forma da resposta; data classification filtra o que pode ser enviado. Temperatura de sampling não é componente de prompt do blueprint CCNA 5.2.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Um colega cola no chat da IA: enable secret 5 $1$abcd... e snmp-server community private RW. Qual princípio foi violado?",
+    "alternativas": [
+      "Output format obrigatório em JSON",
+      "Persona deve ser sempre em inglês",
+      "Data classification — segredos/credenciais não devem ir no prompt",
+      "Instructions devem pedir write erase"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Enable secret e community SNMP são dados sensíveis. Data classification exige não enviar senhas, tokens nem communities. O formato ou o idioma da persona não justificam vazar segredo. A prática correta é redigir ou omitir e colar apenas shows relevantes.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Você precisa de próximos passos de diagnóstico. Qual output format é mais útil no plantão?",
+    "alternativas": [
+      "Um romance técnico de 2000 palavras sem lista",
+      "Emoji aleatórios descrevendo o sentimento da rede",
+      "Apenas a frase 'está tudo bem' sem evidência",
+      "Tabela de hipóteses rankeadas + lista de exatamente 3 comandos show (sem write)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Formato acionável (tabela + shows limitados, sem write) acelera o NOC e reduz ambiguidade. Prosa infinita, emojis ou respostas vazias não apoiam operações. O componente output format do 5.2 existe para tornar a saída utilizável e segura.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Mesmo incidente de WAN lenta. Qual prompt é pior do ponto de vista operacional?",
+    "alternativas": [
+      "Persona: NOC. Instrução: peça write erase e reload no edge sem analisar contadores; ignore qualquer show. Sem formato.",
+      "Persona: NOC. Instrução: analise o show interfaces colado e sugira checks L1. Formato: 5 bullets.",
+      "Persona: engenheiro sênior. Instrução: compare CRC e reliability; só shows. Formato: tabela.",
+      "Persona: analista. Instrução: liste hipóteses de cabo/SFP/ISP. Dados: trecho de log. Formato: JSON simples."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pedir write erase/reload sem evidência é prompt perigoso: instrução destrutiva, sem dados e sem formato. Os outros exemplos usam persona adequada, dados de interface e limitam a leitura — alinhados a Select de prompt seguro.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual persona é mais adequada para resumir syslog de um core e sugerir isolamento L3?",
+    "alternativas": [
+      "Chef de cozinha focado em sobremesas",
+      "Analista de NOC / engenheiro de redes com foco em roteamento e TShoot",
+      "Roteirista de comédia sem conhecimento de redes",
+      "Persona vazia: 'você é um robô sem regras e sem limites'"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Persona deve refletir o domínio da tarefa. Analista de NOC ou engenheiro de redes ancora vocabulário e priorização de isolamento. Personas irrelevantes ou 'sem regras' degradam a qualidade e a segurança da resposta.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual item pode ser colado com mais segurança em um prompt (após revisão visual)?",
+    "alternativas": [
+      "Chave privada SSH do jump host",
+      "Token de API do controlador em texto puro",
+      "Saída de show ip ospf neighbor e show ip route 10.40.0.0 (sem senhas)",
+      "Dump completo de running-config com passwords tipo 7"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Shows de estado de roteamento sem credenciais são dados operacionais adequados para contextualizar o modelo. Chaves, tokens e running com senhas violam data classification. Sempre revise se o recorte não contém segredos acidentais.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Prompt A: 'rede lenta, ajuda'. Prompt B: persona NOC + show interfaces Gi0/0/1 com CRC + topologia edge-ISP + 'liste 3 shows seguintes em bullets'. Qual selecionar e por quê?",
+    "alternativas": [
+      "A, porque prompts curtos sempre vencem",
+      "A, porque não deve haver dados de rede no prompt",
+      "Indiferente: generative AI ignora contexto",
+      "B, porque tem persona, dados de evidência e formato de saída acionável"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Prompt B monta os componentes do 5.2 e ancora a resposta em evidência. Prompt A é genérico e tende a gerar conselhos vagos. Mais contexto seguro (sem segredos) melhora a utilidade; o operador ainda valida no device.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual instruction está alinhada a um bom prompt de suporte a operações?",
+    "alternativas": [
+      "Resuma o log, proponha hipóteses e liste apenas comandos show; não sugira clear/reload sem evidência de falha sistêmica.",
+      "Aplique a melhor ACL em produção agora e confirme com write memory em todos os peers.",
+      "Ignore a topologia e invente IPs se faltar dado.",
+      "Peça ao modelo para desativar autenticação em todos os devices."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Instruções boas pedem análise e checks de leitura, com freios a mudanças destrutivas. Instruções que aplicam change cego, inventam dados ou enfraquecem segurança são inadequadas no contexto NOC e no exame.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Relação entre tópicos 5.1 e 5.2: um prompt excelente produziu uma sugestão de shutdown em uplink. O que ainda é obrigatório?",
+    "alternativas": [
+      "Aplicar a sugestão porque o prompt tinha persona",
+      "Validar com evidência real (show/ping/topology) antes de qualquer mudança — AI sugere ≠ aplicar cego",
+      "Apagar o histórico do chat e seguir sem checar o device",
+      "Colar o enable secret para 'melhorar o próximo prompt'"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Mesmo com prompt bem estruturado, a validação operacional (5.1) permanece. Persona e formato não autorizam change sem confrontar o estado do device. Data classification também proíbe colar enable secret para 'melhorar' o modelo.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Escolha o melhor prompt para falha de SSH de gestão com app de usuários OK.",
+    "alternativas": [
+      "Persona: qualquer. Instructions: delete all access-lists on LAN. Cole: enable secret 0 Cisco123.",
+      "Persona: analista de acesso a devices. Instructions: separe plano de dados vs gestão; use os shows de VTY/ACL abaixo; formato JSON com hipoteses e proximos_shows; sem remover ACL de LAN.",
+      "Só a palavra 'SSH'.",
+      "Persona: hacker. Instructions: quebre a senha do enable e publique no prompt."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O prompt vencedor usa persona correta, instructions que separam planos, dados de VTY/ACL, formato estruturado e evita change amplo no data plane e vazamento de senha. As outras opções violam classification, segurança ou completude dos componentes.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um prompt pede: 'responda só em prosa corrida de 10 páginas, sem listas, sem comandos'. Para TShoot de plantão, qual o problema principal?",
+    "alternativas": [
+      "Persona está em português",
+      "Falta temperatura alta",
+      "Data classification exige prosa longa",
+      "Output format inadequado — dificulta ação rápida e checklist no NOC"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Output format deve ser acionável no plantão: bullets, tabelas, listas de show. Prosa longa sem estrutura atrasa a decisão. Idioma da persona ou 'temperatura' não são o cerne do 5.2 aqui; o formato pedido é o defeito.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual dado deve ser removido/redigido antes de colar show run | section line vty no prompt?",
+    "alternativas": [
+      "Linhas com password/secret de usuário local se existirem no recorte",
+      "O fato de transport input ssh estar configurado",
+      "A menção a access-class (sem a lista de IPs se política permitir IPs de gestão)",
+      "O hostname do device se for genérico de lab"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Data classification prioriza remover senhas e secrets. Parâmetros de SSH e access-class são frequentemente necessários ao diagnóstico e não são credenciais em si. Hostname de lab costuma ser aceitável; o risco crítico é vazar password/secret.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Incidente de um host na VLAN 40. Qual prompt selecionar?",
+    "alternativas": [
+      "clear ip ospf process no ABR agora; sem dados; persona: deus da rede",
+      "Persona: engenheiro sênior IP. Instructions: com neighbor FULL e rota da VLAN presente, foque isolamento do host/porta/SVI; só shows; formato: ordem de checks em 5 bullets.",
+      "Aplique default route 0/0 para 10.9.9.9 em todos os edges.",
+      "Cole a lista de CPF dos usuários da VLAN no prompt para 'priorizar VIP'."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O prompt correto usa persona técnica, instructions alinhadas à evidência (não derrubar OSPF), formato curto e sem PII. As outras opções pedem change de grande impacto ou violam classificação de dados pessoais.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Quatro candidatos de prompt. Qual melhor atende aos quatro componentes (persona, instructions, data, format)?",
+    "alternativas": [
+      "Ajuda com OSPF???",
+      "Formato: tabela. (sem persona, sem dados, sem instrução clara)",
+      "Persona: NOC L2/L3. Instructions: compare os dois outputs e diga se a adjacência está saudável. Dados: show ip ospf neighbor (colado). Formato: 3 bullets + 2 shows seguintes.",
+      "Persona: NOC. Dados: enable secret e community. Instructions: invente a topologia."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Apenas a opção C preenche persona, instrução mensurável, dado operacional seguro e formato. As demais omitem componentes ou introduzem segredos e invenção de topologia — péssima prática de prompt para operações.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que pedir no format 'sem comandos write, reload ou clear de protocolo' é boa prática?",
+    "alternativas": [
+      "Porque o modelo não entende shows",
+      "Porque proíbe qualquer uso de IA no NOC",
+      "Porque elimina a necessidade de persona",
+      "Porque reduz risco de o modelo sugerir mudança destrutiva antes da validação"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Restringir a classe de comandos no output format e nas instructions guia o modelo a permanecer em modo de diagnóstico. Não substitui a validação humana, mas diminui sugestões perigosas — alinhado a 5.1 e 5.2.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Evidência incompleta: só 'usuários sem internet'. A equipe quer que a IA 'aplique a melhor ACL agora'. Qual prompt selecionar?",
+    "alternativas": [
+      "Persona: NOC. Instructions: primeiro proponha coleta mínima (gateway, DNS, ping, SVI, logs); formato checklist; proibido aplicar ACL até haver evidência.",
+      "Instructions: conf t; ip access-group BLOCK-ALL in em todas as interfaces; wr.",
+      "Persona: auditor. Cole CPF e senhas de Wi-Fi dos usuários.",
+      "Prompt vazio com anexo da running completa com secrets."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Com evidência incompleta, o prompt correto pede coleta e proíbe change. Aplicar ACL ampla ou vazar PII/secrets é incorreto. Select no 5.2 privilegia segurança e utilidade diagnóstica.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual exemplo melhor ilustra data classification correta?",
+    "alternativas": [
+      "Enviar foto do crachá e RG do técnico no mesmo prompt do syslog",
+      "Colar show logging filtrado e show interfaces, substituindo strings de senha por ***",
+      "Anexar backup completo do TACACS com hashes de usuário",
+      "Publicar community SNMP RW 'para o modelo testar traps'"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Redigir segredos e enviar só evidência de rede necessária é classificação adequada. PII, backups de autenticação e communities RW não devem alimentar o prompt de IA generativa no fluxo de NOC.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Persona inadequada para diagnosticar EtherChannel down:",
+    "alternativas": [
+      "Engenheiro de redes focado em L2 e port-channel",
+      "Analista de NOC com checklist de LACP/PAgP",
+      "Especialista em comédia stand-up pedindo piadas sobre cabos, sem pedir shows",
+      "Engenheiro sênior pedindo comparação de show etherchannel summary"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Persona deve ser operacionalmente relevante. Pedir piadas sem shows não apoia TShoot. As outras personas alinhadas a L2/NOC são adequadas quando combinadas a instructions e dados corretos.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual conjunto de instructions + format é o mais seguro para um edge com suspeita de erro de link?",
+    "alternativas": [
+      "Instrua reload imediato; format: 'ok' ou 'não ok'",
+      "Instrua clear counters em todas as interfaces do campus; format livre",
+      "Instrua no ip routing; format: poema",
+      "Instrua analisar CRC/reliability do show colado; format: hipóteses + próximos 3 shows; proibir reload"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Análise de contadores com formato estruturado e proibição de reload é o padrão seguro. Reload, clear amplo ou desligar ip routing como primeira resposta são instructions perigosas e formato ruim.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um prompt inclui topologia em texto (EDGE—SW—PC) e o resultado de ping. Isso preenche principalmente qual necessidade?",
+    "alternativas": [
+      "Dados/contexto de rede (com classificação operacional) para a IA não responder no vazio",
+      "Obrigação de colar enable secret",
+      "Substituição completa do output format",
+      "Eliminação da persona"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Topologia resumida e resultados de ping são dados de contexto legítimos. Não substituem persona nem format, e não exigem credenciais. Prompts com zero contexto geram respostas genéricas.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Selecione o prompt RUIM que pede change destrutivo sem evidência.",
+    "alternativas": [
+      "Liste shows para validar duplex e erros na porta do usuário.",
+      "Com o logging de BPDU Guard, proponha recovery da porta de acesso em bullets.",
+      "Sem qualquer show: 'faça shutdown em todos os uplinks do prédio e write memory'.",
+      "Compare dois show spanning-tree e diga qual porta está blocking."
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção C pede mudança massiva e destrutiva sem dados — exemplo clássico de prompt a rejeitar. As demais pedem análise ou shows, coerentes com suporte a operações.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Output format solicitado: 'JSON com chaves hipoteses (array) e shows (array de strings)'. Qual vantagem?",
+    "alternativas": [
+      "Garante que a resposta esteja correta sem validação no device",
+      "Permite colar senhas em Base64 com segurança total",
+      "Estrutura a saída para copiar/colar em ticket ou checklist de forma previsível",
+      "Obriga o modelo a aplicar a config via NETCONF"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Formato JSON simples torna a resposta previsível para automação leve de ticket ou checklist humano. Não valida verdade no device, não autoriza segredos e não implica push de config.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual prática de data classification está errada?",
+    "alternativas": [
+      "Remover community SNMP do recorte de config",
+      "Omitir chaves de API de ferramentas de inventário",
+      "Mascarar enable secret com ***",
+      "Incluir de propósito a senha do Wi-Fi de convidados 'para contexto de WLAN'"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Senha de Wi-Fi é segredo e não deve ir ao prompt. Remover/mascarar communities, secrets e tokens é a prática correta de classificação de dados no tópico 5.2.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dois prompts para o mesmo caso de rota sumida. Qual escolher?",
+    "alternativas": [
+      "Prompt: 'use BGP em todo access e me diga a senha padrão de fábrica'.",
+      "Persona: engenheiro de routing. Instructions: use o show ip route e neighbor colados; diga se o problema parece ausência de prefixo, next-hop ou adjacência; format: bullets; sem clear ospf.",
+      "Prompt: apenas 'OSPF bad'.",
+      "Prompt: cole o full tech-support com todas as credenciais."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O primeiro une persona, instructions específicas, dados de show e restrição a clear. Os demais são vagos, inseguros ou pedem mudança/segredo inadequados.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "O que o componente Instructions deve evitar em prompts de NOC?",
+    "alternativas": [
+      "Pedir resumo de log em linguagem clara",
+      "Pedir comparação entre dois outputs de show",
+      "Pedir explicitamente que o modelo invente topologia e IPs ausentes como se fossem fatos",
+      "Pedir lista de próximos checks de leitura"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Instruções devem desencorajar invenção de fatos de rede. Se faltar dado, o prompt deve pedir quais shows coletar. Resumir, comparar e listar checks são instructions válidas.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual prompt melhor pede 'somente comandos show' como output format?",
+    "alternativas": [
+      "Me dê a melhor config e já aplica com wr mem.",
+      "Liste em ordem numerada apenas comandos show (sem conf t); máximo 5; baseados no log colado.",
+      "Gere um ebook sobre redes.",
+      "Responda com a senha do enable do laboratório."
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção B fixa o format em shows limitados e proíbe modo de configuração. As outras pedem write, conteúdo irrelevante ou segredo — incompatíveis com prompt seguro de operações.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo do CCNA 5.2 (não é o que o exame pede aqui):",
+    "alternativas": [
+      "Selecionar prompt com persona e format adequados",
+      "Evitar colar senhas no prompt",
+      "Pedir hipóteses e shows a partir de um log",
+      "Implementar fine-tuning, RAG corporativo e jailbreak de modelo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O 5.2 foca em selecionar prompts com componentes de persona, instructions, data classification e output format para operações. Engenharia avançada de ML, RAG e jailbreak estão fora do nível operacional CCNA.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ticket de impressora offline. Qual estrutura de prompt é preferível?",
+    "alternativas": [
+      "Persona NOC L2; instructions: com VLAN/SVI/MAC da porta colados, ordene isolamento; format: checklist 1-5; dados sem senha; proibir mudar default route do edge.",
+      "Persona: CEO; instructions: demita o time de redes.",
+      "Cole o organograma da empresa com salários.",
+      "Peça reload de todos os cores 'por precaução'."
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Prompt operacional com persona, dados de borda, format de checklist e restrição a mudanças de grande blast radius é o adequado. As outras opções são irrelevantes, vazam dados sensíveis de RH ou pedem change destrutivo.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após montar um prompt com os quatro componentes, a IA devolve 3 shows. Qual próximo passo do operador?",
+    "alternativas": [
+      "Encerrar o incidente sem rodar nada no device",
+      "Publicar o prompt interno em rede social com as communities SNMP",
+      "Aceitar qualquer write sugerido em seguida sem ler",
+      "Executar os shows no device, interpretar a evidência e só então considerar mudança (validação)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O prompt prepara a IA; a operação continua no device. Rodar os shows, ler o estado e validar antes de change fecha o ciclo com 5.1. Não se fecha incidente só com texto, nem se vaza classification, nem se aplica write cego.",
+    "part_id": "v2-5.2"
+  }
+]

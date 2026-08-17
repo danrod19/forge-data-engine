@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1901: Role app-api não decifra; erro kms:Decrypt AccessDenied ao ler S3 SSE-KMS.",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:sts::111122223333:assumed-role/app-api/session\n\n$ aws s3api get-object --bucket corp-data --key reports/a.bin outfile\nAn error occurred (AccessDenied) when calling the GetObject operation:\n... not authorized to perform: kms:Decrypt on resource: arn:aws:kms:us-east-1:111122223333:key/abcd-...\n\n$ aws iam list-attached-role-policies --role-name app-api\nAttached: arn:aws:iam::111122223333:policy/AppS3Read\n# AppS3Read: s3:GetObject on arn:aws:s3:::corp-data/*   (no kms:*)\n\n$ aws kms get-key-policy --key-id abcd-... --policy-name default --output text\n# Statement allows root + key-admins only; no app-api role\n\n$ aws kms describe-key --key-id abcd-...\nKeyState: Enabled\nKeyManager: CUSTOMER",
+    "alternativas": [
+      "Adicionar kms:Decrypt (e necessários) à role app-api e Allow correspondente na key policy da CMK",
+      "Só aumentar o visibility timeout da fila",
+      "Só criar invalidation CloudFront",
+      "Desabilitar a CMK"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Erro kms:Decrypt com S3 Get e policy só s3:GetObject + key policy sem a role fecha o caso. Desabilitar a chave piora. Tip de prova: AccessDenied kms:Decrypt em GetObject → IAM kms + key policy, não só s3:GetObject.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1902: RDS app-db encrypted com CMK; snapshot copy para conta de backup falha em KMS.",
+    "cli_output": "$ aws rds describe-db-instances --db-instance-identifier app-db\nStorageEncrypted: true\nKmsKeyId: arn:aws:kms:us-east-1:111122223333:key/cmk-rds\n\n$ aws rds copy-db-snapshot --source-db-snapshot-identifier snap-1 \\\n  --target-db-snapshot-identifier snap-1-bck --kms-key-id arn:aws:kms:us-east-1:222233334444:key/bck\nAn error occurred (KMSKeyNotAccessibleFault) / not authorized for kms on source key\n\n$ aws kms get-key-policy --key-id cmk-rds --policy-name default\n# No statement allowing account 222233334444 or its roles to use/create grant on cmk-rds\n\n$ aws kms describe-key --key-id cmk-rds\nKeyState: Enabled",
+    "alternativas": [
+      "Atualizar key policy/grants da CMK de origem para permitir o uso/cópia pela conta de backup (e CMK de destino)",
+      "Abrir 3306 0.0.0.0/0 no SG do RDS",
+      "Trocar o endpoint para público",
+      "Remover Multi-AZ"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Snapshot cifrado exige permissões KMS cross-account na CMK de origem. SG 0.0.0.0/0 não autoriza KMS. Tip de prova: copy snapshot encrypted cross-account → key policy/grant KMS, não só share do snapshot.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1903: Lambda billing-fn GetSecretValue em prod/stripe/key retorna AccessDenied.",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:sts::111122223333:assumed-role/billing-fn-role/session\n\n$ aws secretsmanager get-secret-value --secret-id prod/stripe/key\nAn error occurred (AccessDeniedException) when calling the GetSecretValue operation:\nUser: ...billing-fn-role... is not authorized to perform: secretsmanager:GetSecretValue\non resource: arn:aws:secretsmanager:us-east-1:111122223333:secret:prod/stripe/key-AbCd\n\n$ aws iam get-role-policy --role-name billing-fn-role --policy-name inline\n# Allows logs:* and s3:GetObject only\n\n$ aws secretsmanager get-resource-policy --secret-id prod/stripe/key\n{\n  \"ResourcePolicy\": \"{\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::111122223333:role/payments-admin\"},\"Action\":\"secretsmanager:GetSecretValue\",\"Resource\":\"*\"}]}\"\n}\n# billing-fn-role not listed\n\n$ aws kms describe-key --key-id alias/aws/secretsmanager\nKeyState: Enabled",
+    "alternativas": [
+      "Allow secretsmanager:GetSecretValue no secret ARN à role da Lambda e alinhar resource policy do secret se houver restrição",
+      "Só aumentar memória da Lambda para 10 GB",
+      "Só criar fila FIFO",
+      "Desligar o CloudTrail"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "IAM sem GetSecretValue e resource policy só payments-admin bloqueiam a Lambda. Memória e FIFO não autorizam Secrets. Tip de prova: GetSecretValue AccessDenied → IAM da role + resource policy do secret.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1904: Auditoria: secret prod/db/master sem rotation; política interna exige ≤90 dias.",
+    "cli_output": "$ aws secretsmanager describe-secret --secret-id prod/db/master\nName: prod/db/master\nRotationEnabled: false\nLastChangedDate: 2024-01-10\nLastAccessedDate: 2026-08-01\nKmsKeyId: arn:aws:kms:us-east-1:111122223333:key/cmk-sec\nVersionIdsToStages: AWSCURRENT\n\n$ aws secretsmanager list-secrets --filters Key=name,Values=prod/db/master\n# confirms no RotationLambdaARN\n\n# Compliance control: database credentials must rotate at least every 90 days\n# App already uses GetSecretValue (not hardcoded) — good baseline",
+    "alternativas": [
+      "Habilitar rotation no Secrets Manager (Lambda/integração) e garantir que a app sempre lê AWSCURRENT",
+      "Commitar a senha no repositório para 'facilitar'",
+      "Desabilitar a CMK do secret",
+      "Tornar o secret public via resource policy Principal *"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "RotationEnabled false viola a política de 90 dias; habilitar rotation e leitura GetSecretValue resolve. Publicar o secret ou desabilitar CMK piora. Tip de prova: compliance de rotação de senha → RotationEnabled no Secrets Manager.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1905: Após 'limpeza de custos', objetos S3 SSE-KMS e secrets param de abrir; KMS mostra PendingDeletion.",
+    "cli_output": "$ aws kms describe-key --key-id abcd-prod-cmk\nKeyState: PendingDeletion\nDeletionDate: 2026-09-01\nKeyManager: CUSTOMER\n\n$ aws s3api get-object --bucket corp-data --key x.bin -\nAn error occurred (AccessDenied) ... kms:Decrypt ... key is pending deletion / not available\n\n$ aws secretsmanager get-secret-value --secret-id prod/api\nAn error occurred ... related to KMS key state\n\n$ aws kms list-keys\n# key still listed with PendingDeletion\n\n# Change ticket from last week: \"schedule deletion unused keys\" — wrong key tagged",
+    "alternativas": [
+      "cancel-key-deletion na CMK e reabilitar uso; revisar tags antes de schedule-key-deletion",
+      "create-invalidation /* no CloudFront como único fix",
+      "delete-bucket corp-data",
+      "Abrir 0.0.0.0/0 no SG do bastion"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "PendingDeletion bloqueia Decrypt de S3/secrets; cancel-key-deletion é a recuperação na waiting period. Invalidation e delete-bucket não restauram a chave. Tip de prova: KeyState PendingDeletion + kms:Decrypt fail → cancel-key-deletion já.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  }
+]

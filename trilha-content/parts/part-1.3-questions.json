@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Um ponto de rede fica a 120 m do switch de acesso, em UTP Cat5e, e o link 1G oscila com muitos CRC. Qual limite de projeto de cobre é o mais relevante nesse cenário?",
+    "alternativas": [
+      "Canal horizontal típico de UTP Ethernet cerca de 100 m; 120 m extrapola o alcance confiável",
+      "Fibra monomodo é obrigatória em qualquer link abaixo de 50 m",
+      "PoE+ exige no máximo 20 m de cabo para dados 1G",
+      "Canais Wi-Fi 1/6/11 substituem o limite métrico do UTP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A regra clássica de canal UTP é cerca de 100 m; 120 m explica oscilação e CRC por atenuação. Monomodo não é obrigatório em curtas distâncias. PoE não reduz o limite de dados para 20 m. Canais 802.11 não governam o comprimento do cabo de cobre.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual conector é o mais comum em interfaces de cobre de acesso Ethernet em PCs e switches?",
+    "alternativas": [
+      "LC duplex de fibra monomodo",
+      "RJ-45",
+      "SC quadrado apenas em backplane WAN",
+      "ST baioneta exclusivo de PoE++"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Acesso em cobre usa RJ-45. LC/SC/ST são conectores de fibra (ou legados ópticos), não o padrão de porta de host Ethernet. PoE usa o mesmo RJ-45 de dados, sem trocar o conector por ST.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Em um data center, o uplink entre racks vizinhos tem poucas dezenas de metros e usa OM4. Qual tipo de fibra é o mais adequado a esse perfil?",
+    "alternativas": [
+      "Monomodo de longo alcance metro",
+      "Cabo coaxial RG-6 de TV",
+      "Multimodo (MMF) para distâncias curtas/médias em campus/DC",
+      "UTP Cat3 de 10 Mbps apenas"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "OM3/OM4 são multimodo para curtas/médias distâncias em DC/campus. Monomodo brilha em longas distâncias. Coaxial TV e Cat3 não descrevem uplink óptico OM4 entre racks.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Após instalar um AP novo, o switch mostra link up, mas o AP não energiza sem fonte externa. O mesmo cabo em outra porta PoE+ funciona. Qual hipótese é a mais coerente?",
+    "alternativas": [
+      "O SSID do AP está em canal 6 e por isso bloqueia PoE",
+      "CRC na fibra monomodo impede a negociação de BSS",
+      "Auto-MDIX desativado obriga crossover para alimentar o AP",
+      "A porta original sem power budget PoE suficiente ou PoE desabilitado; dados podem subir sem alimentar o device"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "PoE é independente do SSID/canal. Link de dados pode existir sem potência adequada na porta. Canal Wi-Fi, CRC de fibra e Auto-MDIX não explicam AP que só liga com fonte quando outra porta PoE+ no mesmo cabo funciona.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show interfaces Gi1/0/12 exibe CRC e input errors em forte subida, com colisões em enlace que deveria ser full-duplex. Qual conjunto de causas L1/L2 é o mais provável?",
+    "alternativas": [
+      "Cabo/conector ruim, EMI, transceiver inadequado ou duplex mismatch",
+      "Falta de rota default no core",
+      "ACL de saída bloqueando ICMP apenas",
+      "ESS com dois SSIDs diferentes no mesmo AP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "CRC e erros de input apontam meio físico, conector, óptica/transceiver ou mismatch de duplex. Rota default e ACL não geram CRC na interface. ESS/SSID são conceitos wireless de serviço, não contadores de erro Ethernet.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Dois switches foram configurados manualmente: um em full-duplex e o outro em half-duplex na mesma velocidade. Qual sintoma é típico desse duplex mismatch?",
+    "alternativas": [
+      "Aumento de alcance do UTP para 300 m sem CRC",
+      "Colisões tardias, desempenho ruim e contadores anômalos no enlace",
+      "Conversão automática do link em monomodo",
+      "PoE+ desliga todos os APs do stack"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Mismatch full/half gera colisões e performance degradada. Não estende o UTP para 300 m, não muda o tipo de fibra e não é o mecanismo padrão de desligar PoE em todo o stack.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual definição descreve corretamente um BSS no 802.11 corporativo?",
+    "alternativas": [
+      "Conjunto de rotas BGP anunciadas pelo WLC",
+      "Apenas o nome SSID sem rádio associado",
+      "Um AP e os clientes associados em sua área de cobertura",
+      "Todos os canais 1–11 usados ao mesmo tempo no mesmo rádio"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "BSS é o conjunto básico: um AP e seus clientes na área de RF. Não é tabela BGP, nem SSID isolado sem rádio, nem a prática de empilhar todos os canais 2,4 no mesmo rádio.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Vários APs no mesmo campus publicam o SSID “EMPRESA” integrados à LAN, permitindo roaming. Qual termo 802.11 descreve esse conjunto?",
+    "alternativas": [
+      "IBSS ad hoc sem infraestrutura",
+      "Apenas um único BSS físico",
+      "Canal non-overlapping 1 isolado",
+      "ESS (Extended Service Set)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Múltiplos BSSs com mesmo SSID na infraestrutura formam um ESS. IBSS é ad hoc sem AP corporativo. Não é um único BSS nem sinônimo de um canal específico.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No planejamento de RF em 2,4 GHz para minimizar sobreposição co-canal entre APs vizinhos, quais canais non-overlapping clássicos o CCNA enfatiza?",
+    "alternativas": [
+      "1, 6 e 11",
+      "2, 7 e 12 apenas em monomodo",
+      "3, 4 e 5 como padrão mundial exclusivo",
+      "8, 9 e 10 para PoE+"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Em 2,4 GHz os canais clássicos non-overlapping são 1, 6 e 11. 3/4/5 se sobrepõem fortemente. Não há vínculo monomodo ou PoE+ com a escolha desses canais.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Comparando bandas Wi-Fi no uso típico de campus, qual afirmação está alinhada ao conteúdo?",
+    "alternativas": [
+      "2,4 GHz sempre tem mais canais non-overlapping que 5 GHz",
+      "5 GHz em geral oferece mais canais e capacidade; 2,4 GHz tem maior alcance relativo e mais congestionamento",
+      "5 GHz é imune a qualquer interferência e ignora paredes",
+      "2,4 GHz só funciona com fibra LC"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "5 GHz costuma ter mais canais e melhor densificação; 2,4 GHz propaga mais longe, mas é mais congestionada. 5 GHz não é imune a obstáculos. Wi-Fi não depende de conector LC de fibra no cliente.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Uplink de 10 km entre prédios, ambiente com forte EMI de motores. A equipe debate UTP Cat6 vs fibra. Qual escolha e motivo são os mais corretos?",
+    "alternativas": [
+      "UTP Cat6 de 10 km, pois o limite de 100 m não se aplica a outdoor",
+      "Cabo crossover T568B obrigatório em qualquer distância óptica",
+      "Fibra (tipicamente monomodo nesse alcance), imune a EMI e adequada a longa distância",
+      "Apenas aumentar PoE+ no switch de acesso para “esticar” o cobre"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "10 km e EMI eliminam UTP de 100 m. Fibra monomodo é o meio adequado a longa distância e não sofre EMI elétrica como o cobre. Crossover e PoE não resolvem alcance óptico de quilômetros.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um SFP multimodo foi inserido em link plantado com monomodo. O link não sobe ou fica instável. Qual é a lição operacional correta?",
+    "alternativas": [
+      "Basta mudar o duplex para half e o tipo de fibra deixa de importar",
+      "CRC zero em show interfaces prova que a mistura MMF/SMF é suportada",
+      "Canais 1/6/11 corrigem incompatibilidade de óptica",
+      "Transceiver, tipo de fibra e alcance devem ser compatíveis; misturar MMF/SMF e SFPs inadequados quebra o enlace"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Óptica exige casamento de transceiver e fibra (MMF vs SMF) e orçamento de potência/alcance. Duplex half e canais Wi-Fi não validam óptica errada. CRC zero com link down sequer se aplica como prova de compatibilidade.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Telefone IP e AP no mesmo switch: alguns devices reiniciam quando muitos APs ligam juntos. show power inline indica consumo próximo do limite. O que está acontecendo?",
+    "alternativas": [
+      "ESS grande demais obriga desligar o cobre",
+      "Auto-negociação de velocidade consome o power budget inteiro",
+      "O power budget PoE do switch está no limite; PoE/PoE+ alimenta a borda, mas a potência total é finita",
+      "CRC na VLAN de voz remove watts do chassi"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "PoE tem orçamento de potência por switch/fonte; muitos APs esgotam o budget e geram reset. ESS e auto-negociação de speed não “gastam watts” como PoE. CRC não converte erros em redução de power budget.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Interface Gi0/1 está administratively down. Qual estado e ação inicial são esperados?",
+    "alternativas": [
+      "up/up após apenas trocar o patch cord, sem no shutdown",
+      "down/down (ou down administrativamente); é preciso reabilitar a interface (no shutdown) além de validar o cabo",
+      "protocol up com CRC infinito até limpar a WLC",
+      "half-duplex forçado por canal Wi-Fi 11"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Interface shutdown fica down administrativamente; não sobe só com cabo novo. É preciso no shutdown e depois checar L1. WLC e canal Wi-Fi não definem o estado admin da porta Ethernet do switch.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cliente associa ao AP (bom sinal), obtém IP na subnet wireless, mas não alcança servidor em outra VLAN. Do ponto de vista de papéis L2 wireless vs L3, o que é verdade?",
+    "alternativas": [
+      "O AP elimina qualquer necessidade de default gateway",
+      "BSS/ESS resolvem sozinhos o roteamento inter-subnet",
+      "Associação 802.11 é L2; tráfego a outra subnet ainda depende de gateway L3 na rede cabeada",
+      "CRC no SSID substitui a SVI do gateway"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Associação ao AP/BSS é enlace L2 wireless. Sair da subnet exige gateway L3 (SVI/roteador). ESS não roteia por si. CRC e SSID não substituem gateway.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Técnico fixou todos os APs de um andar em canal 3 (2,4 GHz) “para ficar no meio entre 1 e 6”. Qual é o problema de RF?",
+    "alternativas": [
+      "Canal 3 é non-overlapping com 1 e 6 e maximiza SNR",
+      "Canal 3 só existe em 5 GHz monomodo",
+      "PoE+ proíbe canais abaixo de 6",
+      "Canal 3 sobrepõe-se a 1 e 6; o conjunto non-overlapping clássico é 1, 6 e 11"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Em 2,4 GHz o canal 3 interfere com 1 e 6. O planejamento clássico usa 1/6/11. Não é restrição de PoE nem propriedade de fibra monomodo.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ambiente industrial com forte ruído elétrico em bandejas de cobre. Além de boa práticas de aterramento, qual meio/cabo ajuda a reduzir EMI no cabeamento metálico?",
+    "alternativas": [
+      "STP/FTP com blindagem adequada (ou migrar trechos críticos para fibra)",
+      "UTP Cat3 sem trançado adicional como única opção",
+      "Aumentar potência de todos os APs no canal 3",
+      "Forçar half-duplex em todos os uplinks de core"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Blindagem (STP/FTP) e especialmente fibra combatem EMI. Cat3 piora a margem. Canal Wi-Fi e half-duplex no core não resolvem ruído no cabeamento metálico industrial.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual comando IOS resume de forma compacta status de portas com VLAN, duplex, speed e tipo de conexão?",
+    "alternativas": [
+      "show ip route summary",
+      "show interfaces status",
+      "show wireless freelist",
+      "show vlan poe-map"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show interfaces status é o resumo operacional de porta/VLAN/duplex/speed. show ip route não trata L1 de porta. Os outros nomes não são o comando padrão desse inventário de interfaces.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Patch cord Cat5e de má qualidade foi usado em porta mGig que tentava 2,5G/5G. O link cai para 1G ou gera erros. Qual leitura está correta?",
+    "alternativas": [
+      "Qualquer Cat5e garante 10G a 100 m sem teste",
+      "Erros vêm só do SSID guest no AP",
+      "Categoria e qualidade do cabo limitam a velocidade confiável, mesmo que a porta do switch suporte multigig",
+      "SFP monomodo no access copper corrige o patch ruim"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A porta pode ser mGig, mas o meio (categoria/instalação) limita a taxa estável. Cat5e não “garante 10G/100m”. SSID e SFP monomodo em porta copper não sanam patch inadequado.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Modo ad hoc (IBSS) entre dois notebooks foi usado em campo. Por que isso é raro na WLAN corporativa gerenciada?",
+    "alternativas": [
+      "Porque IBSS exige obrigatoriamente canais 1/6/11 e PoE",
+      "Porque IBSS só opera em fibra SC",
+      "Porque ad hoc aumenta automaticamente o power budget do switch",
+      "Porque corporações preferem modo infraestrutura com AP (e frequentemente WLC) para política, RF e roaming"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Redes empresariais usam infraestrutura com AP para controle central, autenticação e ESS/roaming. IBSS não depende de PoE/fibra SC nem altera power budget de switch.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show interfaces Gi1/0/5: line protocol is down, mas a interface não está administratively down. Cabo e SFP foram suspeitos. Qual interpretação de estado é a melhor?",
+    "alternativas": [
+      "up/down sugere problema de enlace L1/L2 (cabo, SFP, remoto, layer1), não necessariamente shutdown local",
+      "down/down exclusivo de falta de rota OSPF",
+      "protocol down significa ESS sem SSID",
+      "Sempre indica duplex full perfeito sem erros"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Interface up com protocol down aponta falha de carrier/enlace (cabo, óptica, lado remoto). Não é falta de rota OSPF nem definição de ESS. Também não garante duplex saudável.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Em SFPs de switch moderno, qual conector de fibra é frequentemente encontrado por ser compacto?",
+    "alternativas": [
+      "RJ-45 de cobre soldado no laser",
+      "LC",
+      "DB-9 serial de console",
+      "IEC de tomada elétrica PoE"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "LC é o conector compacto dominante em SFP/SFP+. RJ-45 é cobre; DB-9 é console legado; tomada elétrica não é conector óptico de transceiver.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dois APs vizinhos em 2,4 GHz usam ambos o canal 6 com potência alta e células muito sobrepostas. Qual efeito de RF é esperado?",
+    "alternativas": [
+      "Dobra automática do limite de 100 m do UTP",
+      "Eliminação total de CRC em todas as portas Ethernet do andares",
+      "Interferência co-canal, contenção e queda de desempenho efetivo",
+      "Conversão do BSS em monomodo SMF"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Mesmo canal e sobreposição forte geram co-channel interference e pior throughput. Não altera limite de cobre, CRC de todas as portas Ethernet nem tipo de fibra.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Pinagem T568A de um lado e T568B do outro no mesmo cabo UTP entre PC e switch antigo sem Auto-MDIX. O que se formou?",
+    "alternativas": [
+      "Cabo straight-through padrão de host–switch moderno",
+      "Enlace óptico LC-LC",
+      "PoE+ classe máxima obrigatória",
+      "Cabo crossover (pinagem mista A/B), que em equipamentos sem Auto-MDIX pode ser necessário em cenários específicos host–host/switch–switch"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "T568A de um lado e T568B do outro produzem crossover. Straight-through usa o mesmo padrão nos dois lados. Não é enlace LC nem definição de classe PoE.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Antes de culpar STP ou rota, o NOC vê CRC subindo só em uma porta de uplink após faxina na sala de telecom. Qual primeiro passo L1 é o mais sensato?",
+    "alternativas": [
+      "Inspecionar/reassentar cabo ou SFP, limpar conectores e validar speed/duplex e contadores na interface",
+      "Desabilitar todos os canais 1/6/11 do campus",
+      "Trocar o SSID corporativo por ad hoc",
+      "Aumentar o power budget PoE para “zerar CRC” de fibra"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "CRC localizado pede checagem de meio/óptica/duplex na porta. Mexer em canais Wi-Fi, modo ad hoc ou PoE não repara contadores de um uplink óptico/cobre específico.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual padrão de alimentação no cabo é tipicamente associado a maior potência que o PoE original (802.3af), alimentando APs mais exigentes?",
+    "alternativas": [
+      "Half-duplex 10BASE-T obrigatório",
+      "PoE+ (802.3at) e variantes de maior orçamento (conforme hardware)",
+      "Apenas Auto-MDIX em fibra SMF",
+      "ESS com canal 3 fixo"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "PoE+ (at) eleva a potência em relação ao af; há ainda classes maiores em plataformas novas. Duplex, Auto-MDIX óptico e canal 3 não são padrões de potência no cabo.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um projetista afirma que “qualquer padrão 802.11 moderno elimina a necessidade de planejar canais e potência”. Por que isso está errado no contexto CCNA?",
+    "alternativas": [
+      "Porque 802.11ax só opera em UTP Cat6a",
+      "Porque CRC Ethernet define o canal Wi-Fi automaticamente",
+      "Porque RF continua sujeita a interferência, sobreposição e densidade de APs; padrão novo não substitui planejamento de canal/potência",
+      "Porque monomodo impede o uso de 5 GHz"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Gerações 802.11 melhoram eficiência, mas canal, potência e colocação seguem críticos. Não há vínculo Cat6a exclusivo, CRC Ethernet escolhendo canal, nem monomodo bloqueando 5 GHz.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Switch de acesso tem portas RJ-45 1G e uplinks SFP+. Qual afirmação sobre opções de interface está correta?",
+    "alternativas": [
+      "Todas as portas do switch aceitam automaticamente qualquer distância de UTP sem limite",
+      "SFP+ só funciona com pinagem T568A",
+      "PoE flui nativamente por qualquer SFP óptico monomodo",
+      "A porta opera no meio/velocidade suportados por hardware + transceiver + cabo; uplinks ópticos usam módulos SFP/SFP+ adequados"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Interfaces dependem do trio hardware/transceiver/meio. UTP tem limite de distância; SFP+ não usa T568A; PoE clássico é em cobre RJ-45, não “nativo” em qualquer óptica.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Micro-ondas de refeitório e WLANs vizinhas degradam a experiência em 2,4 GHz no horário de almoço. Qual ação de projeto é a mais alinhada?",
+    "alternativas": [
+      "Preferir/balancear clientes em 5 GHz quando possível, revisar canais non-overlapping e reduzir interferência na banda congestionada",
+      "Forçar todos os clientes a canal 3 e half-duplex",
+      "Trocar todo o backbone por Cabo crossover de 120 m",
+      "Desligar show interfaces status no core"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "2,4 GHz sofre com micro-ondas e vizinhança; 5 GHz e bom plano de canais mitigam. Canal 3 piora sobreposição. Crossover de 120 m e desligar comandos de diagnóstico não tratam RF do refeitório.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após upgrade, um lado do enlace ficou em auto e o outro em 100 Mbps full manual. Surgiram erros e lentidão. Qual prática evita esse tipo de problema?",
+    "alternativas": [
+      "Usar sempre canal Wi-Fi 11 no uplink de fibra",
+      "Manter auto-negociação consistente nos dois lados ou configurar speed/duplex de forma compatível e simétrica",
+      "Desabilitar CRC counters para ocultar o mismatch",
+      "Alimentar o uplink óptico com PoE+"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Auto de um lado e manual do outro costuma gerar mismatch de duplex/velocidade e erros. Canais Wi-Fi, ocultar contadores ou PoE em óptica não corrigem a negociação do enlace Ethernet.",
+    "part_id": "1.3"
+  }
+]

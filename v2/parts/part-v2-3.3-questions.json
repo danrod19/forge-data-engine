@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Como habilitar OSPFv2 na interface Gi0/0 na area 0 com process 1 (método interface)?",
+    "alternativas": [
+      "Em Gi0/0: ip ospf 1 area 0",
+      "Somente ip route 0.0.0.0 0.0.0.0 Gi0/0",
+      "switchport mode access vlan 0",
+      "ip helper-address 0.0.0.0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "ip ospf <pid> area <id> na interface coloca o link no processo single-area. Rota estática, access vlan e helper não formam adjacência OSPF. Depois verifique com show ip ospf neighbor e interface.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual comando mostra o estado dos vizinhos OSPFv2 (FULL, 2WAY, etc.)?",
+    "alternativas": [
+      "show vlan brief",
+      "show ip ospf neighbor",
+      "show power inline",
+      "show boot"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show ip ospf neighbor lista Neighbor ID, State, Dead Time e interface. É o Verify principal de adjacência. VLAN e PoE não exibem FULL OSPF.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "R1 area 0 e R2 area 1 no mesmo link Ethernet. Resultado típico?",
+    "alternativas": [
+      "FULL imediato e rotas O em ambos",
+      "DR eleito mesmo com areas diferentes sem Hello",
+      "Area mismatch — Hellos incompatíveis; adjacência não forma corretamente",
+      "OSPFv3 assume o processo automaticamente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Vizinhos devem concordar no area-id do link. Area mismatch impede adjacência. Alinhe as areas no single-area ou no desenho multi (fora do foco profundo). OSPFv3 não corrige mismatch v2 sozinho.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Neighbor preso em EXSTART/EXCHANGE. Causa clássica no CCNA?",
+    "alternativas": [
+      "Falta de banner motd",
+      "Description curta demais na interface",
+      "DNS server ausente no PC do técnico",
+      "MTU mismatch entre as interfaces do link"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Estados ExStart/Exchange lidam com DBD; MTU diferente é o clássico de stuck. Banner, description e DNS do PC não travam DBD OSPF. Compare MTU e ip ospf mtu-ignore só se política permitir.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Para que serve passive-interface Vlan40 sob OSPF?",
+    "alternativas": [
+      "Anuncia a rede da Vlan40 sem formar adjacência (sem Hellos) com hosts",
+      "Força FULL com todos os PCs",
+      "Desliga o SVI",
+      "Converte a VLAN em area 1 automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Passive evita Hellos na LAN de usuário mas mantém a rede no SPF/anúncio conforme o design. Não cria FULL com PCs nem desliga o SVI. Use no access; não no link entre routers.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Dois routers com router-id 1.1.1.1. Problema?",
+    "alternativas": [
+      "Configuração ideal de HSRP",
+      "RID duplicado — adjacência/estabilidade OSPF comprometidas; torne o RID único",
+      "Garante DR em todas as LANs",
+      "Habilita OSPFv3 sem IPv6"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O Router-ID deve ser único no domínio. Duplicata causa comportamento incorreto. Configure router-id distintos (ex. loopbacks). Não é feature de HSRP nem atalho para v3.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Em rede point-to-point OSPF, espera-se DR/BDR?",
+    "alternativas": [
+      "Sim, sempre dois DRs por link p2p",
+      "Sim, e 2-Way é o estado final desejado entre os dois",
+      "Não — p2p forma adjacência FULL sem eleição DR/BDR",
+      "Só se passive-interface default estiver ativo"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Tipo point-to-point não elege DR/BDR; os dois routers vão a FULL. Em broadcast multiacesso a eleição existe. Passive não define DR.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "OSPFv3 no CCNA: afirmação correta sobre Router-ID?",
+    "alternativas": [
+      "É um endereço IPv6 /128 obrigatório",
+      "É derivado só do MAC da primeira porta",
+      "Não existe RID em OSPFv3",
+      "Continua 32-bit (formato IPv4); precisa ser válido e único"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Mesmo carregando IPv6, o RID do OSPFv3 é 32-bit. Sem RID adequado o processo pode falhar. Configure router-id explicitamente se não houver loopback IPv4.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show ip ospf neighbor: FULL/DR. O que isso indica?",
+    "alternativas": [
+      "Adjacência completa com o Designated Router — LSAs podem ser trocadas com o DR",
+      "Interface administratively down",
+      "Area mismatch em curso",
+      "MTU 0 em ambos os lados"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "FULL/DR é o estado saudável de adjacência com o DR em multiacesso. Não indica admin down nem mismatch. É o Verify positivo de vizinhança.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Comando útil para ver Hello interval, area e network type da interface OSPF?",
+    "alternativas": [
+      "show users",
+      "show ip ospf interface",
+      "show banner motd",
+      "show clock"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show ip ospf interface detalha parâmetros que devem casar entre vizinhos: timers, area, type, cost. Essencial no Diagnose de stuck adjacency.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "passive-interface default com no passive-interface Gi0/0/0. Efeito?",
+    "alternativas": [
+      "Todas as interfaces passivas exceto Gi0/0/0, onde Hellos/adjacência são permitidos",
+      "Nenhuma rede é anunciada nunca",
+      "OSPFv3 desliga no chassis",
+      "MTU vira 1500 à força em todas as portas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "passive default silencia Hellos em geral; no passive no WAN permite a adjacência desejada. Padrão comum em campus. Não desliga v3 nem redefine MTU global.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Como anunciar 10.1.1.0/24 na area 0 com network command (wildcard)?",
+    "alternativas": [
+      "network 10.1.1.0 255.255.255.0 area 0 (mask invertida errada no IOS clássico)",
+      "network 10.1.1.0 0.0.0.255 area 0 sob router ospf",
+      "network 10.1.1.0 area 0 sem wildcard",
+      "switchport access vlan 0"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "IOS clássico usa wildcard (0.0.0.255 para /24), não a subnet mask normal no network OSPF. O statement coloca interfaces matching no processo/area.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Neighbor stuck em 2-WAY em link que deveria ser p2p FULL. O que checar?",
+    "alternativas": [
+      "Apenas o banner",
+      "Apenas o hostname",
+      "Network type, timers, area, se não é multiacesso com DROther esperado, e parâmetros do link",
+      "Apenas o clock timezone"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Em p2p espera-se FULL. 2-Way persistente pede comparação de network type e parâmetros. Em broadcast, 2-Way entre DROthers pode ser normal — saiba o tipo de rede.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "R1 e R2 FULL em OSPFv2; hosts IPv6 sem rotas entre sites. Ação?",
+    "alternativas": [
+      "Aumentar o Hello só no v2",
+      "Configurar e verificar OSPFv3 nas interfaces IPv6 — FULL v2 não carrega IPv6",
+      "Remover todos os RIDs",
+      "Passivar o link WAN no v2 e no v3"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "OSPFv2 e OSPFv3 são processos distintos. Adjacência IPv4 não instala rotas IPv6. Habilite ospfv3/ipv6 ospf e confira show ipv6 ospf neighbor.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem mental de Diagnose de neighbor down?",
+    "alternativas": [
+      "clear all → write erase → ver cabo",
+      "Só Wireshark no core sem show ospf",
+      "show ip ospf neighbor/interface → area/timers/MTU/passive/RID → reachability L3 do link",
+      "Só trocar o SFP de todas as portas access"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Comece pelos shows OSPF que expõem mismatch. Depois L3 do link. write erase e troca em massa de SFP não são o primeiro passo de adjacência.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Configurar RID 2.2.2.2 no processo 10:",
+    "alternativas": [
+      "router ospf 10 seguido de router-id 2.2.2.2",
+      "ip name-server 2.2.2.2",
+      "spanning-tree vlan 2 root primary",
+      "username 2.2.2.2 privilege 15"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "router-id sob o processo OSPF define o RID. Pode exigir clear ip ospf process para aplicar. name-server e STP não definem RID OSPF.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Hello 10 no R1 e Hello 30 no R2 no mesmo link. Efeito?",
+    "alternativas": [
+      "FULL garantido mais rápido",
+      "Timers incompatíveis — adjacência falha ou não estabiliza",
+      "Converte para OSPFv3",
+      "Ignora area-id"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Hello/Dead devem casar. Mismatch de timers é causa clássica de neighbor down. Alinhe ip ospf hello-interval/dead-interval nos dois lados.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Em LAN multiacesso broadcast, quem normalmente fica FULL com um DROther?",
+    "alternativas": [
+      "Todos os outros DROthers obrigatoriamente FULL entre si",
+      "Ninguém; DROther nunca forma FULL",
+      "Apenas switches de acesso",
+      "O DR e o BDR (FULL com DR/BDR); 2-Way com outros DROthers é esperado"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Modelo broadcast: FULL com DR e BDR; entre DROthers permanece 2-Way. Não confunda com falha se o tipo de rede for broadcast.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Interface WAN com passive-interface Gi0/0/1. Sintoma?",
+    "alternativas": [
+      "DR eleito duas vezes mais rápido",
+      "Hellos não saem/entram — adjacência desejada no WAN não forma",
+      "MTU sobe para 9000",
+      "RID vira 0.0.0.0"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Passive no link entre routers é erro clássico. Remova passive dessa interface. Não altera MTU nem RID diretamente.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Habilitar OSPFv3 area 0 no processo 1 em Gi0/0 (ideia de comando):",
+    "alternativas": [
+      "switchport voice vlan 1",
+      "ip ospf 1 area 0 somente (só v2)",
+      "spanning-tree portfast",
+      "interface Gi0/0 com ipv6 ospf 1 area 0 (ou ospfv3 1 ipv6 area 0) + IPv6 na interface"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "OSPFv3 se habilita no contexto IPv6 da interface (sintaxe varia por plataforma: ipv6 ospf / ospfv3). ip ospf é v2. A interface precisa de IPv6 e unicast-routing.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ipv6 ospf neighbor vazio; show ip ospf neighbor FULL. Leitura?",
+    "alternativas": [
+      "OSPFv3 não está formando adjacência IPv6 — configure/verifique v3; v2 FULL não implica v3",
+      "IPv6 está proibido se v2 está FULL",
+      "RID IPv6 /128 está ok e oculto",
+      "passive-interface não existe em v3 nunca"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Dois planos de controle. FULL v2 com neighbor v3 vazio pede config v3, link-local, area e processo. Não significa que IPv6 seja ilegal.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que configurar loopback e RID manual é boa prática?",
+    "alternativas": [
+      "Loopback desliga OSPF",
+      "Loopback estável ancora o RID e a identidade do router quando links físicos caem",
+      "RID manual força area 1",
+      "Elimina a necessidade de Hello"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Loopback up/up e router-id explícito dão previsibilidade. Não mudam a area sozinhos nem eliminam Hellos no link real.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "FULL mas prefixo da LAN do vizinho não aparece. Possível causa single-area?",
+    "alternativas": [
+      "Sempre MTU 1500 vs 1500",
+      "Sempre area mismatch (FULL contradiz)",
+      "Interface da LAN não está no OSPF / rede não anunciada / passive ok mas network statement faltando",
+      "Sempre RID duplicado com FULL estável"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Adjacência FULL no WAN não anuncia automaticamente toda LAN se a interface não está no processo. Verifique network/ip ospf area na LAN. Area mismatch impediria FULL.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ip ospf network point-to-point em ambos os lados de um link Ethernet dedicado. Vantagem conceitual?",
+    "alternativas": [
+      "Força eleição de 4 DRs",
+      "Desliga Hellos",
+      "Exige BDR sempre",
+      "Evita DR/BDR e forma FULL direto entre os dois — adequado a link p2p lógico"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Forçar p2p em Ethernet ponto a ponto simplifica (sem DR). Os dois devem usar o mesmo tipo. Não desliga Hello nem multiplica DRs.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Router-id 0.0.0.0 aparece no design. Ação?",
+    "alternativas": [
+      "Corrigir para um RID válido único (ex. 1.1.1.1 em loopback) — 0.0.0.0 é problemático",
+      "Manter; é o RID reservado ideal",
+      "Usar o mesmo 0.0.0.0 em todos os routers",
+      "Apagar IPv6 de todo o campus"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "RID zero não é identidade saudável. Configure RID explícito único. Duplicar 0.0.0.0 piora. Não exige apagar IPv6.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Verify OSPFv3 após config:",
+    "alternativas": [
+      "show vlan brief apenas",
+      "show power inline apenas",
+      "show ipv6 ospf neighbor e show ipv6 route ospf (ou show ospfv3…)",
+      "show ip dhcp binding apenas"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Neighbor v3 e tabela de rotas IPv6 OSPF fecham o Verify. VLAN/PoE/DHCP não provam adjacência OSPFv3.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ACL no link entre routers bloqueia IP protocol 89. Efeito OSPF?",
+    "alternativas": [
+      "Acelera FULL",
+      "Muda RID automaticamente",
+      "Hellos/LSA bloqueados — adjacência cai ou não forma",
+      "Converte broadcast em p2p"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "OSPF usa protocol 89. ACL que filtra impede Hellos e adjacência. Libere 89 entre routers ou ajuste a ACL. Não altera RID nem network type sozinho.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo do 3.3 CCNA:",
+    "alternativas": [
+      "Single-area neighbor FULL",
+      "passive-interface em LAN",
+      "OSPFv3 neighbor IPv6",
+      "Virtual-link, NSSA detalhado e redistribuição policy completa"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O blueprint no nível CCNA enfatiza single-area v2/v3 e adjacência. Virtual-link/NSSA/redistribute avançado ficam para estudos posteriores.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "clear ip ospf process — uso consciente?",
+    "alternativas": [
+      "Força reconvergência/reaprendizado; pode derrubar adjacências temporariamente — use com cuidado",
+      "Apaga a running-config inteira",
+      "Desliga permanentemente o switch",
+      "Remove todas as VLANs"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Clear do processo reestabece adjacências e pode ser necessário após mudar RID. É disruptivo o suficiente para janela de mudança. Não é write erase.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo Configure/Verify 3.3:",
+    "alternativas": [
+      "Só multi-area e LSA type decorados",
+      "Só NetFlow no lugar de neighbor",
+      "Só static routes com AD 110",
+      "OSPFv2/v3 single-area: RID, area, passive, tipo de rede, FULL neighbor e rotas O / OIPv6"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O pacote mental é adjacência single-area IPv4 e IPv6 com parâmetros corretos e verify de neighbor/rotas. Não substitui por NetFlow nem exige multi-area profundo no CCNA.",
+    "part_id": "v2-3.3"
+  }
+]

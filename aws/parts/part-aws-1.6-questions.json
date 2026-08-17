@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "App em EC2 privadas precisa de MySQL gerenciado com patches e backup da AWS. Qual serviço encaixa?",
+    "alternativas": [
+      "Somente S3 como engine SQL transacional",
+      "Amazon RDS for MySQL (ou engine equivalente) em subnet group privado",
+      "Somente ElastiCache Redis como source of truth relacional",
+      "AMI EC2 sem backup e sem Multi-AZ como única opção gerenciada"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "RDS entrega engine relacional gerenciada com backup/Multi-AZ. S3 não é OLTP SQL; ElastiCache é cache; EC2 self-managed não é o 'gerenciado' do cenário. Tip de prova: banco relacional gerenciado → RDS; objeto → S3; cache → ElastiCache.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Requisito: se a AZ do writer cair, o app deve voltar a escrever com RPO baixo. O que habilitar no RDS?",
+    "alternativas": [
+      "Apenas read replica assíncrona na mesma AZ",
+      "PubliclyAccessible true",
+      "Multi-AZ com standby síncrono e failover automático",
+      "Desligar automated backups para acelerar failover"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Multi-AZ mantém standby síncrono (ideia) e promove no failover de AZ — RPO baixo para escrita. Read replica assíncrona não garante o mesmo RPO de escrita; desligar backup piora recuperação. Tip de prova: falha de AZ no writer → Multi-AZ, não só read replica.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Timeout da app na porta 5432; describe-db-instances mostra available. sg-db inbound só 22 de bastion. Causa?",
+    "alternativas": [
+      "gp3 não suporta PostgreSQL",
+      "Multi-AZ desliga conexões TCP por padrão",
+      "Falta de regra no SG do RDS permitindo a porta do engine a partir do SG do app",
+      "Snapshot semanal bloqueia a porta 5432"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Engine available + timeout típico = path de rede/SG. Sem allow do sg-app na 5432 o pacote morre no ENI. Storage e Multi-AZ não removem a necessidade de SG. Tip de prova: timeout app→RDS com status available → SG do DB na porta do engine.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "DB subnet group só lista subnets em us-east-1a. Multi-AZ está 'enabled' no console mas deploy falha. Interpretação?",
+    "alternativas": [
+      "Multi-AZ funciona com uma AZ se o storage for io2",
+      "Subnet group precisa de subnets em pelo menos duas AZ para Multi-AZ",
+      "Basta PubliclyAccessible true",
+      "Read replica substitui o subnet group"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Subnet group precisa de subnets em pelo menos duas AZ para Multi-AZ. Isso resolve o cenário: DB subnet group só lista subnets em us-east-1a. Multi-AZ está 'enabled' no conso… O distractor «Multi-AZ funciona com uma AZ se o storage for io2» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Antes de major upgrade, o time quer ponto de restauração sob demanda. O que criar?",
+    "alternativas": [
+      "Apenas aumentar max_connections",
+      "Apenas abrir 0.0.0.0/0 temporariamente",
+      "Desligar o CloudWatch",
+      "Snapshot manual (e manter automated backup com retention adequada)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Snapshot manual (e manter automated backup com retention adequada). Isso resolve o cenário: Antes de major upgrade, o time quer ponto de restauração sob demanda. O que cria… O distractor «Apenas aumentar max_connections» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Multi-constraint: HA de AZ, RPO de minutos para restore lógico e DB inacessível da Internet. Qual pacote?",
+    "alternativas": [
+      "Single-AZ + PubliclyAccessible true + SG 0.0.0.0/0 + backup retention 0",
+      "Multi-AZ + automated backup com retention >0 + PubliclyAccessible false + SG só do app",
+      "Read replica pública como writer",
+      "EC2 self-managed sem snapshot em subnet pública"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Multi-AZ cobre HA de AZ; backup/retention cobre RPO de restore; private+SG do app fecha Internet. Público com 0.0.0.0/0 viola segurança. Tip de prova: HA+RPO+não público → Multi-AZ + backup + SG app + PubliclyAccessible false.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Relatórios SELECT pesados degradam o writer. Qual recurso RDS (ideia) alivia leitura?",
+    "alternativas": [
+      "Desligar Multi-AZ",
+      "Read replica para offload de SELECT (assíncrona)",
+      "Tornar o DB PubliclyAccessible",
+      "Remover o Security Group"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Read replica para offload de SELECT (assíncrona). Isso resolve o cenário: Relatórios SELECT pesados degradam o writer. Qual recurso RDS (ideia) alivia lei… O distractor «Desligar Multi-AZ» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Produção típica: o parâmetro PubliclyAccessible deve ficar como?",
+    "alternativas": [
+      "true com SG 0.0.0.0/0 para o ALB alcançar o SQL",
+      "true somente se Multi-AZ estiver off",
+      "false — app na VPC acessa por IP privado; ALB não precisa falar SQL na Internet",
+      "Irrelevante porque SG é ignorado no RDS"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "App e RDS na VPC usam rede privada; ALB termina HTTP e fala com app, não com a porta SQL na Internet. Public true + 0.0.0.0/0 é anti-pattern. Tip de prova: RDS produção → PubliclyAccessible false + SG do app. (aws-1.6 #8)",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Disco do RDS em 99% e writes falhando. Controle nativo (ideia) para evitar recorrência?",
+    "alternativas": [
+      "Somente aumentar instance class sem storage",
+      "Abrir porta 80 no SG do DB",
+      "Storage autoscaling e/ou aumentar allocated storage (gp2/gp3)",
+      "Converter o endpoint em S3 static website"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Falta de storage se resolve com mais allocated storage ou autoscaling. Instance class maior não substitui GiB livres; porta 80 não é o engine. Tip de prova: FreeStorageSpace baixo → storage (auto)scale, não só CPU class.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Encryption at rest no RDS (ideia SAA): o que se espera?",
+    "alternativas": [
+      "Criptografia com KMS configurada na criação (ou conforme suporte de cópia/snapshot)",
+      "Que o SG 0.0.0.0/0 já cifre os dados",
+      "Que Multi-AZ desligue a criptografia",
+      "Que read replica proíba KMS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Criptografia com KMS configurada na criação (ou conforme suporte de cópia/snapshot). Isso resolve o cenário: Encryption at rest no RDS (ideia SAA): o que se espera?… O distractor «Que o SG 0.0.0.0/0 já cifre os dados» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Failover Multi-AZ em andamento; app perde conexões por alguns minutos e reconecta no mesmo endpoint. Interpretação?",
+    "alternativas": [
+      "Prova de que Multi-AZ nunca falha conexão",
+      "Indica que o subnet group tem uma AZ só e por isso é normal perder dados",
+      "Exige PubliclyAccessible true para reconectar",
+      "Comportamento esperado de failover — RTO de minutos; app deve retentar no endpoint"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Failover promove standby e o DNS/endpoint estabiliza; apps precisam de retry. Não é perda de dados por single-AZ se Multi-AZ real. Tip de prova: breve outage no failover Multi-AZ → retry no endpoint, não recriar a VPC. (aws-1.6 #11)",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Automated backup retention = 0. O que se perde?",
+    "alternativas": [
+      "Apenas o Enhanced Monitoring",
+      "Apenas o tipo de instance class",
+      "Point-in-time restore e a janela de backup automático (além de risco operacional)",
+      "A capacidade de usar Security Groups"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Point-in-time restore e a janela de backup automático (além de risco operacional). Isso resolve o cenário: Automated backup retention = 0. O que se perde?… O distractor «Apenas o Enhanced Monitoring» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Multi-constraint: custo menor que Multi-AZ full, mas leituras HA em outra AZ e RPO de escrita de alguns segundos aceitável em DR leve. Candidato?",
+    "alternativas": [
+      "Multi-AZ obrigatório + três writers",
+      "Single-AZ writer + read replica em outra AZ (e backup) — trade-off vs Multi-AZ síncrono",
+      "DB público sem backup",
+      "Somente ElastiCache como banco relacional"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Replica em outra AZ ajuda leitura e DR assíncrono barato que Multi-AZ; não iguala RPO síncrono de Multi-AZ. Tip de prova: se a questão aceita RPO assíncrono e foca leitura → replica; se exige failover de escrita síncrono → Multi-AZ.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Restore from snapshot cria qual objeto?",
+    "alternativas": [
+      "Uma nova DB instance (novo endpoint) a partir do snapshot",
+      "Um Security Group com as mesmas regras automaticamente público",
+      "Um NAT Gateway na subnet do DB",
+      "Um ALB listener 5432"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Uma nova DB instance (novo endpoint) a partir do snapshot. Isso resolve o cenário: Restore from snapshot cria qual objeto?… O distractor «Um Security Group com as mesmas regras automaticamente público» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que NÃO colocar o RDS na subnet pública só 'para o ALB conectar'?",
+    "alternativas": [
+      "Porque o ALB precisa falar SQL na 443 com o engine",
+      "Porque Multi-AZ proíbe subnets",
+      "O ALB fala com o app tier; o app fala com o RDS na VPC privada — expor o DB na pública aumenta superfície",
+      "Porque gp3 só funciona em privada"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: O ALB fala com o app tier; o app fala com o RDS na VPC privada — expor o DB na pública aumenta superfície. Isso resolve o cenário: Por que NÃO colocar o RDS na subnet pública só 'para o ALB conectar'?… O distractor «Porque o ALB precisa falar SQL na 443 com o engine» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Custo: Multi-AZ vs single-AZ no mesmo instance class e storage. Expectativa?",
+    "alternativas": [
+      "Multi-AZ costuma custar mais (standby e storage espelhado ideia)",
+      "Multi-AZ é sempre grátis",
+      "Single-AZ custa o dobro por definição",
+      "Preço só depende do Security Group"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Multi-AZ costuma custar mais (standby e storage espelhado ideia). Isso resolve o cenário: Custo: Multi-AZ vs single-AZ no mesmo instance class e storage. Expectativa?… O distractor «Multi-AZ é sempre grátis» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Evento: maintenance window com upgrade; single-AZ. Impacto típico vs Multi-AZ?",
+    "alternativas": [
+      "Single-AZ tem maior chance de downtime na maintenance; Multi-AZ reduz impacto com standby",
+      "Single-AZ nunca tem downtime de maintenance",
+      "Multi-AZ apaga automated backups na maintenance",
+      "Maintenance só ocorre se PubliclyAccessible true"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Single-AZ tem maior chance de downtime na maintenance; Multi-AZ reduz impacto com standby. Isso resolve o cenário: Evento: maintenance window com upgrade; single-AZ. Impacto típico vs Multi-AZ?… O distractor «Single-AZ nunca tem downtime de maintenance» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "sg-db permite 3306 de 0.0.0.0/0 e PubliclyAccessible true. Avaliação de segurança?",
+    "alternativas": [
+      "Best practice de least privilege",
+      "Obrigatório para Multi-AZ",
+      "Aceitável se houver snapshot diário",
+      "Anti-pattern: DB exposto à Internet — restrinja SG ao app e PubliclyAccessible false"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Anti-pattern: DB exposto à Internet — restrinja SG ao app e PubliclyAccessible false. Isso resolve o cenário: sg-db permite 3306 de 0.0.0.0/0 e PubliclyAccessible true. Avaliação de seguranç… O distractor «Best practice de least privilege» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PITR (point-in-time restore) depende principalmente de quê?",
+    "alternativas": [
+      "Apenas de tags na VPC",
+      "Automated backups habilitados com retention > 0 e janela de restore",
+      "Apenas de read replica pública",
+      "Apenas de Enhanced Monitoring granularity 1s"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Automated backups habilitados com retention > 0 e janela de restore. Isso resolve o cenário: PITR (point-in-time restore) depende principalmente de quê?… O distractor «Apenas de tags na VPC» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo desta part RDS foundations?",
+    "alternativas": [
+      "Multi-AZ e subnet group",
+      "Backup/snapshot/PITR ideia",
+      "SG e PubliclyAccessible",
+      "Aurora Serverless v2 deep, Global Database lab, RDS Proxy full e DMS full"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O piloto cobre RDS clássico HA/backup/SG/storage. Aurora Serverless/Global, Proxy e DMS deep ficam de fora. Tip de prova: se a questão for Aurora Global deep, não force só 'ligar Multi-AZ clássico' sem ler o stem. (aws-1.6 #20)",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "App connection string aponta para o endpoint de escrita. Após criar read replica, as escritas devem ir para onde?",
+    "alternativas": [
+      "Continuam no endpoint do primary/writer; replica é para leituras (ideia)",
+      "Todas as escritas devem ir só para a replica",
+      "Escritas só funcionam se PubliclyAccessible true na replica",
+      "Escritas só via snapshot restore diário"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Continuam no endpoint do primary/writer; replica é para leituras (ideia). Isso resolve o cenário: App connection string aponta para o endpoint de escrita. Após criar read replica… O distractor «Todas as escritas devem ir só para a replica» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Storage type gp3 no RDS (ideia) vs necessidade de IOPS altos previsíveis. Direção?",
+    "alternativas": [
+      "gp3 permite dimensionar storage/IOPS com bom custo; cenários extremos podem exigir io classes conforme engine/suporte",
+      "gp3 proíbe Multi-AZ",
+      "gp3 exige 0.0.0.0/0 no SG",
+      "gp3 remove a necessidade de backup"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: gp3 permite dimensionar storage/IOPS com bom custo; cenários extremos podem exigir io classes conforme engine/suporte. Isso resolve o cenário: Storage type gp3 no RDS (ideia) vs necessidade de IOPS altos previsíveis. Direçã… O distractor «gp3 proíbe Multi-AZ» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Instance RDS em 'storage-full'. Qual sintoma de app e ação?",
+    "alternativas": [
+      "App com erros de escrita/transação; aumentar storage ou confiar em autoscaling se habilitado",
+      "Apenas 404 no ALB listener 443 por definição",
+      "Apenas falha de IAM AssumeRole",
+      "Apenas perda de Elastic IP do RDS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: App com erros de escrita/transação; aumentar storage ou confiar em autoscaling se habilitado. Isso resolve o cenário: Instance RDS em 'storage-full'. Qual sintoma de app e ação?… O distractor «Apenas 404 no ALB listener 443 por definição» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Alguém deletou a DB instance sem snapshot final e automated backup estava off. Resultado?",
+    "alternativas": [
+      "PITR de 35 dias ainda disponível sempre",
+      "A VPC inteira é restaurada",
+      "Multi-AZ recria os dados de outra conta",
+      "Dados tipicamente irrecuperáveis no serviço — sem snapshot/backup não há restore"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Dados tipicamente irrecuperáveis no serviço — sem snapshot/backup não há restore. Isso resolve o cenário: Alguém deletou a DB instance sem snapshot final e automated backup estava off. R… O distractor «PITR de 35 dias ainda disponível sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Desenho: ALB → ASG app → RDS. Onde aplicar o allow 3306?",
+    "alternativas": [
+      "No SG do ALB para 0.0.0.0/0",
+      "No SG do RDS com Source = SG das instances de app (sg-app)",
+      "No NACL only Deny all",
+      "Somente no Security Group do NAT Gateway"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: No SG do RDS com Source = SG das instances de app (sg-app). Isso resolve o cenário: Desenho: ALB → ASG app → RDS. Onde aplicar o allow 3306?… O distractor «No SG do ALB para 0.0.0.0/0» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Read replica cross-Region (ideia leve) serve a qual objetivo?",
+    "alternativas": [
+      "Failover síncrono Multi-AZ na mesma AZ apenas",
+      "Substituir o Security Group",
+      "DR/leitura em outra Região com RPO assíncrono (não idêntico a Multi-AZ local)",
+      "Eliminar a necessidade de KMS"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: DR/leitura em outra Região com RPO assíncrono (não idêntico a Multi-AZ local). Isso resolve o cenário: Read replica cross-Region (ideia leve) serve a qual objetivo?… O distractor «Failover síncrono Multi-AZ na mesma AZ apenas» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Enhanced Monitoring / Performance Insights (menção): para que servem no TShoot?",
+    "alternativas": [
+      "Métricas de OS/SQL para diagnosticar CPU, wait, conexões — não substituem SG/backup",
+      "Abrem automaticamente 0.0.0.0/0",
+      "Criam Multi-AZ sozinhos",
+      "Apagam snapshots antigos por padrão sem policy"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Métricas de OS/SQL para diagnosticar CPU, wait, conexões — não substituem SG/backup. Isso resolve o cenário: Enhanced Monitoring / Performance Insights (menção): para que servem no TShoot?… O distractor «Abrem automaticamente 0.0.0.0/0» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Modificar instance class (vertical) vs adicionar read replica (horizontal leitura). Quando replica?",
+    "alternativas": [
+      "Quando se precisa só de mais RAM no writer sem leituras extras",
+      "Quando o gargalo é volume de SELECT e se pode separar leituras",
+      "Quando se quer desligar o endpoint de escrita",
+      "Quando PubliclyAccessible deve ser true"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Quando o gargalo é volume de SELECT e se pode separar leituras. Isso resolve o cenário: Modificar instance class (vertical) vs adicionar read replica (horizontal leitur… O distractor «Quando se precisa só de mais RAM no writer sem leituras extras» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mental de TShoot RDS nesta part?",
+    "alternativas": [
+      "Só recriar a conta AWS",
+      "Só aumentar o TTL do Route 53 do site",
+      "Só desligar o versioning do bucket de logs",
+      "Status instance → SG/porta/Public → Multi-AZ/eventos → storage livre → backups/snapshots"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Status instance → SG/porta/Public → Multi-AZ/eventos → storage livre → backups/snapshots. Isso resolve o cenário: Checklist mental de TShoot RDS nesta part?… O distractor «Só recriar a conta AWS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.6), não em controles de outro domínio.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo de design RDS foundations no SAA-C03:",
+    "alternativas": [
+      "DB público 0.0.0.0/0 single-AZ sem backup",
+      "RDS na subnet pública porque o ALB 'precisa de SQL'",
+      "Só read replica como HA de escrita síncrona",
+      "Privado multi-AZ (se HA), SG do app, backup/PITR, storage dimensionado, encryption conforme dados"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Núcleo: private+SG, Multi-AZ se HA de AZ, backup para RPO, storage/custo conscientes. Público sem backup e confundir replica com Multi-AZ são anti-patterns. Tip de prova: se a opção junta private, Multi-AZ, backup e SG do app, costuma ser a correta.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6401 — Playbook de banner “rodou ok”, mas SW-CORE-20 não mudou. Operador colou o IP errado no inventário.",
+    "cli_output": "$ cat inventory.ini\n[cores]\n10.1.1.10 ansible_network_os=ios ansible_user=netops\n# comentario: 10.1.1.20 e o SW-CORE-20 real — NAO listado\n\n$ ansible-playbook -i inventory.ini banner.yml\n\nPLAY [cores] ****************************************************************\nTASK [Set banner motd] ******************************************************\nok: [10.1.1.10]\n\nPLAY RECAP ******************************************************************\n10.1.1.10              : ok=1    changed=0    unreachable=0    failed=0\n\nSW-CORE-20# show banner motd\n% Banner not set\n\nSW-CORE-10# show banner motd\nAuthorized access only\n\n! hostname SW-CORE-10 tem IP 10.1.1.10; SW-CORE-20 e 10.1.1.20",
+    "alternativas": [
+      "Playbook falhou com failed=1 no RECAP",
+      "10.1.1.20 esta no grupo [cores] e recebeu o banner",
+      "SW-CORE-20 mostra banner Authorized access only",
+      "Inventory so lista 10.1.1.10 — playbook ok no host errado; SW-CORE-20 (10.1.1.20) ausente do inventory"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "RECAP so 10.1.1.10 ok/changed=0; banner existe em CORE-10 e nao em CORE-20. Inventory omite 10.1.1.20. Corrija o inventory. Nao ha failed. Ticket classico de alvo errado.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6402 — Ontem o playbook criou user netops. Hoje o user sumiu no switch; ninguem rerodou automacao.",
+    "cli_output": "$ ansible-playbook -i inventory.ini users.yml\nPLAY RECAP ******************************************************************\n10.10.10.5             : ok=2    changed=1    unreachable=0    failed=0\n# ontem 18:00 UTC\n\nSW1# show run | include username\nusername netops secret 9 $9$REDACTED\n# capturado ontem apos o playbook\n\nSW1# show run | include username\n# capturado hoje 09:00 — vazio\n\nSW1# show logging | include CONFIG\n%SYS-5-CONFIG_I: Configured from console by admin on vty0\n# hoje 08:55 — admin removeu o user manualmente\n\n$ ansible-playbook -i inventory.ini users.yml --check\n# mudaria: recriar username netops (changed predicted)",
+    "alternativas": [
+      "Inventory ficou unreachable desde ontem",
+      "Playbook de ontem teve failed=1 no RECAP",
+      "Drift: mudanca CLI manual (CONFIG_I) removeu o user apos o playbook; estado real divergiu do desejado",
+      "Idempotencia proibe recriar o user na proxima run"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "RECAP de ontem sucesso; log CONFIG_I de console; username sumiu. Drift por CLI. Proxima playbook recria (idempotencia ajuda). Nao foi unreachable nem failed no RECAP antigo.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6403 — NOC quer saber se pode rodar o playbook de NTP de novo com seguranca. Segunda execucao ja feita.",
+    "cli_output": "$ ansible-playbook -i inventory.ini ntp.yml\nTASK [Configure NTP servers] ***********************************************\nchanged: [leaf1]\nchanged: [leaf2]\nPLAY RECAP ******************************************************************\nleaf1                  : ok=3    changed=1    unreachable=0    failed=0\nleaf2                  : ok=3    changed=1    unreachable=0    failed=0\n# first run\n\n$ ansible-playbook -i inventory.ini ntp.yml\nTASK [Configure NTP servers] ***********************************************\nok: [leaf1]\nok: [leaf2]\nPLAY RECAP ******************************************************************\nleaf1                  : ok=3    changed=0    unreachable=0    failed=0\nleaf2                  : ok=3    changed=0    unreachable=0    failed=0\n# second run\n\nleaf1# show run | include ntp\nntp server 10.0.0.1\nntp server 10.0.0.2",
+    "alternativas": [
+      "Segunda run failed=1 em leaf1 e leaf2",
+      "Segunda run unreachable prova perda total de SSH",
+      "changed=1 na segunda run mostra reaplicacao destrutiva obrigatoria",
+      "Primeira run changed=1 e segunda changed=0 — idempotencia: estado ja conforme, seguro reexecutar"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Padrao classico: apply depois no-op. NTP permanece. Nao ha failed/unreachable na segunda. Idempotencia do content 6.4. Pode rodar de novo com seguranca.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6404 — Playbook em massa falhou em um site. Control node novo com chave SSH desatualizada.",
+    "cli_output": "$ ansible-playbook -i inventory.ini harden.yml\nTASK [Gather facts] ********************************************************\nfatal: [10.50.50.2]: UNREACHABLE! => {\n  \"changed\": false,\n  \"msg\": \"Failed to connect to the host via ssh: Permission denied (publickey,password).\",\n  \"unreachable\": true\n}\n\nPLAY RECAP ******************************************************************\n10.50.50.2             : ok=0    changed=0    unreachable=1    failed=0\n10.50.50.3             : ok=4    changed=1    unreachable=0    failed=0\n\n$ ssh -i ~/.ssh/old_key netops@10.50.50.2\nPermission denied (publickey,password).\n\n$ ssh -i ~/.ssh/new_key netops@10.50.50.2\nnetops@10.50.50.2's password: ********\n# login ok com key nova / senha\n\n10.50.50.2# show ip interface brief | include Vlan1\nVlan1   10.50.50.2   YES manual up  up",
+    "alternativas": [
+      "UNREACHABLE por falha de autenticacao SSH/credencial no control node; device up, task nem aplica (failed=0)",
+      "failed=1 de ios_config com sintaxe errada no RECAP de 10.50.50.2",
+      "Host 10.50.50.2 esta down L3 (interface administratively down)",
+      "Inventory nao contem 10.50.50.2"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Permission denied e unreachable=1; failed=0. Interface up. Outro host ok. Atualize a key/senha no control node. Diferencie unreachable de failed de modulo.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6405 — Task de VLAN em IOS falha com mensagem de modulo; SSH ao switch funciona no putty.",
+    "cli_output": "$ ansible-playbook -i inventory.ini vlans.yml -v\nTASK [Ensure VLAN 50 exists] ***********************************************\nfatal: [leaf8]: FAILED! => {\n  \"changed\": false,\n  \"msg\": \"Unsupported parameters for (ansible.builtin.copy) module: vlan_id. Supported parameters include: ...\"\n}\n\nPLAY RECAP ******************************************************************\nleaf8                  : ok=1    changed=0    unreachable=0    failed=1\n\n# trecho playbook (lab)\n- name: Ensure VLAN 50 exists\n  ansible.builtin.copy:\n    vlan_id: 50\n    name: USERS\n  # dev colou module Linux copy em vez de cisco.ios.ios_vlans / ios_config\n\n$ ansible leaf8 -i inventory.ini -m ansible.netcommon.net_ping\nleaf8 | SUCCESS => {\"ping\": \"pong\"}\n\nleaf8# show ip interface brief | include up\nVlan1  10.8.8.8  YES manual up  up",
+    "alternativas": [
+      "unreachable=1 por perda total de gestao",
+      "Module errado (copy com vlan_id) → failed com parametro unsupported; host reachable (ping module ok)",
+      "PLAY RECAP failed=0 e changed=2",
+      "Inventory nao inclui leaf8"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Mensagem Unsupported parameters for copy; failed=1; unreachable=0; net_ping SUCCESS. Troque para module IOS de VLAN/config. SSH/putty ok confirma gestao. Task/module errado, nao path down.",
+    "part_id": "6.4"
+  }
+]

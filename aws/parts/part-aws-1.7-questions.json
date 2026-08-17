@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Site apex exemplo.com deve apontar ao ALB app-alb-123.us-east-1.elb.amazonaws.com. Qual record Route 53 é o adequado?",
+    "alternativas": [
+      "Record A/AAAA ALIAS para o Application Load Balancer",
+      "CNAME no apex (exemplo.com) para o DNS do ALB (DNS clássico não permite CNAME no apex)",
+      "MX apontando ao ALB na porta 443",
+      "NS record substituindo os name servers da AWS pelo IP do ALB"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Record A/AAAA ALIAS para o Application Load Balancer. Isso resolve o cenário: Site apex exemplo.com deve apontar ao ALB app-alb-123.us-east-1.elb.amazonaws.co… O distractor «CNAME no apex (exemplo.com) para o DNS do ALB (DNS clássico não permite CNAME no apex)» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Primary failover record unhealthy; secondary saudável não recebe tráfego. O que verificar primeiro?",
+    "alternativas": [
+      "Se o price class do CloudFront está em All Edge Locations",
+      "Se o S3 versioning está habilitado no bucket de logs",
+      "Health check associado ao primary, status do check e configuração failover (Evaluate Target Health / secondary)",
+      "Se o RDS Multi-AZ está enabled"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Failover DNS depende do health check do primary e da policy failover corretamente ligada ao secondary. CloudFront price class e RDS não controlam esse DNS. Tip de prova: secondary não promove → health check R53 do primary e records failover.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "CloudFront na frente de s3://corp-site (privado). Usuários na edge recebem 403. Causa comum?",
+    "alternativas": [
+      "Falta de OAI/OAC e/ou bucket policy permitindo GetObject só à distribuição CloudFront",
+      "TTL de cache alto demais (isso causa stale, não 403 de origem)",
+      "Weighted routing com peso 0 no secondary apenas",
+      "Alias record apontando ao ALB em vez de A numérico"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Falta de OAI/OAC e/ou bucket policy permitindo GetObject só à distribuição CloudFront. Isso resolve o cenário: CloudFront na frente de s3://corp-site (privado). Usuários na edge recebem 403. … O distractor «TTL de cache alto demais (isso causa stale, não 403 de origem)» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Após deploy de index.html, usuários ainda veem a home antiga por horas. Ação CloudFront típica?",
+    "alternativas": [
+      "Desligar o Route 53 health check",
+      "Criar invalidation dos paths afetados (ou versionar o object key) e revisar TTL/default TTL",
+      "Abrir 0.0.0.0/0 no SG do S3 (S3 não usa SG de VPC assim)",
+      "Trocar o hosted zone para privada"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Cache na edge mantém objeto até TTL/invalidation; invalidar /* ou versionar arquivos força refresh. Health check e hosted zone não limpam cache de HTML. Tip de prova: conteúdo stale no CloudFront → invalidation ou versioned keys.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual diferença prática ALIAS Route 53 vs CNAME?",
+    "alternativas": [
+      "ALIAS pode no apex e integra targets AWS (ALB, CloudFront); CNAME não no apex em DNS padrão",
+      "CNAME só funciona com IPv6",
+      "ALIAS apaga health checks automaticamente",
+      "CNAME é obrigatório para qualquer ALB"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: ALIAS pode no apex e integra targets AWS (ALB, CloudFront); CNAME não no apex em DNS padrão. Isso resolve o cenário: Qual diferença prática ALIAS Route 53 vs CNAME?… O distractor «CNAME só funciona com IPv6» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Multi-constraint: site estático global com baixa latência de leitura, bucket S3 privado (sem Principal *) e HTTPS. Desenho?",
+    "alternativas": [
+      "S3 website público Principal * sem CloudFront",
+      "CloudFront com origem S3 + OAI/OAC, ACM us-east-1, opcionalmente price class alinhado a custo de edge",
+      "Somente Route 53 failover para dois buckets públicos em uma AZ",
+      "ALB internet-facing apontando direto a objetos S3 via porta 80 no SG do bucket"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: CloudFront com origem S3 + OAI/OAC, ACM us-east-1, opcionalmente price class alinhado a custo de edge. Isso resolve o cenário: Multi-constraint: site estático global com baixa latência de leitura, bucket S3 … O distractor «S3 website público Principal * sem CloudFront» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Latency-based routing em Route 53 serve para quê?",
+    "alternativas": [
+      "Enviar o cliente ao record com menor latência medida entre regiões configuradas",
+      "Substituir Multi-AZ do RDS",
+      "Invalidar cache do CloudFront a cada query DNS",
+      "Forçar todos os usuários a us-east-1 sempre"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Enviar o cliente ao record com menor latência medida entre regiões configuradas. Isso resolve o cenário: Latency-based routing em Route 53 serve para quê?… O distractor «Substituir Multi-AZ do RDS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Certificado ACM para viewer HTTPS no CloudFront deve estar em qual região?",
+    "alternativas": [
+      "Sempre na mesma região do bucket S3 origem, qualquer região",
+      "Somente eu-central-1",
+      "Somente ap-south-1",
+      "us-east-1 (N. Virginia) para certificados usados com CloudFront"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: us-east-1 (N. Virginia) para certificados usados com CloudFront. Isso resolve o cenário: Certificado ACM para viewer HTTPS no CloudFront deve estar em qual região?… O distractor «Sempre na mesma região do bucket S3 origem, qualquer região» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Weighted routing 80/20 entre v1 e v2 de API. Uso típico?",
+    "alternativas": [
+      "Canary/blue-green gradual de tráfego DNS entre dois endpoints",
+      "Obrigar 100% de cache hit no CloudFront",
+      "Desligar health checks permanentemente",
+      "Substituir o Security Group do ALB"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Canary/blue-green gradual de tráfego DNS entre dois endpoints. Isso resolve o cenário: Weighted routing 80/20 entre v1 e v2 de API. Uso típico?… O distractor «Obrigar 100% de cache hit no CloudFront» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Geolocation routing (ideia): o que controla?",
+    "alternativas": [
+      "Latência medida em tempo real apenas",
+      "Preço Spot das instances de origem",
+      "Localização geográfica do resolvedor DNS do cliente para escolher o record",
+      "TTL máximo do CloudFront globalmente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Localização geográfica do resolvedor DNS do cliente para escolher o record. Isso resolve o cenário: Geolocation routing (ideia): o que controla?… O distractor «Latência medida em tempo real apenas» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Health check R53 HTTP /health no ALB retorna 401; failover marca primary unhealthy. Correção?",
+    "alternativas": [
+      "Ajustar path/success codes do health check (ou endpoint de readiness sem auth) no R53",
+      "Aumentar o TTL do record para 86400 para 'esconder' o 401",
+      "Trocar ALIAS por CNAME no apex",
+      "Desligar o CloudFront price class"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Ajustar path/success codes do health check (ou endpoint de readiness sem auth) no R53. Isso resolve o cenário: Health check R53 HTTP /health no ALB retorna 401; failover marca primary unhealt… O distractor «Aumentar o TTL do record para 86400 para 'esconder' o 401» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Origem do CloudFront é um ALB interno (só VPC). Clientes Internet na distribuição falham. Problema de desenho?",
+    "alternativas": [
+      "CloudFront na Internet não alcança ALB internal sem path/origem adequada (use ALB internet-facing ou origin acessível)",
+      "Falta de Multi-AZ no Route 53 hosted zone",
+      "S3 versioning desligado",
+      "Weighted routing com peso 50/50"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: CloudFront na Internet não alcança ALB internal sem path/origem adequada (use ALB internet-facing ou origin acessível). Isso resolve o cenário: Origem do CloudFront é um ALB interno (só VPC). Clientes Internet na distribuiçã… O distractor «Falta de Multi-AZ no Route 53 hosted zone» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Multi-constraint: DR multi-Region barato em DNS + site estático com cache edge e custo de edge limitado a NA/EU. Combinação?",
+    "alternativas": [
+      "Failover R53 (ou latency) entre origens + CloudFront price class só regiões necessárias + OAI se S3 privado",
+      "Um único A record para um IP elástico em uma AZ sem health",
+      "Somente CNAME apex para EC2",
+      "Principal * no bucket e sem CloudFront"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Failover R53 (ou latency) entre origens + CloudFront price class só regiões necessárias + OAI se S3 privado. Isso resolve o cenário: Multi-constraint: DR multi-Region barato em DNS + site estático com cache edge e… O distractor «Um único A record para um IP elástico em uma AZ sem health» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Simple routing policy: comportamento?",
+    "alternativas": [
+      "Sempre exige dois health checks",
+      "Só funciona com CloudFront",
+      "Substitui OAI automaticamente",
+      "Único valor (ou multi-value answer ideia) sem avaliação de latência/peso/geo por policy avançada"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Único valor (ou multi-value answer ideia) sem avaliação de latência/peso/geo por policy avançada. Isso resolve o cenário: Simple routing policy: comportamento?… O distractor «Sempre exige dois health checks» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Alias para CloudFront no record www: qual benefício vs A com IP fixo da edge?",
+    "alternativas": [
+      "ALIAS desliga HTTPS",
+      "ALIAS proíbe invalidation",
+      "ALIAS obriga bucket público",
+      "ALIAS acompanha a distribuição CloudFront (targets AWS dinâmicos) sem fixar IP de edge"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: ALIAS acompanha a distribuição CloudFront (targets AWS dinâmicos) sem fixar IP de edge. Isso resolve o cenário: Alias para CloudFront no record www: qual benefício vs A com IP fixo da edge?… O distractor «ALIAS desliga HTTPS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Price class CloudFront (ideia de custo): o que altera?",
+    "alternativas": [
+      "A engine do RDS Multi-AZ",
+      "O cipher suite do NACL",
+      "O tamanho mínimo de EBS gp3",
+      "Quais grupos de edge locations servem a distribuição (custo vs cobertura global)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Quais grupos de edge locations servem a distribuição (custo vs cobertura global). Isso resolve o cenário: Price class CloudFront (ideia de custo): o que altera?… O distractor «A engine do RDS Multi-AZ» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "DNS não resolve domínio novo: hosted zone criada mas name servers do registrador ainda apontam ao provedor antigo. Causa?",
+    "alternativas": [
+      "Falta de read replica no RDS",
+      "ASG desired 0 apenas",
+      "Delegação NS no registrador não atualizada para os 4 name servers da hosted zone Route 53",
+      "gp3 IOPS abaixo de 3000"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Delegação NS no registrador não atualizada para os 4 name servers da hosted zone Route 53. Isso resolve o cenário: DNS não resolve domínio novo: hosted zone criada mas name servers do registrador… O distractor «Falta de read replica no RDS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Failover routing: Evaluate Target Health em ALIAS para ALB. Ideia?",
+    "alternativas": [
+      "Força o ALB a ser internal",
+      "Apaga o listener 443",
+      "Route 53 pode considerar health dos targets do ALB (quando suportado) além/ao invés de só health check externo isolado",
+      "Converte records em MX"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Route 53 pode considerar health dos targets do ALB (quando suportado) além/ao invés de só health check externo isolado. Isso resolve o cenário: Failover routing: Evaluate Target Health em ALIAS para ALB. Ideia?… O distractor «Força o ALB a ser internal» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Invalidation /* em produção a cada commit de CSS. Trade-off?",
+    "alternativas": [
+      "É grátis ilimitado e obrigatório em todo PUT S3",
+      "Substitui OAI",
+      "Garante consistência rápida mas pode aumentar custo/requests de invalidation e origem se abusado",
+      "Desliga o Route 53"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Garante consistência rápida mas pode aumentar custo/requests de invalidation e origem se abusado. Isso resolve o cenário: Invalidation /* em produção a cada commit de CSS. Trade-off?… O distractor «É grátis ilimitado e obrigatório em todo PUT S3» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo desta part R53/CloudFront?",
+    "alternativas": [
+      "ALIAS vs CNAME no apex",
+      "Failover + health check",
+      "OAI/OAC e invalidation",
+      "Lambda@Edge full, Traffic Flow policies deep, Resolver hybrid lab, signed cookies lab completo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Lambda@Edge full, Traffic Flow policies deep, Resolver hybrid lab, signed cookies lab completo. Isso resolve o cenário: Fora de escopo profundo desta part R53/CloudFront?… O distractor «ALIAS vs CNAME no apex» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "CNAME www.exemplo.com → d111.cloudfront.net vs ALIAS para a mesma distribuição. Ambos válidos em subdomínio?",
+    "alternativas": [
+      "CNAME é inválido em qualquer subdomínio",
+      "ALIAS é proibido em www",
+      "Sim em subdomínio; ALIAS ainda é preferível por integração AWS e opções de routing/health",
+      "Só MX pode apontar a CloudFront"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Sim em subdomínio; ALIAS ainda é preferível por integração AWS e opções de routing/health. Isso resolve o cenário: CNAME www.exemplo.com → d111.cloudfront.net vs ALIAS para a mesma distribuição. … O distractor «CNAME é inválido em qualquer subdomínio» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Health check TCP na porta 443 do ALB falha, mas curl HTTPS /health retorna 200 de dentro da VPC. Hipótese?",
+    "alternativas": [
+      "CloudFront price class bloqueia TCP",
+      "S3 BPA desliga health checks R53",
+      "Health check R53 parte da Internet — SG do ALB pode não permitir os ranges de health checkers da AWS",
+      "Weighted weight 100 impede health"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Health check R53 parte da Internet — SG do ALB pode não permitir os ranges de health checkers da AWS. Isso resolve o cenário: Health check TCP na porta 443 do ALB falha, mas curl HTTPS /health retorna 200 d… O distractor «CloudFront price class bloqueia TCP» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Origem S3 com OAC configurado mas bucket policy ainda tem Deny explícito a todos exceto um user IAM admin. Efeito no CloudFront?",
+    "alternativas": [
+      "OAC ignora qualquer Deny sempre",
+      "CloudFront pode continuar 403 se o Deny não exceptuar o service principal do OAC",
+      "Route 53 converte Deny em Allow",
+      "Invalidation remove o Deny da policy"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: CloudFront pode continuar 403 se o Deny não exceptuar o service principal do OAC. Isso resolve o cenário: Origem S3 com OAC configurado mas bucket policy ainda tem Deny explícito a todos… O distractor «OAC ignora qualquer Deny sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Latency routing entre ALB us-east-1 e ALB eu-west-1; um ALB unhealthy. Comportamento desejado com health checks?",
+    "alternativas": [
+      "Todo tráfego cai mesmo com um ALB saudável",
+      "Clientes tendem a ir ao endpoint saudável de menor latência entre os records healthy",
+      "DNS vira NXDOMAIN permanente",
+      "CloudFront apaga as distribuições"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Clientes tendem a ir ao endpoint saudável de menor latência entre os records healthy. Isso resolve o cenário: Latency routing entre ALB us-east-1 e ALB eu-west-1; um ALB unhealthy. Comportam… O distractor «Todo tráfego cai mesmo com um ALB saudável» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "S3 website endpoint vs REST API origin no CloudFront (ideia): por que OAI/OAC prefere REST/API origin?",
+    "alternativas": [
+      "Website endpoint é obrigatório com OAC",
+      "OAI/OAC integra com bucket via REST e policy; website endpoint é outro modelo de hosting público clássico",
+      "REST origin proíbe HTTPS no viewer",
+      "Website endpoint desliga Route 53"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: OAI/OAC integra com bucket via REST e policy; website endpoint é outro modelo de hosting público clássico. Isso resolve o cenário: S3 website endpoint vs REST API origin no CloudFront (ideia): por que OAI/OAC pr… O distractor «Website endpoint é obrigatório com OAC» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Record failover secondary aponta a static site de manutenção no S3. Primary é ALB. Quando secondary responde?",
+    "alternativas": [
+      "Sempre 50% do tempo por weighted implícito",
+      "Quando o health check do primary está unhealthy (e secondary configurado healthy)",
+      "Somente se o CloudFront price class for All",
+      "Nunca — secondary é só documentação"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Quando o health check do primary está unhealthy (e secondary configurado healthy). Isso resolve o cenário: Record failover secondary aponta a static site de manutenção no S3. Primary é AL… O distractor «Sempre 50% do tempo por weighted implícito» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Viewer protocol policy Redirect HTTP to HTTPS no CloudFront. Efeito?",
+    "alternativas": [
+      "Desliga o origin protocol",
+      "Requests HTTP do viewer são redirecionadas para HTTPS na edge",
+      "Remove a necessidade de certificado ACM",
+      "Abre a porta 80 no RDS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Requests HTTP do viewer são redirecionadas para HTTPS na edge. Isso resolve o cenário: Viewer protocol policy Redirect HTTP to HTTPS no CloudFront. Efeito?… O distractor «Desliga o origin protocol» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após mudar origin do CloudFront de S3 A para S3 B, alguns paths ainda servem objetos do bucket A. Causa provável?",
+    "alternativas": [
+      "Route 53 ignora mudanças de origin",
+      "Cache na edge ainda tem objetos do origin antigo até TTL/invalidation",
+      "ALIAS impede troca de origin",
+      "Health check R53 grava objetos no bucket A"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Cache na edge ainda tem objetos do origin antigo até TTL/invalidation. Isso resolve o cenário: Após mudar origin do CloudFront de S3 A para S3 B, alguns paths ainda servem obj… O distractor «Route 53 ignora mudanças de origin» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mental TShoot DNS/edge nesta part?",
+    "alternativas": [
+      "Só recriar a VPC",
+      "Só aumentar IOPS do EBS do bastion",
+      "Só desligar Multi-AZ do RDS",
+      "Delegação NS → record ALIAS/CNAME → health R53 → origin access/403 → cache TTL/invalidation → ACM us-east-1"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Delegação NS → record ALIAS/CNAME → health R53 → origin access/403 → cache TTL/invalidation → ACM us-east-1. Isso resolve o cenário: Checklist mental TShoot DNS/edge nesta part?… O distractor «Só recriar a VPC» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.7), não em controles de outro domínio.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo Route 53 + CloudFront foundations no SAA-C03:",
+    "alternativas": [
+      "CNAME no apex + S3 Principal * + sem health no failover",
+      "Só A com IP de uma EC2 single-AZ sem edge",
+      "CloudFront sem certificado e origin ALB internal para site público global",
+      "ALIAS correto, routing/health quando HA DNS, CloudFront+OAI/OAC para S3 privado, invalidation/TTL e ACM us-east-1"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Desenho sólido une DNS certo (ALIAS/failover/health), edge com origem segura e cache controlado. Apex CNAME e bucket público solto são anti-patterns. Tip de prova: se a opção une ALIAS, health/failover, OAI/OAC e ACM us-east-1, costuma ser a correta.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  }
+]

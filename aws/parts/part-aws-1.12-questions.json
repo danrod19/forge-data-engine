@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Alarme deve detectar média de CPU > 70% por 5 minutos em uma EC2. Quais parâmetros principais?",
+    "alternativas": [
+      "Metric CPUUtilization, statistic Average, period 60s, evaluation coerente (ex. 5 de 5), threshold 70, dimensão InstanceId",
+      "Metric FreeStorageSpace do RDS sem dimensão da EC2",
+      "Statistic SampleCount de CPU com threshold 70 sem InstanceId",
+      "Apenas um dashboard sem alarme"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Metric CPUUtilization, statistic Average, period 60s, evaluation coerente (ex. 5 de 5), threshold 70, dimensão InstanceId. Isso resolve o cenário: Alarme deve detectar média de CPU > 70% por 5 minutos em uma EC2. Quais parâmetr… O distractor «Metric FreeStorageSpace do RDS sem dimensão da EC2» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Alarme fica INSUFFICIENT_DATA após terminate da instance monitorada. Interpretação?",
+    "alternativas": [
+      "Não há datapoints novos na série (dimensão InstanceId morta) — não significa que o serviço substituto está saudável",
+      "INSUFFICIENT_DATA prova que CPU está em 0% com saúde perfeita",
+      "O alarme sempre vira ALARM em 60s",
+      "Logs retention apaga a métrica de hypervisor"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Não há datapoints novos na série (dimensão InstanceId morta) — não significa que o serviço substituto está saudável. Isso resolve o cenário: Alarme fica INSUFFICIENT_DATA após terminate da instance monitorada. Interpretaç… O distractor «INSUFFICIENT_DATA prova que CPU está em 0% com saúde perfeita» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Log group /aws/lambda/pay sem retention; conta sobe mês a mês. Ação de custo?",
+    "alternativas": [
+      "put-retention-policy (ex. 14 ou 30 dias) e revisar ingestão/verbosidade",
+      "Aumentar o timeout da Lambda para 900s",
+      "Abrir 0.0.0.0/0 no SG do RDS",
+      "Criar mais 10 log groups Never expire"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: put-retention-policy (ex. 14 ou 30 dias) e revisar ingestão/verbosidade. Isso resolve o cenário: Log group /aws/lambda/pay sem retention; conta sobe mês a mês. Ação de custo?… O distractor «Aumentar o timeout da Lambda para 900s» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ASG deveria subir com CPU > 60%, mas desired não muda. Checks?",
+    "alternativas": [
+      "Alarme em ALARM? action AutoScaling correta? métrica do grupo/instances e policies do ASG habilitadas",
+      "Só o price class do CloudFront",
+      "Só o CNAME do apex",
+      "Só o TTL do objeto S3"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Alarme em ALARM? action AutoScaling correta? métrica do grupo/instances e policies do ASG habilitadas. Isso resolve o cenário: ASG deveria subir com CPU > 60%, mas desired não muda. Checks?… O distractor «Só o price class do CloudFront» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Statistic Sum vs Average em alarme de contagem de erros HTTP 5xx do ALB?",
+    "alternativas": [
+      "Sum (ou contagem) reflete volume de erros no período; Average de 'contagem' pode mascarar picos se mal usado",
+      "Average sempre conta erros absolutos melhor que Sum",
+      "Statistic não importa nunca",
+      "Maximum de bytes enviados substitui 5xx"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Sum (ou contagem) reflete volume de erros no período; Average de 'contagem' pode mascarar picos se mal usado. Isso resolve o cenário: Statistic Sum vs Average em alarme de contagem de erros HTTP 5xx do ALB?… O distractor «Average sempre conta erros absolutos melhor que Sum» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Multi-constraint: notificar on-call em falha de Lambda, limitar custo de logs a 14 dias, e evitar flapping do alarme. Desenho?",
+    "alternativas": [
+      "Alarm em Errors (Sum) com datapoints coerentes → SNS; log retention 14; evaluation periods > 1 se houver ruído",
+      "Retention Never + alarme sem action + threshold em 1 segundo sempre",
+      "Só dashboard manual 24×7 sem alarm",
+      "INSUFFICIENT_DATA tratado como sucesso silencioso"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Alarm em Errors (Sum) com datapoints coerentes → SNS; log retention 14; evaluation periods > 1 se houver ruído. Isso resolve o cenário: Multi-constraint: notificar on-call em falha de Lambda, limitar custo de logs a … O distractor «Retention Never + alarme sem action + threshold em 1 segundo sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Metric filter no log group detecta 'ERROR' e publica métrica custom ErrorCount. Próximo elo típico?",
+    "alternativas": [
+      "Alarme na métrica ErrorCount com action SNS",
+      "Remover a execution role da Lambda",
+      "Desligar o ALB",
+      "Apagar o log group"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Alarme na métrica ErrorCount com action SNS. Isso resolve o cenário: Metric filter no log group detecta 'ERROR' e publica métrica custom ErrorCount. … O distractor «Remover a execution role da Lambda» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "PutMetricData AccessDenied na role do agent. Causa?",
+    "alternativas": [
+      "Falta cloudwatch:PutMetricData (e namespaces permitidos) na identity policy",
+      "Falta rota 53 ListHostedZones apenas",
+      "Falta s3:CreateBucket apenas",
+      "Falta ec2:CreateTags apenas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Falta cloudwatch:PutMetricData (e namespaces permitidos) na identity policy. Isso resolve o cenário: PutMetricData AccessDenied na role do agent. Causa?… O distractor «Falta rota 53 ListHostedZones apenas» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Datapoints to alarm = 3 de 3 com period 60s. Significado?",
+    "alternativas": [
+      "Dispara no primeiro segundo sempre",
+      "Ignora o threshold",
+      "Apaga a métrica",
+      "Precisa de 3 períodos consecutivos em violação (3 min) para ALARM — reduz falso positivo de 1 pico"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Precisa de 3 períodos consecutivos em violação (3 min) para ALARM — reduz falso positivo de 1 pico. Isso resolve o cenário: Datapoints to alarm = 3 de 3 com period 60s. Significado?… O distractor «Dispara no primeiro segundo sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Composite alarm (ideia): benefício?",
+    "alternativas": [
+      "Substituir todos os log groups",
+      "Desligar billing da conta",
+      "Criar VPC endpoints automaticamente",
+      "Combinar vários alarmes (AND/OR ideia) para reduzir ruído e acionar só em condição agregada"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Combinar vários alarmes (AND/OR ideia) para reduzir ruído e acionar só em condição agregada. Isso resolve o cenário: Composite alarm (ideia): benefício?… O distractor «Substituir todos os log groups» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Métrica de memória de EC2 não aparece por default no hypervisor básico. Caminho ideia?",
+    "alternativas": [
+      "Só o health check Route 53 no apex",
+      "Só o Multi-AZ do RDS",
+      "Só aumentar o EBS size",
+      "CloudWatch Agent (custom metrics) com permissão PutMetricData"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: CloudWatch Agent (custom metrics) com permissão PutMetricData. Isso resolve o cenário: Métrica de memória de EC2 não aparece por default no hypervisor básico. Caminho … O distractor «Só o health check Route 53 no apex» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Alarme de FreeStorageSpace RDS nunca dispara; storage-full no console. Possível erro de config?",
+    "alternativas": [
+      "SNS topic inexistente sempre impede a métrica de existir",
+      "DynamoDB on-demand desliga métricas RDS",
+      "CloudFront price class esconde FreeStorageSpace",
+      "Threshold no sentido errado (alarma se FreeStorage > X em vez de < X) ou dimensão DBInstanceIdentifier errada"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Threshold no sentido errado (alarma se FreeStorage > X em vez de < X) ou dimensão DBInstanceIdentifier errada. Isso resolve o cenário: Alarme de FreeStorageSpace RDS nunca dispara; storage-full no console. Possível … O distractor «SNS topic inexistente sempre impede a métrica de existir» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Multi-constraint: ASG scale-out em picos e notificação se scale falhar por 10 min; custo de logs de app em 7 dias. Desenho?",
+    "alternativas": [
+      "Sem alarmes, retention Never, scale manual só",
+      "Um único alarme de CPU com action terminate em todas as instances",
+      "CPU alarm → ASG policy; alarme de InService/activity falha → SNS; retention 7 nos log groups de app",
+      "Metric filter que apaga a VPC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: CPU alarm → ASG policy; alarme de InService/activity falha → SNS; retention 7 nos log groups de app. Isso resolve o cenário: Multi-constraint: ASG scale-out em picos e notificação se scale falhar por 10 mi… O distractor «Sem alarmes, retention Never, scale manual só» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Namespace AWS/Lambda metric Errors dimension FunctionName=checkout. O que monitora?",
+    "alternativas": [
+      "Latência do NAT Gateway apenas",
+      "RCU da tabela DynamoDB Orders",
+      "Contagem/erros de invocação da function checkout (com statistic adequada)",
+      "CPU de todas as EC2 da conta"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Contagem/erros de invocação da function checkout (com statistic adequada). Isso resolve o cenário: Namespace AWS/Lambda metric Errors dimension FunctionName=checkout. O que monito… O distractor «Latência do NAT Gateway apenas» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Missing data treatment ignore / notBreaching / breaching (ideia): impacto?",
+    "alternativas": [
+      "Apaga o alarm history",
+      "Muda o runtime da Lambda",
+      "Define se ausência de pontos mantém estado, trata como OK ou como violação — crítico em métricas esparsas",
+      "Cria um GSI no DynamoDB"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Define se ausência de pontos mantém estado, trata como OK ou como violação — crítico em métricas esparsas. Isso resolve o cenário: Missing data treatment ignore / notBreaching / breaching (ideia): impacto?… O distractor «Apaga o alarm history» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dashboard operacional (ideia): papel vs alarme?",
+    "alternativas": [
+      "Dashboard envia SMS sozinho sempre",
+      "Alarme proíbe dashboards",
+      "Dashboard visualiza; alarme automatiza reação — um não substitui o outro",
+      "Dashboard aumenta RCU"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Dashboard visualiza; alarme automatiza reação — um não substitui o outro. Isso resolve o cenário: Dashboard operacional (ideia): papel vs alarme?… O distractor «Dashboard envia SMS sozinho sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ALB HTTPCode_Target_5XX_Count em ALARM com action SNS. O que o time ganha?",
+    "alternativas": [
+      "Prova de que o DNS apex está errado sempre",
+      "Aumento automático de EBS IOPS",
+      "Sinal de falha de backend/targets com notificação — correlacionar com target health e deploys",
+      "Disable do WAF"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Sinal de falha de backend/targets com notificação — correlacionar com target health e deploys. Isso resolve o cenário: ALB HTTPCode_Target_5XX_Count em ALARM com action SNS. O que o time ganha?… O distractor «Prova de que o DNS apex está errado sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "High-resolution metrics (ideia 1s): trade-off?",
+    "alternativas": [
+      "Sempre grátis e obrigatório",
+      "Remove a need de dimensions",
+      "Maior granularidade e possível custo/volume; use quando period 60s é grosso demais",
+      "Desliga alarms"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Maior granularidade e possível custo/volume; use quando period 60s é grosso demais. Isso resolve o cenário: High-resolution metrics (ideia 1s): trade-off?… O distractor «Sempre grátis e obrigatório» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Log stream por instance/function: por que retention no group?",
+    "alternativas": [
+      "Cada stream ignora retention do group sempre",
+      "Retention apaga a execution role",
+      "Policy de retenção aplica ao group inteiro (streams herdam) — controla custo e compliance",
+      "Retention cria Multi-AZ"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Policy de retenção aplica ao group inteiro (streams herdam) — controla custo e compliance. Isso resolve o cenário: Log stream por instance/function: por que retention no group?… O distractor «Cada stream ignora retention do group sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo desta part CloudWatch foundations?",
+    "alternativas": [
+      "Alarms threshold e actions SNS/ASG",
+      "Log retention e metric filters",
+      "INSUFFICIENT_DATA e dimensions",
+      "Contributor Insights deep, Logs Insights lab full, OpenSearch/Firehose lab e X-Ray full service map"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Contributor Insights deep, Logs Insights lab full, OpenSearch/Firehose lab e X-Ray full service map. Isso resolve o cenário: Fora de escopo profundo desta part CloudWatch foundations?… O distractor «Alarms threshold e actions SNS/ASG» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "DynamoDB UserErrors / ThrottledRequests no CloudWatch: uso?",
+    "alternativas": [
+      "Medir latência do CloudFront edge apenas",
+      "Detectar throttle/capacity issues e acionar alarme/autoscaling de capacidade ou on-demand review",
+      "Substituir IAM GetItem",
+      "Apagar a tabela automaticamente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Detectar throttle/capacity issues e acionar alarme/autoscaling de capacidade ou on-demand review. Isso resolve o cenário: DynamoDB UserErrors / ThrottledRequests no CloudWatch: uso?… O distractor «Medir latência do CloudFront edge apenas» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "EC2 StatusCheckFailed_System em ALARM com action recover. Ideia?",
+    "alternativas": [
+      "Sempre significa disco cheio do convidado",
+      "Problema de host AWS; recover pode migrar a instance — distinto de falha de app (instance status)",
+      "É métrica de S3",
+      "Desliga o SNS topic"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Problema de host AWS; recover pode migrar a instance — distinto de falha de app (instance status). Isso resolve o cenário: EC2 StatusCheckFailed_System em ALARM com action recover. Ideia?… O distractor «Sempre significa disco cheio do convidado» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Anomaly detection alarm (ideia): quando preferir a threshold estático?",
+    "alternativas": [
+      "Quando não existe métrica",
+      "Baseline sazonal/variável onde threshold fixo gera ruído ou atraso",
+      "Quando se quer ignorar SNS",
+      "Quando se desliga CloudTrail"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Baseline sazonal/variável onde threshold fixo gera ruído ou atraso. Isso resolve o cenário: Anomaly detection alarm (ideia): quando preferir a threshold estático?… O distractor «Quando não existe métrica» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cross-account alarm notification (ideia): peça típica?",
+    "alternativas": [
+      "Abrir 22 em todos os bastions",
+      "SNS topic com policy permitindo a conta de monitoramento publicar/assinar conforme desenho",
+      "Desabilitar MFA do root",
+      "Tornar o log group público ACL"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: SNS topic com policy permitindo a conta de monitoramento publicar/assinar conforme desenho. Isso resolve o cenário: Cross-account alarm notification (ideia): peça típica?… O distractor «Abrir 22 em todos os bastions» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Evaluation periods = 5, datapoints to alarm = 1. Comportamento?",
+    "alternativas": [
+      "Exige 5 violações sempre",
+      "Mais sensível: 1 violação na janela de 5 pode disparar (dependendo da config) — risco de flapping",
+      "Desliga o alarme",
+      "Converte métrica em log"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Mais sensível: 1 violação na janela de 5 pode disparar (dependendo da config) — risco de flapping. Isso resolve o cenário: Evaluation periods = 5, datapoints to alarm = 1. Comportamento?… O distractor «Exige 5 violações sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Lambda Throttles metric em ALARM sem SNS. Resultado operacional?",
+    "alternativas": [
+      "O alarme invoca a function automaticamente sempre",
+      "Problema existe na métrica mas ninguém é notificado — falta action",
+      "Reserved concurrency sobe sozinho",
+      "O código é corrigido por IA na conta"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Problema existe na métrica mas ninguém é notificado — falta action. Isso resolve o cenário: Lambda Throttles metric em ALARM sem SNS. Resultado operacional?… O distractor «O alarme invoca a function automaticamente sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Namespace custom App/Checkout com dimensão stage=prod. Por que dimensions importam?",
+    "alternativas": [
+      "Dimensions apagam logs",
+      "Separam séries (prod vs dev); alarme na dimensão errada não vê o tráfego prod",
+      "Dimensions substituem IAM",
+      "Dimensions definem o VPC CIDR"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Separam séries (prod vs dev); alarme na dimensão errada não vê o tráfego prod. Isso resolve o cenário: Namespace custom App/Checkout com dimensão stage=prod. Por que dimensions import… O distractor «Dimensions apagam logs» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Custo alto de GetMetricData/API e dashboards: alavanca?",
+    "alternativas": [
+      "Desligar todos os alarmes de produção críticos",
+      "Reduzir alta resolução desnecessária, cardinalidade de dimensions e refresh agressivo de dashboards",
+      "Never expire em mais log groups",
+      "Provisioned 4000 WCU ocioso"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Reduzir alta resolução desnecessária, cardinalidade de dimensions e refresh agressivo de dashboards. Isso resolve o cenário: Custo alto de GetMetricData/API e dashboards: alavanca?… O distractor «Desligar todos os alarmes de produção críticos» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mental TShoot alarme silencioso nesta part?",
+    "alternativas": [
+      "Só recriar a conta",
+      "Só aumentar o ASG max sem olhar o alarme",
+      "Só apagar o log group",
+      "Métrica existe? dimensions? statistic? period/datapoints? estado ALARM vs INSUFFICIENT_DATA? action SNS/ASG configurada e permissões?"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Métrica existe? dimensions? statistic? period/datapoints? estado ALARM vs INSUFFICIENT_DATA? action SNS/ASG configurada e permissões?. Isso resolve o cenário: Checklist mental TShoot alarme silencioso nesta part?… O distractor «Só recriar a conta» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.12), não em controles de outro domínio.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo CloudWatch foundations no SAA-C03 (fecha o piloto):",
+    "alternativas": [
+      "Sem alarmes, retention Never, INSUFFICIENT_DATA = OK, sem SNS",
+      "Só dashboards manuais 24×7",
+      "Threshold invertido em toda métrica crítica",
+      "Métricas certas + alarmes com datapoints/actions + logs com retention + metric filters quando o sinal está no texto + custo consciente"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Observabilidade completa une métrica, alarme acionável e logs com retenção. Silêncio e Never expire são anti-patterns. Tip de prova: se a opção equilibra alarm action, retention e métrica/dimensão corretas, costuma ser a correta.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  }
+]

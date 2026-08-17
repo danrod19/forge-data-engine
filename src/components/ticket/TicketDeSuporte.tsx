@@ -34,6 +34,10 @@ interface TicketDeSuporteProps {
   disabled: boolean;
   /** Total do banco (ex.: 359) — só UX; a sessão usa `questions.length` */
   bankSize?: number;
+  /** Título da sessão (ex.: Trilha · Fundamentos) */
+  sessionTitle?: string;
+  /** Subtítulo sob o título */
+  sessionSubtitle?: string;
   /** Nova sessão embaralhada (recomendado na Trilha) */
   onNewSession?: () => void;
   /** Voltar para outro modo (ex.: Sobre / home) */
@@ -50,6 +54,8 @@ export function TicketDeSuporte({
   onUpgrade,
   disabled,
   bankSize,
+  sessionTitle,
+  sessionSubtitle,
   onNewSession,
   onExit,
   loading = false,
@@ -237,7 +243,7 @@ export function TicketDeSuporte({
               <p className="text-[10px] font-semibold uppercase tracking-widest text-neon-cyan">
                 {isTraditional
                   ? "Modo Traditional"
-                  : "Trilha · Tickets de Suporte"}
+                  : sessionTitle ?? "Trilha · Tickets de Suporte"}
               </p>
               <p className="text-xs text-slate-500">
                 {score > 0 && (
@@ -245,9 +251,11 @@ export function TicketDeSuporte({
                 )}
                 {isTraditional
                   ? "Questão de prova"
-                  : typeof bankSize === "number" && bankSize > 0
-                    ? `Troubleshooting · ${bankSize} tickets no banco`
-                    : "Troubleshooting / diagnóstico de rede"}
+                  : sessionSubtitle
+                    ? sessionSubtitle
+                    : typeof bankSize === "number" && bankSize > 0
+                      ? `Troubleshooting · ${bankSize} tickets no banco`
+                      : "Troubleshooting / diagnóstico de rede"}
               </p>
             </div>
           </div>

@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Como configurar a porta Gi1/0/10 para um PC na VLAN 40?",
+    "alternativas": [
+      "switchport mode access e switchport access vlan 40",
+      "switchport mode trunk e switchport trunk native vlan 40 apenas",
+      "no switchport e ip address na porta de acesso do PC",
+      "switchport voice vlan 40 sem access vlan de dados"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "End host de dados usa mode access e access vlan da VLAN de usuário. Trunk e no switchport são para outros papéis. Voice vlan sozinha não define a VLAN de dados do PC. Verifique com show interfaces status.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Telefone IP e PC no mesmo cabo. Qual comando adiciona a VLAN de voz na porta access?",
+    "alternativas": [
+      "ip helper-address na interface do phone",
+      "switchport voice vlan <id>",
+      "switchport mode tunnel",
+      "spanning-tree vlan 1 root primary"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "switchport voice vlan associa a VLAN de voz ao telefone; a access vlan permanece para o PC. Helper e root primary não configuram voice na borda. Sem voice vlan, a voz costuma falhar com o PC ainda ok.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show interfaces status mostra Gi1/0/5 connected 1. O PC deveria estar na VLAN 30. O que falta?",
+    "alternativas": [
+      "Apenas description na interface",
+      "Somente PortFast global",
+      "Corrigir switchport access vlan 30 (está na VLAN 1)",
+      "Configurar OSPF na porta do PC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A coluna Vlan = 1 indica access VLAN errada para o desenho 30. Ajuste access vlan 30 e revalide status. Description e PortFast não movem o PC de VLAN; OSPF não se configura na access do host.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Câmera IoT na borda: qual configuração de porta é a mais adequada no CCNA?",
+    "alternativas": [
+      "Trunk permitindo todas as VLANs com DTP desirable",
+      "Routed port com IP público",
+      "EtherChannel LACP com o NVR",
+      "mode access + access vlan dedicada de IoT/câmeras"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Endpoint IoT fica em access VLAN dedicada para isolamento e simplicidade. Trunk no endpoint é misconfig comum. Routed port e LACP não são o padrão de câmera de borda no 2.2.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show power inline Gi1/0/8: Oper power fault. Telefone não liga; PC atrás não se aplica. Interpretação?",
+    "alternativas": [
+      "PoE em falha na porta — cabo/device/classe/orçamento; não é default route do core",
+      "Voice vlan está perfeita e irrelevante",
+      "Access vlan errada sempre",
+      "PortFast desliga PoE automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Estado fault no power inline aponta problema de alimentação PoE. Investigue cabo, telefone, short e capacidade da porta. PortFast e rota default não geram fault de PoE.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Para que serve spanning-tree portfast em porta access de usuário?",
+    "alternativas": [
+      "Eleger root bridge do campus",
+      "Colocar a porta em forwarding mais rápido no edge — reduz atraso de link/DHCP no boot",
+      "Criar voice vlan automaticamente",
+      "Ativar PoE++"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "PortFast (edge) evita esperar timers longos de STP em portas de host, acelerando conectividade e DHCP. Não elege root nem configura voice/PoE. Use em access, não em links que recebem BPDUs de switch.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Porta de mesa vazia deve ficar como?",
+    "alternativas": [
+      "Trunk nativo VLAN 1 sempre up",
+      "Desirable DTP para 'qualquer coisa'",
+      "shutdown (e description se política pedir) — higiene de borda",
+      "Voice vlan 999 sem device"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Portas ociosas em shutdown reduzem risco e links acidentais. Manter trunk/DTP aberto em mesa vazia é má prática de edge. Description ajuda inventário quando a porta for reativada.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "AP de escritório em desenho simples de exame: melhor modo de porta no access switch?",
+    "alternativas": [
+      "no switchport com /30 para cada AP",
+      "Trunk para o notebook do gerente",
+      "SPAN session como access",
+      "mode access na VLAN de AP/management (SSID→VLAN no controller — ideia)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "No nível CCNA de borda, o AP costuma ser access na VLAN de management/AP. O mapeamento de SSID para VLAN de usuário fica no WLC. Routed /30 por AP e SPAN não são o padrão pedido no 2.2.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "PC navega; telefone no mesmo cabo não registra. access vlan 40 presente; voice vlan ausente. Ação?",
+    "alternativas": [
+      "Configurar switchport voice vlan (e validar PoE) — dados ok não provam voz",
+      "Remover access vlan 40",
+      "Transformar a porta em routed port",
+      "Desligar PortFast e esperar 30 minutos"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sintoma clássico de falta de voice vlan: PC na data VLAN funciona, voz não. Adicione voice vlan e confira power inline. Remover access ou virar routed piora o cenário.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Comando de verify que mostra status connected e a VLAN da porta em formato tabular?",
+    "alternativas": [
+      "show version",
+      "show interfaces status",
+      "show clock",
+      "show flash:"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show interfaces status resume Status e Vlan por porta — ideal para Verify de borda. version/clock/flash não mostram access VLAN operacional do host.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Interface com switchport mode trunk ligada a impressora. Efeito indesejado?",
+    "alternativas": [
+      "Endpoint recebe framing de trunk — deve ser mode access + access vlan da impressora",
+      "Impressora vira root bridge automaticamente",
+      "PoE desliga em todas as portas",
+      "Voice vlan se cria sozinha"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Impressora/IoT não esperam 802.1Q de trunk. Corrija para access na VLAN correta. Root/PoE/voice não são consequência automática desse trunk.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show power inline: Gi1/0/3 delivering, Device Ieee PD, Power 6.5. Significado?",
+    "alternativas": [
+      "Porta sem cabo",
+      "PoE ativo alimentando um PD (phone/AP/câmera) com sucesso operacional",
+      "Fault de curto garantido",
+      "VLAN 1 only"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Delivering com device PD indica PoE saudável na borda. Não é notconnect nem fault. Ainda valide VLAN/voice conforme o tipo de device.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após ligar o PC, demora ~30–50s para obter IP; a porta access não tem PortFast. Hipótese de borda?",
+    "alternativas": [
+      "Sempre falha de DNS AAAA",
+      "Sempre cabo de fibra MM no RJ45",
+      "Atraso de STP na porta access — PortFast edge costuma melhorar; ainda validar DHCP",
+      "Necessidade de trunk nativo 999"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Sem PortFast a porta passa por listening/learning e atrasa o DHCP do host. Configure PortFast em access e continue o Diagnose de DHCP se precisar (1.7). Trunk nativo não é a correção de edge host.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual par de comandos documenta e segura uma porta de AP na VLAN 15?",
+    "alternativas": [
+      "shutdown apenas, sem VLAN",
+      "switchport mode access; switchport access vlan 15; description AP-SALA-2; no shutdown",
+      "ip routing na interface do AP",
+      "switchport voice vlan 15 somente, sem access"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Access + VLAN de AP + description + no shutdown é o pacote Configure de borda. Voice vlan sozinha não substitui access de AP. ip routing na porta do AP não é o desenho access típico.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show run interface Gi1/0/12: mode access, access vlan 40, voice vlan 50, portfast. O que essa porta atende bem?",
+    "alternativas": [
+      "Uplink para outro switch com múltiplas VLANs de usuário sem phone",
+      "Porta routed de WAN",
+      "Mesa com telefone IP + PC (data 40, voice 50) em edge",
+      "Apenas câmera que exige trunk nativo 50"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O conjunto access+voice+PortFast é o padrão de mesa com phone e PC. Uplink de switch pede trunk; WAN é routed; câmera costuma ser access sem voice.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Device PoE não liga; show power inline mostra absent e status notconnect. Primeiro foco?",
+    "alternativas": [
+      "Cabo/link físico e se o PD está plugado — sem link não há delivering",
+      "OSPF area 0 no access",
+      "AAA nos VTY apenas",
+      "Remover todas as access VLANs do switch"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "notconnect + power absent apontam ausência de link/PD. Verifique cabo e device antes de redesenhar VLAN ou OSPF. Sem link, PoE não entrega.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "DTP deixou a porta em trunk dinâmico com um PC. Como forçar o papel correto de borda?",
+    "alternativas": [
+      "Manter dynamic auto",
+      "Configurar switchport mode access (e access vlan) explicitamente",
+      "Ativar ip unnumbered",
+      "Criar SVI por porta de PC"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Mode access explícito evita trunk indesejado com endpoint. dynamic auto é arriscado na borda. SVI por PC e unnumbered não são o padrão de access host.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show vlan brief não lista a VLAN 60, mas a porta tem access vlan 60. Sintoma possível?",
+    "alternativas": [
+      "Porta always connected na 60",
+      "PoE delivering garantido",
+      "PortFast vira root",
+      "VLAN inexistente/inativa — crie a VLAN no switch; senão o acesso falha"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Access vlan para VLAN não criada deixa o host sem forwarding adequado. Crie a VLAN (e propague se VTP/política) e revalide status. PoE e PortFast não criam a VLAN.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual situação pede voice vlan além da access vlan?",
+    "alternativas": [
+      "Impressora USB local",
+      "PC desktop sem telefone",
+      "Telefone IP com PC conectado na porta do phone (mesmo cabo até o switch)",
+      "Uplink fiber para o core"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O caso phone+PC no mesmo drop usa data access + voice vlan. Impressora, PC só e uplink não pedem esse par clássico de mesa.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Verify rápido de que a porta Gi1/0/20 está access na 25 e up:",
+    "alternativas": [
+      "Apenas show boot",
+      "Apenas ping 127.0.0.1 no switch",
+      "Apenas show users",
+      "show interfaces status | include Gi1/0/20 e/ou show run interface Gi1/0/20"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "status + running-config da interface confirmam VLAN, mode e connected. boot/users/loopback local não validam a porta de borda do host.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Câmera PoE connected na VLAN 70, power delivering, mas NVR não vê vídeo. O 2.2 já validou L1/PoE/VLAN. Próximo domínio típico?",
+    "alternativas": [
+      "IP/ACL/app da câmera — borda L2 ok; não reconfigure trunk sem evidência",
+      "Obrigatoriamente falta de voice vlan 70",
+      "Sempre PortFast off causa codec H.264",
+      "Trocar o core por hub"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Com access, VLAN e PoE ok, o 2.2 cumpriu a borda. O resto é L3/serviço da câmera. Voice vlan não é requisito de câmera típica. Evite trunk aleatório.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que description é boa prática em portas de borda?",
+    "alternativas": [
+      "Substitui a necessidade de access vlan",
+      "Documenta o endpoint (AP, mesa, IoT) e acelera operate/verify no plantão",
+      "Ativa PoE automaticamente",
+      "Cria a VLAN no VTP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Description não altera VLAN nem PoE, mas reduz MTTR ao identificar o que está plugado. Continue configurando mode/vlan corretamente.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "err-disabled na porta de usuário com PortFast e BPDU Guard (contexto). Causa provável de borda?",
+    "alternativas": [
+      "Falta de default-router no DHCP apenas",
+      "DNS A ausente",
+      "Alguém pluggou um switch/hub gerando BPDU — segurança de edge, não 'PC normal'",
+      "Mask /24 no host"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "BPDU Guard em PortFast err-disable se receber BPDU — típico de switch não autorizado na mesa. Não é DNS nem mask. Remova o device e recupere a porta conforme procedimento.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Config mínima para phone+PC: access 40, voice 50, edge rápido?",
+    "alternativas": [
+      "Só switchport mode trunk",
+      "Só ip address no phone port",
+      "Só shutdown",
+      "mode access; access vlan 40; voice vlan 50; spanning-tree portfast"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Esse bloco é o Configure clássico de mesa com voz e dados. Trunk ou IP na porta L2 do access switch não substituem voice vlan + PortFast.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show interfaces status: Gi1/0/9 notconnect. Cabo e notebook testados em outra porta ok. Próximo no switch?",
+    "alternativas": [
+      "Verificar se a porta está em shutdown e a config da interface; testar outro cabo/patch panel naquela posição",
+      "Configurar BGP no access",
+      "Apagar a VLAN 1 globalmente",
+      "Ativar voice vlan em todas as portas notconnect"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "notconnect é L1/admin naquela porta. Confira shutdown, damage e patch. BGP e voice em massa não levantam link. Notebook ok noutra porta isola o path da posição 9.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "IoT na VLAN 80; alguém configurou switchport trunk allowed vlan 80. Melhor correção?",
+    "alternativas": [
+      "Manter trunk e adicionar todas as VLANs",
+      "Voltar para switchport mode access e switchport access vlan 80",
+      "Remover a VLAN 80 do switch",
+      "Colocar voice vlan 80 no IoT e trunk on"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Endpoint IoT deve ser access na VLAN 80. Trunk allowed não é o substituto correto de mode access. Não apague a VLAN; não use voice como gambiarra de IoT.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "AP não sobe; power inline fault após trocar o injector barato. Ação alinhada a 2.2?",
+    "alternativas": [
+      "Ignorar PoE e abrir ticket só de DNS",
+      "Trocar o core supervisor primeiro",
+      "Diagnosticar PoE/cabo/PD (fault) antes de culpar WLC SSID",
+      "Configurar access vlan 1 em todos os uplinks"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Fault de PoE é problema de borda de alimentação. Resolva power/cabo/device; SSID no WLC não conserta short elétrico. Não escale supervisor sem evidência.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual combinação NÃO é objetivo do tópico 2.2?",
+    "alternativas": [
+      "Access VLAN para PC",
+      "Voice VLAN para phone",
+      "PoE básico na borda",
+      "Desenho completo FlexConnect multi-site e fabric underlay"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "2.2 é Configure/Verify de edge ports e PoE básico. FlexConnect/fabric profundos estão fora. Foque mode, VLAN, voice, PortFast e power inline.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PC na VLAN errada apesar de cabo ok. show run interface: mode access, access vlan 20; desenho pede 40. Correção?",
+    "alternativas": [
+      "switchport access vlan 40 e verify show interfaces status",
+      "switchport mode tunnel",
+      "no spanning-tree",
+      "ip default-gateway no PC apenas, mantendo VLAN 20"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Basta alinhar access vlan ao desenho e verificar a coluna Vlan. Tunnel e desligar STP não movem a VLAN de dados. Gateway no PC não corrige membership L2 errada.",
+    "part_id": "v2-2.2"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo Configure de borda 2.2:",
+    "alternativas": [
+      "Sempre trunk + DTP desirable em todo endpoint",
+      "Sempre routed port por mesa",
+      "Sempre desligar PoE em phones",
+      "Access (+ voice se phone), VLAN correta, PortFast edge, PoE se PD, shutdown se ociosa, verify status/power"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O pacote mental do 2.2 é access/voice, VLAN, edge PortFast, PoE e higiene de porta, com verify por status e power inline. Trunk/DTP em todo host e routed por mesa não são o padrão.",
+    "part_id": "v2-2.2"
+  }
+]

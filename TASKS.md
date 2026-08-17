@@ -4,20 +4,33 @@
 > Marque com [x] ao concluir. Não mantenha histórico antigo neste arquivo.
 
 ## Sprint Atual
-**Objetivo do Sprint:** Fechar monetização PRO em produção (Stripe links + webhook E2E) e consolidar a disciplina Context-as-Code.
+**Objetivo do Sprint:** Multi-track (CCNA V1 / V2 / AWS SAA) jogável end-to-end; Stripe em produção fica em paralelo.
 
-**Período:** 2026-07-29 → 2026-08-12
+**Período:** 2026-08-14 → 2026-08-28
 
 ### Tarefas Ativas
 - [x] Criar e alinhar PROMPT_BASE.md, DECISIONS.md, TASKS.md e CHANGELOG.md na raiz
+- [x] Corrigir build de produção: excluir `supabase/` do typecheck do Next (`tsconfig.json`)
+- [x] Multi-track: TrackProvider + TopBar + pools Simulado/Trilha por track
+- [x] Fase 3: `domains-aws.ts` (8 domínios) + Estudo dual + progresso namespaced
+- [x] Fase 3: SobreProvaAws + Sobre CCNA V1/V2 + polish labels V2
+- [x] Bias fino Simulado V2: mix ~30% tickets (sessão; JSON intocado)
+- [x] Deploy prep: README, .env.example, vercel.json headers, npm run qa:tracks
+- [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção
 - [ ] Validar webhook Stripe → Edge Function → atualização de `profiles.pro_expires_at` (mesmo e-mail)
 - [ ] Criar README curto com: trial, planos, regra do e-mail e contato
 - [ ] Checklist manual pós-deploy (Home, login, trial, Trilha, Simulado, estado PRO/free)
+- [ ] Deploy produção multi-track
 
 ### Em Progresso
 - Nenhum
+
+### Conteúdo / Trilha (concluído neste ciclo)
+- [x] Integrar Módulo 6.0 (Automação): traditional + tickets + domains + Estudo/Simulado/Trilha
+- [x] AWS SAA Foundations 1.1–1.12 (quality-pass FINAL → app)
+- [x] Estudo AWS jogável + Sobre SAA
 
 ### Bloqueios / Pendências
 - Env Stripe em produção já falhou uma vez (“link não configurado”)

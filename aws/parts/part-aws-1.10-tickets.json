@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1101: Lambda report-gen termina com Task timed out; job de PDF leva ~2 min.",
+    "cli_output": "$ aws lambda get-function-configuration --function-name report-gen\nTimeout: 30\nMemorySize: 512\nRole: arn:aws:iam::111122223333:role/report-gen-role\nVpcConfig: null\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/report-gen --filter-pattern \"Task timed out\"\n... Task timed out after 30.00 seconds\n... REPORT Duration: 30000.12 ms ... Status: timeout\n\n# Business: PDF generation p50=90s p99=110s on same code path in staging with Timeout 120",
+    "alternativas": [
+      "Aumentar Timeout para ≥120s (e monitorar) ou mover o job para assíncrono (SQS) se o client não pode esperar",
+      "Remover a execution role",
+      "Só criar um CNAME no apex",
+      "Desabilitar CloudWatch Logs"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1101: Lambda report-gen termina com Task timed out; job de PDF leva ~2 min.…), a ação correta é: Aumentar Timeout para ≥120s (e monitorar) ou mover o job para assíncrono (SQS) se o client não pode esperar. «Remover a execution role» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.10.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1102: Lambda order-writer falha ao PutItem no DynamoDB com AccessDenied.",
+    "cli_output": "$ aws sts get-caller-identity\n# from inside function simulation\nArn: arn:aws:sts::111122223333:assumed-role/order-writer-role/...\n\n$ aws lambda get-function-configuration --function-name order-writer\nRole: arn:aws:iam::111122223333:role/order-writer-role\n\n$ aws iam list-attached-role-policies --role-name order-writer-role\nAttached: AWSLambdaBasicExecutionRole\n# only logs\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/order-writer --filter-pattern \"AccessDenied\"\n... User is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:us-east-1:111122223333:table/Orders\n\nTimeout: 10  MemorySize: 256  # not the failing axis",
+    "alternativas": [
+      "Anexar policy com dynamodb:PutItem no ARN da tabela Orders à execution role",
+      "Só aumentar o timeout para 900",
+      "Só habilitar reserved concurrency 100",
+      "Só colocar a function em VPC sem endpoints"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1102: Lambda order-writer falha ao PutItem no DynamoDB com AccessDenied.…), a ação correta é: Anexar policy com dynamodb:PutItem no ARN da tabela Orders à execution role. «Só aumentar o timeout para 900» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.10.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1103: Function checkout-fn com reserved concurrency 5; Black Friday gera milhares de 429.",
+    "cli_output": "$ aws lambda get-function-concurrency --function-name checkout-fn\nReservedConcurrentExecutions: 5\n\n$ aws cloudwatch get-metric-statistics --namespace AWS/Lambda --metric-name Throttles \\\n  --dimensions Name=FunctionName,Value=checkout-fn ...\n# Throttles spike 10:00–11:00\n\n$ aws cloudwatch get-metric-statistics ... ConcurrentExecutions\n# plateaus at 5\n\n# API Gateway integration sync → user-facing 429/5xx\n# SQS buffer not in front of checkout-fn",
+    "alternativas": [
+      "Aumentar reserved concurrency (com base na conta) e/ou colocar SQS buffer + async para absorver picos",
+      "Apagar o log group",
+      "Remover a policy de logs para 'ir mais rápido'",
+      "Trocar o runtime sem mudar concurrency"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1103: Function checkout-fn com reserved concurrency 5; Black Friday gera milhares de 429.…), a ação correta é: Aumentar reserved concurrency (com base na conta) e/ou colocar SQS buffer + async para absorver picos. «Apagar o log group» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.10.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1104: Lambda em VPC não alcança Secrets Manager; IAM GetSecretValue ok.",
+    "cli_output": "$ aws lambda get-function-configuration --function-name pay-fn\nVpcConfig:\n  SubnetIds: [subnet-0priva, subnet-0privb]\n  SecurityGroupIds: [sg-lambda]\nTimeout: 10\n\n$ aws iam get-role-policy --role-name pay-fn-role --policy-name secrets\n# Allow secretsmanager:GetSecretValue on arn:...:secret:prod/db-*\n# Allow kms:Decrypt on cmk-sec\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/pay-fn --filter-pattern \"timeout\"\n... Task timed out after 10.00 seconds\n# stack shows hang on GetSecretValue HTTP client\n\n$ aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=vpc-0app\nNatGateways: []\n\n$ aws ec2 describe-vpc-endpoints --filters Name=vpc-id,Values=vpc-0app\n# no secretsmanager or kms interface endpoints\n\n$ aws ec2 describe-route-tables --filters Name=association.subnet-id,Values=subnet-0priva\nRoutes: 10.0.0.0/16 local   # no 0.0.0.0/0 to nat",
+    "alternativas": [
+      "Criar VPC endpoints (secretsmanager/kms) ou NAT + rota 0.0.0.0/0 nas subnets da Lambda — IAM já está ok",
+      "Remover GetSecretValue da role",
+      "Desabilitar a CMK",
+      "Só aumentar memory para 10 GB"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1104: Lambda em VPC não alcança Secrets Manager; IAM GetSecretValue ok.…), a ação correta é: Criar VPC endpoints (secretsmanager/kms) ou NAT + rota 0.0.0.0/0 nas subnets da Lambda — IAM já está ok. «Remover GetSecretValue da role» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.10.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1105: Fila orders-q tem 2k msgs; Lambda orders-worker não é invocada.",
+    "cli_output": "$ aws sqs get-queue-attributes --queue-url .../orders-q --attribute-names ApproximateNumberOfMessagesVisible\nApproximateNumberOfMessagesVisible: 2044\n\n$ aws lambda list-event-source-mappings --function-name orders-worker\n[\n  {\n    \"UUID\": \"1111-2222\",\n    \"EventSourceArn\": \"arn:aws:sqs:us-east-1:111122223333:orders-q\",\n    \"State\": \"Enabled\",\n    \"LastProcessingResult\": \"PROBLEM: Function call failed\",\n    \"BatchSize\": 10\n  }\n]\n\n$ aws iam list-attached-role-policies --role-name orders-worker-role\nAWSLambdaBasicExecutionRole\n# missing sqs:ReceiveMessage, DeleteMessage, GetQueueAttributes on orders-q\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/orders-worker --filter-pattern \"AccessDenied\"\n... not authorized to perform: sqs:ReceiveMessage ...",
+    "alternativas": [
+      "Permitir sqs:ReceiveMessage/DeleteMessage/GetQueueAttributes na role e corrigir o mapping até LastProcessingResult OK",
+      "Apagar todas as mensagens da fila sem fix de IAM",
+      "Desabilitar o event source mapping e esperar",
+      "Trocar a fila para FIFO sem policy SQS na role"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Mapping enabled mas AccessDenied ReceiveMessage impede o poller. Apagar msgs esconde o backlog sem corrigir IAM. Tip de prova: SQS cheia + Lambda idle + AccessDenied ReceiveMessage → IAM SQS na execution role.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  }
+]

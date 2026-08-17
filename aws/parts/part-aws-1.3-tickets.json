@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1301: Role app-reader não consegue GetObject em s3://corp-shared/reports/q1.pdf. Time de dados diz que 'o bucket já tem policy'.",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:sts::111122223333:assumed-role/app-reader/session\n\n$ aws s3api get-object --bucket corp-shared --key reports/q1.pdf outfile.pdf\nAn error occurred (AccessDenied) when calling the GetObject operation:\nUser: arn:aws:sts::111122223333:assumed-role/app-reader/session is not authorized to perform: s3:GetObject\non resource: \"arn:aws:s3:::corp-shared/reports/q1.pdf\"\n\n$ aws iam list-attached-role-policies --role-name app-reader\nAttached: (none managed)\nInline: none\n\n$ aws s3api get-bucket-policy --bucket corp-shared\n{\n  \"Statement\": [{\n    \"Sid\": \"AllowDataTeam\",\n    \"Effect\": \"Allow\",\n    \"Principal\": { \"AWS\": \"arn:aws:iam::111122223333:role/data-etl\" },\n    \"Action\": [\"s3:GetObject\"],\n    \"Resource\": \"arn:aws:s3:::corp-shared/reports/*\"\n  }]\n}\n\n$ aws s3api get-public-access-block --bucket corp-shared\nBlockPublicAcls=true RestrictPublicBuckets=true",
+    "alternativas": [
+      "Anexar policy IAM à role app-reader com s3:GetObject no ARN reports/* (bucket policy hoje só permite data-etl)",
+      "Desligar o Block Public Access e usar Principal *",
+      "Criar Internet Gateway na conta para o S3",
+      "Trocar o nome do objeto para remover o prefixo reports/"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Caller é app-reader sem identity Allow; bucket policy Allow só data-etl. Falta permissão no principal da app. Público * e IGW não são o fix least privilege. o, ou Allow genérico que não remove Deny/rota/BPA. Tip de prova: ancore a resposta em uma linha do output (Deny, rota ausente, policy Principal, delete marker, lifecycle ausente).",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1302: Pipeline CI (role ci-writer) recebe AccessDenied em PutObject em s3://corp-artifacts/builds/. Havia Allow s3:PutObject; alguém publicou policy nova.",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:sts::111122223333:assumed-role/ci-writer/build-442\n\n$ aws s3api put-object --bucket corp-artifacts --key builds/app.zip --body app.zip\nAn error occurred (AccessDenied) when calling the PutObject operation:\n... with an explicit deny in a resource-based policy\n\n$ aws iam list-attached-role-policies --role-name ci-writer\nAttached: arn:aws:iam::111122223333:policy/CI-S3-Write\n# CI-S3-Write: Allow s3:PutObject on arn:aws:s3:::corp-artifacts/builds/*\n\n$ aws s3api get-bucket-policy --bucket corp-artifacts\nStatement:\n  - Sid: AllowCIWrite\n    Effect: Allow\n    Principal: { AWS: arn:aws:iam::111122223333:role/ci-writer }\n    Action: s3:PutObject\n    Resource: arn:aws:s3:::corp-artifacts/builds/*\n  - Sid: FreezeProdBuilds\n    Effect: Deny\n    Principal: \"*\"\n    Action: s3:PutObject\n    Resource: arn:aws:s3:::corp-artifacts/builds/*\n    Condition: { StringEquals: { \"s3:x-amz-acl\": \"public-read\" } }\n  - Sid: DenyAllPutsTemp\n    Effect: Deny\n    Principal: { AWS: arn:aws:iam::111122223333:role/ci-writer }\n    Action: s3:PutObject\n    Resource: arn:aws:s3:::corp-artifacts/builds/*\n\n$ aws s3api get-public-access-block --bucket corp-artifacts\nBlockPublicPolicy=true RestrictPublicBuckets=true",
+    "alternativas": [
+      "Adicionar mais um Allow * na role sem tocar no Deny",
+      "Remover ou ajustar o statement DenyAllPutsTemp (Deny explícito no Put do ci-writer)",
+      "Habilitar static website hosting no bucket",
+      "Desligar o versioning para permitir Put"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A mensagem cita explicit deny na resource policy; DenyAllPutsTemp bloqueia ci-writer apesar do Allow. Outro Allow não vence Deny. Website e versioning não removem o Deny. o, ou Allow genérico que não remove Deny/rota/BPA. Tip de prova: ancore a resposta em uma linha do output (Deny, rota ausente, policy Principal, delete marker, lifecycle ausente).",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1303: Objeto config/app.json 'sumiu' após delete acidental de um estagiário. Bucket tem versioning. Listagem simples não mostra o arquivo.",
+    "cli_output": "$ aws s3api get-bucket-versioning --bucket corp-config\nStatus: Enabled\n\n$ aws s3 ls s3://corp-config/config/\n(no app.json)\n\n$ aws s3api list-object-versions --bucket corp-config --prefix config/app.json\n{\n  \"Versions\": [\n    { \"Key\": \"config/app.json\", \"VersionId\": \"v3\", \"IsLatest\": false, \"Size\": 2048 },\n    { \"Key\": \"config/app.json\", \"VersionId\": \"v2\", \"IsLatest\": false, \"Size\": 1980 }\n  ],\n  \"DeleteMarkers\": [\n    { \"Key\": \"config/app.json\", \"VersionId\": \"dm1\", \"IsLatest\": true }\n  ]\n}\n\n$ aws s3api get-public-access-block --bucket corp-config\nAll BPA flags: true\n\nEstagiário: aws s3 rm s3://corp-config/config/app.json  (sem --version-id)",
+    "alternativas": [
+      "Recriar a conta AWS do zero",
+      "Desligar o Block Public Access para 'restaurar'",
+      "Remover o delete marker (ou get-object com VersionId v3) para restaurar o objeto corrente",
+      "Converter o bucket em EFS"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Versioning ON com delete marker latest explica o sumiço na listagem; versões v2/v3 existem. Restaure removendo o marker ou lendo VersionId. BPA e EFS não restauram versões. o, ou Allow genérico que não remove Deny/rota/BPA. Tip de prova: ancore a resposta em uma linha do output (Deny, rota ausente, policy Principal, delete marker, lifecycle ausente).",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1304: Cost Explorer mostra S3 Standard alto em bucket de logs (objetos > 120 dias, acesso raro). Sem regra de lifecycle.",
+    "cli_output": "$ aws s3api get-bucket-lifecycle-configuration --bucket corp-logs\nAn error occurred (NoSuchLifecycleConfiguration) when calling the GetBucketLifecycleConfiguration\n\n$ aws s3api list-objects-v2 --bucket corp-logs --prefix app/ --max-items 3\nKey: app/2024-01-01.log  StorageClass: STANDARD  LastModified: 2024-01-01\nKey: app/2024-02-01.log  StorageClass: STANDARD  LastModified: 2024-02-01\nKey: app/2024-03-01.log  StorageClass: STANDARD  LastModified: 2024-03-01\n\n$ aws s3api get-bucket-versioning --bucket corp-logs\nStatus: Suspended\n\n$ aws ce get-cost-and-usage ... (resumo)\nService AmazonS3 Storage STANDARD: elevated MoM\nAccess pattern note: <1 GET per object per month (from analytics)\n\nRequirement: restore within hours ok for compliance audits (not ms API)",
+    "alternativas": [
+      "Manter tudo em STANDARD e comprar mais Requests",
+      "Desligar o logging da aplicação",
+      "Tornar o bucket público para 'baratear'",
+      "Criar lifecycle: transition para STANDARD_IA (e/ou Glacier conforme RTO) após N dias — hoje não há lifecycle"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "NoSuchLifecycleConfiguration + Standard em logs frios explica custo. Transition para IA/Glacier alinha domínio 4. Público e desligar logs não otimizam armazenamento de arquivo. o, ou Allow genérico que não remove Deny/rota/BPA. Tip de prova: ancore a resposta em uma linha do output (Deny, rota ausente, policy Principal, delete marker, lifecycle ausente).",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1305: Scanner de segurança marca s3://corp-marketing como publicamente legível. Ninguém deveria ter deixado o site aberto.",
+    "cli_output": "$ aws s3api get-public-access-block --bucket corp-marketing\nAn error occurred (NoSuchPublicAccessBlockConfiguration)\n# BPA não configurado no bucket\n\n$ aws s3api get-bucket-policy --bucket corp-marketing\n{\n  \"Statement\": [{\n    \"Sid\": \"PublicReadGetObject\",\n    \"Effect\": \"Allow\",\n    \"Principal\": \"*\",\n    \"Action\": \"s3:GetObject\",\n    \"Resource\": \"arn:aws:s3:::corp-marketing/*\"\n  }]\n}\n\n$ aws s3api get-bucket-acl --bucket corp-marketing\nGrants include AllUsers READ (legacy ACL present)\n\n$ curl -s -o /dev/null -w \"%{http_code}\" https://corp-marketing.s3.amazonaws.com/index.html\n200\n\nAccount BPA (org default): not enforced on this bucket",
+    "alternativas": [
+      "Habilitar Block Public Access no bucket/conta e remover Principal * / ACL AllUsers (ou migrar para CloudFront + origem privada)",
+      "Adicionar mais um Allow s3:* para *",
+      "Habilitar Transfer Acceleration para 'esconder' o bucket",
+      "Suspender versioning como único remédio"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "BPA ausente + Principal * GetObject + ACL AllUsers e HTTP 200 confirmam público indevido. Ative BPA e remova grants públicos (ou use CloudFront privado). Mais Allow * e Transfer Acceleration não fecham o acesso.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  }
+]

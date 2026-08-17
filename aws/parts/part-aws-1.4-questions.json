@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Time precisa de VMs Linux com app stateless atrás de ALB. Qual serviço de compute é o encaixe clássico Associate?",
+    "alternativas": [
+      "Amazon EC2 com AMI e Auto Scaling/ALB no desenho (ASG detalhe em outra part)",
+      "Somente S3 website hosting para o backend da API",
+      "Somente DynamoDB sem compute",
+      "AWS Glue exclusivamente para cada request HTTP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "APIs e apps tradicionais em VM usam EC2 (AMI + rede + SG). S3 website não substitui backend de app; DynamoDB e Glue não são o compute HTTP clássico. Tip de prova: VM com SO e processo → EC2; objeto estático → S3. (aws-1.4 #1)",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Instance i-app está running na us-east-1a. Volume de dados vol-data foi criado em us-east-1b. Attach falha. Causa?",
+    "alternativas": [
+      "Falta de Internet Gateway na VPC",
+      "O volume gp3 não pode ser anexado a Linux",
+      "É obrigatório Elastic IP no volume",
+      "Volume EBS e instance precisam estar na mesma Availability Zone"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "EBS é recurso de AZ: attach só funciona se volume e instance compartilham a AZ. IGW e EIP não definem attach de volume; gp3 é válido em Linux. Tip de prova: describe-volumes AvailabilityZone vs Placement.AvailabilityZone da instance.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Ops parou (stop) a instance de homologação para economizar CPU/hora. O que acontece com o volume EBS root por padrão típico?",
+    "alternativas": [
+      "O root é apagado imediatamente como em terminate com DeleteOnTermination",
+      "A instance vira AMI automaticamente",
+      "O volume EBS persiste (storage continua faturável); a instance pode ser start depois",
+      "O Security Group é removido da conta"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Stop mantém EBS e permite start posterior; cobrança de instance hours para, storage EBS segue. Terminate é que pode apagar root com DeleteOnTermination. Tip de prova: stop ≠ terminate para persistência de disco. (aws-1.4 #3)",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Workload de analytics com picos e jobs que toleram reinício. Qual purchase option reduz custo com o trade-off correto?",
+    "alternativas": [
+      "Dedicated Hosts obrigatórios para todo batch",
+      "Somente Reserved de 3 anos sem analisar uso",
+      "On-Demand exclusivo sem considerar Spot",
+      "EC2 Spot para a frota de workers (com design de interrupção/retry)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Spot oferece desconto usando capacidade ociosa, ideal para batch/stateless com retry; interrupção é o trade-off. Dedicated Host e RI longo sem análise podem ser overkill; On-Demand puro é mais caro para picos flexíveis. Tip de prova: tolerante a falha + custo → Spot; estado crítico single-node → não Spot puro.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "App em EC2 precisa GetObject em S3 sem access key no disco. Qual mecanismo de identidade?",
+    "alternativas": [
+      "Instance profile associando IAM role à instance (credenciais via IMDS)",
+      "Colocar AKIA no user-data em claro",
+      "Abrir o bucket com Principal * e BPA off",
+      "Usar apenas o Security Group com porta 443"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Instance profile entrega role temporária à EC2 — padrão cruzado com IAM. Keys no user-data e bucket público são anti-patterns; SG não concede API S3. Tip de prova: EC2 → AWS API = role/instance profile, não AKIA no host.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Após terminate acidental, o root sumiu e não há snapshot. DeleteOnTermination estava true. Lição de design?",
+    "alternativas": [
+      "Terminate nunca apaga volumes",
+      "Sempre desligar o CloudTrail",
+      "Planejar snapshots/AMI e revisar DeleteOnTermination em volumes com dados críticos",
+      "Usar só instance store para dados duráveis de banco"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "DeleteOnTermination true no root (comum) apaga o volume no terminate — sem snapshot, dados se perdem. Instance store é efêmero. Tip de prova: dados importantes → snapshot/backup e DeleteOnTermination consciente, não só stop.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Cliente não alcança a app na porta 8080; instance running, process listening. describe-security-groups do sg-app sem inbound 8080. Causa mais alinhada?",
+    "alternativas": [
+      "A AMI está corrompida em todas as AZs",
+      "Falta de regra inbound no Security Group na porta 8080 (path de rede)",
+      "EBS gp3 não suporta TCP",
+      "Reserved Instance impede tráfego inbound"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Falta de regra inbound no Security Group na porta 8080 (path de rede). Isso resolve o cenário: Cliente não alcança a app na porta 8080; instance running, process listening. de… O distractor «A AMI está corrompida em todas as AZs» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.4), não em controles de outro domínio.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Precisam de baseline de IOPS alto e durabilidade para banco em um único volume EBS. Família mais alinhada (ideia)?",
+    "alternativas": [
+      "Throughput Optimized HDD st1 para latência de ms de OLTP",
+      "Cold HDD sc1 para banco primário online",
+      "Somente S3 Standard como disco de bloco do OS",
+      "io2 (ou gp3 bem dimensionado) conforme requisito de IOPS/latência — io2 para IOPS altos críticos"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "io2 é a família de SSD de alto IOPS/durabilidade para latência crítica; gp3 cobre muitos casos com IOPS provisionável. st1/sc1 e S3 não são o root/data OLTP clássico. Tip de prova: OLTP sensível a IOPS → io2/gp3, não HDD frio.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Como criar uma AMI reutilizável a partir de uma instance configurada?",
+    "alternativas": [
+      "Apenas copiar o Elastic IP para outro account",
+      "Somente exportar o Security Group",
+      "CreateImage / console Create AMI (baseado em snapshots dos volumes selecionados)",
+      "Desligar o versioning do S3 da conta"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: CreateImage / console Create AMI (baseado em snapshots dos volumes selecionados). Isso resolve o cenário: Como criar uma AMI reutilizável a partir de uma instance configurada?… O distractor «Apenas copiar o Elastic IP para outro account» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.4), não em controles de outro domínio.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "User data no launch de EC2 serve principalmente para quê (ideia SAA)?",
+    "alternativas": [
+      "Substituir o Security Group da VPC",
+      "Script/bootstrap na primeira inicialização (pacotes, config) sem ser o controle de IAM da role",
+      "Garantir multi-AZ automático do volume EBS",
+      "Converter a instance em Lambda"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Script/bootstrap na primeira inicialização (pacotes, config) sem ser o controle de IAM da role. Isso resolve o cenário: User data no launch de EC2 serve principalmente para quê (ideia SAA)?… O distractor «Substituir o Security Group da VPC» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.4), não em controles de outro domínio.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "describe-instances mostra State terminated. Ops tenta start-instances. Resultado esperado?",
+    "alternativas": [
+      "A instance volta running com o mesmo instance id sempre",
+      "Start falha / não se aplica — terminated não reinicia; é preciso launch nova instance (ex. de AMI)",
+      "O volume EBS se reconecta sozinho em outra Região",
+      "O Spot bid é recriado automaticamente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Start falha / não se aplica — terminated não reinicia; é preciso launch nova instance (ex. de AMI). Isso resolve o cenário: describe-instances mostra State terminated. Ops tenta start-instances. Resultado… O distractor «A instance volta running com o mesmo instance id sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.4), não em controles de outro domínio.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "App chama S3 e recebe AccessDenied. Rede e SG OK; describe-iam-instance-profile-associations vazio. Causa raiz?",
+    "alternativas": [
+      "Falta de instance profile/role na EC2 — sem identidade IAM para a API",
+      "O volume root está em gp2 e bloqueia HTTPS",
+      "On-Demand não pode chamar S3",
+      "Falta de snapshot diário impede GetObject"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem instance profile a instance não tem role; APIs AWS falham por autorização mesmo com rede ok. Tipo de volume e modelo de compra não concedem S3. Tip de prova: AccessDenied na app EC2 → role/profile antes de abrir 0.0.0.0/0.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que habilitar IMDSv2 (ideia) em instances com role?",
+    "alternativas": [
+      "Para aumentar o tamanho do EBS automaticamente",
+      "Para desligar o Security Group",
+      "Para exigir token de sessão no metadata e reduzir roubo de credenciais da role via SSRF simples",
+      "Para obrigar Spot em todas as instances"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Para exigir token de sessão no metadata e reduzir roubo de credenciais da role via SSRF simples. Isso resolve o cenário: Por que habilitar IMDSv2 (ideia) em instances com role?… O distractor «Para aumentar o tamanho do EBS automaticamente» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.4), não em controles de outro domínio.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Restore de snapshot snap-1 cria vol-new em us-east-1a. Instance está em us-east-1a stopped. Próximo passo para usar os dados?",
+    "alternativas": [
+      "Attach do volume na instance e mount no SO (mesmo AZ)",
+      "Converter o snapshot em Security Group",
+      "Associar Elastic IP ao snapshot",
+      "Terminate a instance para o volume montar sozinho"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Attach do volume na instance e mount no SO (mesmo AZ). Isso resolve o cenário: Restore de snapshot snap-1 cria vol-new em us-east-1a. Instance está em us-east-… O distractor «Converter o snapshot em Security Group» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.4), não em controles de outro domínio.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Instance store (efêmero) vs EBS para dados de banco que devem sobreviver a stop/terminate planejado?",
+    "alternativas": [
+      "Instance store é sempre mais durável que EBS multi-volume",
+      "EBS (com snapshot/backup) para dados persistentes; instance store some se a instance for parada/terminada conforme tipo",
+      "Somente S3 pode ser montado como /var/lib/mysql nativo sem FUSE em todo engine",
+      "Reserved Instance transforma instance store em EBS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Dados duráveis de banco usam EBS (+ backup); instance store é local e efêmero no ciclo da instance. RI não converte store em EBS. Tip de prova: persistência → EBS/snapshots; cache scratch → instance store candidato. (aws-1.4 #15)",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Public IP da instance em subnet pública mudou após stop/start. Como manter IP público estável?",
+    "alternativas": [
+      "Usar Elastic IP associado à instance (ou ENI) conforme design",
+      "Aumentar o tamanho do root volume",
+      "Trocar a AMI para Windows",
+      "Desligar o source/dest check apenas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Usar Elastic IP associado à instance (ou ENI) conforme design. Isso resolve o cenário: Public IP da instance em subnet pública mudou após stop/start. Como manter IP pú… O distractor «Aumentar o tamanho do root volume» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.4), não em controles de outro domínio.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Steady-state 24×7 por 1 ano com uso previsível. Qual direção de custo (ideia)?",
+    "alternativas": [
+      "Somente Spot sem capacidade de reposição",
+      "Reserved Instance ou Savings Plans (compromisso) vs só On-Demand",
+      "Terminate diário sem snapshot e recriar do zero sempre",
+      "Dedicated Hosts para um micro t3.nano único sem compliance"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Reserved Instance ou Savings Plans (compromisso) vs só On-Demand. Isso resolve o cenário: Steady-state 24×7 por 1 ano com uso previsível. Qual direção de custo (ideia)?… O distractor «Somente Spot sem capacidade de reposição» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.4), não em controles de outro domínio.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Status check system reachability failed após manutenção de host. Ação típica de recuperação (ideia)?",
+    "alternativas": [
+      "Só esperar sem opção de stop/start ou replace",
+      "Stop/start (pode migrar de host) ou replace da instance conforme runbook",
+      "Apagar todos os Security Groups da VPC",
+      "Desligar o CloudWatch por 24h"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "System status failure aponta infraestrutura AWS; stop/start ou substituir a instance é o caminho comum. Apagar SGs e CloudWatch piora o diagnóstico. Tip de prova: system check fail → stop/start ou nova instance; instance check → OS/app.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Data volume com DeleteOnTermination false; root com true. Após terminate, o que esperar?",
+    "alternativas": [
+      "Root e data sempre permanecem",
+      "Root e data sempre são apagados",
+      "Root tipicamente removido; data volume pode permanecer disponível na AZ para reattach",
+      "Os volumes viram snapshots automaticamente sempre"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "DeleteOnTermination é por volume: root true some; data false fica para attach em outra instance. Snapshots não são automáticos só por terminate. Tip de prova: revise DeleteOnTermination em cada volume antes do terminate.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo desta part EC2/EBS foundations?",
+    "alternativas": [
+      "EBS snapshots e attach por AZ",
+      "Instance profile e lifecycle stop/terminate",
+      "Spot vs On-Demand ideia",
+      "ECS/EKS orchestration, Beanstalk full e ASG scaling policies detalhadas"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O piloto cobre EC2+EBS core, rede/IAM cruzados e custo ideia. Containers orchestration e ASG policies deep ficam para parts seguintes. Tip de prova: se a pergunta for EKS/ASG policy, não force só 'criar AMI'. (aws-1.4 #20)",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Launch com AMI da conta compartilhada e tipo m-family para app web genérico. Por que general purpose (ideia)?",
+    "alternativas": [
+      "Balanceia CPU/memória para web/app típicos sem especializar só em CPU ou só em RAM",
+      "É o único tipo que aceita Security Groups",
+      "Impede o uso de EBS",
+      "Obriga Spot e proíbe On-Demand"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Famílias general purpose cobrem a maioria dos web/apps; compute/memory otimizam extremos. SG e EBS não são exclusivos de m-family. Tip de prova: web genérico → general purpose; ML CPU-bound → compute; in-memory → memory.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Snapshot de vol-prod é iniciado com a instance running. Comportamento/expectativa (ideia)?",
+    "alternativas": [
+      "Snapshots só funcionam se a instance estiver terminated",
+      "Pode-se snapshotar volume em uso; consistência de app pode exigir freeze/quiesce dependendo do workload",
+      "O snapshot apaga o volume original imediatamente",
+      "O snapshot move a instance para outra Região"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Snapshots de volumes em uso são comuns; bancos podem precisar de freeze para consistência. Snapshot não apaga o volume nem move a instance. Tip de prova: backup EBS → snapshot; consistência de DB → coordenar com a app. (aws-1.4 #22)",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Instance em subnet privada sem NAT/VPC endpoints; app precisa baixar pacotes da Internet. Sintoma e direção de fix (cruzar VPC)?",
+    "alternativas": [
+      "Trocar a AMI resolve saída de rede sempre",
+      "Aumentar IOPS do root libera Internet",
+      "Falta path de egress (NAT/endpoints) — não é problema de EBS size",
+      "Reserved Instance bloqueia yum/apt"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Falta path de egress (NAT/endpoints) — não é problema de EBS size. Isso resolve o cenário: Instance em subnet privada sem NAT/VPC endpoints; app precisa baixar pacotes da … O distractor «Trocar a AMI resolve saída de rede sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.4), não em controles de outro domínio.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Spot instance foi interrompida; logs mostram 'instance-stop' por Spot. Design correto para o job?",
+    "alternativas": [
+      "Assumir uptime 100% sem checkpoint",
+      "Usar Spot só para o banco primário single-AZ sem réplica",
+      "Proibir qualquer retry do job",
+      "Arquitetar jobs stateless/checkpoint + fleets mistos ou On-Demand para componentes críticos"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Spot exige tolerância a interrupção: checkpoint, retry, multi-instance. Banco primário único em Spot puro é anti-pattern. Tip de prova: interrupção Spot na evidência → design resiliente, não 'Spot nunca falha'. (aws-1.4 #24)",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Attach vol-data em /dev/sdf ok; app não vê o disco. Próximo passo no SO?",
+    "alternativas": [
+      "Só recreate a VPC",
+      "Mount/format do device no sistema operacional (lsblk/mkfs/mount ou inicialização de disco no Windows)",
+      "Abrir porta 2049 no SG para 'ativar EBS'",
+      "Converter o volume em AMI antes de montar"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Mount/format do device no sistema operacional (lsblk/mkfs/mount ou inicialização de disco no Windows). Isso resolve o cenário: Attach vol-data em /dev/sdf ok; app não vê o disco. Próximo passo no SO?… O distractor «Só recreate a VPC» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.4), não em controles de outro domínio.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Hibernate (ideia) vs stop: quando hibernate é cogitado?",
+    "alternativas": [
+      "Para apagar o root volume com segurança",
+      "Para migrar a instance entre Regiões sem snapshot",
+      "Para preservar o estado da RAM no root volume e retomar depois (casos específicos, root adequado)",
+      "Para substituir o Security Group por NACL"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Hibernate grava memória no root e retoma processos; exige suporte de AMI/tipo/root. Não é migração cross-region nem substituto de SG. Tip de prova: hibernate = RAM preservada; stop = desliga sem preservar RAM. (aws-1.4 #26)",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Compliance: nenhuma access key de longo prazo no host; role AppRole já existe. O que falta no launch?",
+    "alternativas": [
+      "Associar instance profile que referencia AppRole à instance",
+      "Colocar a secret key no tag Name",
+      "Abrir 22/0.0.0.0/0 para a role funcionar",
+      "Desligar IMDSv2 obrigatoriamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Role existe mas precisa de instance profile associado no launch/attach. Tags e SSH aberto não entregam credenciais; IMDSv2 é recomendado, não desligar. Tip de prova: role sem profile association = sem credenciais na EC2.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Volume 100 GiB com 90% uso; app falha por disco cheio. Ação EBS típica?",
+    "alternativas": [
+      "Terminate e recriar sem snapshot",
+      "Só mudar o instance type para metal",
+      "Só recriar o Security Group",
+      "Modificar o volume (increase size) e estender o filesystem no SO; snapshot antes se possível"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Modificar o volume (increase size) e estender o filesystem no SO; snapshot antes se possível. Isso resolve o cenário: Volume 100 GiB com 90% uso; app falha por disco cheio. Ação EBS típica?… O distractor «Terminate e recriar sem snapshot» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.4), não em controles de outro domínio.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mental de TShoot EC2 nesta part?",
+    "alternativas": [
+      "Estado instance → AZ volumes → SG/rota → instance profile → purchase/Spot se aplicável",
+      "Só recriar a conta AWS",
+      "Só aumentar o TTL do Route 53",
+      "Só desligar o bucket versioning"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Estado instance → AZ volumes → SG/rota → instance profile → purchase/Spot se aplicável. Isso resolve o cenário: Checklist mental de TShoot EC2 nesta part?… O distractor «Só recriar a conta AWS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.4), não em controles de outro domínio.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo de design EC2+EBS foundations no SAA-C03:",
+    "alternativas": [
+      "Sempre Spot + access key no user-data + EBS multi-AZ attach em uma instance",
+      "Sempre terminate diário de produção sem snapshot",
+      "Sempre um único SG 0.0.0.0/0 e sem instance profile",
+      "AMI/tipo adequados, EBS na mesma AZ com snapshot, rede/SG corretos, role via profile, compra alinhada a custo/risco"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O núcleo combina compute certo, disco na AZ com backup, path de rede, IAM role e modelo de compra consciente. Spot+keys+attach multi-AZ em um volume são anti-patterns. Tip de prova: se a opção equilibra AZ, SG, role e custo, tende a ser a correta.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  }
+]

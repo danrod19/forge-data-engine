@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4301 — Logs do edge e do firewall “não batem” no horário. Equipe suspeita de ataque; relógios divergem em horas.",
+    "cli_output": "Edge# show ntp status\nClock is unsynchronized, stratum 16, no reference clock\nnominal freq is 250.0000 Hz, actual freq is 250.0000 Hz, precision is 2**10\nreference time is 00000000.00000000 (00:00:00.000 UTC Mon Jan 1 1900)\n\nEdge# show ntp associations\n  address         ref clock       st   when   poll   reach  delay  offset   disp\n ~203.0.113.10    .INIT.          16      -     64      0     0.0    0.0  16000\n * master (synced), # master (unsynced), + selected, - candidate, ~ configured\n\nEdge# show run | include ntp\nntp server 203.0.113.10\n\nEdge# show logging | include time|Log Buffer\nNo time-source configured or time not synchronized\nLog Buffer (8192 bytes):\n*Mar  1 02:11:44.201: %LINK-3-UPDOWN: Interface GigabitEthernet0/1, changed state to up\n\nEdge# ping 203.0.113.10\n..... Success rate is 0 percent (0/5)",
+    "alternativas": [
+      "show ntp status indica synchronized stratum 1",
+      "ping ao servidor NTP 100% prova alcance",
+      "ntp server ausente na running-config",
+      "Clock unsynchronized stratum 16, association ~ sem reach, ping 0% — fonte NTP configurada mas inalcançável/unsync"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "status unsynchronized/stratum 16; association com reach 0 e .INIT.; ping ao 203.0.113.10 falha. A linha ntp server existe — o problema é alcance/serviço, não ausência de comando. Timestamps de log ficam não confiáveis até haver sync.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4302 — Servidor Syslog quase vazio; só raríssimas mensagens “emergency”. No device, show logging mostra errors e warnings no buffer.",
+    "cli_output": "R1# show run | include logging\nservice timestamps log datetime msec\nlogging buffered 16384 warnings\nlogging host 10.255.255.50\nlogging trap emergencies\nlogging console warnings\n\nR1# show logging\nSyslog logging: enabled (0 messages dropped, 0 flushes, 0 overruns)\n    Console logging: level warnings, 42 messages logged\n    Buffer logging: level warnings, 38 messages logged\n    Trap logging: level emergencies, 2 message lines logged\n        Logging to 10.255.255.50 (udp port 514, audit disabled,\n              link up), 2 message lines logged\nLog Buffer (16384 bytes):\n*Aug 12 10:01:02.111: %LINK-3-UPDOWN: Interface GigabitEthernet0/0, changed state to down\n*Aug 12 10:01:05.200: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/0, changed state to down\n*Aug 12 10:02:11.004: %SYS-5-CONFIG_I: Configured from console by admin\n\nR1# show ntp status\nClock is synchronized, stratum 3, reference is 10.0.0.1",
+    "alternativas": [
+      "NTP unsync explica a ausência total de buffer local",
+      "logging trap emergencies restringe o host a severidade 0 — errors/notifications no buffer não sobem ao Syslog server",
+      "logging host está ausente no show run",
+      "Trap level debugging floodaria e o output mostra level debugging"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Trap logging level emergencies com só 2 linhas ao host; buffer tem LINK-3 e SYS-5 que não passam no filtro 0. logging host 10.255.255.50 existe. NTP está synchronized. O gap é trap restritivo demais, não host ausente.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4303 — SIEM no IP 10.50.50.100 não recebe nada do core. Console e buffer locais mostram eventos normalmente.",
+    "cli_output": "Core# show run | include logging|ntp|snmp\nservice timestamps log datetime msec\nlogging buffered 32768 informational\nlogging console informational\nlogging trap informational\nlogging host 10.50.50.200\nntp server 10.0.0.1\nsnmp-server community OpsRO ro\n\nCore# show logging\nSyslog logging: enabled\n    Console logging: level informational, 120 messages logged\n    Buffer logging: level informational, 118 messages logged\n    Trap logging: level informational, 115 message lines logged\n        Logging to 10.50.50.200 (udp port 514, link up), 115 message lines logged\nLog Buffer (32768 bytes):\n*Aug 12 14:22:01.001: %SYS-5-CONFIG_I: Configured from console by admin\n\nCore# show ntp status\nClock is synchronized, stratum 2, reference is 10.0.0.1\n\n! Inventário do NOC: SIEM real = 10.50.50.100 (não .200)",
+    "alternativas": [
+      "logging trap está em emergencies e bloqueia tudo",
+      "NTP unsynchronized no output",
+      "logging host aponta 10.50.50.200 — destino errado; SIEM esperado é .100; trap informational e buffer ok",
+      "snmp-server community ausente impede Syslog"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Trap informational com 115 linhas para 10.50.50.200; buffer e console ativos; NTP sync. O SIEM do inventário é .100 — host de log errado. Community SNMP não carrega Syslog. Não há trap emergencies nem unsync no recorte.",
+    "part_id": "4.3"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4304 — Ferramenta NMS falha autenticação SNMP no switch de acesso. String configurada no NMS: “public”.",
+    "cli_output": "SW1# show run | include snmp|ntp|logging\nsnmp-server community CampusRO ro\nsnmp-server community CampusRW rw\nntp server 10.0.0.1\nlogging host 10.50.50.100\nlogging trap warnings\n\nSW1# show snmp\nChassis: FOC1234X0AB\n0 SNMP packets input\n    0 Bad Community names\n    0 Illegal operation for community name supplied\n    0 Encoding errors\n0 SNMP packets output\n\nSW1# show ntp status\nClock is synchronized, stratum 3, reference is 10.0.0.1\n\nSW1# show run | include community\nsnmp-server community CampusRO ro\nsnmp-server community CampusRW rw\n! nenhuma community \"public\"",
+    "alternativas": [
+      "Agent só tem communities CampusRO/CampusRW — NMS com “public” não autentica (v2c string errada)",
+      "logging trap warnings desliga o agent SNMP",
+      "NTP stratum 3 proíbe qualquer SNMP",
+      "show snmp prova community public ativa"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Running só tem CampusRO e CampusRW; public não existe. NMS com public falha community match. NTP sync e logging trap não desligam SNMP. show snmp não lista public. Corrija a string no NMS ou adicione community alinhada (preferir RO para monitor).",
+    "part_id": "4.3"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4305 — Após queda de link, o NMS não mostrou alerta SNMP; o buffer local registrou %LINK-3-UPDOWN horas “no passado”. NTP estava off na manutenção.",
+    "cli_output": "R2# show run | include ntp|logging|snmp\nlogging buffered 8192 warnings\nlogging console warnings\nlogging trap warnings\nlogging host 10.50.50.100\nsnmp-server community Monitor ro\n! sem ntp server\n! sem snmp-server host / snmp-server enable traps (nenhuma linha de trap destination)\n\nR2# show ntp status\n%NTP is not enabled.\n\nR2# show logging\nSyslog logging: enabled\n    Trap logging: level warnings, 40 message lines logged\n        Logging to 10.50.50.100, 40 message lines logged\nLog Buffer (8192 bytes):\n*Mar  1 01:04:12.000: %LINK-3-UPDOWN: Interface GigabitEthernet0/1, changed state to down\n*Mar  1 01:04:13.000: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/1, changed state to down\n\nR2# show snmp\nChassis: FTX9999\n0 SNMP packets input\n0 SNMP packets output\n\nR2# show clock\n*01:10:00.000 UTC Fri Mar 1 2002",
+    "alternativas": [
+      "ntp server e synchronized stratum 1 estão explícitos no output",
+      "snmp-server host de traps está configurado e show snmp mostra tráfego alto de traps",
+      "Syslog host ausente — contradiz logging host 10.50.50.100",
+      "NTP não habilitado (relógio/timestamps ruins) e SNMP só com community RO sem snmp-server host/traps — NMS não recebe traps; eventos ficam no Syslog/buffer"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "NTP is not enabled e clock em 2002 explicam timestamps “no passado”. Syslog host existe e registrou LINK-3. SNMP tem community mas zero packets e sem snmp-server host/enable traps no include — traps não estão direcionados ao NMS. Dois eixos do chamado: tempo + traps ausentes.",
+    "part_id": "4.3"
+  }
+]

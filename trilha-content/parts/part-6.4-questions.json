@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O principal problema que configuration management ataca em redes grandes é:",
+    "alternativas": [
+      "Inconsistência/drift e baixa escala de mudanças só com CLI hop-a-hop",
+      "Eliminar a necessidade de qualquer endereço IP",
+      "Substituir o Spanning Tree por YAML",
+      "Desligar o data plane em todos os switches"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Aplicar a mesma baseline em muitos devices manualmente gera erro e divergência. Config management declara estado desejado e reaplica. Não remove IP, STP nem o forwarding. Liga à ideia de consistência da 6.1.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No modelo típico do Ansible no CCNA, o control node é:",
+    "alternativas": [
+      "O switch de acesso do usuário final",
+      "A máquina onde rodam ansible/ansible-playbook e de onde partem as conexões",
+      "Somente o servidor DNS público",
+      "Somente o cabo console USB"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Control node hospeda inventory, playbooks e inicia o push agentless. Switches são managed hosts. DNS e console não definem o control node. Sem control node funcional, não há automação Ansible.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Inventory no Ansible serve para:",
+    "alternativas": [
+      "Cifrar o data plane com IPsec automaticamente",
+      "Substituir o enable secret",
+      "Listar hosts/grupos que serão alvos das plays",
+      "Gerar chaves WPA3"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Inventory (INI/YAML) define quem recebe as tasks. Host errado ou ausente = automação no alvo errado ou em zero hosts. Não configura IPsec/WPA sozinho. É peça obrigatória do mental model Ansible.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Playbook Ansible é tipicamente escrito em:",
+    "alternativas": [
+      "Somente binário proprietário ilegível",
+      "Somente ASN.1 de SNMP",
+      "Somente WEP keys",
+      "YAML (plays, hosts e tasks)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Playbooks usam YAML legível. JSON é mais comum em REST (6.3). Indentação importa. Não é SNMP/WEP. Reconhecer YAML de playbook é o nível da prova.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Module no Ansible é:",
+    "alternativas": [
+      "A unidade de ação usada nas tasks (ex.: ios_config, ping)",
+      "Somente o nome do switch no CDP",
+      "Somente a VLAN nativa",
+      "Somente o algoritmo de hash do enable password tipo 7"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Tasks chamam modules com parâmetros. Module errado ou parâmetros ruins → failed. CDP/VLAN/tipo 7 são outros eixos. Escolher o module certo é parte do design do playbook.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Agentless, no discurso Ansible, significa:",
+    "alternativas": [
+      "Todo host precisa de daemon Puppet obrigatório",
+      "O control node conecta sob demanda (SSH/API) sem agente permanente no device",
+      "Não existe inventory",
+      "Playbooks não podem usar YAML"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Ansible tipicamente não instala agent nos switches; usa SSH/NETCONF/API. Puppet/Chef no contraste introdutório são agent-based. Inventory e YAML continuam essenciais.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Push model do Ansible indica que:",
+    "alternativas": [
+      "O device puxa o playbook sozinho a cada segundo sem control node",
+      "Só existe pull de Chef no Ansible",
+      "O control node inicia a conexão e empurra as tasks para os hosts do inventory",
+      "Push apaga o data plane"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Quem inicia é o control node (push). Pull é contraste de outras ferramentas. Data plane não é apagado por push. Entender a direção evita achar que o switch “busca” o playbook sozinho no modelo típico Ansible.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Idempotência em config management significa, em ideia:",
+    "alternativas": [
+      "Cada run duplica o banner infinitamente",
+      "Só funciona na primeira instalação do IOS",
+      "Proíbe reexecutar playbooks",
+      "Reaplicar o mesmo playbook deixa o estado desejado estável (sem mudanças desnecessárias se já conforme)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Segunda run com changed=0 é saudável. Append cego pode não ser idempotente. Idempotência permite reexecutar com segurança. Não limita à instalação do IOS nem proíbe reruns.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Drift de configuração ocorre quando:",
+    "alternativas": [
+      "O estado real do device diverge do estado desejado (ex.: mudança manual após o playbook)",
+      "O inventory lista o host correto e o playbook aplica sem erro",
+      "changed=0 na segunda run idempotente",
+      "O control node está no mesmo fuso NTP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "CLI manual, out-of-band ou outro processo altera o box fora do pipeline. Inventory ok e idempotência não são drift. NTP do control node não define drift de VLAN/banner. Detectar drift é motivo para reaplicar automação.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Puppet e Chef no CCNA 6.4 devem ser tratados como:",
+    "alternativas": [
+      "Protocolos de Spanning Tree",
+      "Ciphers WPA3 obrigatórios",
+      "Nomes de outras ferramentas de config management (contraste; sem lab profundo)",
+      "Tipos de SFP óptico"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A prova cita alternativas a Ansible por nome. Não exige playbooks Puppet/Chef. Não são STP, WPA nem mídia. Ansible recebe o detalhe de inventory/playbook/module.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PLAY RECAP mostra unreachable=1 para um host. Interpretação principal?",
+    "alternativas": [
+      "Falha de conectividade/autenticação até o host (SSH/credencial/path) — task nem rodou como em failed de módulo",
+      "Sempre module ios_config com sintaxe errada",
+      "Sempre changed=1 com sucesso",
+      "Sempre JSON inválido no body REST"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "unreachable ≠ failed. Sem sessão ao device, o module não aplica. Verifique IP no inventory, SSH, user/key, VRF de gestão. Sintaxe de module seria failed se a conexão existisse.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Primeira run: changed=1 no banner; segunda run idêntica: changed=0. Isso sugere:",
+    "alternativas": [
+      "Bug grave que apagou o inventory",
+      "Comportamento alinhado a idempotência — estado já conforme",
+      "Que o playbook nunca deve ser reexecutado",
+      "Que o host ficou unreachable"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Módulo detectou que o banner já está no estado desejado. Reexecutar é esperado. Não é unreachable. Inventory intacto. Sinal positivo de automação bem modelada.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Inventory lista só 10.1.1.10; o switch alvo é 10.1.1.20. Playbook termina ok=1. Problema?",
+    "alternativas": [
+      "Nenhum: Ansible descobre todos os CDP neighbors sozinho",
+      "Nenhum: playbook ignora inventory",
+      "Alvo errado no inventory — a mudança foi no host listado, não no 10.1.1.20 desejado",
+      "Idempotência proíbe dois IPs"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Inventory é a fonte de verdade dos alvos. “ok” no host errado é falha operacional clássica. CDP não reescreve inventory sozinho. Corrija o IP/grupo. Idempotência não limita quantidade de hosts.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após playbook de username local, técnico apaga o user na CLI. Sem nova run, o estado é:",
+    "alternativas": [
+      "Permanentemente igual ao playbook por mágica",
+      "Drift — realidade divergiu do desejado até reaplicar automação",
+      "unreachable forçado no RECAP futuro sempre",
+      "Convertido em Puppet agent"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Mudança manual desfaz o intent do playbook. Próxima run deve recriar o user (changed). Não vira Puppet. unreachable não é automático. Governança: evitar CLI fora do pipeline ou aceitar reapply.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Caso típico de playbook no nível CCNA:",
+    "alternativas": [
+      "Compilar kernel Linux em todos os APs",
+      "Aplicar banner, usuários locais ou VLAN de access padrão em muitos switches",
+      "Treinar modelo de ML no data center",
+      "Substituir todos os SFPs automaticamente sem inventário"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Baseline de gestão e L2 simples escala bem. O exame não pede ML nem troca física de SFP via Ansible. Banner/user/VLAN são exemplos do content.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ansible all -i inventory.ini -m ping testa principalmente:",
+    "alternativas": [
+      "Alcance/auth do control node aos hosts do inventory (módulo ping do Ansible, não só ICMP de user)",
+      "Somente o root bridge STP",
+      "Somente o cipher WPA2",
+      "Somente o pool NAT"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Módulo ping do Ansible valida conectividade de gestão/Python/SSH conforme plataforma. Útil antes do playbook. Não mede STP/WPA/NAT. RECAP unreachable aqui salva tempo.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Task failed com erro de sintaxe do module ios_config, host reachable. Classificação RECAP?",
+    "alternativas": [
+      "unreachable",
+      "failed — task/módulo/parâmetros, não falta de SSH",
+      "ok sem changed por idempotência forçada",
+      "skipped por inventory vazio sempre"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Conexão ok + erro de task = failed. unreachable seria sem acesso. Corrija a task/module. Não confunda com idempotência changed=0. Inventory não está vazio se o host respondeu.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "YAML de playbook com indentação errada. O que ocorre primeiro?",
+    "alternativas": [
+      "O switch aplica a config mesmo assim",
+      "O playbook falha no parse no control node antes de configurar a rede",
+      "O IOS corrige o YAML sozinho",
+      "O inventory vira JSON automaticamente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Ansible valida o YAML localmente. Erro de indentação aborta cedo. Devices intactos. Não há auto-repair IOS. JSON da 6.3 é outro formato. Valide o playbook com --syntax-check se disponível.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que agentless ajuda em devices de rede?",
+    "alternativas": [
+      "Porque não exige instalar e manter agente em cada switch/router para o modelo Ansible típico",
+      "Porque remove a necessidade de inventory",
+      "Porque proíbe SSH",
+      "Porque apaga o management plane"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Menos software nos boxes, usa canais de gestão existentes. Inventory e SSH/API ainda importam. Management plane é exatamente o que se usa. Benefício operacional do content.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ansible-playbook -i inventory.ini site.yml --check serve conceitualmente para:",
+    "alternativas": [
+      "Apagar o inventory",
+      "Forçar reboot de todos os hosts",
+      "Converter playbook em Puppet manifest",
+      "Executar em modo dry-run/checagem sem aplicar mudanças definitivas (quando suportado)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "--check estima mudanças sem commit completo (suporte varia por module). Útil antes de produção. Não reboot massivo nem conversão Puppet. Não apaga inventory.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Consistência multi-site com playbooks relaciona-se a:",
+    "alternativas": [
+      "Mesma baseline aplicada a grupos do inventory (ex.: leafs, cores) em vez de configs manuais divergentes",
+      "Cada site inventar VLANs aleatórias sem template",
+      "Proibir idempotência",
+      "Usar apenas Telnet sem inventory"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Grupos no inventory + playbooks = política uniforme. Divergência manual é o anti-padrão. Idempotência ajuda a reaplicar. Telnet sem inventory não é o modelo Ansible do exame.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Diferença conceitual Ansible vs Puppet no nível introdutório da prova:",
+    "alternativas": [
+      "Ansible é sempre agent-based; Puppet é sempre agentless",
+      "Ambos são ciphers de WPA2",
+      "Ambos são protocolos OSPF",
+      "Ansible é tipicamente agentless/push; Puppet é citado como abordagem agent/pull em contraste de ferramentas"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Contraste de nomes e modelos, sem lab Puppet. Não são OSPF nem WPA. Memorização leve do content 6.4. Detalhes de arquitetura Puppet ficam fora.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Host no inventory sem chave SSH autorizada e senha errada. RECAP esperado?",
+    "alternativas": [
+      "ok=1 changed=1 sempre",
+      "failed só por ios_vlan sempre",
+      "unreachable — autenticação/conexão de gestão falhou",
+      "skipped porque YAML proíbe SSH"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Sem login, tasks não aplicam. Corrija user/key/password e reachability. Não é skipped por YAML. ok/changed exigem sessão. Classifique corretamente no RECAP.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mínimo do content 6.4 quando o playbook “não muda o switch certo”:",
+    "alternativas": [
+      "Só reiniciar o core OSPF",
+      "Só trocar o SFP do uplink",
+      "Só aumentar potência Wi-Fi",
+      "Validar inventory/alvo, credenciais, YAML, module/task e se houve drift manual depois"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Ordem mental evita culpar a rede óptica por host errado no inventory. OSPF/SFP/Wi-Fi são eixos paralelos. RECAP + show run no device fecham o diagnóstico.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Playbook e controller DNA podem coexistir porque:",
+    "alternativas": [
+      "Um apaga o outro obrigatoriamente",
+      "Ansible proíbe qualquer inventário central",
+      "Automação de devices (Ansible) e intent/assurance (controller) são camadas complementares de operação",
+      "YAML substitui o data plane"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "6.1 controller + 6.4 Ansible: ambos buscam consistência em escalas diferentes. Não se excluem por definição. Data plane permanece. Inventário pode alimentar ambos os mundos.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "“Aplicar de novo sem quebrar” resume qual propriedade?",
+    "alternativas": [
+      "Apenas spanning-tree portfast",
+      "Apenas storm-control",
+      "Apenas native VLAN mismatch",
+      "Idempotência do processo de config management"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Definição em linguagem de prova. PortFast/storm/native são L2. Idempotência permite reexecução segura do playbook. Changed=0 na segunda run ilustra o conceito.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Grupo [access] no inventory com 40 switches; play hosts: access. Efeito?",
+    "alternativas": [
+      "Tasks rodam só no control node",
+      "Tasks miram os 40 hosts do grupo access",
+      "Tasks miram apenas o primeiro host da Internet",
+      "Inventory é ignorado se o playbook tiver YAML"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "hosts: access seleciona o grupo. Escala a baseline de access. Control node não é o alvo a menos que esteja no grupo. YAML não desliga inventory. Poder do grouping no Ansible.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Módulo inadequado (ex.: módulo Linux em device IOS sem suporte). Resultado típico?",
+    "alternativas": [
+      "ok silencioso com config IOS perfeita sempre",
+      "Conversão automática para Puppet",
+      "Task failed com erro do module — escolha errada de ferramenta na task",
+      "unreachable por definição mesmo com SSH ok"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "SSH ok + module errado = failed, não unreachable. Use modules de rede apropriados (ios_*). Puppet não assume. Leia a mensagem de erro da task.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que CLI hop-a-hop sozinho é frágil em 200 switches?",
+    "alternativas": [
+      "Porque aumenta risco de omissão, inconsistência e tempo — config management/playbooks reduzem esse risco",
+      "Porque o IOS proíbe CLI",
+      "Porque inventory é ilegal",
+      "Porque idempotência proíbe humanos"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Escala e erro humano. CLI ainda existe para break-glass e lab. Inventory é legal e central. Humanos + automação coexistem. Mensagem central da 6.4.",
+    "part_id": "6.4"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor uso do PLAY RECAP em incidente de automação?",
+    "alternativas": [
+      "Substituir qualquer show no device forever",
+      "Só provar o estado do EtherChannel",
+      "Apagar hosts do inventory automaticamente",
+      "Separar ok/changed (estado) de unreachable (acesso) e failed (task) para isolar o eixo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "RECAP classifica o resultado por host. unreachable → path/auth; failed → playbook/module; changed → o que foi alterado. Ainda valide com show no box. EtherChannel é paralelo. Não apague inventory sem análise.",
+    "part_id": "6.4"
+  }
+]

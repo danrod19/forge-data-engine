@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No Windows, qual comando mostra IP, máscara, gateway e servidores DNS de uma vez?",
+    "alternativas": [
+      "ipconfig /all",
+      "shutdown /r",
+      "chkdsk /f",
+      "netstat -e apenas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "ipconfig /all lista os parâmetros de cliente essenciais para Configure/Verify no CCNA: endereço, mask, gateway, DNS e se DHCP está ativo. shutdown e chkdsk não exibem a stack IP. Use-o como primeiro passo no helpdesk.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Linux: o host fala com a LAN mas não sai dela. ip route não mostra default. O que configurar/verificar?",
+    "alternativas": [
+      "Aumentar o MTU do YouTube",
+      "Default gateway / rota default (via ip route ou settings) ausente",
+      "Desligar IPv4 para forçar só fe80",
+      "Apagar todas as rotas conectadas da LAN"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem default route o kernel só alcança subnets conectadas. Configure o gateway estático correto ou corrija o DHCP que deveria entregar default-router e reaplique. Apagar rotas conectadas piora a LAN.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Sequência de Verify correta no cliente?",
+    "alternativas": [
+      "nslookup só → formatar disco",
+      "tracert antes de ter IP",
+      "ping gateway → ping IP remoto → ping/nslookup do nome",
+      "Desligar o Wi-Fi e declarar sucesso"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A ordem isola camadas: gateway (LAN local), IP remoto (caminho L3), nome (DNS). Pular direto para nome mistura problemas. Formatar disco e desligar Wi-Fi não são Verify de conectividade.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ipconfig mostra 169.254.12.4/16 e DHCP Enabled Yes. Interpretação no cliente?",
+    "alternativas": [
+      "IP estático de datacenter",
+      "GUA IPv6 válida",
+      "DNS público configurado com sucesso",
+      "APIPA — falha em obter lease DHCP; renew e checar rede (1.7), não tratar como produção"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "169.254 é autoconfiguração link-local IPv4 quando o DHCP falha. O ângulo 1.6 é reconhecer no OS e tentar /renew; a causa de rede/DHCP aprofunda em 1.7. Não é estático de DC nem GUA v6.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Windows com IP estático 10.40.0.50, mask 255.255.0.0 (deveria /24), gateway 10.40.0.1. Risco principal?",
+    "alternativas": [
+      "Máscara errada altera o que o host considera local vs remoto — roteamento assimétrico/ falhas de reachability",
+      "Sempre melhora o OSPF do core",
+      "Garante APIPA",
+      "Remove a necessidade de DNS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Mask /16 em rede desenhada /24 faz o PC tratar destinos 10.40.x.x como on-link e pode quebrar o uso do gateway. Corrija a máscara no OS. Não é benefício de OSPF nem APIPA.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual par Linux é análogo a ipconfig + route print do Windows?",
+    "alternativas": [
+      "systemctl poweroff + reboot",
+      "ip addr e ip route",
+      "lsblk e df -h apenas",
+      "crontab -l e history"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "ip addr mostra endereços da interface; ip route mostra a tabela incluindo default. Juntos cobrem o Verify básico de cliente no Linux, equivalente conceitual a ipconfig e route print.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ping 8.8.8.8 ok; ping google.com falha; nslookup timeout no DNS 192.0.2.9 listado no OS. Ação no cliente?",
+    "alternativas": [
+      "Trocar o cabo do data center inteiro",
+      "Desabilitar IPv4",
+      "Corrigir os DNS servers no OS (ou via DHCP) — conectividade IP ok, resolução não",
+      "Apagar a default route que já funciona"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "IP path ok e falha só de nome com DNS morto no OS é misconfig/ponte 4.4 vista no cliente. Ajuste DNS e reteste nslookup. Remover default route quebra o que já funciona.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Comando Windows para renovar lease DHCP após o time de rede corrigir o pool?",
+    "alternativas": [
+      "ipconfig /flushdns apenas (não renova IP)",
+      "winver",
+      "dxdiag",
+      "ipconfig /release e ipconfig /renew"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "release/renew força novo DORA e puxa options atualizadas (gateway/DNS). flushdns limpa cache de nomes, não o lease. winver e dxdiag não negociam DHCP.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "tracert: hop 1 = 10.40.0.1 (OK), hops seguintes * * * até timeout. Conclusão sobre o cliente?",
+    "alternativas": [
+      "Gateway e config local provavelmente ok o suficiente; problema tende a estar além do primeiro hop",
+      "Obrigatoriamente mask errada no PC",
+      "APIPA confirmado",
+      "DNS do OS sempre ausente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Resposta no hop 1 valida que o host alcança o gateway com a config atual. A quebra depois escala para WAN/roteamento, não para reconfigurar IP aleatório no PC sem evidência. Mask/APIPA/DNS não se concluem só por * no meio do path.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "macOS/Linux: ferramenta típica de caminho semelhante ao tracert do Windows?",
+    "alternativas": [
+      "notepad",
+      "traceroute (ou traceroute6)",
+      "paint.exe",
+      "diskpart"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "traceroute cumpre o papel de tracert no ecossistema Unix-like. Serve ao Verify de caminho a partir do cliente. Notepad e diskpart não traçam hops de rede.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Técnico configura estático 10.40.0.88/24 e gateway 10.41.0.1. Qual erro?",
+    "alternativas": [
+      "Uso correto de APIPA",
+      "DNS obrigatoriamente igual ao gateway",
+      "Mask /24 proibida em clientes",
+      "Gateway fora da subnet do host — default gateway IPv4 deve ser alcançável on-link na LAN"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "10.41.0.1 não está na 10.40.0.0/24; o host não entrega o default corretamente. Corrija o gateway para o SVI da VLAN (ex. 10.40.0.1). /24 é válida; APIPA não se aplica a estático bem formado.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Quando preferir deixar o cliente em DHCP em vez de estático manual?",
+    "alternativas": [
+      "Sempre em roteadores core com OSPF",
+      "Hosts de usuário em rede corporativa com pool gerenciado — menos erro de digitação e options centralizadas",
+      "Nunca; estático é sempre superior",
+      "Somente se o IP for 169.254"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Usuários finais em massa usam DHCP para IP/GW/DNS consistentes. Estático reserva-se a servers/labs. 169.254 não é motivo para 'preferir DHCP' — é sintoma de falha. Core OSPF não é endpoint de usuário típico do 1.6.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Linux: ip addr mostra só fe80:: na eth0; IPv4 ausente. Usuário precisa de IPv4 na LAN DHCP. Ação no cliente?",
+    "alternativas": [
+      "Ignorar e usar só fe80 para Internet pública",
+      "Desligar a interface para sempre",
+      "Verificar se DHCP client está ativo / obter IPv4 (dhclient/Network settings) e checar cabo/link — sem IPv4 não há gateway v4",
+      "Configurar MX no /etc/hosts como default route"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Sem IPv4 o host não usa gateway v4 da LAN. No OS: garanta link up e cliente DHCP (ou estático correto). fe80 sozinho não navega na Internet. MX em hosts não cria rota default.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "route print no Windows não lista 0.0.0.0 com gateway. Efeito?",
+    "alternativas": [
+      "DNS passa a ser opcional e infinito",
+      "Default route ausente — tráfego off-subnet falha até configurar gateway/DHCP option",
+      "O PC vira roteador OSPF",
+      "APIPA se converte em GUA"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem rota default o Windows não sabe para onde enviar pacotes fora da subnet. Configure gateway estático ou obtenha via DHCP. Isso não ativa OSPF no PC.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Output: ping GW ok, ping 203.0.113.10 ok, nslookup intranet.local falha com o DNS listado. Próximo passo no OS?",
+    "alternativas": [
+      "Reinstalar o switch core",
+      "Forçar half duplex no NIC",
+      "Inspecionar/corrigir configuração de DNS no cliente e retestar nslookup (ponte 4.4)",
+      "Remover o IP estático que já faz ping remoto"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Path IP validado; falha isolada de nome aponta DNS no OS ou no servidor configurado. Corrija DNS e use nslookup. Não desmonte o core nem mexa em duplex sem evidência L1.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Comando Linux para ver endereços da interface eth0 de forma moderna?",
+    "alternativas": [
+      "format eth0",
+      "ip addr show eth0",
+      "tracert eth0",
+      "ipconfig /all eth0 (sintaxe Windows)"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "ip addr show é o padrão atual no Linux. ipconfig é Windows; format/tracert não listam endereços da iface. ifconfig ainda aparece como legado em alguns sistemas.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Usuário mudou o PC de DHCP para estático 'inventando' 10.1.1.50/24 em rede 10.40.0.0/24. Sintoma?",
+    "alternativas": [
+      "Conectividade correta garantida",
+      "IP/mask/gateway provavelmente incompatíveis com a VLAN — sem reachability ao GW real",
+      "Melhora automática do DNS corporativo",
+      "Converte a porta em trunk"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Estático fora do plano de endereçamento da VLAN isola o host. Volte a DHCP ou use IP/GW/DNS do desenho. Trunk não é configurado pelo estático do PC.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual item NÃO é parâmetro típico de cliente no escopo 1.6?",
+    "alternativas": [
+      "Endereço IP",
+      "Default gateway",
+      "Servidores DNS",
+      "OSPF process-id do core e área 0 do backbone"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "1.6 cobre IP, mask/prefix, gateway e DNS no OS do endpoint. OSPF do core é outro domínio. O técnico de cliente não configura process-id no PC para navegar.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ping ao gateway falha; ipconfig mostra IP e mask corretos, gateway correto, link up. Possível causa ainda no cliente?",
+    "alternativas": [
+      "Obrigatoriamente falta de rota default na Internet",
+      "Sempre ausência de registro MX",
+      "Firewall local bloqueando ICMP de saída/eco — testar outro método ou ajustar regra básica",
+      "Necessidade de write erase no PC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Com parâmetros corretos e link up, firewall local pode interferir em testes ICMP. Não conclua WAN caída só por ping bloqueado; use outros testes e verifique L2 se necessário. write erase no PC não é procedimento padrão.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "No macOS, a ideia de networksetup no contexto CCNA é:",
+    "alternativas": [
+      "Substituir o Spanning Tree do switch",
+      "Configurar BGP no Mac mini como RR",
+      "Treinar modelos de IA no Wi-Fi",
+      "Ferramenta de linha de comando para ver/ajustar parâmetros de rede do host (IP/DNS/serviço)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "networksetup ilustra Configure/Verify no macOS via CLI, no mesmo espírito do ipconfig. Não vira feature de switch ou BGP. O exame cobra a lógica de parâmetros, não o manual completo da ferramenta.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "DHCP Enabled: No no ipconfig; IP 10.40.0.20 fixo. Time muda o GW da VLAN. O que o usuário precisa fazer no OS?",
+    "alternativas": [
+      "Nada; estático atualiza sozinho com RA IPv4",
+      "Somente limpar cookies do browser",
+      "Atualizar manualmente o default gateway (e DNS se preciso) no estático do cliente",
+      "Rodar ipconfig /renew (não se aplica a estático puro)"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Com DHCP desabilitado, options não vêm do servidor. Mudança de gateway exige editar o estático no OS. /renew não reescreve estático. Cookies não alteram a tabela de rotas.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Linux: dig @8.8.8.8 exemplo.com ok; dig sem @ usando DNS 10.0.0.9 do resolv.conf falha. Leitura?",
+    "alternativas": [
+      "O cabo está rompido (contradiz dig via 8.8.8.8)",
+      "IPv4 está proibido no kernel",
+      "Internet DNS genérico funciona; o DNS configurado no OS está ruim/inacessível — corrija resolv/settings",
+      "traceroute está desinstalado obrigatoriamente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Testar com @server isola o resolvedor do host. 8.8.8.8 ok prova path; falha no DNS local do OS pede correção de configuração de cliente (e ponte 4.4). Cabo rompido não explicaria o dig externo ok.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual sintoma casa com mask 255.255.255.0 em host 10.40.0.50 e gateway digitado 10.40.1.1?",
+    "alternativas": [
+      "Gateway fora da /24 do host — configuração inválida típica de estático errado",
+      "DHCP APIPA normal",
+      "DNSSEC obrigatório",
+      "Sucesso de /renew"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "10.40.1.1 não está em 10.40.0.0/24. O Verify no OS deve rejeitar mentalmente esse GW. Corrija para 10.40.0.1 (exemplo). Não é APIPA nem DNSSEC.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ferramenta Windows para testar resolução de nome sem abrir o browser?",
+    "alternativas": [
+      "paint",
+      "snippingtool",
+      "cleanmgr",
+      "nslookup"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "nslookup interroga o DNS configurado no OS e mostra a resposta. É o Verify de nome no 1.6/4.4. Paint e cleanmgr não resolvem FQDN.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PC pinga o GW e a intranet por IP; Internet por IP falha; tracert morre no hop após o GW. Onde NÃO começar?",
+    "alternativas": [
+      "Reconfigurar IP/mask do PC sem evidência de erro local (cliente já passou nos testes locais)",
+      "Verificar path/firewall/WAN além do gateway",
+      "Confirmar se o destino Internet responde a ICMP",
+      "Escalar com o tracert anexado"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Com GW e LAN ok, reescrever IP do PC sem erro no ipconfig é desperdício. O path quebra depois do hop 1 — foque além do cliente. Anexar tracert ajuda o NOC L2/L3.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ifconfig no macOS/Linux legado mostra inet 10.40.0.33 netmask 0xffffff00. Em decimal a mask é?",
+    "alternativas": [
+      "255.0.0.0",
+      "255.255.255.0",
+      "255.255.0.0",
+      "0.0.0.0"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "0xffffff00 = 255.255.255.0. Ler netmask em hex/ifconfig ainda aparece em outputs legados; o técnico deve reconhecer /24. Não é /8 nem /16.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Usuário cola no ticket só 'sem internet'. Qual primeiro comando Windows você pede?",
+    "alternativas": [
+      "ipconfig /all (e se tem IP/GW/DNS/APIPA)",
+      "delete C:\\Windows\\System32",
+      "diskpart clean all",
+      "format D: /y"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem inventário de IP/GW/DNS o helpdesk trabalha às cegas. ipconfig /all é o mínimo do 1.6. Comandos destrutivos de disco não diagnosticam rede.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Diferença prática Configure estático vs DHCP no cliente?",
+    "alternativas": [
+      "Estático grava IP/GW/DNS no OS; DHCP obtém do servidor e pode mudar com renew",
+      "DHCP proíbe ping",
+      "Estático remove a NIC",
+      "Ambos configuram OSPF area no PC"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Estático é persistente no host até edição manual; DHCP depende do lease e options. Nenhum dos dois configura OSPF no endpoint típico. Ping funciona nos dois modos se a stack estiver ok.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Linux: ip route show default via 10.40.0.1 dev eth0. ping 10.40.0.1 ok. Isso verifica o quê?",
+    "alternativas": [
+      "Somente o DNS corporativo",
+      "Somente o certificado HTTPS",
+      "Default route instalada e reachability L3 ao gateway no cliente",
+      "Que o core tem VXLAN"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A linha default via + ping no GW confirma Configure/Verify do gateway no Linux. Não prova DNS, TLS nem fabric do data center. Próximo passo seria IP remoto e nome.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo do tópico 1.6 no CCNA:",
+    "alternativas": [
+      "Administrar Group Policy e DSC enterprise completo",
+      "Deep iptables e NetworkManager plugins avançados",
+      "VPN client full mesh com certificados de fábrica",
+      "Configure/Verify IP, mask/prefix, gateway e DNS no Windows/macOS/Linux com ping, rota e nslookup/tracert"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O blueprint pede settings de cliente e ferramentas nativas de verificação. Não exige GPO enterprise, iptables avançado nem VPN detalhada. Foque parâmetros e outputs de OS no tom helpdesk/NOC L1.",
+    "part_id": "v2-1.6"
+  }
+]

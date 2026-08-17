@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No CCNA de automação, JSON é usado principalmente como:",
+    "alternativas": [
+      "Formato textual de representação de dados em bodies de APIs REST",
+      "Protocolo de roteamento substituto do OSPF",
+      "Tipo de cabo de fibra monomodo",
+      "Modo do Spanning Tree"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "JSON carrega inventário, interfaces e policies nas respostas REST. Não é IGP, mídia física nem STP. A 6.2 mostrou verbos/status; a 6.3 foca ler a estrutura do payload. Scripts parseiam JSON para extrair hostname, IP e status.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Em JSON, um objeto é delimitado por:",
+    "alternativas": [
+      "Apenas colchetes [ ]",
+      "Chaves { } com pares chave–valor",
+      "Apenas parênteses ( )",
+      "Apenas tags <xml>"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Objeto usa { }. Array usa [ ]. Parênteses não definem JSON. Tags são XML (contraste leve). Dentro do objeto, chaves são strings e valores têm tipos (string, number, boolean, etc.).",
+    "part_id": "6.3"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Um array JSON é tipicamente usado para:",
+    "alternativas": [
+      "Substituir o status HTTP",
+      "Eliminar a necessidade de aspas em strings",
+      "Representar listas ordenadas (ex.: vários devices ou interfaces)",
+      "Marcar o plano de dados ASIC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Listas de inventário e interfaces são arrays de objetos. Índices começam em 0. Status HTTP continua separado no header da resposta. Strings ainda usam aspas. ASIC não é sintaxe JSON.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No trecho \"vlanId\": 20, o valor 20 é do tipo:",
+    "alternativas": [
+      "string",
+      "boolean",
+      "array",
+      "number"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Sem aspas, 20 é number. \"20\" seria string. Boolean seria true/false. Array usaria [ ]. Em automação, comparar number com string quebra filtros de VLAN e portas.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No trecho \"enabled\": true, o tipo de true é:",
+    "alternativas": [
+      "boolean",
+      "string (porque parece palavra)",
+      "null",
+      "object obrigatoriamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "true/false sem aspas são booleanos JSON. A string seria \"true\". null é outro valor. Object seria { }. Scripts que tratam true como string falham em condições if.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "\"managementIp\": \"10.1.1.1\" — o valor é:",
+    "alternativas": [
+      "number decimal",
+      "string (IP entre aspas)",
+      "boolean",
+      "array de octetos obrigatório"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Endereços IP em JSON de APIs costumam ser string. Number não representa bem IPv4 com pontos. Boolean e array não se aplicam. Parse correto evita TypeError ao concatenar ou validar IP.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Diferença entre null e campo ausente no objeto?",
+    "alternativas": [
+      "São sempre idênticos no parse",
+      "null só existe em XML",
+      "null = chave presente com valor nulo; ausente = chave não existe no objeto",
+      "Campo ausente é sempre number zero"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Script pode testar hasOwnProperty/in. null ≠ undefined/ausente. XML é só contraste. Ausência não vira 0 automaticamente. APIs usam os dois casos com semânticas diferentes.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Dado [ {\"hostname\":\"SW1\"}, {\"hostname\":\"SW2\"} ], o hostname do índice 1 é:",
+    "alternativas": [
+      "SW1",
+      "O array inteiro",
+      "null",
+      "SW2"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Índice 0 = primeiro (SW1); índice 1 = segundo (SW2). Erro clássico de off-by-one em inventário. O array não é um hostname. null não está no trecho.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Vírgula após o último elemento de um array/objeto em JSON estrito causa tipicamente:",
+    "alternativas": [
+      "JSON inválido (parse error ou 400 se for body de request)",
+      "Conversão automática para YAML",
+      "Status 201 Created obrigatório",
+      "Upgrade para XML"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Trailing comma é erro clássico de sintaxe. Parsers rejeitam; APIs podem responder 400. Não vira YAML/XML sozinho. Corrija a vírgula antes de culpar o token.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "HTTP 200 com body JSON válido significa, no mínimo:",
+    "alternativas": [
+      "Que todos os campos do script existem sempre",
+      "Que a request foi bem-sucedida no transporte e o body pode ser parseado como JSON",
+      "Que o método foi DELETE com sucesso de remoção",
+      "Que ocorreu 401 de autenticação"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "200 = sucesso HTTP genérico; ainda valide chaves e tipos. DELETE pode usar 200/204, mas o enunciado não afirma delete. 401 contradiz 200. Leia status e body juntos (6.2+6.3).",
+    "part_id": "6.3"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Trecho: {\"device\":{\"hostname\":\"EDGE1\",\"interfaces\":[{\"name\":\"Gi0/0\",\"operStatus\":\"up\"}]}}. O valor de operStatus da primeira interface é:",
+    "alternativas": [
+      "true (boolean)",
+      "\"up\" (string no objeto aninhado do índice 0)",
+      "EDGE1",
+      "O número 0"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Path: device.interfaces[0].operStatus → \"up\". EDGE1 é hostname do device. true seria boolean sem aspas. 0 é o índice, não o status. Leitura de aninhamento é competência central da 6.3.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Script faz if (vlanId === 20) mas a API envia \"vlanId\": \"20\". Resultado típico?",
+    "alternativas": [
+      "Sempre true porque o texto parece 20",
+      "Falso/não entra no if — string \"20\" ≠ number 20 em comparação estrita",
+      "Converte o JSON em XML automaticamente",
+      "Gera HTTP 500 no cliente curl"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Tipos diferentes falham em ===. Normalize com parseInt ou ajuste o contrato. Não é XML. curl apenas transporta. Erro clássico number vs string do content.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Body 200: {\"id\":\"dev-1\",\"hostname\":\"SW-A\"}. Script lê body.device.hostname. Sintoma?",
+    "alternativas": [
+      "Sempre imprime SW-A",
+      "Campo undefined/ausente no path — hostname está na raiz, não sob device",
+      "Sempre imprime dev-1",
+      "Parse impossível porque falta array"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O objeto é flat na raiz: hostname existe em body.hostname, não body.device.hostname. JSON é válido. Ajuste o path do script após mudança de schema da API.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual trecho é JSON de objeto com boolean e number válidos?",
+    "alternativas": [
+      "{hostname: SW1, up: yes}",
+      "{'hostname': 'SW1'}",
+      "[hostname=SW1]",
+      "{\"hostname\":\"SW1\",\"mtu\":1500,\"enabled\":true}"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Chaves e strings com aspas duplas; number e boolean sem aspas. Aspas simples e chaves sem aspas são inválidos no JSON estrito. Colchetes com = não são JSON de objeto.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Inventário: [{\"hostname\":\"A\",\"ip\":\"10.0.0.1\"},{\"hostname\":\"B\",\"ip\":\"10.0.0.2\"}]. IP do hostname B?",
+    "alternativas": [
+      "10.0.0.1",
+      "10.0.0.2 (segundo objeto do array)",
+      "Somente null",
+      "O array inteiro como string"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "B está no índice 1 com ip 10.0.0.2. 10.0.0.1 é de A. Ler o par hostname/ip no elemento correto evita provisionar o device errado.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Request com JSON inválido (aspas quebradas) para POST. Resposta comum do servidor?",
+    "alternativas": [
+      "400 Bad Request (body malformado)",
+      "200 com inventário completo",
+      "201 ignorando o parse",
+      "Somente 101 do STP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Servidor rejeita payload inválido com 4xx, frequentemente 400. Não cria recurso. STP irrelevante. Corrija sintaxe JSON do -d no curl antes de debugar token.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "\"interfaces\": [] significa:",
+    "alternativas": [
+      "null",
+      "Array vazio válido — lista sem elementos",
+      "boolean false",
+      "Sintaxe inválida obrigatória"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "[] é array vazio legítimo. Diferente de null ou ausência da chave. Script deve tratar length 0. Não é false booleano. Válido no JSON.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Contraste leve JSON vs XML no CCNA:",
+    "alternativas": [
+      "JSON é o formato de payload mais citado em REST de controllers; XML é legado/contraste, sem lab profundo",
+      "XML substituiu JSON em todas as APIs DNA",
+      "JSON só existe em IPv6",
+      "XML é o único com arrays"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O módulo 6 enfatiza JSON. XML pode aparecer em outros contextos, mas não é o foco de parse do 6.3. Ambos podem estruturar dados; o exame não exige lab XML. IPv6 não limita JSON.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Trecho: {\"reachability\":\"UNREACHABLE\",\"isManaged\":false}. Tipos de reachability e isManaged?",
+    "alternativas": [
+      "number e array",
+      "boolean e number",
+      "null e object",
+      "string e boolean"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "\"UNREACHABLE\" entre aspas = string; false sem aspas = boolean. number/array/object não batem. Leitura de inventário de controller usa esses campos com frequência.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Script espera body.platformId; API v2 renomeou para platform.id (objeto aninhado). Com 200 OK, o script:",
+    "alternativas": [
+      "Sempre funciona sem mudança",
+      "Converte sozinho platformId",
+      "Recebe undefined/ausente em platformId — path da chave mudou (aninhamento)",
+      "Gera 404 mesmo com 200"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Schema drift: chave antiga some ou muda de lugar. 200 confirma transporte; lógica quebra. Atualize o path para platform.id. 404 seria status HTTP, não coexistente com 200 na mesma response.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual afirmação sobre aspas em JSON é correta?",
+    "alternativas": [
+      "Números devem sempre ir entre aspas",
+      "Booleanos true/false devem ir entre aspas para serem boolean",
+      "Chaves de objeto usam aspas duplas; strings também — números e booleanos não usam aspas",
+      "Aspas simples são o padrão obrigatório do RFC JSON"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "JSON padrão usa aspas duplas em chaves/strings. \"true\" vira string, não boolean. Números sem aspas. Aspas simples quebram parsers estritos. Base de prova da 6.3.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cliente tenta parsear resposta HTML de erro (portal login) como JSON. Sintoma?",
+    "alternativas": [
+      "Parse error no cliente — body não é JSON apesar de possível status enganoso de proxy",
+      "Sempre 201 Created",
+      "Sempre array de devices válido",
+      "Conversão automática HTML→JSON no HTTP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Content-Type e corpo devem ser JSON. HTML de login/captive quebra JSON.parse. Verifique URL da API e auth. Não há conversão mágica. Combine com leitura de status e primeiros bytes do body.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Objeto aninhado: device.interface.name vs device.interfaces[0].name. Diferença conceitual?",
+    "alternativas": [
+      "São sempre o mesmo path",
+      "O segundo path não existe em JSON",
+      "O primeiro assume um único objeto interface; o segundo assume array de interfaces e pega o índice 0",
+      "Ambos são number"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Estrutura da API dita o path. Array exige índice; objeto singular não. Errar colchetes vs objeto é falha de leitura aninhada. Tipos dos nomes continuam string em geral.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mínimo ao ler resposta de inventário JSON:",
+    "alternativas": [
+      "Só olhar o LED do switch",
+      "Só o root do STP",
+      "Só o cipher WPA",
+      "Status HTTP + JSON válido + path da chave + tipo + índice do array se houver lista"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O método une 6.2 e 6.3. LED/STP/WPA podem ser eixos de rede, não de parse. Valide estrutura antes de confiar no valor. É o checklist do study note final.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "\"count\": null em estatística de API. Interpretação segura?",
+    "alternativas": [
+      "Sempre zero numérico",
+      "Sempre string \"null\"",
+      "Valor nulo explícito — trate como ausência de número, não como 0 automático",
+      "Array com um elemento null obrigatório"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "null ≠ 0 ≠ \"null\". Código deve ramificar. Coerção descuidada gera bugs em gráficos de assurance. Não é array por si. Leitura correta de tipos.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual estrutura representa lista de duas interfaces Gi0/0 e Gi0/1 up?",
+    "alternativas": [
+      "{\"name\":\"Gi0/0\",\"name\":\"Gi0/1\"} apenas",
+      "\"Gi0/0,Gi0/1\" como number",
+      "true",
+      "[{\"name\":\"Gi0/0\",\"operStatus\":\"up\"},{\"name\":\"Gi0/1\",\"operStatus\":\"up\"}]"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Array de objetos permite dois names. Objeto com chave name duplicada é inválido/ambíguo. String única e boolean não modelam a lista. Padrão de APIs de interface.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "200 OK + body vazio ou não-JSON quando Content-Type diz application/json. Risco?",
+    "alternativas": [
+      "Parse do cliente falha ou dados faltam — valide body real, não só o status",
+      "Prova de create 201",
+      "Prova de delete de inventário global",
+      "Prova de autenticação 401"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Inconsistência status/body quebra automação. Inspecione bytes e headers. 201/401 são outros códigos. 200 não garante payload útil. Tema direto do content.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Chave JSON com typo \"hostnme\" em vez de \"hostname\" no request de update. Efeito comum?",
+    "alternativas": [
+      "API ignora ou rejeita o campo; hostname real não atualiza como esperado",
+      "Corrige o typo automaticamente sempre",
+      "Converte para XML hostnme",
+      "Força 101 Switching Protocols"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Campos desconhecidos podem ser ignorados (200 com no-op) ou gerar 400. Hostname não muda. Não há correção mágica. Valide schema e nomes exatos das chaves.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que number e string importam em contadores e VLANs de API de rede?",
+    "alternativas": [
+      "Porque JSON não permite números",
+      "Porque boolean substitui ambos",
+      "Porque comparações, ordenação e serialização diferem — \"100\" e 100 não são o mesmo tipo",
+      "Porque arrays não podem conter objects"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Automação de compliance e filtros depende de tipos corretos. JSON permite ambos os tipos; o contrato da API define qual usar. Arrays de objects são comuns. boolean não substitui VLAN id.",
+    "part_id": "6.3"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor hábito ao depurar automação que “não acha o IP do device” no JSON?",
+    "alternativas": [
+      "Só reiniciar o OSPF process",
+      "Só aumentar o modulus SSH",
+      "Só apagar a VLAN 1",
+      "Imprimir/inspecionar o body, validar path (aninhamento/índice) e o tipo do campo managementIp"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O IP pode estar em outro nível, em string, ou no elemento errado do array. Inspecionar o JSON evita culpar a rede. OSPF/SSH/VLAN são eixos paralelos. Fecha o checklist 6.3 de leitura de inventário.",
+    "part_id": "6.3"
+  }
+]

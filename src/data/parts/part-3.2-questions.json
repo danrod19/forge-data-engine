@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Por que hosts em VLANs diferentes não se comunicam só com switching L2?",
+    "alternativas": [
+      "Porque são domínios de broadcast separados e precisam de encaminhamento L3 (gateway por VLAN)",
+      "Porque o MAC é apagado a cada segundo",
+      "Porque EtherChannel é obrigatório entre PCs",
+      "Porque OSPF é necessário em toda access port"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "VLANs diferentes isolam L2; inter-VLAN exige roteador/SVI. MAC aging, EtherChannel e OSPF na access não são a razão fundamental.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No router-on-a-stick, cada VLAN no roteador é tipicamente representada por:",
+    "alternativas": [
+      "Uma interface loopback obrigatória",
+      "Uma subinterface com encapsulation dot1Q e IP da subnet da VLAN",
+      "Um SVI no PC do usuário",
+      "Um canal LACP no rádio 2,4"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "ROAS usa subinterfaces dot1Q+IP. Loopback, SVI no PC e LACP wireless não definem o ROAS clássico.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O comando encapsulation dot1Q 20 na subinterface serve para:",
+    "alternativas": [
+      "Desligar o trunk no switch",
+      "Definir o native de todas as VLANs como 20 forçadamente sem IP",
+      "Associar a subinterface à VLAN 20 no trunk 802.1Q",
+      "Criar a VLAN 20 no show vlan do switch automaticamente em todo o campus"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "dot1Q 20 amarra a subinterface à tag 20. Não desliga trunk nem cria VLAN em todos os switches sozinho.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "SVI no L3 switch é criada com:",
+    "alternativas": [
+      "channel-group 1 mode on",
+      "spanning-tree portfast apenas",
+      "interface loopback 20 como único método",
+      "interface Vlan <id> + ip address + no shutdown (e VLAN/L2 saudáveis)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "SVI = interface Vlan. EtherChannel/PortFast/loopback não criam o gateway da VLAN de acesso.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ip routing no switch multilayer habilita:",
+    "alternativas": [
+      "Encaminhamento L3 entre SVIs/redes no próprio switch",
+      "Apenas o aging da tabela MAC",
+      "Somente DTP no uplink",
+      "Desligar todas as VLANs access"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "ip routing torna o switch capaz de rotear entre SVIs. Não é aging/DTP nem apaga VLANs.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "no switchport em uma interface física do L3 switch cria:",
+    "alternativas": [
+      "Porta access VLAN 1 forçada",
+      "Porta trunk nativa 99",
+      "Routed port L3 (IP na física, sem switchport L2)",
+      "Subinterface ROAS automática"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "no switchport = routed port. Não é access/trunk ROAS automático.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O default gateway do PC na VLAN 10 deve ser:",
+    "alternativas": [
+      "O IP da SVI ou subinterface da VLAN 10",
+      "Qualquer IP da VLAN 20",
+      "O MAC do switch apenas",
+      "0.0.0.0/0 no host sem IP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Gateway = interface L3 da VLAN do host. VLAN 20, só MAC ou 0.0.0.0 sem IP não servem.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Causa clássica de SVI Vlan20 up/down:",
+    "alternativas": [
+      "ip routing habilitado demais",
+      "Excesso de rotas estáticas",
+      "VLAN 20 inexistente ou sem porta/trunk ativo transportando a VLAN",
+      "encapsulation dot1Q no PC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "SVI precisa de L2 ativo na VLAN. ip routing e estáticas não causam up/down típico; PC não usa encapsulation.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No ROAS, a porta do switch ligada ao roteador deve ser:",
+    "alternativas": [
+      "Access em uma única VLAN de dados sem trunk",
+      "Shutdown permanente",
+      "Routed port no switch de acesso obrigatoriamente",
+      "Trunk com as VLANs das subinterfaces no allowed"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "ROAS exige trunk no switch. Access único, shutdown ou routed no access switch quebram o modelo clássico.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show ip interface brief no ROAS deve mostrar, se saudável:",
+    "alternativas": [
+      "Subinterfaces com IP up/up",
+      "Apenas interfaces err-disabled",
+      "Somente Port-channel down",
+      "Nenhuma interface com IP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Subinterfaces com IP up/up são o esperado. err-disable/Po down/sem IP não descrevem ROAS ok.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Subinterface Gi0/0.20 tem IP mas sem encapsulation dot1Q. Efeito típico:",
+    "alternativas": [
+      "A VLAN 20 é roteada normalmente no trunk",
+      "A subinterface não associa corretamente a VLAN 20 no 802.1Q — inter-VLAN da 20 falha",
+      "O switch cria native 20 sozinho",
+      "ip routing no PC corrige o problema"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem encapsulation a subinterface não tagueia/recebe a VLAN. Native mágica e ip routing no PC não resolvem.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "L3 switch com SVIs up mas sem ip routing. Hosts na VLAN 10 e 20:",
+    "alternativas": [
+      "Roteiam entre VLANs pelo hardware mesmo assim",
+      "Não obtêm inter-VLAN routing no switch até habilitar ip routing",
+      "Comunicam entre VLANs via flood unknown unicast apenas",
+      "Usam automaticamente ROAS inexistente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem ip routing o multilayer não encaminha entre SVIs. Flood L2 não substitui roteamento inter-VLAN.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Vantagem típica de SVI em L3 switch sobre ROAS com muitas VLANs:",
+    "alternativas": [
+      "Sempre mais barato que qualquer switch L2",
+      "Elimina a necessidade de VLANs",
+      "ROAS escala melhor que hardware de switch",
+      "Inter-VLAN no switch multilayer escala melhor que um único link de roteador (ROAS)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "SVI/hardware no campus supera o gargalo do ROAS de um cabo. Não elimina VLANs nem é “sempre mais barato”.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "encapsulation dot1Q 10 native na subinterface indica:",
+    "alternativas": [
+      "Que a VLAN 10 é a única allowed no mundo",
+      "Que a VLAN 10 é tratada como native (untagged no trunk) naquele ROAS",
+      "Que todos os frames vão tagged 10 inclusive de outras VLANs",
+      "Que ip routing está off"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "native na subinterface alinha a VLAN untagged. Não define allowed global nem ip routing.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip route em L3 switch com inter-VLAN ok deve listar, para as subnets das SVIs:",
+    "alternativas": [
+      "Apenas rotas BGP",
+      "Redes C (connected) das SVIs up com ip routing ativo",
+      "Nenhuma connected",
+      "Somente S* obrigatória"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "SVIs up geram connected. Não exige BGP/S* como único conteúdo.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Trunk do switch para o ROAS tem allowed 10,20 mas a subinterface da VLAN 30 está configurada. Resultado:",
+    "alternativas": [
+      "VLAN 30 passa mesmo assim por native mágica",
+      "Apenas a 30 funciona; 10 e 20 caem",
+      "O roteador cria allowed 30 no switch via CDP",
+      "Tráfego da VLAN 30 não atravessa o trunk — allowed não inclui 30"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Allowed filtra o trunk. Sem 30, a subinterface da 30 não recebe/envia no link. CDP não corrige allowed.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Quando preferir routed port (no switchport) em vez de SVI?",
+    "alternativas": [
+      "Sempre para PCs de usuário final",
+      "Nunca em L3 switch",
+      "Em enlace L3 ponto a ponto entre devices, sem precisar de VLAN de acesso naquela porta",
+      "Para substituir encapsulation dot1Q no ROAS do PC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Routed port é L3 na física. PCs usam access+SVI. ROAS do PC não existe.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Native mismatch no link do ROAS costuma causar:",
+    "alternativas": [
+      "Problemas com untagged e sintoma confuso na VLAN nativa; tagged podem parecer ok",
+      "Apagar todas as SVIs do campus",
+      "Forçar ip routing off",
+      "Converter o trunk em access automaticamente em ambos"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Native desalinhada afeta untagged. Não apaga SVIs nem desliga ip routing sozinha.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "interface Vlan10 shutdown. Efeito no gateway da VLAN 10:",
+    "alternativas": [
+      "SVI administratively down — hosts perdem o gateway da VLAN 10",
+      "A VLAN 10 some do 802.1Q mundial",
+      "ROAS assume automaticamente",
+      "Portas access viram trunk"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "shutdown na SVI tira o gateway. Não mexe em todos os trunks do mundo nem cria ROAS mágico.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Comando show vlan brief ajuda no inter-VLAN a verificar:",
+    "alternativas": [
+      "Apenas o next-hop OSPF",
+      "Só o hash LACP",
+      "Se a VLAN existe e quais portas access estão nela (base L2 da SVI)",
+      "Senhas VTY"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "show vlan brief = VLAN e membros access. Não é OSPF/LACP/VTY.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PC na VLAN 10 com gateway 192.168.20.1 (SVI da VLAN 20). Sintoma esperado:",
+    "alternativas": [
+      "Inter-VLAN perfeito",
+      "Gateway na VLAN errada — o host não usa o L3 da sua própria subnet/VLAN",
+      "SVI 10 assume o IP 20.1 sozinha",
+      "dot1Q no PC corrige"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Gateway deve ser o da VLAN 10. IP da SVI 20 na config do PC está errado. PC não faz dot1Q típico.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem mental de troubleshooting inter-VLAN:",
+    "alternativas": [
+      "Só clear mac em loop",
+      "Só aumentar potência Wi-Fi",
+      "L2 VLAN/trunk → interface L3 up → ip routing → connected no route → ping gateway → outra VLAN",
+      "Desligar todas as SVIs"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Fluxo do content: L2 então L3. Clear mac/Wi-Fi/desligar SVI não são o método.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Subinterface administratively down no ROAS:",
+    "alternativas": [
+      "Continua roteando a VLAN normalmente",
+      "Exige native mismatch para funcionar",
+      "Precisa de no shutdown (e física up) para servir a VLAN",
+      "Substitui a SVI do switch automaticamente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Admin down impede a interface L3. no shutdown é necessário. Não substitui SVI sozinha.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Diferença chave SVI vs routed port:",
+    "alternativas": [
+      "SVI não pode ter IP",
+      "Routed port exige encapsulation dot1Q no PC",
+      "Ambas são apenas L2 access",
+      "SVI é gateway virtual da VLAN de várias portas L2; routed port coloca IP na física L3"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "SVI serve a VLAN; routed é L3 na porta. SVI tem IP; PC não usa encap; não são só L2 access.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show interfaces trunk no switch do ROAS deve confirmar:",
+    "alternativas": [
+      "Que a porta ao roteador está trunking com VLANs needed allowed/active e native coerente",
+      "Que o PC está em mode trunk aberto",
+      "Que ip routing está on no roteador via CDP",
+      "Que não existe VLAN 1"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Trunk status/allowed/native no uplink do ROAS. Não prova mode do PC nem ip routing via CDP nesse comando.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "VLAN 30 não criada no switch, mas SVI Vlan30 configurada. Resultado comum:",
+    "alternativas": [
+      "SVI up/up garantido",
+      "SVI/line protocol problemático — L2 da VLAN 30 inexistente/incompleto",
+      "ROAS desnecessário em qualquer design",
+      "Allowed ignora a ausência da VLAN"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem VLAN no banco L2, a SVI não fica saudável. Não garante up/up.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Em campus com distribution multilayer e muitos access switches, o desenho inter-VLAN usual CCNA é:",
+    "alternativas": [
+      "ROAS em cada PC",
+      "Um hub entre VLANs",
+      "SVIs no L3 switch de distribuição + ip routing (e trunks dos access)",
+      "Somente rotas estáticas sem interfaces por VLAN"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "SVI no multilayer é o padrão de escala. ROAS por PC e hub estão errados.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Física Gi0/0 no roteador ROAS com IP e sem subinterfaces. Limite:",
+    "alternativas": [
+      "Serve nativamente todas as VLANs tagged sem config",
+      "É o único modelo suportado em 200-301",
+      "Substitui encapsulation em todas as VLANs",
+      "Um IP na física não multiplexa várias VLANs como subinterfaces dot1Q — falta o modelo ROAS multi-VLAN"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Multi-VLAN no ROAS pede subinterfaces+dot1Q. Um IP na física não tagueia N VLANs.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ping do PC ao gateway da própria VLAN falha; inter-VLAN também. Primeiro eixo:",
+    "alternativas": [
+      "OSPF area 0 no core apenas",
+      "L2/VLAN do host e status da SVI/subinterface gateway antes de culpar rotas remotas",
+      "EtherChannel entre impressoras",
+      "Canal Wi-Fi 6 GHz do switch"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem gateway local, inter-VLAN nem começa. Ver VLAN e SVI/subinterface primeiro.",
+    "part_id": "3.2"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist “SVI não sobe / inter-VLAN morto”:",
+    "alternativas": [
+      "Só trocar o cabo do core por monomodo",
+      "Desligar show vlan brief",
+      "Apagar ip routing para forçar L2 entre VLANs",
+      "VLAN existe + porta/trunk ativo + SVI no shutdown? + ip routing + trunk allowed/native no caminho ROAS"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O content une L2 da VLAN, estado da SVI, routing e trunk do ROAS. Atalhos ópticos/desligar show/ip routing off não são o checklist.",
+    "part_id": "3.2"
+  }
+]

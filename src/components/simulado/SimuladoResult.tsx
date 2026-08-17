@@ -33,6 +33,8 @@ export interface SimuladoResultProps {
   /** Segundos gastos (apenas se timer estava ativo); null se sem timer */
   elapsedSeconds: number | null;
   wrongCountForReview: number;
+  /** Quantos itens ticket/troubleshooting na sessão (ex.: mix V2) */
+  troubleshootingCount?: number;
   onReviewErrors: () => void;
   onNewSimulado: () => void;
   onBackToStart: () => void;
@@ -63,6 +65,7 @@ export function SimuladoResult({
   timerExpired,
   elapsedSeconds,
   wrongCountForReview,
+  troubleshootingCount,
   onReviewErrors,
   onNewSimulado,
   onBackToStart,
@@ -132,6 +135,12 @@ export function SimuladoResult({
               </span>
             )}
           </p>
+          {typeof troubleshootingCount === "number" &&
+            troubleshootingCount > 0 && (
+              <p className="mt-2 inline-flex items-center rounded-full border border-neon-green/30 bg-neon-green/10 px-2.5 py-0.5 text-[10px] font-semibold text-neon-green">
+                {troubleshootingCount} troubleshooting na sessão
+              </p>
+            )}
 
           {/* Score ring */}
           <div className="relative my-6 flex size-36 items-center justify-center sm:size-40">

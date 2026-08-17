@@ -1,0 +1,145 @@
+{
+  "part_id": "4.4",
+  "title": "SSH e acesso remoto seguro",
+  "blueprint_module": "4.0",
+  "weight_percent": 10,
+  "topic_list": [
+    "SSH vs Telnet: criptografia vs cleartext",
+    "Por que Telnet é inseguro em redes modernas",
+    "Pré-requisitos SSH no IOS: hostname e ip domain-name",
+    "crypto key generate rsa (módulo adequado)",
+    "Usuário local: username secret e line vty login local",
+    "transport input ssh (e perigos de telnet/all)",
+    "ip ssh version 2 preferível",
+    "line vty: password legado, access-class, session limits",
+    "Local database vs ideia de AAA (conceito leve)",
+    "show ip ssh, show users e diagnóstico de login",
+    "ACL em VTY bloqueando o admin",
+    "Checklist: SSH não conecta"
+  ],
+  "study_notes": [
+    {
+      "heading": "SSH versus Telnet",
+      "bullets": [
+        "Telnet envia credenciais e sessão em texto claro — qualquer sniffing no caminho lê usuário/senha e comandos.",
+        "SSH (Secure Shell) cifra a sessão: autenticação e tráfego de gerenciamento ficam protegidos em trânsito.",
+        "No CCNA, a expectativa de hardening básico é preferir SSH e desabilitar Telnet nas VTY quando possível.",
+        "Portas conceituais: Telnet 23, SSH 22 — o exame cobra o modelo de segurança mais que o número da porta.",
+        "Mesmo com senha “forte”, Telnet continua inseguro porque a senha viaja legível."
+      ],
+      "exam_tips": [
+        "Pergunta clássica: por que SSH? → confidencialidade da sessão de gerenciamento."
+      ]
+    },
+    {
+      "heading": "Checklist para habilitar SSH no IOS",
+      "bullets": [
+        "1) hostname significativo (não o default genérico em muitos labs).",
+        "2) ip domain-name <domínio> — necessário para o nome FQDN da chave.",
+        "3) crypto key generate rsa [modulus 2048] — gera o par de chaves; sem chave, SSH não sobe.",
+        "4) username <user> secret <senha> — base local moderna (secret > password em claro).",
+        "5) line vty 0 4 (ou range do device): login local e transport input ssh.",
+        "6) Opcional/recomendado: ip ssh version 2; access-class para restringir origem.",
+        "Ordem importa na prática: sem domain-name/hostname adequados a geração de chave falha ou SSH fica disabled."
+      ],
+      "exam_tips": [
+        "SSH disabled no show ip ssh → falta chave RSA ou pré-requisitos (hostname/domain)."
+      ]
+    },
+    {
+      "heading": "line vty: o ponto de entrada remoto",
+      "bullets": [
+        "As linhas VTY aceitam sessões remotas (SSH/Telnet) ao plano de gerenciamento.",
+        "login local consulta o username configurado no device; login + password na VTY é modelo legado de senha única.",
+        "transport input ssh — só SSH; transport input telnet — só Telnet; all/ssh telnet — ambos.",
+        "Se transport input telnet (sem ssh), clientes SSH são recusados mesmo com chave gerada.",
+        "access-class <ACL> in na VTY filtra IPs de origem permitidos a tentar login remoto.",
+        "exec-timeout e session-limit (conceito) reduzem sessões abandonadas e abuso — visão leve no CCNA."
+      ],
+      "exam_tips": [
+        "Chave ok + transport telnet only = sintoma “SSH connection refused / não sobe”."
+      ]
+    },
+    {
+      "heading": "Autenticação local e AAA em visão leve",
+      "bullets": [
+        "Database local: username/secret no running-config — suficiente para labs e small branch no exame.",
+        "login local nas VTY amarra o acesso remoto a esses usuários.",
+        "AAA (Authentication, Authorization, Accounting) centraliza usuários em servidores (RADIUS/TACACS) — conceito apenas; config full fora do escopo.",
+        "Sem username e com login local, o login falha (“Authentication failed”) mesmo com SSH up.",
+        "enable secret protege o modo privilegiado após o login da linha — é camada diferente da autenticação VTY."
+      ],
+      "exam_tips": [
+        "SSH pede senha e falha → confira username/secret + login local, não só a chave RSA."
+      ]
+    },
+    {
+      "heading": "SSH version 2 e verificação",
+      "bullets": [
+        "SSHv1 é legado e considerado inseguro; ip ssh version 2 força o uso de v2.",
+        "show ip ssh: versão, autenticação, se SSH está enabled e bits da chave.",
+        "show users / who: quem está conectado (console/VTY).",
+        "show run | section line vty / username / ip ssh mostra a intenção de hardening.",
+        "Mensagens de falha no cliente (timeout, refused, auth fail) guiam se o problema é rede, transport ou credencial."
+      ],
+      "exam_tips": [
+        "Preferir v2 no checklist de segurança de gerenciamento do 200-301."
+      ]
+    },
+    {
+      "heading": "ACL na VTY e outros bloqueios",
+      "bullets": [
+        "access-list permitindo só a rede de gerenciamento + access-class na VTY é boa prática.",
+        "ACL errada (deny do IP do admin, wildcard invertido, ordem) = timeout ou conexão recusada para o NOC.",
+        "Interface de gerenciamento down, ACL de interface, firewall no caminho e VRF errado também impedem SSH — isole com ping/rota antes de culpar só a VTY.",
+        "Após login, privilege e AAA authorization podem limitar comandos — no CCNA foque login e transporte.",
+        "Não confundir ACL de VTY com ACL de dados da LAN: uma protege o plano de controle/gerência."
+      ],
+      "exam_tips": [
+        "Ping ok + SSH falha → VTY/transport/login/ACL VTY; ping falha → L3/path primeiro."
+      ]
+    },
+    {
+      "heading": "Checklist “SSH não conecta”",
+      "bullets": [
+        "1) Alcance IP ao device (ping/rota/firewall 22).",
+        "2) show ip ssh — enabled? versão? chave presente?",
+        "3) hostname + ip domain-name + crypto key generate rsa feitos?",
+        "4) line vty: transport input inclui ssh? login local?",
+        "5) username secret existe e senha correta?",
+        "6) access-class permite o IP de origem do admin?",
+        "7) Não restou só Telnet habilitado por engano (risco + sintoma confuso)."
+      ],
+      "exam_tips": [
+        "Método: rede → SSH engine → VTY transport/login → usuário → ACL VTY."
+      ]
+    }
+  ],
+  "key_commands": [
+    "hostname <nome>",
+    "ip domain-name <domínio>",
+    "crypto key generate rsa",
+    "ip ssh version 2",
+    "username <user> secret <senha>",
+    "enable secret <senha>",
+    "line vty 0 4",
+    "login local",
+    "transport input ssh",
+    "transport input telnet",
+    "access-class <n> in",
+    "access-list <n> permit <rede> <wildcard>",
+    "show ip ssh",
+    "show users",
+    "show running-config | section vty|username|ip ssh|crypto",
+    "show access-lists"
+  ],
+  "must_know": [
+    "Telnet = cleartext (inseguro); SSH = sessão cifrada para gerenciamento remoto.",
+    "SSH no IOS exige hostname, ip domain-name, chave RSA, usuário e VTY com login local + transport input ssh.",
+    "Sem crypto key (ou pré-requisitos), show ip ssh costuma indicar SSH disabled.",
+    "transport input telnet (sem ssh) impede clientes SSH; preferir transport input ssh apenas.",
+    "login local precisa de username/secret; senha só na VTY é modelo legado.",
+    "ip ssh version 2 é a prática preferida no CCNA; v1 é legado.",
+    "access-class na VTY pode bloquear o IP do administrador mesmo com SSH correto."
+  ]
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1701: notebooks na VLAN 40 ficam em 'Obtendo IP' e caem em 169.254.x.x. Porta access e SVI ok.",
+    "cli_output": "PC> ipconfig\n   IPv4 Address. . . . . . . . . . . : 169.254.67.12\n   Subnet Mask . . . . . . . . . . . : 255.255.0.0\n   Default Gateway . . . . . . . . . :\n\nSW-ACC# show interfaces Gi1/0/22 status\nPort      Name     Status    Vlan Duplex Speed\nGi1/0/22  USER     connected 40   a-full a-1000\n\nCORE# show ip interface brief | include Vlan40\nVlan40                 10.40.0.1       YES NVRAM  up    up\n\nCORE# show run interface Vlan40 | include helper|ip address\n ip address 10.40.0.1 255.255.255.0\n (no helper-address)\n\nDHCP-SERVER: 10.10.10.53 in VLAN 10 (reachable from CORE)\nCORE# show ip route 10.10.10.53\nS*  0.0.0.0/0 ... / or connected path OK to server subnet",
+    "alternativas": [
+      "CRC na fibra do ISP causa APIPA local",
+      "Falta de ip helper-address no SVI Vlan40 — Discover não chega ao server em outra subnet",
+      "Pool DNS AAAA ausente",
+      "Desligar o SVI 40 resolve o lease"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "APIPA com L2 e SVI up, server remoto e zero helper no SVI 40 é o clássico de relay ausente. Broadcast DHCP não cruza L3. Configure ip helper-address 10.10.10.53 em Vlan40. Derrubar o SVI piora o segmento.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1702: helper existe, mas foi colocado no uplink em vez do SVI de usuários. VLAN 30 em APIPA.",
+    "cli_output": "CORE# show run | include helper-address\n ip helper-address 10.10.10.53\n\nCORE# show run interface GigabitEthernet0/0/1\n description UPLINK-WAN\n ip address 203.0.113.2 255.255.255.252\n ip helper-address 10.10.10.53\n\nCORE# show run interface Vlan30\n ip address 10.30.0.1 255.255.255.0\n (no helper-address)\n\nPC-VLAN30> ipconfig\n   IPv4 Address. . . . . . . . . . . : 169.254.11.9\n\nCORE# show ip interface brief | include Vlan30\nVlan30   10.30.0.1   YES NVRAM  up   up\n\nServer 10.10.10.53 counters: no Discover seen from 10.30.0.0/24",
+    "alternativas": [
+      "Helper no uplink WAN atende automaticamente Vlan30",
+      "APIPA indica sucesso de DORA",
+      "Mover/configurar ip helper-address no SVI Vlan30 (segmento do cliente), não só no WAN",
+      "Forçar duplex half nas portas de usuário"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O helper precisa estar na interface/SVI onde o Discover é recebido (VLAN 30). No WAN uplink ele não relê o broadcast dos PCs da 30. Evidência: sem Discover no server e APIPA nos hosts. Corrija a interface do helper.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1703: primeiros 50 PCs ok; a partir de hoje novos notebooks não obtêm IP. Server local na VLAN.",
+    "cli_output": "R1# show ip dhcp pool USERS\nPool USERS :\n Utilization mark (high/low)    : 100 / 0\n Subnet size (first/next)       : 0 / 0\n Total addresses                : 254\n Leased addresses               : 254\n Excluded addresses             : 2\n Pending event                  : none\n 1 subnet is currently in the pool :\n Current index        IP address range                    Leased/Excluded/Total\n 10.40.0.0            10.40.0.1     - 10.40.0.254          254    / 2     / 256\n\nR1# show ip dhcp binding | count\nNumber of lines which match regexp = 254\n\nNEW-PC> ipconfig\n   Autoconfiguration IPv4 Address. . : 169.254.200.5\n\nR1# show run | include excluded-address\n ip dhcp excluded-address 10.40.0.1 10.40.0.2",
+    "alternativas": [
+      "Falta de cabo no core de Internet",
+      "DNS option apenas",
+      "Helper ausente (server está na mesma VLAN e L2 ok para antigos)",
+      "Pool esgotado (0 free / 254 leased) — ampliar escopo, liberar leases ou redesenhar range"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "show ip dhcp pool com 254 leased e free efetivo zero explica por que só novos clientes falham. Hosts antigos mantêm lease. Não é helper (server local, bindings cheios). Expanda o pool ou recupere endereços.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1704: host tem IP na subnet e ping em vizinhos ok, mas não sai da VLAN. DNS também aponta para IP legado.",
+    "cli_output": "PC> ipconfig /all\n   IPv4 Address. . . . . . . . . . . : 10.40.0.88\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.40.0.254\n   DNS Servers . . . . . . . . . . . : 192.0.2.53\n\nPC> ping 10.40.0.10\nReply from 10.40.0.10: time<1ms\n\nPC> ping 10.40.0.254\nRequest timed out.\n\nCORE# show ip interface brief | include Vlan40\nVlan40   10.40.0.1   YES NVRAM  up   up\n\nCORE# show run | section dhcp\nip dhcp pool USERS\n network 10.40.0.0 255.255.255.0\n default-router 10.40.0.254\n dns-server 192.0.2.53\n\nNote: SVI real gateway is 10.40.0.1; 10.40.0.254 not on network.",
+    "alternativas": [
+      "Options default-router e dns-server incorretas no pool — corrigir para 10.40.0.1 e DNS válido; renew do cliente",
+      "APIPA em curso",
+      "Pool free 0 (não há evidência de esgotamento)",
+      "Desligar service dhcp resolve o gateway"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Lease existe, mas default-router 10.40.0.254 não é o SVI real (10.40.0.1) e DNS 192.0.2.53 está legado. Sintoma de options erradas. Ajuste o pool e ipconfig /renew. Desligar DHCP não corrige gateway.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1705: hosts dual-stack na LAN de lab. Política: GUA via DHCPv6 stateful. PCs só mostram link-local.",
+    "cli_output": "PC> ipconfig\n   IPv6 Address. . . . . . . . . . . : fe80::d1e2:33ff:fe44:5566%12\n   IPv4 Address. . . . . . . . . . . : 10.40.0.55 (DHCP OK)\n   (no global IPv6 address listed)\n\nR1# show ipv6 interface Vlan40 | include fe80|FF02|joined|line protocol\nVlan40 is up, line protocol is up\n  IPv6 is enabled, link-local address is FE80::1\n  No global unicast address is configured on Vlan40 for RA prefix advertise in this lab extract\n  Joined group address(es):\n    FF02::1\n    FF02::2\n\nR1# show run | include ipv6 dhcp|dhcp server\n (no ipv6 dhcp pool / no ipv6 dhcp server on Vlan40)\n\nR1# show ipv6 dhcp binding\n% No bindings present\n\nDesign note: M-flag intended for stateful DHCPv6 but server not enabled.",
+    "alternativas": [
+      "IPv4 APIPA está causando a falta de GUA",
+      "CRC de cobre remove fe80::",
+      "Problema só de registro MX",
+      "DHCPv6/RA: sem pool/server v6 na interface e sem GUA — habilitar DHCPv6 stateful (e RA adequado); hoje só link-local"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "IPv4 DHCP ok; IPv6 só fe80 e zero bindings v6 com server não configurado. Falta o serviço DHCPv6/RA para GUA. Não é MX nem CRC. Ative pool/server (ou SLAAC com prefixo) conforme a política.",
+    "part_id": "v2-1.7"
+  }
+]

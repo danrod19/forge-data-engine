@@ -16,12 +16,14 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { INITIAL_LIVES, INITIAL_STREAK } from "@/data/questions";
 import {
   createTrilhaSession,
-  TOTAL_TICKETS,
+  trilhaSessionCopy,
 } from "@/data/tickets";
 import type { NavTab, Question } from "@/types/question";
-
-const LIVES_STORAGE_KEY = "ccna-forge-lives";
-const STREAK_STORAGE_KEY = "ccna-forge-streak";
+import {
+  livesStorageKey,
+  streakStorageKey,
+  useTrack,
+} from "@/lib/track-context";
 
 function readStoredNumber(key: string, fallback: number): number {
   try {
@@ -36,14 +38,8 @@ function readStoredNumber(key: string, fallback: number): number {
 
 export default function HomePage() {
   const { isPro, isProEfetivo } = useAuth();
-  // isPro === isProEfetivo (pro_expires_at no futuro)
+  const { track, trackReady } = useTrack();
 
-  /**
-   * Hydration-safe:
-   * - activeTab starts as "home" (stable SSR/static)
-   * - trilhaSession starts empty — Fisher–Yates only after mount
-   * - lives/streak: defaults first paint, then localStorage in useEffect
-   */
   const [mounted, setMounted] = useState(false);
   const [lives, setLives] = useState(INITIAL_LIVES);
   const [streak, setStreak] = useState(INITIAL_STREAK);
@@ -55,29 +51,45 @@ export default function HomePage() {
   const [authOpen, setAuthOpen] = useState(false);
   const [trilhaSession, setTrilhaSession] = useState<Question[]>([]);
   const [trilhaKey, setTrilhaKey] = useState(0);
+  const [simuladoKey, setSimuladoKey] = useState(0);
 
-  // Client-only: mount flag + localStorage stats + first trilha shuffle
+  // Client-only mount
   useEffect(() => {
     setMounted(true);
-    setLives(readStoredNumber(LIVES_STORAGE_KEY, INITIAL_LIVES));
-    setStreak(readStoredNumber(STREAK_STORAGE_KEY, INITIAL_STREAK));
   }, []);
 
-  // Shuffle only after mount / when session key changes (never on SSR)
+  // Load lives/streak when track is ready or changes
   useEffect(() => {
-    if (!mounted) return;
-    setTrilhaSession(createTrilhaSession());
-  }, [mounted, trilhaKey]);
+    if (!mounted || !trackReady) return;
+    setLives(readStoredNumber(livesStorageKey(track), INITIAL_LIVES));
+    setStreak(readStoredNumber(streakStorageKey(track), INITIAL_STREAK));
+  }, [mounted, trackReady, track]);
 
-  // Persist lives (client-only)
+  // Trilha session per track
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !trackReady) return;
+    setTrilhaSession(createTrilhaSession(10, track));
+  }, [mounted, trackReady, track, trilhaKey]);
+
+  // Persist lives per track
+  useEffect(() => {
+    if (!mounted || !trackReady) return;
     try {
-      localStorage.setItem(LIVES_STORAGE_KEY, String(lives));
+      localStorage.setItem(livesStorageKey(track), String(lives));
     } catch {
       /* ignore */
     }
-  }, [lives, mounted]);
+  }, [lives, mounted, track, trackReady]);
+
+  // Persist streak per track
+  useEffect(() => {
+    if (!mounted || !trackReady) return;
+    try {
+      localStorage.setItem(streakStorageKey(track), String(streak));
+    } catch {
+      /* ignore */
+    }
+  }, [streak, mounted, track, trackReady]);
 
   const openUpgrade = useCallback(() => {
     setPaywallReason("upgrade");
@@ -104,7 +116,16 @@ export default function HomePage() {
     setTrilhaKey((k) => k + 1);
   }, []);
 
+  const handleTrackChange = useCallback(() => {
+    // Reset in-flight quiz sessions so tracks never mix mid-session
+    setTrilhaSession([]);
+    setTrilhaKey((k) => k + 1);
+    setSimuladoKey((k) => k + 1);
+    setActiveTab("home");
+  }, []);
+
   const livesBlocked = !isPro && lives === 0;
+  const trilhaCopy = trilhaSessionCopy(track);
 
   return (
     <div className="relative flex min-h-dvh flex-col tech-grid">
@@ -120,18 +141,19 @@ export default function HomePage() {
         streak={streak}
         lives={lives}
         isPro={isPro}
-        statsReady={mounted}
+        statsReady={mounted && trackReady}
         onUpgradeClick={openUpgrade}
         onAuthClick={() => setAuthOpen(true)}
         onAccountClick={() => setActiveTab("conta")}
         onLogoClick={() => setActiveTab("home")}
+        onTrackChange={handleTrackChange}
       />
 
       <main className="relative z-10 mx-auto w-full max-w-2xl flex-1 px-3 pb-24 pt-4 sm:px-4 sm:pt-6">
         <AnimatePresence mode="wait">
           {activeTab === "home" && (
             <motion.div
-              key="home"
+              key={`home-${track}`}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
@@ -148,7 +170,7 @@ export default function HomePage() {
 
           {activeTab === "trilha" && (
             <motion.div
-              key={`trilha-${trilhaKey}`}
+              key={`trilha-${track}-${trilhaKey}`}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
@@ -161,17 +183,21 @@ export default function HomePage() {
                 onWrongAnswer={handleWrongAnswer}
                 onUpgrade={openUpgrade}
                 disabled={livesBlocked}
-                bankSize={TOTAL_TICKETS}
+                bankSize={trilhaCopy.bankSize}
+                sessionTitle={trilhaCopy.title}
+                sessionSubtitle={trilhaCopy.subtitle}
                 onNewSession={startNewTrilhaSession}
                 onExit={() => setActiveTab("home")}
-                loading={!mounted || trilhaSession.length === 0}
+                loading={
+                  !mounted || !trackReady || trilhaSession.length === 0
+                }
               />
             </motion.div>
           )}
 
           {activeTab === "simulado" && (
             <motion.div
-              key="simulado"
+              key={`simulado-${track}-${simuladoKey}`}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
@@ -189,7 +215,7 @@ export default function HomePage() {
 
           {activeTab === "estudo" && (
             <motion.div
-              key="estudo"
+              key={`estudo-${track}`}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
@@ -205,7 +231,7 @@ export default function HomePage() {
 
           {activeTab === "sobre" && (
             <motion.div
-              key="sobre"
+              key={`sobre-${track}`}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}

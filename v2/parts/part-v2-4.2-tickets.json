@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4201: auditoria de segurança — switch de acesso ainda aceita Telnet. SSH também está configurado.",
+    "cli_output": "SW# show run | section line vty\nline vty 0 4\n login local\n transport input telnet ssh\n!\nline vty 5 15\n login local\n transport input telnet ssh\n\nSW# show ip ssh\nSSH Enabled - version 2.0\nAuthentication methods:publickey,keyboard-interactive,password\nAuthentication timeout: 120 secs; Authentication retries: 3\n\nSW# show run | include username\nusername admin privilege 15 secret 9 $9$...\n\nPC> telnet 10.40.0.2\nTrying 10.40.0.2 ... Open\nUser Access Verification\nUsername:\n\nPC> ssh -l admin 10.40.0.2\n(admin@10.40.0.2) Password:  [works]",
+    "alternativas": [
+      "Remover todas as chaves RSA",
+      "Alterar para transport input ssh (somente) nas VTY — fechar Telnet cleartext",
+      "Desabilitar username admin",
+      "Manter transport input telnet ssh — Telnet open é aceitável em produção"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Telnet Open prova cleartext ainda permitido apesar do SSH ok. transport input ssh only fecha o Telnet. Não remova chaves nem o usuário admin.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4202: SSH Connection refused; Telnet também recusado. Device acessível por console.",
+    "cli_output": "R1# show run | include hostname|domain-name|crypto key|ip ssh\nhostname R1\n (no ip domain-name)\n (no crypto key rsa)\n (no ip ssh version)\n\nR1# show ip ssh\n%SSH has not been enabled\n\nR1# show run | section line vty\nline vty 0 4\n password cisco\n login\n transport input ssh\n\nR1# show ip interface brief | include Vlan10\nVlan10  10.10.10.1  YES NVRAM  up  up\n\nConsole works; management IP pings from PC.",
+    "alternativas": [
+      "Falta domain-name e crypto key generate rsa — SSH not enabled; gerar chave e completar pré-requisitos",
+      "Problema exclusivo de access-class (não configurada)",
+      "transport input ssh está errado e deve ser só telnet",
+      "VLAN 10 down (output mostra up)"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "show ip ssh: not enabled e ausência de domain-name/key explicam refused. transport ssh está correto na intenção; complete RSA. VLAN e path estão ok pelo ping.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4203: rotina de backup noturno usa TFTP da DMZ para cores com secrets. Time de segurança reprova.",
+    "cli_output": "CORE# show run | include tftp|scp|sftp|ftp\nip tftp source-interface Loopback0\n\n! cron/script excerpt:\ncopy running-config tftp://203.0.113.50/core-run.cfg\n\nCORE# show ip ssh\nSSH Enabled - version 2.0\n\nCORE# show run | include username\nusername backup privilege 15 secret 9 $9$...\n\nThreat model: path crosses shared campus to DMZ TFTP server\nConfig contains enable secret hashes and local users",
+    "alternativas": [
+      "Manter TFTP; hashes nunca são úteis a atacantes",
+      "Trocar para Telnet paste diário",
+      "Migrar backup para SCP ou SFTP (SSH já enabled) em repositório controlado",
+      "Desligar SSH e usar só FTP anônimo"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "TFTP cleartext em path compartilhado expõe a config. Com SSH enabled e usuário backup, SCP/SFTP é o caminho. FTP anônimo e Telnet pioram. Hashes e secrets ainda são sensíveis.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4204: admin legítimo no jump 10.50.1.20 não entra; outro jump 10.255.1.5 ok. SSH server up.",
+    "cli_output": "SW# show ip ssh\nSSH Enabled - version 2.0\n\nSW# show run | section line vty\nline vty 0 4\n login local\n transport input ssh\n access-class MGMT-ONLY in\n\nSW# show run | section access-list MGMT-ONLY|ip access-list\nip access-list standard MGMT-ONLY\n 10 permit 10.255.0.0 0.0.255.255\n 20 deny   any log\n\nSW# show logging | include MGMT-ONLY|VTY\n%SEC-6-IPACCESSLOGS: list MGMT-ONLY denied 10.50.1.20\n\nPC-JUMP-A 10.50.1.20: ssh fails (timeout/refused after SYN)\nPC-JUMP-B 10.255.1.5: ssh works\nBoth can ping 10.40.0.2 management IP",
+    "alternativas": [
+      "Gerar nova chave RSA imediatamente (server já enabled e funciona do jump B)",
+      "Trocar transport para telnet",
+      "Desligar login local",
+      "access-class MGMT-ONLY nega 10.50.1.20 — ajustar ACL/permit do jump legítimo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Log deny e assimetria entre jumps isolam a ACL da VTY. SSH e chave ok (jump B). Inclua 10.50.1.20/subnet do jump A. Telnet não é a correção de segurança.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4205: estagiário propõe FTP para enviar running-config com senhas ao servidor de backup interno. Compare com SCP.",
+    "cli_output": "Proposed:\n  copy running-config ftp://user:Passw0rd@10.20.5.10/edge.cfg\n\nAlternative available:\n  copy running-config scp://backup@10.20.5.10/edge.cfg\n\nEDGE# show ip ssh\nSSH Enabled - version 2.0\n\nEDGE# show run | include username backup\nusername backup privilege 15 secret 9 $9$...\n\nPacket capture risk on SPAN of management VLAN: credentials visible on FTP control channel (demonstrated in lab)",
+    "alternativas": [
+      "FTP é preferível porque mostra a senha no comando para auditoria",
+      "FTP e SCP são igualmente cleartext",
+      "Preferir SCP: canal SSH cifrado; FTP envia credenciais/dados em claro mesmo em rede interna",
+      "Desabilitar SSH para forçar FTP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A captura de lab e a natureza do FTP mostram cleartext. SCP usa SSH já enabled. Não desligue SSH nem normalize FTP para secrets.",
+    "part_id": "v2-4.2"
+  }
+]

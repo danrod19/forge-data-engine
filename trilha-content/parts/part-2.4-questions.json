@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual é o objetivo principal do EtherChannel entre dois switches?",
+    "alternativas": [
+      "Agregar múltiplos links físicos em um Port-Channel lógico (banda e redundância)",
+      "Substituir VLANs por PAgP em hosts",
+      "Desabilitar STP em toda a campus forever",
+      "Converter access ports em hubs CSMA"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "EtherChannel cria um bundle lógico. Não remove VLANs do design, não “desliga STP no campus” como objetivo, nem transforma access em hub.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Quais modes LACP formam canal corretamente?",
+    "alternativas": [
+      "passive + passive",
+      "active + active (ou active + passive)",
+      "auto + auto",
+      "on + passive sempre"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "LACP precisa de pelo menos um active. passive+passive não inicia. auto é PAgP. on+passive não é o par LACP padrão confiável da prova.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Modes PAgP que estabelecem EtherChannel:",
+    "alternativas": [
+      "active + passive apenas",
+      "passive + passive",
+      "desirable + desirable ou desirable + auto",
+      "on + active"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "PAgP usa desirable/auto. active/passive são LACP. on+active mistura estático com negociação.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "channel-group 1 mode on em ambos os lados significa:",
+    "alternativas": [
+      "Negociação LACP active obrigatória",
+      "PAgP desirable automático",
+      "Bundle suspenso até BPDU Guard",
+      "Bundle estático sem protocolo de negociação PAgP/LACP"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "on força o canal sem LACP/PAgP. Não é active nem desirable por si. BPDU Guard não define mode on.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Em ambiente multi-vendor, o protocolo de agregação preferido no CCNA é:",
+    "alternativas": [
+      "LACP",
+      "PAgP only",
+      "ISL trunking",
+      "DTP desirable"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "LACP é IEEE/multivendor. PAgP é Cisco. ISL/DTP não são o protocolo de EtherChannel multi-vendor.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Requisito típico para membros do mesmo channel-group:",
+    "alternativas": [
+      "Speeds diferentes de propósito",
+      "Um access e um trunk misturados livremente",
+      "Mesma speed/duplex e mesmo modo access ou trunk alinhado",
+      "Native VLANs diferentes em cada membro trunk"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Membros precisam de parâmetros L2/L1 coerentes. Misturar access/trunk, speed e native divergentes quebra o bundle.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show etherchannel summary serve principalmente para:",
+    "alternativas": [
+      "Ver o hash de OSPF",
+      "Listar senhas enable",
+      "Visão rápida do Po, protocolo e estado dos membros no bundle",
+      "Configurar PortFast default"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "summary é o panorama do EtherChannel. Não é OSPF, secret nem PortFast.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Load-balancing de EtherChannel no CCNA distribui tráfego por:",
+    "alternativas": [
+      "Round-robin garantido de cada frame isolado em todas as plataformas",
+      "Apenas o número da VLAN nativa",
+      "STP root priority",
+      "Hash de campos do fluxo (ex.: MACs/IPs) — fluxos iguais no mesmo membro"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Hash de fluxo. Não é RR perfeito universal, nem só native VLAN ou root priority.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "passive + passive em LACP resulta em:",
+    "alternativas": [
+      "Sem formação do bundle, pois ninguém inicia a negociação",
+      "Canal LACP up com todos os membros",
+      "Canal PAgP desirable",
+      "Modo on automático"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Passive só responde; sem active não sobe. Não vira PAgP nem on sozinho.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "interface Port-channel 2 representa:",
+    "alternativas": [
+      "A interface lógica do bundle (channel-group 2)",
+      "Apenas o primeiro membro físico Gi1/0/1",
+      "Um SVI de VLAN 2 obrigatório",
+      "O processo OSPF process-id 2"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Po2 é o lógico do grupo 2. Não é um único físico fixo, nem SVI/OSPF por definição.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SW1: channel-group 1 mode desirable. SW2: channel-group 1 mode passive. O que ocorre?",
+    "alternativas": [
+      "EtherChannel LACP perfeito active-passive",
+      "PAgP de um lado e LACP do outro — combinação incompatível; bundle tende a não formar",
+      "Modo on implícito nos dois",
+      "load-balance desliga o Po"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "desirable é PAgP; passive é LACP. Protocolos diferentes não fecham o canal como pares válidos da prova.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um lado mode on e o outro mode active. Resultado mais provável:",
+    "alternativas": [
+      "PAgP desirable-auto estável",
+      "Bundle LACP com hash perfeito",
+      "Canal sobe só com native VLAN 999",
+      "Falha na formação adequada: on não negocia LACP como o active espera"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "on+active é armadilha clássica. Não é par PAgP nem LACP saudável. Native 999 não salva o mode.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Po1 up com apenas 1 de 4 membros no bundle (flag P em um só). Impacto:",
+    "alternativas": [
+      "EtherChannel inválido na norma se houver qualquer Po",
+      "Capacidade e redundância reduzidas — investigar mismatch/cabo nos outros membros",
+      "Load-balance usa automaticamente OSPF",
+      "STP vê quatro roots obrigatórios"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Bundle parcial funciona mal em HA/banda. Não invalida o conceito de Po, não vira OSPF hash, nem quatro roots.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Membro Gi1/0/1 trunk allowed 10,20 e Gi1/0/2 trunk allowed 10,20,30 no mesmo channel-group. Risco:",
+    "alternativas": [
+      "Nenhum; allowed pode divergir livremente",
+      "PAgP vira LACP sozinho",
+      "PortFast ativa nos dois",
+      "Mismatch de config trunk entre membros pode impedir o membro de entrar no bundle"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Membros precisam de configs alinhadas (incl. allowed). Divergência suspende/rejeita membro. Não converte PAgP↔LACP nem liga PortFast.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show etherchannel load-balance exibe src-dst-ip. Um único fluxo TCP grande satura Gi1/0/1 e deixa Gi1/0/2 ocioso. Conclusão:",
+    "alternativas": [
+      "O Po está necessariamente com modes passive+passive",
+      "LACP foi substituído por hubs",
+      "channel-group foi apagado dos dois lados",
+      "Comportamento possível: mesmo hash → mesmo membro; não prova sozinho que o bundle está down"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Hash por fluxo explica assimetria com um elephant flow. Não implica passive+passive, hub ou channel-group removido.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "auto + auto em PAgP:",
+    "alternativas": [
+      "Forma canal imediatamente",
+      "Equivalente a active + active LACP",
+      "Não inicia negociação; ninguém é “desirable”",
+      "Força mode on"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "auto espera; auto+auto não sobe. Não é LACP active nem on.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Benefício de STP ao usar EtherChannel entre os mesmos dois switches:",
+    "alternativas": [
+      "STP vê um único link lógico em vez de múltiplos caminhos paralelos entre o par",
+      "STP é desabilitado globalmente",
+      "Root Bridge deixa de existir",
+      "BPDU Guard vira obrigatório no Po"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Bundle = um path lógico para STP. Não desliga STP global, não remove root, nem impõe Guard no Po.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Gi1/0/1 a 1G full e Gi1/0/2 a 100M full no mesmo channel-group. Expectativa:",
+    "alternativas": [
+      "Bundle perfeito com load ideal",
+      "LACP ignora speed sempre",
+      "Provável rejeição/inconsistência — speed deve ser igual nos membros",
+      "PAgP converte ambos para 10G"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Speed alinhada é requisito. Protocolos não “igualam” 100M a 1G magicamente.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Comando que configura o membro físico no grupo 5 com LACP iniciando:",
+    "alternativas": [
+      "switchport mode access only",
+      "channel-group 5 mode active",
+      "spanning-tree portfast",
+      "channel-group 5 mode auto"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "mode active = LACP inicia. auto é PAgP. access/PortFast não definem LACP active.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cisco a Cisco, desirable + auto:",
+    "alternativas": [
+      "Não forma nunca",
+      "É par LACP",
+      "Exige mode on no meio",
+      "Forma EtherChannel PAgP (desirable inicia, auto responde)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Par PAgP válido. Não é LACP nem “nunca forma”. on no meio não é requisito desse par.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após corrigir modes para active/active, o Po sobe mas um membro continua standalone. Próximo foco:",
+    "alternativas": [
+      "Apagar o Port-channel e usar só hubs",
+      "Comparar speed/duplex e trunk/access/native/allowed daquele membro com os demais e o peer",
+      "Trocar LACP por DNS",
+      "Desligar show etherchannel summary"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Membro fora do bundle com modes ok → mismatch L1/L2 no link. Hubs/DNS/desligar show não diagnosticam.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Flag “P” em show etherchannel summary (visão Cisco comum) indica em geral:",
+    "alternativas": [
+      "Porta em err-disable por BPDU Guard apenas",
+      "Membro bundled no Port-Channel (in port-channel)",
+      "Protocolo OSPF adjacente",
+      "Native VLAN mismatch obrigatório"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "P ≈ participante do Po. Não é OSPF nem definição de native mismatch/Guard.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que on+on exige disciplina de configuração?",
+    "alternativas": [
+      "Porque on+on proíbe trunks",
+      "Porque on+on só funciona com PAgP auto",
+      "Porque on+on desliga todas as VLANs",
+      "Porque sem negociação LACP/PAgP, divergências nos membros não são “negociadas” da mesma forma"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Estático depende de configs idênticas. Não proíbe trunk nem exige auto PAgP, nem apaga VLANs por si.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Misturar switchport mode access vlan 10 em um membro e trunk nos outros do mesmo channel-group:",
+    "alternativas": [
+      "É recomendado para load-balance MAC",
+      "Ativa LACP passive automaticamente",
+      "É mismatch grave — o bundle tende a falhar ou suspender membros",
+      "Cria dois Port-channels com o mesmo ID legalmente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Todos access ou todos trunk alinhados. Mistura quebra. Não é best practice de hash nem cria dois Po com mesmo ID “legalmente”.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show interfaces port-channel 1 serve para:",
+    "alternativas": [
+      "Inspecionar a interface lógica do bundle Po1 (status, membros associados conforme plataforma)",
+      "Só listar rotas estáticas",
+      "Configurar channel-group mode auto remotamente",
+      "Apagar o EtherChannel sem confirmação"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "É show da interface lógica. Não configura mode remoto, não lista rotas estáticas como função principal, não apaga o Po.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "active + passive (LACP):",
+    "alternativas": [
+      "Não forma porque passive é inválido",
+      "Forma o canal: active inicia e passive responde",
+      "É par exclusivo PAgP",
+      "Equivalente a auto + auto"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Par LACP válido. Não é PAgP nem auto+auto. Passive é válido com active.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Tráfego assimétrico com todos os membros em P no summary. Melhor interpretação inicial:",
+    "alternativas": [
+      "Verificar se há poucos fluxos grandes (hash) e o método de load-balance — bundle pode estar saudável",
+      "Concluir que modes são on+active",
+      "Concluir que o Po está administratively down",
+      "Concluir que PAgP foi usado com Huawei com sucesso garantido"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Assimetria com membros up é típica de hash. Não prova on+active, admin down ou PAgP multi-vendor ok.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Número do channel-group nos membros locais deve ser:",
+    "alternativas": [
+      "Diferente em cada cabo do mesmo bundle",
+      "O mesmo ID de grupo nos membros que formam aquele Po no switch",
+      "Igual ao número da VLAN nativa sempre",
+      "Sempre 1 global na empresa inteira"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Mesmo channel-group local agrega no mesmo Po. Não precisa ser a native nem único na empresa toda, nem diferente por cabo do mesmo bundle.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist rápido “por que o EtherChannel não sobe?”:",
+    "alternativas": [
+      "Só trocar o SFP por monomodo sem olhar modes",
+      "Ignorar allowed e focar só em DNS",
+      "Modes compatíveis → speed/duplex → access/trunk/native/allowed alinhados → show etherchannel summary",
+      "Desabilitar Port-channel e usar PortFast nos uplinks"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Ordem do content: mode e L2 dos membros, depois summary. SFP/DNS/PortFast no uplink não substituem o checklist.",
+    "part_id": "2.4"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PAgP desirable no Cisco e “LACP active” no peer não-Cisco. Expectativa:",
+    "alternativas": [
+      "Interoperabilidade perfeita garantida",
+      "auto+auto forma no peer",
+      "on+on implícito",
+      "Falha de interoperabilidade de protocolo — use LACP nos dois lados"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "PAgP não é o caminho multi-vendor. LACP active/active (ou active/passive) é o adequado. Não há formação mágica desirable↔LACP.",
+    "part_id": "2.4"
+  }
+]

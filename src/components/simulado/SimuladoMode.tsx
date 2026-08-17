@@ -17,19 +17,39 @@ import { Button } from "@/components/ui/button";
 import { playCorrectSound, playWrongSound } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import type { Question } from "@/types/question";
-import { getQuestionPrompt } from "@/types/question";
+import {
+  getQuestionPrompt,
+  isTraditionalQuestion,
+  hasDeepExplanation,
+} from "@/types/question";
 import {
   SIMULADO_COUNTS,
   pickSimuladoQuestions,
+  pickSimuladoQuestionsForTrack,
   getSimuladoTimerMinutes,
-  simuladoQuestions,
-  TOTAL_SIMULADO_QUESTIONS,
+  getSimuladoPool,
+  getSimuladoPoolByTrack,
+  defaultSimuladoSourceForTrack,
+  countTicketsInSession,
+  V2_SIMULADO_TICKET_RATIO,
+  TOTAL_SIMULADO_V2,
+  TOTAL_SIMULADO_AWS,
+  TOTAL_SIMULADO_MODULE1,
+  TOTAL_SIMULADO_MODULE2,
+  TOTAL_SIMULADO_MODULE3,
+  TOTAL_SIMULADO_MODULE4,
+  TOTAL_SIMULADO_MODULE5,
+  TOTAL_SIMULADO_MODULE6,
+  TOTAL_SIMULADO_CURATED,
+  TOTAL_SIMULADO_LEGACY,
   type SimuladoCountOption,
+  type SimuladoSource,
 } from "@/data/simulado-questions";
 import { SimuladoResult } from "@/components/simulado/SimuladoResult";
 import { SimuladoReview } from "@/components/simulado/SimuladoReview";
 import { Explicacao } from "@/components/ticket/Explicacao";
-import { hasDeepExplanation } from "@/types/question";
+import { TerminalCLI } from "@/components/ticket/TerminalCLI";
+import { useTrack } from "@/lib/track-context";
 
 type Phase = "config" | "quiz" | "result" | "review";
 
@@ -61,8 +81,12 @@ export function SimuladoMode({
   disabled,
   onUpgrade,
 }: SimuladoModeProps) {
+  const { track, meta } = useTrack();
   const [phase, setPhase] = useState<Phase>("config");
   const [countOption, setCountOption] = useState<SimuladoCountOption>(20);
+  const [source, setSource] = useState<SimuladoSource>(() =>
+    defaultSimuladoSourceForTrack(track)
+  );
   const [timerEnabled, setTimerEnabled] = useState(false);
   const [sessionQuestions, setSessionQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -122,8 +146,26 @@ export function SimuladoMode({
     return () => window.clearInterval(id);
   }, [phase, timerEnabled, secondsLeft, timerExpired]);
 
+  // Sync bank when track changes (never mix mid-quiz — parent remounts with key)
+  useEffect(() => {
+    setSource(defaultSimuladoSourceForTrack(track));
+    setPhase("config");
+  }, [track]);
+
+  const activePool = useMemo(() => {
+    if (track === "aws") return getSimuladoPoolByTrack("aws");
+    return getSimuladoPool(source);
+  }, [track, source]);
+  const poolTotal = activePool.length;
+
   const startSimulado = useCallback(() => {
-    const picked = pickSimuladoQuestions(countOption);
+    // ccna-v2: mix ~30% tickets (posture diagnóstico). V1/AWS: pure traditional.
+    const picked =
+      track === "ccna-v2"
+        ? pickSimuladoQuestionsForTrack(countOption, "ccna-v2")
+        : track === "aws"
+          ? pickSimuladoQuestionsForTrack(countOption, "aws")
+          : pickSimuladoQuestions(countOption, source);
     setSessionQuestions(picked);
     setCurrentIndex(0);
     setSelected(null);
@@ -134,10 +176,7 @@ export function SimuladoMode({
     setReviewIndex(0);
 
     if (timerEnabled) {
-      const mins = getSimuladoTimerMinutes(
-        picked.length,
-        simuladoQuestions.length
-      );
+      const mins = getSimuladoTimerMinutes(picked.length, poolTotal);
       const budget = mins * 60;
       setTimerBudgetSeconds(budget);
       setSecondsLeft(budget);
@@ -147,7 +186,12 @@ export function SimuladoMode({
     }
 
     setPhase("quiz");
-  }, [countOption, timerEnabled]);
+  }, [countOption, timerEnabled, source, poolTotal, track]);
+
+  const sessionTicketCount = useMemo(
+    () => countTicketsInSession(sessionQuestions),
+    [sessionQuestions]
+  );
 
   const handleSelect = useCallback(
     (index: number) => {
@@ -221,12 +265,9 @@ export function SimuladoMode({
   if (phase === "config") {
     const previewCount =
       countOption === "all"
-        ? simuladoQuestions.length
-        : Math.min(countOption, simuladoQuestions.length);
-    const timerMins = getSimuladoTimerMinutes(
-      previewCount,
-      simuladoQuestions.length
-    );
+        ? poolTotal
+        : Math.min(countOption, poolTotal);
+    const timerMins = getSimuladoTimerMinutes(previewCount, poolTotal);
 
     return (
       <motion.div
@@ -244,11 +285,180 @@ export function SimuladoMode({
                 Modo <span className="text-neon-green">Simulado</span>
               </h1>
               <p className="text-xs text-slate-500">
-                {TOTAL_SIMULADO_QUESTIONS} questões traditional · estilo prova
-                CCNA 200-301
+                {meta.label} · {poolTotal} questões traditional · {meta.examCode}
               </p>
+              {track === "ccna-v2" && (
+                <p className="mt-0.5 text-[10px] text-neon-green/80">
+                  Mix v2.0 · ~{Math.round(V2_SIMULADO_TICKET_RATIO * 100)}%
+                  troubleshooting (tickets)
+                </p>
+              )}
             </div>
           </div>
+
+          {/* Source selector — only ccna-v1; AWS and V2 use fixed pools */}
+          {track === "aws" ? (
+            <div className="mb-5 rounded-xl border border-amber-500/25 bg-amber-500/5 px-3 py-3">
+              <p className="text-sm font-bold text-amber-200">AWS SAA-C03 Foundations</p>
+              <p className="mt-0.5 text-[10px] text-amber-200/70">
+                {TOTAL_SIMULADO_AWS} questões · parts 1.1–1.12 · banco piloto
+              </p>
+            </div>
+          ) : track === "ccna-v2" ? (
+            <div className="mb-5 rounded-xl border border-neon-green/25 bg-neon-green/5 px-3 py-3">
+              <p className="text-sm font-bold text-neon-green">
+                CCNA 200-301 v2.0 · mix diagnóstico
+              </p>
+              <p className="mt-0.5 text-[10px] text-neon-green/70">
+                {TOTAL_SIMULADO_V2} traditional + tickets · ~
+                {Math.round(V2_SIMULADO_TICKET_RATIO * 100)}% troubleshooting
+                na sessão
+              </p>
+            </div>
+          ) : (
+          <div className="mb-5">
+            <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+              Fonte do banco
+            </p>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setSource("v2")}
+                className={cn(
+                  "rounded-xl border px-3 py-3 text-left text-sm font-bold transition-all",
+                  source === "v2"
+                    ? "border-neon-green bg-neon-green/15 text-neon-green shadow-[0_0_16px_rgba(34,197,94,0.2)]"
+                    : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-600 hover:text-slate-200"
+                )}
+              >
+                CCNA v2.0 (primary)
+                <span className="mt-0.5 block text-[10px] font-normal opacity-80">
+                  {TOTAL_SIMULADO_V2} questões · banco consolidado
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSource("curated")}
+                className={cn(
+                  "rounded-xl border px-3 py-3 text-left text-sm font-bold transition-all",
+                  source === "curated"
+                    ? "border-neon-green bg-neon-green/15 text-neon-green shadow-[0_0_16px_rgba(34,197,94,0.2)]"
+                    : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-600 hover:text-slate-200"
+                )}
+              >
+                Módulos 1–6 v1 (legado)
+                <span className="mt-0.5 block text-[10px] font-normal opacity-80">
+                  {TOTAL_SIMULADO_CURATED} questões · fund. → automação
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSource("module1")}
+                className={cn(
+                  "rounded-xl border px-3 py-3 text-left text-sm font-bold transition-all",
+                  source === "module1"
+                    ? "border-neon-green bg-neon-green/15 text-neon-green shadow-[0_0_16px_rgba(34,197,94,0.2)]"
+                    : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-600 hover:text-slate-200"
+                )}
+              >
+                Fundamentos (1.0)
+                <span className="mt-0.5 block text-[10px] font-normal opacity-80">
+                  {TOTAL_SIMULADO_MODULE1} questões · sem drill
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSource("module2")}
+                className={cn(
+                  "rounded-xl border px-3 py-3 text-left text-sm font-bold transition-all",
+                  source === "module2"
+                    ? "border-neon-cyan bg-neon-cyan/15 text-neon-cyan shadow-[0_0_16px_rgba(34,211,238,0.2)]"
+                    : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-600 hover:text-slate-200"
+                )}
+              >
+                Acesso à rede (2.0)
+                <span className="mt-0.5 block text-[10px] font-normal opacity-80">
+                  {TOTAL_SIMULADO_MODULE2} questões · L2–WLAN
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSource("module3")}
+                className={cn(
+                  "rounded-xl border px-3 py-3 text-left text-sm font-bold transition-all",
+                  source === "module3"
+                    ? "border-amber-400/60 bg-amber-400/15 text-amber-300 shadow-[0_0_16px_rgba(251,191,36,0.2)]"
+                    : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-600 hover:text-slate-200"
+                )}
+              >
+                Conectividade IP (3.0)
+                <span className="mt-0.5 block text-[10px] font-normal opacity-80">
+                  {TOTAL_SIMULADO_MODULE3} questões · static–TShoot
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSource("module4")}
+                className={cn(
+                  "rounded-xl border px-3 py-3 text-left text-sm font-bold transition-all",
+                  source === "module4"
+                    ? "border-sky-400/60 bg-sky-400/15 text-sky-300 shadow-[0_0_16px_rgba(56,189,248,0.2)]"
+                    : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-600 hover:text-slate-200"
+                )}
+              >
+                Serviços IP (4.0)
+                <span className="mt-0.5 block text-[10px] font-normal opacity-80">
+                  {TOTAL_SIMULADO_MODULE4} questões · NAT–QoS
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSource("module5")}
+                className={cn(
+                  "rounded-xl border px-3 py-3 text-left text-sm font-bold transition-all",
+                  source === "module5"
+                    ? "border-rose-400/60 bg-rose-400/15 text-rose-300 shadow-[0_0_16px_rgba(251,113,133,0.2)]"
+                    : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-600 hover:text-slate-200"
+                )}
+              >
+                Segurança (5.0)
+                <span className="mt-0.5 block text-[10px] font-normal opacity-80">
+                  {TOTAL_SIMULADO_MODULE5} questões · ACL–VPN
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSource("module6")}
+                className={cn(
+                  "rounded-xl border px-3 py-3 text-left text-sm font-bold transition-all",
+                  source === "module6"
+                    ? "border-violet-400/60 bg-violet-400/15 text-violet-300 shadow-[0_0_16px_rgba(167,139,250,0.2)]"
+                    : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-600 hover:text-slate-200"
+                )}
+              >
+                Automação (6.0)
+                <span className="mt-0.5 block text-[10px] font-normal opacity-80">
+                  {TOTAL_SIMULADO_MODULE6} questões · SDN–YANG
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSource("legacy")}
+                className={cn(
+                  "rounded-xl border px-3 py-3 text-left text-sm font-bold transition-all",
+                  source === "legacy"
+                    ? "border-neon-cyan bg-neon-cyan/15 text-neon-cyan shadow-[0_0_16px_rgba(34,211,238,0.2)]"
+                    : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-600 hover:text-slate-200"
+                )}
+              >
+                Banco completo
+                <span className="mt-0.5 block text-[10px] font-normal opacity-80">
+                  {TOTAL_SIMULADO_LEGACY} questões · FINAL + m2–m6
+                </span>
+              </button>
+            </div>
+          </div>
+          )}
 
           {/* Count selector */}
           <div className="mb-5">
@@ -281,7 +491,7 @@ export function SimuladoMode({
                     : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-600 hover:text-slate-200"
                 )}
               >
-                Todas ({TOTAL_SIMULADO_QUESTIONS})
+                Todas ({poolTotal})
               </button>
             </div>
           </div>
@@ -335,8 +545,18 @@ export function SimuladoMode({
         </div>
 
         <div className="rounded-xl border border-dashed border-slate-800 bg-slate-900/30 px-4 py-3 text-center text-[11px] text-slate-500">
-          Banco: {TOTAL_SIMULADO_QUESTIONS} questões · embaralhadas a cada
-          simulado · feedback + explicação profunda após responder
+          {track === "ccna-v2" ? (
+            <>
+              Banco: {poolTotal} traditional · sessão com mix ~
+              {Math.round(V2_SIMULADO_TICKET_RATIO * 100)}% tickets (diagnóstico)
+              · embaralhada a cada simulado
+            </>
+          ) : (
+            <>
+              Banco: {poolTotal} questões · embaralhadas a cada simulado · drill
+              de subnetting fica só no Estudo (parte 1.4)
+            </>
+          )}
         </div>
       </motion.div>
     );
@@ -354,6 +574,9 @@ export function SimuladoMode({
         timerExpired={timerExpired}
         elapsedSeconds={elapsedSeconds}
         wrongCountForReview={wrongQuestions.length}
+        troubleshootingCount={
+          track === "ccna-v2" ? sessionTicketCount : undefined
+        }
         onReviewErrors={startReview}
         onNewSimulado={handleNewSimulado}
         onBackToStart={handleNewSimulado}
@@ -377,6 +600,8 @@ export function SimuladoMode({
   if (!question) return null;
 
   const prompt = getQuestionPrompt(question);
+  const isTicket =
+    question.question_type === "ticket" || !isTraditionalQuestion(question);
   const timerUrgent = timerEnabled && secondsLeft <= 60;
 
   return (
@@ -396,7 +621,9 @@ export function SimuladoMode({
                 {correctCount > 0 && (
                   <span className="text-neon-green">{correctCount} acertos · </span>
                 )}
-                Prova traditional
+                {track === "ccna-v2"
+                  ? "Mix v2.0 · ~30% troubleshooting"
+                  : "Prova traditional"}
               </p>
             </div>
           </div>
@@ -433,13 +660,18 @@ export function SimuladoMode({
         </div>
         <Progress value={progressPct} className="mb-3 h-1.5 bg-slate-800" />
 
+        {isTicket && (
+          <span className="mb-2 inline-block rounded-md border border-neon-green/30 bg-neon-green/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-neon-green">
+            Troubleshooting
+          </span>
+        )}
         <h1 className="text-sm font-medium leading-relaxed text-slate-100 sm:text-base">
           <span className="mr-1.5 text-neon-green">#</span>
           {prompt}
         </h1>
       </div>
 
-      {/* Alternatives — no CLI, no deep explanation */}
+      {/* Alternatives (+ CLI se ticket) */}
       <AnimatePresence mode="wait">
         <motion.div
           key={question.id}
@@ -449,8 +681,12 @@ export function SimuladoMode({
           transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           className="space-y-2.5"
         >
+          {isTicket && question.cli_output && (
+            <TerminalCLI output={question.cli_output} />
+          )}
+
           <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-            Selecione a resposta
+            {isTicket ? "Selecione o diagnóstico" : "Selecione a resposta"}
           </p>
 
           {question.alternativas.map((alt, index) => {

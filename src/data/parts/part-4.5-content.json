@@ -1,0 +1,139 @@
+{
+  "part_id": "4.5",
+  "title": "QoS (PHB) e TFTP/FTP",
+  "blueprint_module": "4.0",
+  "weight_percent": 10,
+  "topic_list": [
+    "Por que QoS existe: congestão e tráfego sensível a atraso",
+    "Best-effort vs voz/vídeo (requisitos de latência/jitter/perda)",
+    "Classificar e marcar: base do PHB",
+    "DSCP (L3) e CoS (L2) — conceito de marking",
+    "Trust boundary: onde a marca é aceita ou reescrita",
+    "Queuing e prioridade: ideia de fila preferencial",
+    "Policing vs shaping (drop/remark vs buffer/delay)",
+    "“Só aumentar banda” não substitui política de QoS",
+    "TFTP: UDP, simples, image/config backup",
+    "FTP: TCP, autenticação, controle e dados",
+    "TFTP vs FTP: confiabilidade, auth, uso no CCNA",
+    "Falhas: trust errado, ACL bloqueando TFTP/FTP, servidor errado"
+  ],
+  "study_notes": [
+    {
+      "heading": "Por que QoS no CCNA",
+      "bullets": [
+        "Em links congestionados, o roteador/switch decide o que transmitir, enfileirar ou descartar.",
+        "Best-effort trata todos os pacotes iguais — adequado a bulk, ruim para voz em congestão.",
+        "Voz e vídeo interativo sofrem com atraso (latency), variação (jitter) e perda de pacotes.",
+        "QoS não cria banda infinita: prioriza e gerencia o uso da banda existente sob contenção.",
+        "Sem congestão, o efeito prático do QoS é menor — o exame foca o comportamento quando há disputa."
+      ],
+      "exam_tips": [
+        "QoS importa na fila: quem sai primeiro e quem é dropado sob load."
+      ]
+    },
+    {
+      "heading": "PHB: classificar, marcar, tratar",
+      "bullets": [
+        "Per-Hop Behavior (PHB): em cada hop, o device trata o pacote conforme classe/marca.",
+        "Classificar: identificar o fluxo (porta, ACL, protocolo, marca existente) — conceito, sem MQC completo.",
+        "Marcar (marking): gravar DSCP no IP ou CoS no frame 802.1Q para hops seguintes honrarem a classe.",
+        "DSCP = marcação L3 (viaja com o pacote IP); CoS = marcação L2 no trunk (pode se perder sem VLAN tag).",
+        "Tratar: enfileirar com prioridade, limitar taxa, modelar saída — ações de política por classe."
+      ],
+      "exam_tips": [
+        "Marking cedo + hops que confiam na marca = PHB consistente fim a fim no desenho."
+      ]
+    },
+    {
+      "heading": "Trust boundary",
+      "bullets": [
+        "Trust boundary: ponto da rede onde se decide se a marca do endpoint é aceita (trusted) ou reescrita.",
+        "Endpoints de usuário podem marcar DSCP de forma arbitrária — edge costuma remarcar ou confiar só em portas de IP phone/WLC.",
+        "Se o access switch não confia e zera a marca, a voz vira best-effort no core mesmo com telefone “marcado”.",
+        "Trust errado = sintomas de qualidade ruim apesar de “QoS no core” configurado em teoria.",
+        "Conceito de prova: confiar na porta certa; não confiar cegamente em toda a LAN."
+      ],
+      "exam_tips": [
+        "Voz sem prioridade no congestionamento → verifique se a marca sobreviveu ao access (trust)."
+      ]
+    },
+    {
+      "heading": "Queuing, policing e shaping",
+      "bullets": [
+        "Queuing: filas separadas; fila de prioridade (ex.: LLQ conceitual) serve voz antes de bulk.",
+        "Sem fila prioritária, pacotes de voz competem com backup/FTP e sofrem jitter/perda.",
+        "Policing: limita taxa; excesso tipicamente dropado ou re-marcado — pode ser abrupto.",
+        "Shaping: limita taxa média bufferizando o excesso — suaviza picos, adiciona atraso em troca de menos drop imediato.",
+        "Policing “corta”; shaping “atrasa e alisa”. Ambos controlam taxa, com efeitos diferentes em tempo real.",
+        "Não exija sintaxe MQC completa no CCNA — cobre o comportamento e a escolha conceitual."
+      ],
+      "exam_tips": [
+        "Drop duro de excesso → policing; suavizar burst com buffer → shaping."
+      ]
+    },
+    {
+      "heading": "TFTP no trabalho do CCNA",
+      "bullets": [
+        "TFTP (Trivial File Transfer Protocol) usa UDP, implementação simples, sem autenticação forte de usuário.",
+        "Uso clássico: copiar IOS image, backup/restore de startup-config, arquivos de lab.",
+        "Comando mental: copy tftp: flash: / copy flash: tftp: (e variações com endereço do servidor).",
+        "Por ser UDP e “aberto”, depende de rede limpa e frequentemente de ACL permitindo o tráfego TFTP.",
+        "Falha comum: IP do servidor errado, arquivo inexistente, UDP bloqueado, interface de origem errada."
+      ],
+      "exam_tips": [
+        "TFTP = simples e sem auth robusta; ideal em lab controlado, não em Internet hostil."
+      ]
+    },
+    {
+      "heading": "FTP e comparação com TFTP",
+      "bullets": [
+        "FTP usa TCP, com autenticação de usuário/senha e canais de controle e dados.",
+        "Mais robusto em retransmissão (TCP) e com controle de acesso básico por conta.",
+        "No CCNA aparece em transferência de arquivos quando se exige login ou quando o desenho usa servidor FTP.",
+        "copy ftp: / suporte a cliente FTP no IOS (conforme plataforma) — foque o conceito de uso.",
+        "TFTP: leve, UDP, sem auth forte. FTP: TCP, auth, mais “pesado” e firewall-sensitive (portas de dados).",
+        "Escolha errada: expor TFTP na Internet; ou esperar auth no TFTP como no FTP."
+      ],
+      "exam_tips": [
+        "Prova: TFTP=UDP/simples; FTP=TCP/autenticado — case de image/config costuma citar TFTP."
+      ]
+    },
+    {
+      "heading": "Falhas e mitos",
+      "bullets": [
+        "Mito: “só aumentar a banda resolve voz” — sem política, um bulk ainda pode encher o buffer no pico.",
+        "Trust boundary errado apaga marking antes do PHB do core.",
+        "Policing agressivo em voz piora MOS/perda; shaping excessivo aumenta atraso.",
+        "copy tftp falha com %Error opening / timeout → servidor, nome do arquivo, UDP/ACL, reachability.",
+        "FTP falha por usuário/senha, modo ativo/passivo atrás de firewall, TCP bloqueado — eixos diferentes do TFTP.",
+        "show interfaces: drops/output queue podem contextualizar congestão (leitura leve, sem lab MQC)."
+      ],
+      "exam_tips": [
+        "Isole: qualidade de mídia (QoS) vs falha de transferência de arquivo (TFTP/FTP/path)."
+      ]
+    }
+  ],
+  "key_commands": [
+    "copy tftp: flash:",
+    "copy flash: tftp:",
+    "copy tftp: startup-config",
+    "copy startup-config tftp:",
+    "copy ftp: flash:",
+    "copy flash: ftp:",
+    "show flash:",
+    "show file systems",
+    "show interfaces",
+    "show running-config | include tftp|ftp",
+    "ping <servidor>",
+    "dir flash:"
+  ],
+  "must_know": [
+    "QoS gerencia congestão: classifica/marca e trata classes (voz vs best-effort); não cria banda infinita.",
+    "Marking: DSCP (L3) e CoS (L2); trust boundary define se a marca do endpoint é honrada.",
+    "Queuing prioritária reduz atraso/jitter de voz sob load; sem ela, voz compete com bulk.",
+    "Policing: limita e costuma dropar/remark excesso; shaping: bufferiza e suaviza, podendo atrasar.",
+    "TFTP: UDP, simples, sem auth forte — image/config em lab e ops controladas.",
+    "FTP: TCP, autenticação, mais confiável no transporte; firewall/auth importam.",
+    "Falhas típicas: trust perdido, só “mais banda”, TFTP bloqueado (UDP/ACL/IP), confusão TFTP↔FTP."
+  ]
+}

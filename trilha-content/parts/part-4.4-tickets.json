@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4401 — “Habilitamos SSH” mas o cliente reporta serviço indisponível. VTY já tem transport input ssh.",
+    "cli_output": "R1# show ip ssh\nSSH Disabled - version 2.0\n%Please create RSA keys to enable SSH (and of atleast 768 bits for SSHv2).\nAuthentication timeout: 120 secs; Authentication retries: 3\n\nR1# show run | include hostname|domain-name|crypto|username|ip ssh\nhostname Router\n! sem ip domain-name\nusername admin secret 5 $1$abcd$efghijklm\nip ssh version 2\n! sem crypto key / sem rsa key pair\n\nR1# show run | section line vty\nline vty 0 4\n login local\n transport input ssh\n\nR1# show users\n    Line       User       Host(s)              Idle       Location\n*  0 con 0                idle                 00:00:00\n\nR1# show access-lists\n! (vazio — sem access-class)",
+    "alternativas": [
+      "transport input está telnet only no section vty",
+      "login local está ausente",
+      "access-class deny any bloqueia o admin",
+      "SSH Disabled por falta de chave RSA e ip domain-name ausente — pré-requisitos de crypto incompletos"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "show ip ssh pede RSA keys; running sem crypto key e sem domain-name. VTY já tem login local e transport ssh; sem ACL. username existe. O gap é o engine SSH (hostname genérico Router + sem domain-name/chave), não a VTY em si.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4402 — Cliente SSH é recusado; Telnet ainda abre e pede senha. Auditoria de hardening falhou.",
+    "cli_output": "R1# show ip ssh\nSSH Enabled - version 2.0\nAuthentication methods: publickey,keyboard-interactive,password\nAuthentication timeout: 120 secs; Authentication retries: 3\nMinimum expected Diffie Hellman key size : 1024 bits\nIOS Keys in SECSH format(ssh-rsa, base64 encoded): MIIBIjANBgkqh...\n\nR1# show run | section line vty\nline vty 0 4\n password cisco\n login\n transport input telnet\n\nR1# show run | include username|domain-name|hostname|ip ssh\nhostname Edge1\nip domain-name lab.local\nip ssh version 2\nusername admin secret 5 $1$xxxx$yyyy\n\nR1# show access-lists\nStandard IP access list 10\n    10 permit 10.0.0.0, wildcard bits 0.0.0.255",
+    "alternativas": [
+      "SSH Disabled no show ip ssh",
+      "transport input telnet only — SSH recusado na VTY; Telnet cleartext ainda aceito (chave/engine ok)",
+      "Falta username na running",
+      "domain-name e hostname ausentes"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "SSH Enabled com chave; hostname/domain/user ok. VTY com transport input telnet e login+password legado — só Telnet entra. access-list 10 existe mas não está aplicada no section vty deste recorte. Hardening: transport input ssh e login local.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4403 — Handshake SSH parece ok, mas Authentication failed para todos os técnicos. Ninguém criou usuários locais.",
+    "cli_output": "SW1# show ip ssh\nSSH Enabled - version 2.0\nAuthentication timeout: 120 secs; Authentication retries: 3\n\nSW1# show run | section line vty\nline vty 0 15\n login local\n transport input ssh\n\nSW1# show run | include username|hostname|domain-name|crypto|ip ssh\nhostname Access1\nip domain-name corp.internal\nip ssh version 2\n! crypto key presente (par rsa já gerado em boot — omitido por tamanho)\n! nenhuma linha username\n\nSW1# show users\n    Line       User       Host(s)              Idle       Location\n*  0 con 0                idle                 00:00:12\n\nSW1# show access-lists\n! (nenhuma ACL)\n\n! Cliente: ssh admin@10.1.1.2 → Permission denied (password / auth fail)",
+    "alternativas": [
+      "SSH Disabled por falta de versão 2",
+      "transport input telnet no section",
+      "login local sem nenhum username na running — database local vazio; autenticação VTY falha",
+      "access-class 99 in bloqueia conforme show run vty"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Engine SSH enabled e VTY com login local + transport ssh, mas zero username. login local sem usuários = Authentication failed. Sem ACL/access-class no recorte. Correção: username <user> secret … (e senha correta no client).",
+    "part_id": "4.4"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4404 — Admin 172.16.5.20 não consegue SSH; colega em 10.0.0.15 entra normal. Ping de ambos ao device ok.",
+    "cli_output": "R1# show ip ssh\nSSH Enabled - version 2.0\n\nR1# show run | section line vty\nline vty 0 4\n access-class 10 in\n login local\n transport input ssh\n\nR1# show access-lists 10\nStandard IP access list 10\n    10 permit 10.0.0.0, wildcard bits 0.0.0.255\n    20 deny   any\n\nR1# show run | include username|hostname|domain-name\nhostname Core1\nip domain-name lab.local\nusername netops secret 5 $1$aabb$ccdd\n\nR1# show users\n    Line       User       Host(s)              Idle       Location\n   2 vty 0     netops     idle                 00:01:00 10.0.0.15\n\n! Tentativa de 172.16.5.20: connection closed / refused by ACL behavior",
+    "alternativas": [
+      "access-class 10 permite só 10.0.0.0/24 — 172.16.5.20 cai no deny any; sessão de 10.0.0.15 no show users confirma",
+      "Falta transport input ssh",
+      "SSH Disabled no show ip ssh",
+      "username netops ausente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "SSH enabled, login local, user ok, transport ssh. ACL 10 + access-class: permit 10.0.0.0/24, deny any. 172.16.5.20 bloqueado; 10.0.0.15 conectado na VTY. Ping ok isola o problema no filtro de gerência, não no path L3 genérico.",
+    "part_id": "4.4"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4405 — Política exige SSHv2; auditor encontra SSH disabled e reclamação de “version 1 only” em backup antigo. Estado atual no device:",
+    "cli_output": "R1# show ip ssh\nSSH Disabled - version 1.99\n%Please create RSA keys to enable SSH.\nAuthentication timeout: 120 secs; Authentication retries: 3\n\nR1# show run | include ip ssh|hostname|domain-name|crypto|username\nhostname BR1\nip domain-name branch.example\nip ssh version 1\nusername admin secret 5 $1$zzzz$wwww\n! sem chave RSA na config (key pair ausente)\n\nR1# show run | section line vty\nline vty 0 4\n login local\n transport input ssh\n\nR1# show access-lists\n! vazio\n\nR1# show users\n*  0 con 0                idle                 00:00:00",
+    "alternativas": [
+      "SSH Enabled version 2 com chave 2048 visível no show ip ssh",
+      "transport input telnet only impede qualquer menção a ssh na VTY",
+      "SSH Disabled, ip ssh version 1 na running e sem chave RSA — serviço inativo/legado; VTY já pede ssh+login local",
+      "access-class é a única causa e aparece no section vty"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "show ip ssh: Disabled e pedido de RSA; running com ip ssh version 1 e sem key pair. VTY já está ssh+login local; ACL vazia. Corrija: gerar chave, ip ssh version 2, revalidar show ip ssh Enabled. Não é transport telnet nem access-class neste output.",
+    "part_id": "4.4"
+  }
+]

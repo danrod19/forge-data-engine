@@ -13,32 +13,47 @@ import {
   XCircle,
   RotateCcw,
   Calendar,
+  Calculator,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
-  CCNA_DOMAINS,
-  domainAccentClasses,
-  type CcnaDomain,
-  type DomainId,
-} from "@/data/domains";
+  ALL_STUDY_PARTS,
+  V2_STUDY_TOTAL,
+  pickPartPracticeQuestions,
+  pickDrillQuestions,
+  getPartQuestions,
+  partAccentClasses,
+  type StudyPartManifest,
+} from "@/data/estudo-module1";
+import { module1DrillQuestions } from "@/data/module1-traditional";
 import {
-  filterQuestionsByDomain,
-  pickDomainPracticeQuestions,
-} from "@/lib/domain-questions";
+  awsDomains,
+  getAwsDomainById,
+  countQuestionsForAwsDomain,
+  filterQuestionsForAwsDomain,
+  awsDomainAccentClasses,
+  type AwsStudyDomain,
+} from "@/data/domains-aws";
+import {
+  awsTraditionalQuestions,
+  TOTAL_AWS_TRADITIONAL,
+} from "@/data/aws-banks";
 import type { Question } from "@/types/question";
 import { getQuestionPrompt } from "@/types/question";
 import { playCorrectSound, playWrongSound } from "@/lib/sounds";
 import {
-  loadEstudoProgress,
+  loadEstudoProgressForTrack,
   recordDomainPractice,
   getDomainProgress,
   getDomainProgressPercent,
   getOverallProgressPercent,
   formatLastPracticed,
   type EstudoProgressMap,
+  type EstudoTrackId,
 } from "@/lib/estudo-progress";
+import { useTrack, type TrackId } from "@/lib/track-context";
 
 type View = "list" | "detail" | "practice" | "result";
 
@@ -48,15 +63,50 @@ interface AnswerRecord {
   correct: boolean;
 }
 
+interface AccentStyle {
+  border: string;
+  bg: string;
+  text: string;
+  glow: string;
+  bar: string;
+}
+
 interface EstudoModeProps {
   lives: number;
   onWrongAnswer: () => void;
   disabled: boolean;
 }
 
+function pickRandom(pool: Question[], n: number): Question[] {
+  const copy = [...pool];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, Math.min(n, copy.length));
+}
+
+function trackToEstudo(track: TrackId): EstudoTrackId {
+  return track;
+}
+
 export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
+  const { track } = useTrack();
+  const isAws = track === "aws";
+  const estudoTrack = trackToEstudo(track);
+
   const [view, setView] = useState<View>("list");
-  const [selectedDomain, setSelectedDomain] = useState<CcnaDomain | null>(null);
+  const [selectedPart, setSelectedPart] = useState<StudyPartManifest | null>(
+    null
+  );
+  const [selectedAwsDomain, setSelectedAwsDomain] =
+    useState<AwsStudyDomain | null>(null);
+  /** part_id, domain id ou "1.4-drill" */
+  const [practiceKey, setPracticeKey] = useState<string>("");
+  const [practiceLabel, setPracticeLabel] = useState("");
+  const [practiceAccent, setPracticeAccent] = useState<AccentStyle | null>(
+    null
+  );
   const [practiceQuestions, setPracticeQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -64,59 +114,175 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [progressMap, setProgressMap] = useState<EstudoProgressMap>({});
   const [hydrated, setHydrated] = useState(false);
-  /** Evita gravar a mesma sessão de resultado mais de uma vez */
   const progressSavedRef = useRef(false);
 
-  // Carrega progresso real do localStorage (client-only)
-  useEffect(() => {
-    setProgressMap(loadEstudoProgress());
-    setHydrated(true);
-  }, []);
+  // Known progress keys depend on track
+  const knownProgressIds = useMemo(() => {
+    if (isAws) return awsDomains.map((d) => d.id);
+    return [
+      ...ALL_STUDY_PARTS.map((p) => p.part_id),
+      "1.4-drill",
+    ];
+  }, [isAws]);
 
-  const domainCounts = useMemo(() => {
-    const map = new Map<DomainId, number>();
-    for (const d of CCNA_DOMAINS) {
-      map.set(d.id, filterQuestionsByDomain(d).length);
+  // Reload progress when track changes (component also remounts via page key)
+  useEffect(() => {
+    setProgressMap(loadEstudoProgressForTrack(estudoTrack, knownProgressIds));
+    setHydrated(true);
+    setView("list");
+    setSelectedPart(null);
+    setSelectedAwsDomain(null);
+    setPracticeQuestions([]);
+    setPracticeKey("");
+  }, [estudoTrack, knownProgressIds]);
+
+  // ─── CCNA parts ───────────────────────────────────────────
+  const allParts = useMemo(() => ALL_STUDY_PARTS, []);
+
+  const partsByModule = useMemo(() => {
+    const map = new Map<string, StudyPartManifest[]>();
+    for (const p of allParts) {
+      const mod =
+        "blueprint_module" in p && p.blueprint_module
+          ? String(p.blueprint_module)
+          : p.part_id.startsWith("v2-")
+            ? p.part_id.slice(3, 4) + ".0"
+            : p.part_id.split(".")[0] + ".0";
+      if (!map.has(mod)) map.set(mod, []);
+      map.get(mod)!.push(p);
+    }
+    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
+  }, [allParts]);
+
+  const partCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const p of allParts) {
+      map.set(p.part_id, getPartQuestions(p.part_id).length);
+    }
+    map.set("1.4-drill", module1DrillQuestions.length);
+    return map;
+  }, [allParts]);
+
+  // ─── AWS domains ──────────────────────────────────────────
+  const awsDomainCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const d of awsDomains) {
+      map.set(d.id, countQuestionsForAwsDomain(awsTraditionalQuestions, d));
     }
     return map;
   }, []);
 
   const poolTotals = useMemo(() => {
-    const totals: Partial<Record<DomainId, number>> = {};
-    for (const d of CCNA_DOMAINS) {
-      totals[d.id] = domainCounts.get(d.id) ?? 0;
+    const totals: Record<string, number> = {};
+    if (isAws) {
+      for (const d of awsDomains) {
+        totals[d.id] = awsDomainCounts.get(d.id) ?? 0;
+      }
+    } else {
+      for (const p of allParts) {
+        totals[p.part_id] = partCounts.get(p.part_id) ?? 0;
+      }
     }
     return totals;
-  }, [domainCounts]);
+  }, [isAws, allParts, partCounts, awsDomainCounts]);
 
   const overallProgress = useMemo(
-    () => getOverallProgressPercent(progressMap, poolTotals),
-    [progressMap, poolTotals]
+    () =>
+      getOverallProgressPercent(
+        progressMap,
+        poolTotals,
+        isAws
+          ? awsDomains.map((d) => d.id)
+          : allParts.map((p) => p.part_id)
+      ),
+    [progressMap, poolTotals, isAws, allParts]
   );
 
   const getEntry = useCallback(
-    (domainId: DomainId) =>
-      getDomainProgress(progressMap, domainId, poolTotals[domainId] ?? 0),
-    [progressMap, poolTotals]
+    (id: string, fallbackTotal = 0) =>
+      getDomainProgress(progressMap, id, fallbackTotal),
+    [progressMap]
   );
 
-  const openDomain = (domain: CcnaDomain) => {
-    setSelectedDomain(domain);
+  const openPart = (part: StudyPartManifest) => {
+    setSelectedPart(part);
+    setSelectedAwsDomain(null);
     setView("detail");
   };
 
-  const startPractice = useCallback((domain: CcnaDomain) => {
-    const picked = pickDomainPracticeQuestions(domain.id, 15);
-    if (picked.length === 0) return;
-    progressSavedRef.current = false;
-    setPracticeQuestions(picked);
-    setCurrentIndex(0);
-    setSelected(null);
-    setHasAnswered(false);
-    setAnswers([]);
-    setSelectedDomain(domain);
-    setView("practice");
-  }, []);
+  const openAwsDomain = (domain: AwsStudyDomain) => {
+    setSelectedAwsDomain(domain);
+    setSelectedPart(null);
+    setView("detail");
+  };
+
+  const beginPractice = useCallback(
+    (opts: {
+      key: string;
+      label: string;
+      questions: Question[];
+      accent: AccentStyle;
+      part?: StudyPartManifest | null;
+      domain?: AwsStudyDomain | null;
+    }) => {
+      if (opts.questions.length === 0) return;
+      progressSavedRef.current = false;
+      setPracticeQuestions(opts.questions);
+      setPracticeKey(opts.key);
+      setPracticeLabel(opts.label);
+      setPracticeAccent(opts.accent);
+      setCurrentIndex(0);
+      setSelected(null);
+      setHasAnswered(false);
+      setAnswers([]);
+      if (opts.part !== undefined) setSelectedPart(opts.part);
+      if (opts.domain !== undefined) setSelectedAwsDomain(opts.domain);
+      setView("practice");
+    },
+    []
+  );
+
+  const startCcnaPractice = useCallback(
+    (part: StudyPartManifest, mode: "part" | "drill" = "part") => {
+      const picked =
+        mode === "drill"
+          ? pickDrillQuestions(15)
+          : pickPartPracticeQuestions(part.part_id, 15);
+      const accent = partAccentClasses(part.accent);
+      beginPractice({
+        key: mode === "drill" ? "1.4-drill" : part.part_id,
+        label:
+          mode === "drill"
+            ? "Drill de subnetting"
+            : `${part.part_id} · ${part.title}`,
+        questions: picked,
+        accent,
+        part,
+        domain: null,
+      });
+    },
+    [beginPractice]
+  );
+
+  const startAwsPractice = useCallback(
+    (domain: AwsStudyDomain) => {
+      const filtered = filterQuestionsForAwsDomain(
+        awsTraditionalQuestions,
+        domain
+      );
+      const picked = pickRandom(filtered, 15);
+      const accent = awsDomainAccentClasses(domain.accent);
+      beginPractice({
+        key: domain.id,
+        label: `${domain.name}`,
+        questions: picked,
+        accent,
+        part: null,
+        domain,
+      });
+    },
+    [beginPractice]
+  );
 
   const question = practiceQuestions[currentIndex];
   const total = practiceQuestions.length;
@@ -127,21 +293,35 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
       : 0;
 
   const persistSessionProgress = useCallback(
-    (domain: CcnaDomain, sessionAnswers: AnswerRecord[]) => {
+    (key: string, sessionAnswers: AnswerRecord[]) => {
       if (progressSavedRef.current) return;
       const correctIds = sessionAnswers
         .filter((a) => a.correct)
         .map((a) => a.questionId);
-      const poolTotal = filterQuestionsByDomain(domain).length;
+
+      let poolTotal = 0;
+      if (isAws) {
+        const domain = getAwsDomainById(key);
+        poolTotal = domain
+          ? countQuestionsForAwsDomain(awsTraditionalQuestions, domain)
+          : 0;
+      } else if (key === "1.4-drill") {
+        poolTotal = module1DrillQuestions.length;
+      } else {
+        poolTotal = getPartQuestions(key).length;
+      }
+
       const next = recordDomainPractice(progressMap, {
-        domainId: domain.id,
+        domainId: key,
         correctQuestionIds: correctIds,
         poolTotal,
+        storage: "track",
+        track: estudoTrack,
       });
       setProgressMap(next);
       progressSavedRef.current = true;
     },
-    [progressMap]
+    [progressMap, isAws, estudoTrack]
   );
 
   const handleSelect = (index: number) => {
@@ -163,9 +343,8 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
 
   const handleNext = () => {
     if (currentIndex + 1 >= total) {
-      if (selectedDomain) {
-        // Inclui a resposta atual (já em answers) e grava progresso
-        persistSessionProgress(selectedDomain, answers);
+      if (practiceKey) {
+        persistSessionProgress(practiceKey, answers);
       }
       setView("result");
       return;
@@ -175,24 +354,23 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
     setHasAnswered(false);
   };
 
-  // Quando a última resposta acaba de ser registrada e o user clica "Ver resultado",
-  // answers já está atualizado. Mas se handleNext roda no mesmo tick após setAnswers
-  // de uma resposta anterior, answers está completo. OK.
-  // Edge case: se o user responde a última e clica next, answers includes last.
-  // Good.
-
-  // Se chegar em result sem ter salvo (ex.: re-render), garante save
   useEffect(() => {
-    if (view === "result" && selectedDomain && answers.length > 0) {
-      persistSessionProgress(selectedDomain, answers);
+    if (view === "result" && practiceKey && answers.length > 0) {
+      persistSessionProgress(practiceKey, answers);
     }
-  }, [view, selectedDomain, answers, persistSessionProgress]);
+  }, [view, practiceKey, answers, persistSessionProgress]);
 
   const backToList = () => {
     setView("list");
-    setSelectedDomain(null);
+    setSelectedPart(null);
+    setSelectedAwsDomain(null);
     setPracticeQuestions([]);
+    setPracticeKey("");
+    setPracticeAccent(null);
   };
+
+  const titleLabel = isAws ? "AWS SAA" : "CCNA";
+  const titleAccent = isAws ? "text-amber-300" : "text-neon-green";
 
   // ─── LIST ─────────────────────────────────────────────────
   if (view === "list") {
@@ -204,15 +382,31 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
       >
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 terminal-glow">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex size-11 items-center justify-center rounded-xl border border-neon-green/30 bg-neon-green/10 shadow-[0_0_18px_rgba(34,197,94,0.15)]">
-              <BookOpen className="size-5 text-neon-green" />
+            <div
+              className={cn(
+                "flex size-11 items-center justify-center rounded-xl border shadow-[0_0_18px_rgba(34,197,94,0.15)]",
+                isAws
+                  ? "border-amber-400/30 bg-amber-400/10"
+                  : "border-neon-green/30 bg-neon-green/10"
+              )}
+            >
+              <BookOpen
+                className={cn(
+                  "size-5",
+                  isAws ? "text-amber-300" : "text-neon-green"
+                )}
+              />
             </div>
             <div>
               <h1 className="text-lg font-bold text-slate-50">
-                Estudo por <span className="text-neon-green">Tópicos</span>
+                Estudo · <span className={titleAccent}>{titleLabel}</span>
               </h1>
               <p className="text-xs text-slate-500">
-                Domínios CCNA 200-301 · progresso salvo neste dispositivo
+                {isAws
+                  ? `SAA-C03 Foundations · ${awsDomains.length} domínios · ${TOTAL_AWS_TRADITIONAL} questões`
+                  : track === "ccna-v2"
+                    ? `CCNA 200-301 v2.0 · ${allParts.length} parts · ${V2_STUDY_TOTAL} questões`
+                    : `CCNA 200-301 · ${allParts.length} parts · ${V2_STUDY_TOTAL} questões no banco`}
               </p>
             </div>
           </div>
@@ -228,103 +422,209 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
             className="h-1.5 bg-slate-800"
           />
           <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
-            Acertos únicos contam para o domínio. Pratique, revise erros e
-            feche lacunas antes do simulado completo.
+            {isAws
+              ? "Pratique por domínio AWS (parts 1.1–1.12). Progresso salvo neste dispositivo · track AWS."
+              : "Pratique por part_id. Progresso namespaced por track (V1/V2)."}
           </p>
         </div>
 
-        <div className="space-y-3">
-          {CCNA_DOMAINS.map((domain, i) => {
-            const accent = domainAccentClasses(domain.accent);
-            const qCount = domainCounts.get(domain.id) ?? 0;
-            const entry = getEntry(domain.id);
-            const pct = hydrated ? getDomainProgressPercent(entry) : 0;
-            const last = formatLastPracticed(entry.lastPracticed);
+        {isAws
+          ? awsDomains.map((domain, i) => {
+              const accent = awsDomainAccentClasses(domain.accent);
+              const qCount = awsDomainCounts.get(domain.id) ?? 0;
+              const entry = getEntry(domain.id, qCount);
+              const pct = hydrated ? getDomainProgressPercent(entry) : 0;
+              const last = formatLastPracticed(entry.lastPracticed);
 
-            return (
-              <motion.button
-                key={domain.id}
-                type="button"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04 }}
-                onClick={() => openDomain(domain)}
-                className={cn(
-                  "w-full rounded-2xl border bg-slate-900/50 p-4 text-left transition-all hover:bg-slate-900/80",
-                  accent.border,
-                  accent.glow
-                )}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-1 flex flex-wrap items-center gap-2">
+              return (
+                <motion.button
+                  key={domain.id}
+                  type="button"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  onClick={() => openAwsDomain(domain)}
+                  className={cn(
+                    "w-full rounded-2xl border bg-slate-900/50 p-4 text-left transition-all hover:bg-slate-900/80",
+                    accent.border,
+                    accent.glow
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1 flex flex-wrap items-center gap-2">
+                        <span
+                          className={cn(
+                            "rounded-md border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider",
+                            accent.border,
+                            accent.bg,
+                            accent.text
+                          )}
+                        >
+                          {domain.partIds.join(" · ")}
+                        </span>
+                        <span className="text-[10px] text-slate-500">
+                          {qCount} questões · ~{domain.weightPct}% estudo
+                        </span>
+                      </div>
+                      <h2 className="text-sm font-bold text-slate-100">
+                        {domain.name}
+                      </h2>
+                      <p className="mt-2 line-clamp-2 text-[11px] leading-relaxed text-slate-500">
+                        {domain.description}
+                      </p>
+                    </div>
+                    <ChevronRight className="mt-1 size-4 shrink-0 text-slate-600" />
+                  </div>
+                  <div className="mt-3">
+                    <div className="mb-1 flex items-center justify-between gap-2 text-[10px] text-slate-500">
+                      <span className="tabular-nums">
+                        {hydrated
+                          ? `${entry.completed}/${entry.total || qCount} dominadas`
+                          : "…"}
+                      </span>
                       <span
                         className={cn(
-                          "rounded-md border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider",
-                          accent.border,
-                          accent.bg,
+                          "font-semibold tabular-nums",
                           accent.text
                         )}
                       >
-                        ~{domain.weightPct}%
-                      </span>
-                      <span className="text-[10px] text-slate-500">
-                        {qCount} questões
+                        {hydrated ? `${pct}%` : "—"}
                       </span>
                     </div>
-                    <h2 className="text-sm font-bold text-slate-100">
-                      {domain.name}
-                    </h2>
-                    <p className="mt-0.5 text-[11px] text-slate-400">
-                      {domain.namePt}
-                    </p>
-                    <p className="mt-2 line-clamp-2 text-[11px] leading-relaxed text-slate-500">
-                      {domain.description}
-                    </p>
+                    <div className="h-1 overflow-hidden rounded-full bg-slate-800">
+                      <div
+                        className={cn(
+                          "h-full rounded-full transition-all duration-500",
+                          accent.bar
+                        )}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    {last && (
+                      <p className="mt-1.5 flex items-center gap-1 text-[10px] text-slate-600">
+                        <Calendar className="size-2.5" />
+                        Última prática: {last}
+                      </p>
+                    )}
                   </div>
-                  <ChevronRight className="mt-1 size-4 shrink-0 text-slate-600" />
-                </div>
-                <div className="mt-3">
-                  <div className="mb-1 flex items-center justify-between gap-2 text-[10px] text-slate-500">
-                    <span className="tabular-nums">
-                      {hydrated
-                        ? `${entry.completed}/${entry.total || qCount} dominadas`
-                        : "…"}
-                    </span>
-                    <span className={cn("font-semibold tabular-nums", accent.text)}>
-                      {hydrated ? `${pct}%` : "—"}
-                    </span>
-                  </div>
-                  <div className="h-1 overflow-hidden rounded-full bg-slate-800">
-                    <div
+                </motion.button>
+              );
+            })
+          : partsByModule.map(([mod, parts]) => (
+              <div key={mod} className="space-y-3">
+                <p className="mt-4 px-1 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                  Módulo {mod}
+                </p>
+                {parts.map((part, i) => {
+                  const accent = partAccentClasses(part.accent);
+                  const qCount = partCounts.get(part.part_id) ?? 0;
+                  const entry = getEntry(part.part_id, qCount);
+                  const pct = hydrated ? getDomainProgressPercent(entry) : 0;
+                  const last = formatLastPracticed(entry.lastPracticed);
+                  const verb =
+                    "verb" in part && part.verb
+                      ? String(part.verb)
+                      : undefined;
+                  const tickets =
+                    "ticketCount" in part &&
+                    typeof part.ticketCount === "number"
+                      ? part.ticketCount
+                      : undefined;
+
+                  return (
+                    <motion.button
+                      key={part.part_id}
+                      type="button"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.03 }}
+                      onClick={() => openPart(part)}
                       className={cn(
-                        "h-full rounded-full transition-all duration-500",
-                        accent.bar
+                        "w-full rounded-2xl border bg-slate-900/50 p-4 text-left transition-all hover:bg-slate-900/80",
+                        accent.border,
+                        accent.glow
                       )}
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                  {last && (
-                    <p className="mt-1.5 flex items-center gap-1 text-[10px] text-slate-600">
-                      <Calendar className="size-2.5" />
-                      Última prática: {last}
-                    </p>
-                  )}
-                </div>
-              </motion.button>
-            );
-          })}
-        </div>
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-1 flex flex-wrap items-center gap-2">
+                            <span
+                              className={cn(
+                                "rounded-md border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider",
+                                accent.border,
+                                accent.bg,
+                                accent.text
+                              )}
+                            >
+                              {part.part_id}
+                            </span>
+                            {verb && (
+                              <span className="text-[10px] text-slate-500">
+                                {verb}
+                              </span>
+                            )}
+                            <span className="text-[10px] text-slate-500">
+                              {qCount} questões
+                              {tickets != null ? ` · ${tickets} tickets` : ""}
+                            </span>
+                          </div>
+                          <h2 className="text-sm font-bold text-slate-100">
+                            {part.title}
+                          </h2>
+                          <p className="mt-2 line-clamp-2 text-[11px] leading-relaxed text-slate-500">
+                            {part.description}
+                          </p>
+                        </div>
+                        <ChevronRight className="mt-1 size-4 shrink-0 text-slate-600" />
+                      </div>
+                      <div className="mt-3">
+                        <div className="mb-1 flex items-center justify-between gap-2 text-[10px] text-slate-500">
+                          <span className="tabular-nums">
+                            {hydrated
+                              ? `${entry.completed}/${entry.total || qCount} dominadas`
+                              : "…"}
+                          </span>
+                          <span
+                            className={cn(
+                              "font-semibold tabular-nums",
+                              accent.text
+                            )}
+                          >
+                            {hydrated ? `${pct}%` : "—"}
+                          </span>
+                        </div>
+                        <div className="h-1 overflow-hidden rounded-full bg-slate-800">
+                          <div
+                            className={cn(
+                              "h-full rounded-full transition-all duration-500",
+                              accent.bar
+                            )}
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        {last && (
+                          <p className="mt-1.5 flex items-center gap-1 text-[10px] text-slate-600">
+                            <Calendar className="size-2.5" />
+                            Última prática: {last}
+                          </p>
+                        )}
+                      </div>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            ))}
       </motion.div>
     );
   }
 
-  // ─── DETAIL ───────────────────────────────────────────────
-  if (view === "detail" && selectedDomain) {
-    const domain = selectedDomain;
-    const accent = domainAccentClasses(domain.accent);
-    const qCount = domainCounts.get(domain.id) ?? 0;
-    const entry = getEntry(domain.id);
+  // ─── DETAIL AWS ───────────────────────────────────────────
+  if (view === "detail" && isAws && selectedAwsDomain) {
+    const domain = selectedAwsDomain;
+    const accent = awsDomainAccentClasses(domain.accent);
+    const qCount = awsDomainCounts.get(domain.id) ?? 0;
+    const entry = getEntry(domain.id, qCount);
     const pct = hydrated ? getDomainProgressPercent(entry) : 0;
     const last = formatLastPracticed(entry.lastPracticed);
 
@@ -337,7 +637,7 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
         <button
           type="button"
           onClick={backToList}
-          className="flex items-center gap-1 text-xs text-slate-400 transition-colors hover:text-neon-green"
+          className="flex items-center gap-1 text-xs text-slate-400 transition-colors hover:text-amber-300"
         >
           <ChevronLeft className="size-4" />
           Todos os domínios
@@ -370,11 +670,13 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
                     accent.text
                   )}
                 >
-                  Peso ~{domain.weightPct}%
+                  {domain.partIds.join(" · ")}
                 </span>
               </div>
               <h1 className="text-lg font-bold text-slate-50">{domain.name}</h1>
-              <p className="text-xs text-slate-400">{domain.namePt}</p>
+              <p className="text-xs text-slate-400">
+                SAA Foundations · hint ~{domain.weightPct}% do estudo piloto
+              </p>
             </div>
           </div>
           <p className="text-[12px] leading-relaxed text-slate-400">
@@ -406,36 +708,24 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
 
         <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-4">
           <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-            Tópicos principais
+            Keywords / foco
           </p>
-          <ul className="space-y-2">
-            {domain.topics.map((topic) => (
+          <ul className="flex flex-wrap gap-1.5">
+            {domain.keywords.slice(0, 10).map((kw) => (
               <li
-                key={topic.id}
-                className="flex items-center gap-2 rounded-xl border border-slate-800/80 bg-slate-950/40 px-3 py-2.5"
+                key={kw}
+                className="rounded-md border border-slate-800 bg-slate-950/50 px-2 py-1 font-mono text-[10px] text-slate-400"
               >
-                <span
-                  className={cn(
-                    "size-1.5 shrink-0 rounded-full",
-                    accent.bar
-                  )}
-                />
-                <span className="text-xs font-medium text-slate-200">
-                  {topic.name}
-                </span>
+                {kw}
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-[10px] leading-relaxed text-slate-600">
-            O progresso é por domínio (questões únicas acertadas). Pratique para
-            aumentar o percentual.
-          </p>
         </div>
 
         <Button
           type="button"
           disabled={qCount === 0 || disabled}
-          onClick={() => startPractice(domain)}
+          onClick={() => startAwsPractice(domain)}
           className={cn(
             "h-12 w-full gap-2 rounded-xl border font-bold",
             accent.border,
@@ -445,28 +735,191 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
           )}
         >
           <Play className="size-4" fill="currentColor" />
-          Praticar questões deste domínio
+          Praticar este domínio
           {qCount > 0 && (
             <span className="text-[10px] font-normal opacity-80">
               (até {Math.min(15, qCount)})
             </span>
           )}
         </Button>
-        {qCount === 0 && (
-          <p className="text-center text-[11px] text-slate-500">
-            Nenhuma questão correspondente no banco ainda.
+      </motion.div>
+    );
+  }
+
+  // ─── DETAIL CCNA ──────────────────────────────────────────
+  if (view === "detail" && selectedPart) {
+    const part = selectedPart;
+    const accent = partAccentClasses(part.accent);
+    const qCount = partCounts.get(part.part_id) ?? 0;
+    const drillCount = partCounts.get("1.4-drill") ?? 0;
+    const entry = getEntry(part.part_id, qCount);
+    const pct = hydrated ? getDomainProgressPercent(entry) : 0;
+    const last = formatLastPracticed(entry.lastPracticed);
+    const hasDrill = "hasDrill" in part && part.hasDrill;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, x: 16 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="space-y-4"
+      >
+        <button
+          type="button"
+          onClick={backToList}
+          className="flex items-center gap-1 text-xs text-slate-400 transition-colors hover:text-neon-green"
+        >
+          <ChevronLeft className="size-4" />
+          Todas as partes
+        </button>
+
+        <div
+          className={cn(
+            "rounded-2xl border bg-slate-900/60 p-5",
+            accent.border,
+            accent.glow
+          )}
+        >
+          <div className="mb-3 flex items-start gap-3">
+            <div
+              className={cn(
+                "flex size-11 shrink-0 items-center justify-center rounded-xl border",
+                accent.border,
+                accent.bg
+              )}
+            >
+              <Layers className={cn("size-5", accent.text)} />
+            </div>
+            <div className="min-w-0">
+              <div className="mb-1 flex flex-wrap items-center gap-2">
+                <span
+                  className={cn(
+                    "rounded-md border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider",
+                    accent.border,
+                    accent.bg,
+                    accent.text
+                  )}
+                >
+                  Parte {part.part_id}
+                </span>
+              </div>
+              <h1 className="text-lg font-bold text-slate-50">{part.title}</h1>
+              <p className="text-xs text-slate-400">
+                {"blueprint_module" in part && part.blueprint_module
+                  ? `Módulo ${part.blueprint_module}${"verb" in part && part.verb ? ` · ${part.verb}` : ""}`
+                  : part.part_id.startsWith("v2-5")
+                    ? "Módulo 5.0 · AI & Network Ops"
+                    : part.part_id.startsWith("v2-4") ||
+                        part.part_id.startsWith("4.")
+                      ? "Módulo 4.0 · Services & Security"
+                      : part.part_id.startsWith("v2-3") ||
+                          part.part_id.startsWith("3.")
+                        ? "Módulo 3.0 · IP Routing"
+                        : part.part_id.startsWith("v2-2") ||
+                            part.part_id.startsWith("2.")
+                          ? "Módulo 2.0 · Switching & Access"
+                          : "Módulo 1.0 · Infrastructure"}
+              </p>
+            </div>
+          </div>
+          <p className="text-[12px] leading-relaxed text-slate-400">
+            {part.description}
           </p>
+          <div className="mt-4">
+            <div className="mb-1 flex justify-between text-[10px] text-slate-500">
+              <span>
+                Progresso · {entry.completed}/{entry.total || qCount} questões
+              </span>
+              <span className={cn("font-semibold tabular-nums", accent.text)}>
+                {pct}%
+              </span>
+            </div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-slate-800">
+              <div
+                className={cn("h-full rounded-full transition-all", accent.bar)}
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+            {last && (
+              <p className="mt-2 flex items-center gap-1 text-[10px] text-slate-500">
+                <Calendar className="size-3" />
+                Última prática: {last}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-4">
+          <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+            Tópicos principais
+          </p>
+          <ul className="space-y-2">
+            {part.topic_list.map((topic) => (
+              <li
+                key={topic}
+                className="flex items-center gap-2 rounded-xl border border-slate-800/80 bg-slate-950/40 px-3 py-2.5"
+              >
+                <span
+                  className={cn("size-1.5 shrink-0 rounded-full", accent.bar)}
+                />
+                <span className="text-xs font-medium text-slate-200">
+                  {topic}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <Button
+          type="button"
+          disabled={qCount === 0 || disabled}
+          onClick={() => startCcnaPractice(part, "part")}
+          className={cn(
+            "h-12 w-full gap-2 rounded-xl border font-bold",
+            accent.border,
+            accent.bg,
+            accent.text,
+            "hover:opacity-90"
+          )}
+        >
+          <Play className="size-4" fill="currentColor" />
+          Praticar esta parte
+          {qCount > 0 && (
+            <span className="text-[10px] font-normal opacity-80">
+              (até {Math.min(15, qCount)})
+            </span>
+          )}
+        </Button>
+
+        {hasDrill && (
+          <Button
+            type="button"
+            disabled={drillCount === 0 || disabled}
+            variant="outline"
+            onClick={() => startCcnaPractice(part, "drill")}
+            className="h-12 w-full gap-2 rounded-xl border-neon-cyan/40 text-neon-cyan hover:bg-neon-cyan/10"
+          >
+            <Calculator className="size-4" />
+            Drill de subnetting
+            {drillCount > 0 && (
+              <span className="text-[10px] font-normal opacity-80">
+                (até {Math.min(15, drillCount)})
+              </span>
+            )}
+          </Button>
         )}
       </motion.div>
     );
   }
 
   // ─── PRACTICE ─────────────────────────────────────────────
-  if (view === "practice" && question && selectedDomain) {
-    const accent = domainAccentClasses(selectedDomain.accent);
+  if (view === "practice" && question && practiceAccent) {
+    const accent = practiceAccent;
     const progressPct =
       total > 0 ? ((currentIndex + (hasAnswered ? 1 : 0)) / total) * 100 : 0;
     const isCorrect = selected === question.resposta_correta;
+    const backLabel = isAws
+      ? (selectedAwsDomain?.name ?? "Domínio")
+      : (selectedPart?.part_id ?? "Parte");
 
     return (
       <motion.div
@@ -481,7 +934,7 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
             className="flex items-center gap-1 text-xs text-slate-400 hover:text-neon-green"
           >
             <ChevronLeft className="size-4" />
-            {selectedDomain.name}
+            {backLabel}
           </button>
           <span className="text-[10px] tabular-nums text-slate-500">
             {currentIndex + 1}/{total}
@@ -499,7 +952,7 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
                 accent.text
               )}
             >
-              Prática · {selectedDomain.namePt}
+              {practiceLabel}
             </span>
           </div>
           <p className="text-sm leading-relaxed text-slate-100">
@@ -581,9 +1034,14 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
   }
 
   // ─── RESULT ───────────────────────────────────────────────
-  if (view === "result" && selectedDomain) {
-    const accent = domainAccentClasses(selectedDomain.accent);
-    const entry = getEntry(selectedDomain.id);
+  if (view === "result" && practiceAccent) {
+    const accent = practiceAccent;
+    const poolTotalFallback = isAws
+      ? (awsDomainCounts.get(practiceKey) ?? 0)
+      : practiceKey === "1.4-drill"
+        ? (partCounts.get("1.4-drill") ?? 0)
+        : (partCounts.get(practiceKey) ?? 0);
+    const entry = getEntry(practiceKey, poolTotalFallback);
     const domainPct = getDomainProgressPercent(entry);
 
     return (
@@ -608,7 +1066,7 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
             <Target className={cn("size-6", accent.text)} />
           </div>
           <h2 className="text-lg font-bold text-slate-50">Sessão concluída</h2>
-          <p className="mt-1 text-xs text-slate-500">{selectedDomain.name}</p>
+          <p className="mt-1 text-xs text-slate-500">{practiceLabel}</p>
           <p className={cn("mt-4 text-4xl font-bold tabular-nums", accent.text)}>
             {scorePct}%
           </p>
@@ -618,7 +1076,7 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
 
           <div className="mx-auto mt-5 max-w-xs rounded-xl border border-slate-800 bg-slate-950/50 px-4 py-3 text-left">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-              Progresso do domínio
+              Progresso
             </p>
             <div className="mt-2 mb-1 flex justify-between text-[11px] text-slate-400">
               <span className="tabular-nums">
@@ -634,9 +1092,6 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
                 style={{ width: `${domainPct}%` }}
               />
             </div>
-            <p className="mt-2 text-[10px] text-slate-600">
-              Progresso salvo neste dispositivo
-            </p>
           </div>
         </div>
 
@@ -644,7 +1099,16 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
           <Button
             type="button"
             variant="outline"
-            onClick={() => startPractice(selectedDomain)}
+            onClick={() => {
+              if (isAws && selectedAwsDomain) {
+                startAwsPractice(selectedAwsDomain);
+              } else if (selectedPart) {
+                startCcnaPractice(
+                  selectedPart,
+                  practiceKey === "1.4-drill" ? "drill" : "part"
+                );
+              }
+            }}
             className="h-11 gap-2 rounded-xl border-slate-700"
           >
             <RotateCcw className="size-3.5" />
@@ -656,7 +1120,7 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
             className="h-11 gap-2 rounded-xl bg-neon-green font-bold text-slate-950 hover:bg-neon-green/90"
           >
             <BookOpen className="size-3.5" />
-            Domínios
+            {isAws ? "Domínios" : "Partes"}
           </Button>
         </div>
       </motion.div>

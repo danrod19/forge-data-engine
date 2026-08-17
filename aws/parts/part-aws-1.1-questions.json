@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Equipe nova pede AdministratorAccess 'para ir mais rápido'. Qual design IAM atende least privilege no SAA?",
+    "alternativas": [
+      "Conceder só as Actions e Resources necessários à função (ex. Deploy em prefixos S3 específicos)",
+      "Anexar AdministratorAccess a todos os developers por padrão e revisar depois",
+      "Usar Effect Deny em todas as policies e liberar via ticket manual",
+      "Desabilitar MFA no console para reduzir fricção de onboarding"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Least privilege limita Allow ao mínimo do job (ações e ARNs concretos), reduzindo blast radius se a credencial vazar. AdministratorAccess universal falha porque concede bem mais do que o deploy precisa e é o anti-pattern clássico de prova. Tip de prova: se a opção fala em 'admin agora, restringe depois', descarte em favor de permissões mínimas desde o início.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "App em EC2 precisa ler DynamoDB e gravar em S3 sem access key no disco. Qual identidade usar?",
+    "alternativas": [
+      "IAM user com senha e access key no user-data",
+      "IAM role associada via instance profile (credenciais temporárias no IMDS)",
+      "Grupo IAM vazio sem policy, apenas para 'organização'",
+      "Root user da conta com MFA desligado na instância"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Workloads em EC2 usam role + instance profile: o IMDS entrega sessão STS rotativa, sem key estática no host. Access key de user no user-data é o anti-pattern que a prova pune. Tip de prova: se o cenário é serviço AWS falando com outro serviço AWS, a resposta padrão de identidade é role, não user/root.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "EC2 não assume a role S3ReadRole apesar de permissions S3 corretas. Qual documento define quem pode AssumeRole?",
+    "alternativas": [
+      "Apenas a bucket policy do S3 de destino",
+      "Apenas a tag Name da VPC",
+      "A trust policy (AssumeRolePolicyDocument) da role",
+      "O Security Group da ENI da instância"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A trust policy lista Principals (serviço EC2, conta, user) autorizados a sts:AssumeRole; sem trust adequado a role não é assumida mesmo com AmazonS3ReadOnlyAccess anexada. Bucket policy e SG não substituem trust de IAM role. Tip de prova: erro 'not authorized to perform sts:AssumeRole' → confira trust primeiro, não só a policy de dados.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Policy A Allow s3:DeleteObject e policy B Deny s3:DeleteObject no mesmo principal. Resultado da avaliação IAM?",
+    "alternativas": [
+      "Allow sempre vence se estiver em managed policy",
+      "A ação fica Allow só fora do horário comercial",
+      "O root user é desabilitado automaticamente",
+      "Deny explícito prevalece e a ação é negada"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Na lógica IAM, Deny explícito tem precedência sobre qualquer Allow; por isso AccessDenied com 'explicit deny' não se resolve só empilhando outro Allow *. Managed vs inline não muda essa regra de precedência. Tip de prova: se a mensagem cita explicit deny, o próximo passo é achar e ajustar o statement Deny, não criar Allow genérico.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Time de 12 pessoas precisa das mesmas permissões de suporte SQS/S3. Como organizar com least privilege operacional?",
+    "alternativas": [
+      "Colocar users em um IAM group (ex. Support-L2) e anexar policies ao group",
+      "Dar access key de root compartilhada no canal do time",
+      "Criar 12 roles EC2 diferentes só para login de console",
+      "Desligar CloudTrail para reduzir ruído de auditoria"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Groups aplicam o mesmo conjunto de policies a vários users humanos, facilitando least privilege por função. Root keys compartilhadas e desligar CloudTrail são falhas graves de segurança e auditoria. Tip de prova: humanos no console → users + groups; workloads → roles.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Após sts:AssumeRole bem-sucedido, o que o caller recebe para chamar APIs?",
+    "alternativas": [
+      "Um certificado ACM permanente de 1 ano",
+      "Credenciais temporárias (access key, secret e session token) da sessão",
+      "Um Elastic IP fixo associado à role",
+      "Uma AMI nova com a policy embutida"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "AssumeRole devolve credenciais de curta duração via STS, reduzindo impacto de vazamento versus keys de longo prazo. ACM, EIP e AMI não são o output de AssumeRole. Tip de prova: 'temporário/sessão/STS' na resposta costuma bater com role assumption.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "User ana.silva não faz s3:PutObject. Allow Put está só no group Billing; ana está apenas em Helpdesk. Causa mais provável?",
+    "alternativas": [
+      "Falta de Internet Gateway na VPC do endpoint S3",
+      "KMS key rotation desligada na conta",
+      "A policy não está no principal efetivo (group/user errado) — falta attach correto",
+      "CloudFront price class 100 bloqueia PutObject de API"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Permissões IAM efetivas vêm do que está anexado ao user (direto ou via groups dos quais é member). Estar em Helpdesk sem a policy de Put explica a falha; mover ana para o group certo ou anexar a policy resolve. IGW/KMS/CloudFront não são a primeira causa de PutObject IAM. Tip de prova: checklist AccessDenied → 'quem é o principal e quais policies estão attached?'.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "App Node em EC2 grava DynamoDB. Qual anti-pattern de identidade o SAA mais pune?",
+    "alternativas": [
+      "Usar VPC endpoint para DynamoDB",
+      "Usar role com dynamodb:PutItem no ARN da tabela",
+      "Habilitar IMDSv2 na instância",
+      "Gravar access key de IAM user no código ou user-data"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Keys estáticas no host são difíceis de rotacionar e vazam com o disco/imagem; o design esperado é role + instance profile. VPC endpoint e IMDSv2 são boas práticas, não o anti-pattern. Tip de prova: se a opção coloca AKIA... no código, está errada no desenho Associate.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Ao revisar uma identity-based policy JSON, quais elementos formam o núcleo de um Statement?",
+    "alternativas": [
+      "Effect, Action e Resource (Condition opcional)",
+      "Somente CIDR de origem e porta de destino",
+      "Somente AMI ID e instance type da EC2",
+      "Somente o record type do Route 53"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Statements IAM usam Effect Allow/Deny, Action da API e Resource ARN; Condition afina o contexto (MFA, IP, tags). CIDR/porta são de SG/NACL; AMI e DNS não definem autorização IAM. Tip de prova: confunda IAM com SG e a resposta errada fala em porta/CIDR.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "AccessDenied em uma API: qual primeiro comando CLI confirma quem está autenticado?",
+    "alternativas": [
+      "aws ec2 describe-vpcs",
+      "aws sts get-caller-identity",
+      "aws s3 mb s3://teste-temp",
+      "aws configure list-profiles sem inspecionar o ARN ativo"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "get-caller-identity mostra Account, UserId e Arn do principal efetivo (user ou assumed-role), base do TShoot de permissão. describe-vpcs e criar bucket não identificam o caller. Tip de prova: 'quem sou eu nestas credenciais?' → sempre STS get-caller-identity primeiro.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Role S3ReadRole tem AmazonS3ReadOnlyAccess, mas EC2 não obtém credenciais. Trust lista só lambda.amazonaws.com e não há instance profile. Diagnóstico?",
+    "alternativas": [
+      "Aumentar o tamanho do volume EBS root",
+      "Trocar a AMI para Windows Server",
+      "Ajustar trust para ec2.amazonaws.com e associar instance profile com a role à EC2",
+      "Desligar o CloudTrail na região"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Permissions S3 não bastam: o serviço EC2 precisa estar na trust e a instância precisa de instance profile. Trust só Lambda + profile ausente explica falha de assume. EBS/AMI/CloudTrail não corrigem trust. Tip de prova: separe permissions policy (o que faz) de trust policy (quem assume).",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Mensagem: not authorized to perform s3:DeleteObject … with an explicit deny in an identity-based policy. Próximo foco?",
+    "alternativas": [
+      "Criar outro Allow s3:* na mesma role sem ler o Deny",
+      "Passar a usar sempre o root user no pipeline",
+      "Desabilitar versioning do bucket como único remédio",
+      "Localizar e remover/ajustar o statement Deny que bloqueia DeleteObject"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A própria mensagem aponta explicit deny; Allow adicional não supera Deny na avaliação IAM. Root e versioning não removem o Deny da identity policy. Tip de prova: 'explicit deny' no texto = caçar o Deny antes de qualquer Allow extra.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual diferença essencial entre IAM user e IAM role no design Associate?",
+    "alternativas": [
+      "User é identidade de longo prazo (pessoa/app legado); role é assumível e usa credenciais temporárias",
+      "Role só existe em regiões GovCloud",
+      "User nunca pode ter policies anexadas",
+      "Role sempre tem senha de console como user humano"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Users têm credenciais permanentes (senha/keys); roles são assumidas e recebem sessão STS — padrão para serviços e federação. Ambos podem ter policies; role não é GovCloud-only nem login com senha típica de user. Tip de prova: workload AWS → role; humano console → user (ou federation para role).",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Conta B precisa ler objetos em bucket da conta A. Qual padrão SAA de cross-account?",
+    "alternativas": [
+      "Compartilhar a senha do root da conta A no chat do time B",
+      "Role na conta A com trust para principal da B + permissions de leitura; B AssumeRole (e bucket policy se necessário)",
+      "Abrir 0.0.0.0/0 no NACL e ignorar IAM",
+      "Desligar S3 Block Public Access e usar ACL pública always"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Cross-account seguro usa role (trust + permissions) e frequentemente bucket policy permitindo o principal de B — sem root password nem bucket público. NACL não concede API S3. Tip de prova: cross-account = trust/AssumeRole + resource policy, nunca root compartilhado.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Estagiário recebe policy Allow s3:* no Resource \"*\". Avaliação de least privilege?",
+    "alternativas": [
+      "É a melhor prática de onboarding SAA",
+      "É obrigatório para abrir o console S3",
+      "É excesso de privilégio — restringir Actions e ARNs de bucket/prefix necessários",
+      "Impede AccessDenied de forma desejável e deve ser mantido"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "s3:* em * permite apagar e expor dados além do job do estagiário; o exame espera restringir ações e resources. Console não exige admin de S3. Tip de prova: Resource \"*\" com Action ampla em humano júnior = red flag de least privilege.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Durante TShoot, como listar managed policies anexadas a uma role?",
+    "alternativas": [
+      "aws ec2 authorize-security-group-ingress",
+      "aws rds describe-db-instances",
+      "aws iam create-user",
+      "aws iam list-attached-role-policies --role-name <role>"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "list-attached-role-policies mostra as managed policies da role — passo clássico após get-caller-identity. Comandos de SG, RDS ou create-user não listam attaches da role alvo. Tip de prova: 'attached' no verbo CLI = list-attached-*-policies.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "O que um instance profile faz no design EC2 + IAM?",
+    "alternativas": [
+      "Associa uma IAM role a instâncias EC2 para o IMDS entregar credenciais",
+      "Cria subnets multi-AZ automaticamente",
+      "Substitui Customer Managed Keys do KMS",
+      "Ativa MFA Delete em todos os buckets S3 sozinho"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Instance profile é o contêiner que liga a role à EC2; sem ele a instância não assume a role. Não cria rede, não substitui KMS e não configura MFA Delete. Tip de prova: EC2 sem credenciais de role → confira association do instance profile.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dezenas de humanos usam o console. Qual organização de permissões é a boa prática?",
+    "alternativas": [
+      "Distribuir access keys do root a cada pessoa",
+      "Users em groups por função (Dev, Ops, ReadOnly) com policies anexadas aos groups",
+      "Uma única role EC2 compartilhada como 'login' de todos no console",
+      "Desabilitar CloudTrail para não gerar ruído"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Groups por função escalam least privilege e rotação de pessoas; root keys e desligar CloudTrail são inaceitáveis. Role EC2 não é o modelo de login de console humano. Tip de prova: console multi-user → groups; não root keys.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Policy Allow com Condition aws:MultiFactorAuthPresent = true. Qual o papel da Condition?",
+    "alternativas": [
+      "Trocar a região física do hardware do data center",
+      "Criar VPC peering automático com outra conta",
+      "Restringir o Allow a contextos (ex. MFA presente, IP de origem, tags)",
+      "Substituir o Route 53 privado da VPC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Condition afina quando o Statement se aplica — por exemplo MFA presente, SourceIp corporativo ou aws:ResourceTag — sem mudar topologia física do data center nem DNS da VPC. Opções que falam em peering ou hardware confudem IAM com rede. Tip de prova: Condition = 'só se…'; se a opção fala em hardware ou peering, está fora de IAM.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual tema está fora do escopo profundo do piloto IAM foundations (aws-1.1)?",
+    "alternativas": [
+      "Users, groups e least privilege",
+      "Roles, trust e instance profile",
+      "AccessDenied e Deny explícito",
+      "Organizations SCPs profundos e IAM Identity Center lab completo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O piloto cobre IAM clássico da conta (identities, policies, trust, STS ideia e TShoot). SCPs multi-account e Identity Center full ficam para parts posteriores. Tip de prova: se a questão pedir SCP de Organizations em profundidade, não force só 'group IAM'.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Função Lambda precisa dynamodb:Query em uma tabela. Onde anexar o Allow no desenho usual?",
+    "alternativas": [
+      "Na execution role da função Lambda",
+      "No Security Group da Lambda como regra TCP 443",
+      "Na NACL da subnet pública apenas",
+      "No DHCP option set da VPC"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Lambda usa execution role para APIs AWS; a policy dynamodb:Query vai nessa role. SG/NACL/DHCP controlam rede, não autorização da API DynamoDB. Tip de prova: permissão de serviço AWS → role do compute, não SG. (aws-1.1 #21)",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "aws sts get-caller-identity retorna Arn …:assumed-role/AppRole/session. Interpretação?",
+    "alternativas": [
+      "O principal está usando o root user sem MFA",
+      "A sessão atual é de uma role assumida (credenciais temporárias de role)",
+      "Não há conta AWS válida",
+      "O bucket S3 da conta está público"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: A sessão atual é de uma role assumida (credenciais temporárias de role). Isso resolve o cenário: aws sts get-caller-identity retorna Arn …:assumed-role/AppRole/session. Interpre… O distractor «O principal está usando o root user sem MFA» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.1), não em controles de outro domínio.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Policy Allow s3:GetObject com Resource só arn:aws:s3:::dados (sem /*). Risco em GetObject de arquivos?",
+    "alternativas": [
+      "Aumenta o custo do NAT Gateway da VPC",
+      "Desliga o versioning do bucket",
+      "GetObject em objetos pode falhar se o Resource não incluir object ARNs (bucket/* ou prefixo/*)",
+      "Força Glacier Instant Retrieval em todos os puts"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "GetObject age sobre objetos; Resource costuma ser arn:aws:s3:::bucket/* (ou prefixo). Só o ARN do bucket não cobre keys. NAT, versioning e classe de storage não são a causa dessa falha de ARN. Tip de prova: Get/Put Object → Resource com /*; ações de bucket (ListBucket) usam ARN do bucket.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que preferir IAM roles a access keys de longo prazo em workloads na AWS?",
+    "alternativas": [
+      "Roles são mais caras e por isso 'melhores'",
+      "Access keys nunca funcionam com S3",
+      "Roles não podem ter policies anexadas",
+      "Credenciais temporárias rotacionam e reduzem o impacto de vazamento no host"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Sessões STS expiram e o metadata renova; keys AKIA no disco vazam com imagem/backup e são difíceis de rotacionar. Keys funcionam com S3, mas são pior design; roles têm policies sim. Tip de prova: 'longo prazo no host' vs 'temporário/IMDS' decide a questão.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Recebeu AccessDenied em uma API no terminal. Qual primeiro passo prático de TShoot?",
+    "alternativas": [
+      "Confirmar o principal com get-caller-identity e a Action/Resource da mensagem; depois checar policies/trust attached",
+      "Recriar a VPC inteira e todas as subnets",
+      "Trocar o tipo de instância para bare metal",
+      "Apagar o CloudWatch Log Group da aplicação"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem saber quem chama e o que foi negado, qualquer mudança de rede ou compute é chute. O checklist é: identidade → Allow → Deny → trust (se role) → resource policy. Tip de prova: AccessDenied de API AWS ≠ primeiro recriar VPC.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual a diferença útil entre managed policy e inline policy (ideia SAA)?",
+    "alternativas": [
+      "Inline só funciona em China regions",
+      "Managed (AWS ou customer) é reutilizável e versionável; inline fica embutida em um único principal",
+      "Inline é obrigatória para toda EC2",
+      "Managed policies não podem conter Effect Deny"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Managed policies reutilizam o mesmo documento em vários principals e têm versões; inline vive colada em um user/role. Ambos podem Deny. Tip de prova: reuso entre times → managed; exceção pontual em um principal → inline.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "User tem senha de console mas nenhuma policy Allow de EC2. Ao tentar RunInstances, o que ocorre?",
+    "alternativas": [
+      "Sempre funciona porque autenticou no console",
+      "A VPC é recriada automaticamente com admin",
+      "AccessDenied / not authorized — autenticação não é autorização",
+      "O Security Group autoriza a API EC2 sozinho"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Login (authN) não concede APIs (authZ). Sem Allow efetivo, RunInstances falha. SG filtra tráfego de instância, não a API de controle EC2 do user. Tip de prova: senha/console OK + API negada = falta de policy, não 'rede'.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Trust policy com Principal { AWS: arn:aws:iam::111122223333:root }. Significado comum em cross-account?",
+    "alternativas": [
+      "Qualquer principal da conta 111122223333 pode ser candidato a assumir (ainda sujeito a permissões na origem)",
+      "Apenas o serviço S3 da conta atual assume a role",
+      "Nega permanentemente qualquer AssumeRole",
+      "Cria automaticamente um user local na conta da role"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O ARN root da conta parceira representa a conta como principal de trust; quem assume ainda precisa de permissão sts:AssumeRole na conta de origem. Não cria user nem é o serviço S3. Tip de prova: Principal conta (root ARN) = delegação cross-account, não 'usuário root humano logado'.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual checklist mental de TShoot IAM esta part reforça?",
+    "alternativas": [
+      "Principal certo → Allow existe → sem Deny → Resource/Action corretos → trust se for role",
+      "Só aumentar o tamanho do volume root da EC2",
+      "Só mudar o hostname da instância",
+      "Só recriar o Internet Gateway"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Isolar identidade, Allow, Deny, ARN e trust resolve a maioria dos AccessDenied de API. Hostname, volume e IGW não substituem esse checklist de autorização. Tip de prova: memorize a ordem principal → allow → deny → resource → trust.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo de design seguro para identidades de workload no SAA (esta part):",
+    "alternativas": [
+      "Root user em todos os pods e funções Lambda",
+      "Access key única compartilhada no Slack do time",
+      "AdministratorAccess em todo group de desenvolvimento",
+      "Roles com least privilege, trust correto e sessão STS; evitar keys de user no host"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O núcleo Associate é role + least privilege + trust/STS, sem root operacional nem keys no chat. AdministratorAccess em massa contradiz arquiteturas seguras. Tip de prova: se a resposta combina role + least privilege + temporário, costuma ser a correta em workload.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  }
+]

@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No discurso do CCNA, uma API é melhor definida como:",
+    "alternativas": [
+      "Um contrato entre sistemas para solicitar operações e receber respostas previsíveis",
+      "Somente um cabo de console USB",
+      "Somente o protocolo STP entre switches",
+      "Somente a tabela MAC do access"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "API formaliza como um cliente programa um serviço (controller, device, nuvem). Não é mídia física, STP nem CAM. Em redes programáveis, portais e orquestradores usam APIs em vez de só CLI humana.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "REST, no nível 200-301, é tipicamente descrito como:",
+    "alternativas": [
+      "Um IGP substituto do OSPF",
+      "Estilo de API que opera recursos via HTTP (URI, verbos, status, representação)",
+      "Um tipo de cabo fibra monomodo",
+      "Um modo de Spanning Tree"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "REST no exame = HTTP + recursos + métodos + códigos. Não é protocolo de roteamento nem mídia. Northbound de controllers costuma ser REST. Foque CRUD e status, não OAuth profundo.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Northbound no modelo controller (revisão 6.1/6.2) é a direção:",
+    "alternativas": [
+      "Somente do switch para o cabo do usuário final",
+      "Somente do AP para o cliente Wi-Fi",
+      "Das aplicações/orquestração em direção ao controller (API REST típica)",
+      "Somente do SFP para o patch panel"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Apps falam northbound com o controller. Southbound é controller → devices. Tráfego de usuário no access não define northbound. O 6.2 aprofunda o REST dessa interface northbound.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O verbo HTTP GET mapeia principalmente a qual operação CRUD?",
+    "alternativas": [
+      "Create",
+      "Update completo obrigatório",
+      "Delete",
+      "Read (ler/listar recurso)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "GET lê o estado do recurso sem intenção de criar/apagar. Create≈POST, Update≈PUT/PATCH, Delete≈DELETE. Inventário e show via API usam GET. Não use GET mentalmente como “criar policy”.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "POST em REST costuma corresponder a:",
+    "alternativas": [
+      "Create (criar recurso) ou disparar uma operação no servidor",
+      "Somente leitura idempotente de inventário",
+      "Somente apagar todos os devices",
+      "Somente listar status 404"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "POST cria ou inicia ações (ex.: criar policy, token). Não é o verbo de listagem pura (GET) nem de delete. Status de criação bem-sucedida frequentemente é 201. Confundir POST com GET é erro clássico de automação.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "DELETE no mapeamento CRUD significa:",
+    "alternativas": [
+      "Sempre criar um recurso duplicado",
+      "Remover o recurso identificado na URI",
+      "Somente autenticar com Basic Auth",
+      "Somente negociar o cipher WPA3"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "DELETE remove o alvo da URI. Não cria, não autentica e não configura wireless. Use com cuidado em scripts de inventário. Status de sucesso costuma ser 200 ou 204 (ideia).",
+    "part_id": "6.2"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "PUT e PATCH, em visão de prova, relacionam-se a:",
+    "alternativas": [
+      "Apenas códigos 500",
+      "Apenas Open WLAN",
+      "Update: PUT (substituição completa) e PATCH (atualização parcial) — ideia",
+      "Apenas southbound OpenFlow obrigatório"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Ambos atualizam recursos; a diferença conceitual é full vs partial. Não são status 500 nem wireless. O exame pede reconhecer que são verbos de Update no CRUD, junto de POST/GET/DELETE.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Código HTTP 401 indica tipicamente:",
+    "alternativas": [
+      "Recurso criado com sucesso",
+      "Pedido bem-formado e autorizado",
+      "Servidor inventou o recurso sozinho",
+      "Falha de autenticação (credencial/token ausente ou inválido)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "401 = Unauthorized no sentido de autenticação. 403 é autorização após identidade. 201 é created. Corrija token/Basic Auth antes de reescrever a URI inteira. Distinção cobrada nos tickets.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Código HTTP 403 significa, no nível CCNA:",
+    "alternativas": [
+      "Autenticado, mas sem permissão para a operação (autorização)",
+      "Sempre que o DNS falha",
+      "Sempre que o cabo está cortado",
+      "Sempre sucesso de POST"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "403 Forbidden: a API sabe quem você é, mas a role/ACL de API nega. Diferente de 401 (nem autenticou). Cabo/DNS são problemas de path, não o significado do 403. Ajuste permissões do token/usuário de API.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "HTTP 404 em chamada REST indica principalmente:",
+    "alternativas": [
+      "Token perfeito e recurso sempre existente",
+      "Servidor criou o item (201)",
+      "URI/recurso não encontrado no servidor da API",
+      "Somente erro de criptografia WEP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "404 = path ou ID inexistente. Não confunda com 401. Verifique versão da API (/v1/), typos e se o device id existe no inventário. WEP é wireless, não status REST.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Orquestrador lista devices com GET e recebe 200 + JSON. Operação CRUD?",
+    "alternativas": [
+      "Read bem-sucedida do recurso de inventário",
+      "Delete de todos os devices",
+      "Create obrigatório com 201",
+      "Somente falha 500 mascarada"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "GET + 200 é leitura com sucesso. Create seria POST/201. Delete não lista. 500 seria erro de servidor. Cenário clássico northbound de inventário no controller.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "POST para criar policy retorna 201. Interpretação?",
+    "alternativas": [
+      "Recurso não encontrado (404)",
+      "Recurso criado com sucesso",
+      "Autenticação falhou (401)",
+      "Sempre indica timeout de rede"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "201 Created assinala criação ok, típico de POST bem-sucedido. Não é 404/401 nem timeout. Confirme Location/body se a API devolver o id do recurso novo.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "curl sem header Authorization para API que exige Bearer token. Status esperado?",
+    "alternativas": [
+      "200 com inventário completo sempre",
+      "401 Unauthorized (ou desafio de auth)",
+      "201 Created sem body",
+      "Somente 302 de Spanning Tree"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem credencial, a API rejeita com 401. Não inventa 200 de inventário. STP não gera status HTTP de API. Inclua Authorization: Bearer ou Basic conforme o contrato.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Token válido, mas role só de leitura tenta DELETE. Status mais alinhado?",
+    "alternativas": [
+      "200 sempre, porque o token existe",
+      "404 porque DELETE não existe em REST",
+      "201 Created do delete",
+      "403 Forbidden — autenticado sem autorização para a operação"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Identidade ok + permissão negada = 403. 401 seria token inválido. DELETE existe em REST. 201 não é o status típico de delete. Ajuste RBAC da conta de API.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "URI /api/v1/network-device/9999 inexistente. Resposta típica?",
+    "alternativas": [
+      "200 com lista de todos os devices",
+      "404 Not Found",
+      "201 Created automático do id 9999",
+      "Somente 101 Switching Protocols de STP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "ID inexistente → 404. Não cria recurso sozinho no GET. Confira inventário e path. Não misture com códigos de switching L2.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "JSON no payload REST do módulo 6 é:",
+    "alternativas": [
+      "Formato textual comum de representação (chaves/valores, listas) nas respostas e bodies",
+      "Um protocolo de roteamento interno",
+      "Um tipo de conector SFP",
+      "O nome do plano de dados ASIC"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "JSON carrega a representação do recurso. Detalhe de sintaxe aprofunda em 6.4; aqui basta reconhecer o papel. Não é IGP nem mídia óptica. 200 com JSON é o “show” da API.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "HTTP 400 Bad Request sugere principalmente:",
+    "alternativas": [
+      "Sucesso silencioso",
+      "Token perfeito e body ideal",
+      "Somente cabo RJ-45 rompido no core",
+      "Pedido malformado (JSON inválido, campos obrigatórios ausentes)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "400 aponta erro no formato/conteúdo do request. Corrija schema/campos. Não é sucesso. Cabo pode causar timeout, não 400 com resposta HTTP. Leia a mensagem de erro no body se houver.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "HTTP 500 no controller API indica:",
+    "alternativas": [
+      "Erro no lado do servidor da API (falha interna)",
+      "Sempre URI perfeita e cliente culpado apenas",
+      "Sempre 401 de senha",
+      "Sempre criação 201"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "5xx = servidor. Verifique saúde do controller/serviço. Cliente ainda pode ter bug, mas o código aponta falha interna. Não confunda com 401/201. Combine com logs do cluster.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Timeout ao chamar a API; ping ao IP do controller falha. Isolamento inicial?",
+    "alternativas": [
+      "Reachability/path até o host da API (rede/gestão) antes de culpar o verbo HTTP",
+      "Somente JSON indentado demais",
+      "Somente cipher TKIP da WLAN guest",
+      "Somente falta de DELETE no CRUD"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem path IP, não há HTTP status útil. Teste ping/rota/firewall 443. JSON e TKIP são eixos posteriores. O checklist 6.2 começa em reachability da API.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "503 Service Unavailable no gateway da API do DNA/controller. Eixo?",
+    "alternativas": [
+      "Inventário 200 OK garantido",
+      "Device access err-disabled por port-security em todas as portas",
+      "API/serviço do controller indisponível ou sobrecarregado (northbound)",
+      "OSPF sempre em FULL"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "503 aponta disponibilidade do serviço de API. É northbound/controller health, não prova data plane campus inteiro. Corrija cluster/serviço antes de reescrever scripts de CRUD.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Script usa GET em endpoint que só aceita POST para criar recurso. Resultado comum?",
+    "alternativas": [
+      "Create silencioso sempre com 201",
+      "Método incorreto — 405 Method Not Allowed ou falha de operação; não cria como POST faria",
+      "Delete automático de todo o inventário",
+      "Conversão automática GET→POST no HTTP/1.0"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Verbo errado quebra o contrato da API. Use POST para create. GET não deve criar por design. 405 é o status típico quando o método não é permitido. Alinhe CRUD ao verbo.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Basic Auth em API REST, no nível conceitual, envia:",
+    "alternativas": [
+      "Somente o hostname do switch no body OSPF",
+      "Credenciais de usuário/senha no header Authorization (frequentemente Base64) — use HTTPS",
+      "Somente BPDUs",
+      "Somente community SNMP pública em claro no SSID"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Basic é esquema de autenticação HTTP. Em produção, sempre TLS. Token/Bearer é alternativa comum. Não é STP nem SNMP wireless. 401 se as credenciais falharem.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Bearer token expirado em request GET de inventário. Status esperado?",
+    "alternativas": [
+      "200 com inventário fresco sempre",
+      "201 Created do inventário",
+      "401 Unauthorized — reautenticar e obter novo token",
+      "Somente 302 do DHCP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Token morto = falha de autenticação. Renove o token (login/refresh). Não espere 200. DHCP não define status REST. Fluxo típico de automação northbound.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "200 OK com JSON sem o campo esperado pelo script. Interpretação?",
+    "alternativas": [
+      "Sucesso de transporte HTTP, mas possível erro de contrato/versão/campo — leia o body, não só o status",
+      "Prova de 404",
+      "Prova de 401",
+      "Prova de que a API está down"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Status 200 diz que a request foi aceita; a lógica do app ainda pode falhar se o schema mudou. Valide versão da API e campos. Não é 401/404 nem outage total se a resposta chegou.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Southbound vs northbound REST — afirmação correta no 6.2?",
+    "alternativas": [
+      "Northbound é sempre CLI Telnet no access port",
+      "Southbound é o browser do estagiário para o YouTube",
+      "REST northbound é o caminho típico app → controller; southbound liga controller a devices",
+      "Ambos eliminam o management plane"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O 6.2 foca REST no northbound. Southbound continua controller→device (API/protocolo). Telnet e YouTube não definem esses eixos. Management plane coexiste.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mínimo de TShoot de chamada REST no content 6.2:",
+    "alternativas": [
+      "Só reiniciar todos os APs",
+      "Só limpar a tabela MAC",
+      "Só desligar o NTP",
+      "Reachability → Authorization/token → método e URI → status code → body/payload"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A ordem evita culpar JSON quando o host não responde, ou culpar URI quando o token expirou. AP/MAC/NTP podem ser eixos paralelos de rede, não o primeiro passo da API. Siga o study note.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual par CRUD ↔ verbo está correto?",
+    "alternativas": [
+      "Read → DELETE; Create → GET",
+      "Create → GET; Delete → POST",
+      "Update → somente OPTIONS; Read → DELETE",
+      "Create → POST; Read → GET; Update → PUT/PATCH; Delete → DELETE"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Mapeamento padrão cobrado no CCNA de automação leve. Inverter GET/POST é pegadinha. OPTIONS não é o Update do content. Memorize a tabela mental CRUD.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "URI identifica o recurso; o body JSON:",
+    "alternativas": [
+      "Substitui sempre o método HTTP",
+      "Carrega a representação/dados enviados ou retornados do recurso",
+      "É obrigatoriamente XML no CCNA",
+      "Desliga o código de status"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "URI localiza; body carrega conteúdo; método diz a ação; status resume o resultado. JSON é o mais citado; XML pode existir fora do foco. Status continua essencial no curl -i.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "App de automação falha com 401; usuários da rede navegando. Isolamento?",
+    "alternativas": [
+      "Data plane campus inteiro down",
+      "Somente underlay óptico cortado",
+      "Problema de autenticação da API northbound — não prova falha de encaminhamento de usuário",
+      "Somente STP root perdido em todas as VLANs"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "401 é contrato de API/credencial. User data plane pode estar saudável (6.1+6.2). Corrija token/usuário de API. Não reinicie o core por 401 de orquestração.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor uso de curl -i em incidente de orquestrador?",
+    "alternativas": [
+      "Substituir qualquer show de interface para sempre",
+      "Só provar o estado do EtherChannel",
+      "Apagar tokens automaticamente em produção sem log",
+      "Expor status HTTP, headers e início do body para classificar 401/403/404/5xx e validar método/URI/auth"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "curl -i é o “show” do northbound REST. Status+headers fecham o diagnóstico do content 6.2. Ainda use shows de rede no eixo certo. Não apague secrets sem processo. É o fechamento prático da parte.",
+    "part_id": "6.2"
+  }
+]

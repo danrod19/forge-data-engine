@@ -17,10 +17,11 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CONTACT_EMAIL, CONTACT_MAILTO, type NavTab } from "@/types/question";
-import { TOTAL_TICKETS } from "@/data/tickets";
-import { TOTAL_SIMULADO_QUESTIONS } from "@/data/simulado-questions";
+import { getTicketsPool } from "@/data/tickets";
+import { getSimuladoPoolByTrack } from "@/data/simulado-questions";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ProPlans, TrialButton } from "@/components/pro/ProPlans";
+import { useTrack } from "@/lib/track-context";
 
 interface HomeScreenProps {
   isPro: boolean;
@@ -29,48 +30,6 @@ interface HomeScreenProps {
   onAuthClick?: () => void;
 }
 
-const howToCards: {
-  id: NavTab;
-  step: string;
-  title: string;
-  desc: string;
-  icon: typeof Map;
-  accent: string;
-}[] = [
-  {
-    id: "trilha",
-    step: "01",
-    title: "Trilha",
-    desc: `Tickets com sintoma + saída de CLI. Treine troubleshooting real — ${TOTAL_TICKETS} tickets no banco.`,
-    icon: Map,
-    accent: "border-neon-green/30 bg-neon-green/5 text-neon-green",
-  },
-  {
-    id: "simulado",
-    step: "02",
-    title: "Simulado",
-    desc: `Prova no estilo do exame, com timer opcional e revisão — ${TOTAL_SIMULADO_QUESTIONS} questões traditional.`,
-    icon: ClipboardList,
-    accent: "border-neon-cyan/30 bg-neon-cyan/5 text-neon-cyan",
-  },
-  {
-    id: "estudo",
-    step: "03",
-    title: "Estudo",
-    desc: "Pratique por domínio do blueprint CCNA 200-301 e acompanhe o progresso.",
-    icon: BookOpen,
-    accent: "border-violet-500/30 bg-violet-500/5 text-violet-300",
-  },
-  {
-    id: "sobre",
-    step: "04",
-    title: "Sobre a Prova",
-    desc: "Formato do exame, pesos por domínio e o que a v2.0 realmente cobra.",
-    icon: GraduationCap,
-    accent: "border-amber-500/30 bg-amber-500/5 text-amber-300",
-  },
-];
-
 export function HomeScreen({
   isPro,
   onNavigate,
@@ -78,6 +37,69 @@ export function HomeScreen({
   onAuthClick,
 }: HomeScreenProps) {
   const { user, trialAvailable, startTrial } = useAuth();
+  const { track, meta } = useTrack();
+  const ticketCount = getTicketsPool(track).length;
+  const simuladoCount = getSimuladoPoolByTrack(track).length;
+
+  const howToCards: {
+    id: NavTab;
+    step: string;
+    title: string;
+    desc: string;
+    icon: typeof Map;
+    accent: string;
+  }[] = [
+    {
+      id: "trilha",
+      step: "01",
+      title: "Trilha",
+      desc:
+        track === "aws"
+          ? `Tickets AWS (CLI / policy / TShoot) — ${ticketCount} tickets no banco SAA.`
+          : track === "ccna-v2"
+            ? `Trilha 100% tickets · Troubleshooting · v2.0 — ${ticketCount} no banco.`
+            : `Tickets com sintoma + CLI — ${ticketCount} tickets no banco.`,
+      icon: Map,
+      accent: "border-neon-green/30 bg-neon-green/5 text-neon-green",
+    },
+    {
+      id: "simulado",
+      step: "02",
+      title: "Simulado",
+      desc:
+        track === "ccna-v2"
+          ? `${meta.label} · ${simuladoCount} traditional · mix ~30% troubleshooting (tickets).`
+          : `${meta.label} · ${simuladoCount} questões traditional · ${meta.examCode}.`,
+      icon: ClipboardList,
+      accent: "border-neon-cyan/30 bg-neon-cyan/5 text-neon-cyan",
+    },
+    {
+      id: "estudo",
+      step: "03",
+      title: "Estudo",
+      desc:
+        track === "aws"
+          ? "8 domínios SAA Foundations (IAM → CloudWatch) · progresso em :aws."
+          : track === "ccna-v2"
+            ? "Parts CCNA v2.0 · progresso namespaced · prática por part_id."
+            : "Pratique por part/domínio do blueprint CCNA e acompanhe o progresso.",
+      icon: BookOpen,
+      accent: "border-violet-500/30 bg-violet-500/5 text-violet-300",
+    },
+    {
+      id: "sobre",
+      step: "04",
+      title: "Sobre a Prova",
+      desc:
+        track === "aws"
+          ? "SAA-C03 Foundations — 12 parts piloto (IAM → CloudWatch)."
+          : track === "ccna-v2"
+            ? "CCNA 200-301 v2.0 · ênfase troubleshooting e parts consolidadas."
+            : "Formato do exame e pesos por domínio do blueprint CCNA.",
+      icon: GraduationCap,
+      accent: "border-amber-500/30 bg-amber-500/5 text-amber-300",
+    },
+  ];
   const [trialLoading, setTrialLoading] = useState(false);
   const [trialError, setTrialError] = useState<string | null>(null);
 

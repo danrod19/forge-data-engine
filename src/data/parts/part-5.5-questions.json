@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O principal objetivo de uma VPN no discurso do CCNA é:",
+    "alternativas": [
+      "Criar um canal lógico protegido (confidencialidade/integridade) sobre uma rede não confiável",
+      "Substituir completamente o Spanning Tree",
+      "Eliminar a necessidade de endereços IP",
+      "Desabilitar o DHCP em todas as filiais"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "VPN protege o trânsito entre pontas autorizadas sobre Internet/WAN de terceiro. Não remove Ethernet switching, IP ou DHCP. O exame foca casos de uso e propriedades do túnel, não crypto map completo.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Site-to-site VPN caracteriza-se tipicamente por:",
+    "alternativas": [
+      "Cliente VPN em cada notebook da filial obrigatoriamente",
+      "Túnel entre gateways (roteadores/firewalls) ligando redes de sites",
+      "Apenas portal web sem qualquer gateway",
+      "Somente Open WLAN entre prédios"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "As pontas são devices de borda dos sites; hosts internos usam a VPN de forma transparente na maioria dos desenhos. Cliente no laptop é o modelo remote-access. Open WLAN não é VPN site-to-site.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Remote-access VPN é o caso em que:",
+    "alternativas": [
+      "Dois data centers trocam apenas rotas BGP sem túnel",
+      "Switches access formam EtherChannel entre si",
+      "O usuário/cliente estabelece sessão sob demanda até a rede corporativa",
+      "Apenas links seriais ponto a ponto sem Internet"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Home-office, hotel e mobilidade usam cliente ou portal até o concentrador. Não é site-to-site entre DCs nem LACP. Pode rodar sobre Internet com IPsec ou SSL/TLS (conceito).",
+    "part_id": "5.5"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "IPsec, no nível conceitual do exame, contribui com:",
+    "alternativas": [
+      "Apenas escolha de canal Wi-Fi 1/6/11",
+      "Apenas numeração de VLAN nativa",
+      "Apenas métricas OSPF",
+      "Confidencialidade, integridade e autenticação do túnel/peers (ideia)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "As três propriedades são o coração da cobrança IPsec no CCNA. Detalhes de IKEv2 transform sets ficam de fora. RF, native VLAN e OSPF são eixos paralelos, não a definição de IPsec.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "SSL/TLS VPN remote-access, em visão de prova, significa:",
+    "alternativas": [
+      "Acesso remoto seguro baseado em TLS (cliente ou browser) até o concentrador corporativo",
+      "Site-to-site obrigatório entre dois routers sem usuário",
+      "WEP como cipher de túnel",
+      "Somente Telnet cifrado com tipo 7"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "TLS VPN é modelo comum de remote-access, familiar ao HTTPS. Não é sinônimo de site-to-site IPsec puro nem de WEP/Telnet. O content distingue o caso de uso do usuário móvel.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Em AAA, Authentication responde à pergunta:",
+    "alternativas": [
+      "Quais comandos o usuário executou ontem?",
+      "Quem é você? (prova de identidade)",
+      "Qual VLAN dinâmica atribuir após o login?",
+      "Qual o tamanho do pool NAT?"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Authentication valida identidade. Authorization decide permissões (VLAN, ACL, comandos). Accounting registra a sessão. NAT pool é irrelevante ao AAA. Separar os três As é must_know do 5.5.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Authorization em AAA define:",
+    "alternativas": [
+      "Apenas o hostname do RADIUS",
+      "Apenas o algoritmo de hash do enable secret",
+      "O que o usuário autenticado pode fazer ou quais recursos pode alcançar",
+      "Apenas o MTU da interface WAN"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Após auth, authorization aplica políticas de acesso (redes VPN, comandos TACACS, VLAN 802.1X). Não é hostname do servidor nem MTU. Cenário clássico: autenticou mas não alcança a sub-rede do ERP.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Accounting no AAA serve principalmente para:",
+    "alternativas": [
+      "Negar o login antes de qualquer senha",
+      "Substituir a criptografia IPsec",
+      "Escolher o cipher WPA2",
+      "Registrar o que aconteceu na sessão (tempo, comandos, uso) para auditoria"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Accounting não autentica nem autoriza por si; documenta a atividade. Útil para compliance e forense leve. Não cifra túnel nem configura WLAN. Ausência de accounting não impede login, mas quebra trilha de auditoria.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "AAA local no device significa tipicamente:",
+    "alternativas": [
+      "Usuários/senhas (username secret) armazenados no próprio equipamento",
+      "Sempre RADIUS na nuvem obrigatória",
+      "Somente TACACS+ sem base local possível",
+      "Desligar toda autenticação de VTY"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Database local é simples e serve de lab/fallback. Não escala como servidor central. RADIUS/TACACS são externos. Local não desliga VTY — ao contrário, alimenta login local.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "RADIUS no discurso CCNA aparece com frequência em:",
+    "alternativas": [
+      "Apenas sincronização NTP stratum 1",
+      "Autenticação de rede (802.1X, Wi-Fi Enterprise, VPN user) via servidor externo",
+      "Apenas STP root election",
+      "Apenas numeração de access-list standard"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "RADIUS é o exemplo clássico de servidor AAA para acesso de rede. NTP/STP/ACL numbered são outros domínios. Ligue 5.4 Enterprise e 5.5 AAA: autenticador + RADIUS.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Usuário de VPN remote-access autentica com sucesso mas não alcança a sub-rede 10.50.0.0/16. Eixo AAA mais provável?",
+    "alternativas": [
+      "Apenas Accounting bloqueou o IP",
+      "Authorization (política de rede/ACL/split-tunnel) não liberou o prefixo, apesar da Authentication ok",
+      "Apenas falha de site-to-site entre filiais sem cliente",
+      "Apenas WEP no túnel"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Login ok isola identidade; falta de alcance a redes internas é authorization (ou roteamento pós-túnel). Accounting registra, não roteia. Site-to-site é outra topologia. Verifique grupos de política VPN e rotas do cliente.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dois firewalls de HQ e filial com túnel IPsec permanente; PCs sem cliente VPN. Modelo?",
+    "alternativas": [
+      "Remote-access SSL apenas",
+      "Site-to-site VPN entre gateways",
+      "802.1X em todas as portas access do usuário final como túnel",
+      "Open WLAN site-to-site"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Gateways autenticam o túnel; hosts usam a WAN virtual transparente. Sem cliente no PC é site-to-site. SSL remote é para usuários. 802.1X é controle de acesso L2, não o túnel inter-site.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "TACACS+ é frequentemente associado, no nível conceitual, a:",
+    "alternativas": [
+      "Somente DHCP snooping binding",
+      "Somente QoS EF marking",
+      "Administração de devices (auth de admin e autorização de comandos) em ambientes Cisco",
+      "Somente Spanning Tree PortFast"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "TACACS+ brilha em device administration com command authorization. RADIUS domina network access. O exame pede a distinção conceitual, não a config full de policy sets.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Servidor RADIUS down; método AAA só lista group radius (sem local). Efeito típico?",
+    "alternativas": [
+      "Todos os logins usam enable secret automaticamente",
+      "Novas autenticações que dependem do RADIUS falham — sem fallback local configurado",
+      "IPsec site-to-site sobe sem peers",
+      "WPA3 vira Open"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem método local após o grupo radius, o NAS não tem plano B. Fallback local é boa prática de resiliência. enable secret não substitui RADIUS de usuário 802.1X/VPN. VPN site-to-site e WLAN Open não se auto-reparam assim.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "802.1X no access wired/wireless é exemplo de:",
+    "alternativas": [
+      "Apenas Accounting de comandos TACACS",
+      "Apenas site-to-site IPsec entre cores",
+      "Authentication na borda de acesso (supplicant + autenticador + servidor AAA)",
+      "Apenas shaping de WAN"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "802.1X autentica o endpoint antes de liberar a porta/WLAN. Liga-se ao RADIUS (5.5) e ao Enterprise wireless (5.4). Não é túnel site-to-site nem QoS shaping. Authorization pode vir após o sucesso (VLAN dinâmica — conceito).",
+    "part_id": "5.5"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Confidencialidade no túnel IPsec significa, em termos simples:",
+    "alternativas": [
+      "Os dados ficam cifrados para observadores no caminho não confiável",
+      "Qualquer um na Internet pode ler o payload em claro por padrão",
+      "Accounting registra a senha em syslog claro",
+      "Apenas o SSID é ocultado"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Cifra impede leitura casual no path. Integridade cobre adulteração; autenticação valida o peer. Ocultar SSID é wireless, não IPsec. Accounting não deve vazar senhas em claro como feature.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Integridade no contexto IPsec (ideia) protege contra:",
+    "alternativas": [
+      "Apenas falta de IP no cliente DHCP",
+      "Apenas err-disabled de port-security",
+      "Adulteração ou modificação não detectada dos dados no caminho",
+      "Apenas mismatch de native VLAN"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Integridade garante que o que chegou é o que foi enviado (com antireplay no pacote típico). DHCP e port-security são L2/L3 access. A prova lista as três propriedades sem exigir HMAC detail.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Home-office não conecta; engenheiro debuga show crypto isakmp sa do peer da filial SP-RJ. Erro de abordagem?",
+    "alternativas": [
+      "Nenhum: home-office sempre é site-to-site entre SP e RJ",
+      "Provável confusão de caso de uso — usuário remoto pede remote-access/AAA de cliente, não o túnel site-to-site da filial",
+      "Nenhum: ISAKMP da filial autentica o notebook do usuário automaticamente",
+      "Nenhum: remote-access não existe no CCNA"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Diagnosticar o peer errado atrasa o chamado. Home-office = cliente VPN + concentrador + auth de usuário. Site-to-site SP-RJ é outro incidente. O content enfatiza não misturar os dois.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Método AAA: group radius local. RADIUS up. Quem autentica o usuário de rede?",
+    "alternativas": [
+      "Preferencialmente o grupo RADIUS; local é fallback se o externo falhar (ordem da lista)",
+      "Sempre só o local, ignorando RADIUS",
+      "Sempre só TACACS mesmo sem config",
+      "Ninguém; AAA desliga o login"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A ordem dos métodos define a preferência. Com RADIUS disponível, ele atende; local entra se o grupo falhar (conforme implementação/desenho). Não ignora RADIUS nem inventa TACACS. Boa prática de resiliência.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Admin autentica no roteador via TACACS mas comando show running-config é negado. Qual A do AAA?",
+    "alternativas": [
+      "Apenas Accounting, pois o comando não foi logado",
+      "Authorization de comando — identidade ok, permissão de execução negada",
+      "Apenas Authentication, pois a senha está errada",
+      "Apenas o túnel IPsec site-to-site"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Login bem-sucedido = Authentication. Negar comando = Authorization (clássico TACACS). Accounting registraria a tentativa se configurado, mas a negação é authz. Não é VPN site-to-site.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Autenticação do peer IPsec (ideia) serve para:",
+    "alternativas": [
+      "Garantir que o túnel é estabelecido com a ponta legítima (PSK/certificado — conceito)",
+      "Escolher o access VLAN do IP phone automaticamente",
+      "Substituir o enable secret do switch de acesso",
+      "Configurar o default-router do pool DHCP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Peers se autenticam para não cifrar com atacante. Detalhe de cert enrollment fica fora. VLAN de phone, enable secret e DHCP são outros módulos. Foque a propriedade do túnel.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual cenário pede remote-access em vez de site-to-site?",
+    "alternativas": [
+      "Duas redes de data center com roteadores de borda fixos 24x7 sem usuários remotos",
+      "Link MPLS privado já cifrado pelo provedor sem Internet",
+      "Centenas de notebooks de funcionários em redes domésticas precisando de apps internos",
+      "Dois switches no mesmo rack com trunk 802.1Q"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Usuários móveis = remote-access. DC-to-DC fixo = site-to-site (ou WAN privada). Trunk local não é VPN. O caso de uso guia a arquitetura no exame.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Accounting ausente no desenho AAA. Impacto principal?",
+    "alternativas": [
+      "Impossibilidade total de Authentication em qualquer protocolo",
+      "IPsec recusa confidencialidade",
+      "WPA2 vira WEP",
+      "Falta de trilha de auditoria de sessões/comandos — compliance e investigação enfraquecidas"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Usuários ainda podem autenticar e ser autorizados sem accounting. O gap é visibilidade. Não quebra IPsec nem rebaixa WLAN. Inclua accounting quando a política exige log de sessão.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show crypto ipsec sa sem entradas ativas entre HQ e filial; Internet ok. Leitura conceitual site-to-site?",
+    "alternativas": [
+      "Túnel IPsec de dados pode não estar estabelecido (peer/política/fase) — investigar site-to-site, não o cliente do estagiário",
+      "Prova de que remote-access de todos os users está up",
+      "Prova de que 802.1X nas portas access está down",
+      "Prova de que RADIUS está up"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "SA ausente aponta falha ou inatividade do túnel entre gateways. Não diagnostica 802.1X de mesa nem RADIUS de Wi-Fi por si. Isole o caso site-to-site com alcance e políticas dos peers.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fallback local após RADIUS é útil porque:",
+    "alternativas": [
+      "Elimina a necessidade de senhas",
+      "Força todos os users a usarem Telnet",
+      "Converte site-to-site em Open WLAN",
+      "Permite acesso de emergência/admin quando o servidor externo está inacessível"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Método local evita lockout total de gestão ou de um conjunto de contas de break-glass. Ainda exige secrets fortes. Não remove senhas nem mexe em VPN topology. Ordem radius depois local é desenho comum.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mental do content 5.5 para chamado de acesso seguro:",
+    "alternativas": [
+      "Só limpar a CAM do access",
+      "Só aumentar o modulus SSH sem olhar o caso de uso",
+      "Só desligar o NTP",
+      "Site-to-site vs remote? Auth vs Authz vs Accounting? Local vs RADIUS/TACACS? Status do túnel/cliente"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O método evita misturar eixos. CAM, SSH modulus e NTP podem ser paralelos, mas o 5.5 começa pelo tipo de VPN e pelo A do AAA que falhou. Use shows leves de crypto/aaa conforme o cenário.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cliente SSL VPN conecta (sessão ok) mas sem rota para 10.10.10.0/24 interna. Próximo foco?",
+    "alternativas": [
+      "Authorization/política de rede do grupo VPN e tabela de rotas do cliente pós-túnel",
+      "Apenas reativar WEP na WLAN guest",
+      "Apenas err-disabled de outra porta do campus",
+      "Apenas wildcard invertida de ACL 1 no core sem evidência"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sessão up = path TLS e Authentication tipicamente ok. Falta de redes internas = split-tunnel/ACL de autorização ou routing. WEP e err-disabled não explicam o túnel do usuário. Valide o grupo e as rotas injetadas no client.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual par resume melhor RADIUS vs TACACS+ no CCNA conceitual?",
+    "alternativas": [
+      "Ambos são protocolos de Spanning Tree",
+      "RADIUS só existe em IPv6; TACACS só em IPv4",
+      "Ambos são ciphers WPA3",
+      "RADIUS comum em acesso de rede (802.1X/VPN); TACACS+ comum em administração de devices com command authz"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Distinção de caso de uso é o que a prova cobra. Ambos são AAA externos, não STP nem WPA. Versão IP não define exclusividade. Escolha conforme o problema: user de rede vs admin de CLI.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Usuário erra a senha do cliente VPN três vezes. Qual A do AAA falhou primeiro?",
+    "alternativas": [
+      "Authorization de comandos show run",
+      "Accounting de NetFlow",
+      "Authentication — identidade não comprovada",
+      "Site-to-site peer authentication entre filiais"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Senha errada = Authentication. Authorization só entra após sucesso. Accounting pode registrar falhas, mas a falha primária é auth. Site-to-site é outro cenário. Simples e cobrado.",
+    "part_id": "5.5"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor uso combinado de status de túnel/cliente VPN e logs AAA no incidente misto?",
+    "alternativas": [
+      "Substituir qualquer análise de L1 do último trecho",
+      "Só provar o root do STP",
+      "Apagar usuários locais automaticamente",
+      "Separar se o problema é estabelecimento do túnel/sessão (VPN) ou identidade/permissão/registro (AAA)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Túnel down vs auth fail vs authz deny são remédios diferentes. Os shows/logs leves de crypto e AAA guiam o eixo. STP e L1 podem entrar depois se o path básico falhar. Não apague users sem critério.",
+    "part_id": "5.5"
+  }
+]

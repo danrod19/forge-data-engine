@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Uma microempresa com 6 PCs, um impressora e um único link de Internet pede o desenho mais simples e barato. Qual arquitetura se encaixa melhor?",
+    "alternativas": [
+      "SOHO com roteador/firewall all-in-one e switch de acesso",
+      "Spine-leaf com quatro spines",
+      "Three-tier completo com core dedicado em cada sala",
+      "Fabric de DC com leaf por mesa"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Porte minúsculo e um link de Internet apontam para SOHO. Spine-leaf e three-tier completo são oversized e caros para 6 PCs. Leaf por mesa não é design de escritório pequeno.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual descrição corresponde a um hypervisor do tipo 1?",
+    "alternativas": [
+      "Aplicativo instalado sobre Windows desktop do analista",
+      "Software que roda diretamente no hardware e hospeda VMs",
+      "Container que compartilha o kernel sem qualquer isolamento",
+      "Serviço SaaS de e-mail pronto para o usuário final"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Tipo 1 (bare-metal) roda no hardware. Tipo 2 é app sobre SO host. Container e SaaS não definem hypervisor tipo 1.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A empresa quer apenas usar e-mail e suíte de escritório na nuvem, sem gerenciar servidores nem SO. Qual modelo de serviço é esse?",
+    "alternativas": [
+      "IaaS com patch semanal do kernel",
+      "PaaS com controle total do hypervisor",
+      "SaaS — aplicativo entregue pelo provedor",
+      "Three-tier on-prem obrigatório"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "App pronto (e-mail/Office) sem gerenciar SO/VM é SaaS. IaaS e PaaS deixam mais responsabilidade no cliente. Three-tier é arquitetura de campus, não modelo de nuvem de app.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No modelo IaaS, o que o cliente tipicamente ainda gerencia?",
+    "alternativas": [
+      "Apenas o prédio físico do data center do provedor",
+      "Somente o cabeamento spine-leaf do provedor",
+      "Apenas o HVAC do site do cloud",
+      "Sistema operacional, middleware e aplicações nas VMs provisionadas"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Em IaaS o provedor cuida da infra física/hipervisor base; o cliente administra SO e apps nas VMs. HVAC e prédio ficam com o provedor.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Campus médio: switches de acesso sobem para um par de switches que agregam e também fazem o backbone entre prédios, sem core separado. Qual design é esse?",
+    "alternativas": [
+      "Two-tier (collapsed core)",
+      "SOHO all-in-one sem access",
+      "Spine-leaf com spines nos desktops",
+      "SaaS de comutação L2"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Access + camada colapsada distribution/core = two-tier. SOHO é menor. Spine-leaf é fabric DC. SaaS não descreve hierarquia de campus.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual é a principal diferença conceitual entre VM e container no nível CCNA?",
+    "alternativas": [
+      "Container sempre exige tipo 2; VM nunca usa hardware",
+      "VM costuma levar SO/kernel próprio; container é mais leve e compartilha o kernel do host",
+      "São sinônimos perfeitos de SaaS",
+      "VM não permite snapshot; container sim, apenas"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "VM isola máquina completa; container empacota app sobre kernel compartilhado. Não são SaaS nem regras absolutas de snapshot/tipo 2.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Na hierarquia three-tier, qual camada conecta diretamente PCs e APs?",
+    "alternativas": [
+      "Core",
+      "Spine apenas",
+      "Access",
+      "PaaS de borda"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Access é a borda de usuário. Core é backbone. Spine é DC. PaaS não é tier de campus.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Tráfego intensivo entre servidores de aplicação e banco no mesmo DC, com racks densos. Qual topologia o fundamentals favorece?",
+    "alternativas": [
+      "SOHO com um switch não gerenciável",
+      "Three-tier de mesa de usuário sem leafs",
+      "WAN full-mesh entre impressoras",
+      "Spine-leaf, otimizada para east-west"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Server↔server (east-west) em DC combina com spine-leaf. SOHO e three-tier de usuário não são o fabric de racks. WAN de impressoras é irrelevante.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Time de desenvolvimento quer subir código sem administrar o SO nem o runtime base. Qual modelo de nuvem atende melhor?",
+    "alternativas": [
+      "PaaS",
+      "Apenas SOHO local",
+      "Somente IaaS com patch diário do hypervisor do cliente",
+      "SaaS de e-mail como único ambiente de build"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "PaaS entrega plataforma; o dev foca no código. SOHO não é modelo de app runtime. IaaS ainda exige gerir SO. E-mail SaaS não é plataforma de build.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual benefício da virtualização é mais alinhado ao CCNA fundamentals?",
+    "alternativas": [
+      "Eliminar qualquer necessidade de rede física",
+      "Consolidação de cargas, isolamento e uso de snapshots",
+      "Obrigar spine-leaf em toda filial",
+      "Transformar automaticamente SaaS em IaaS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Consolidação, isolamento e snapshot são benefícios clássicos. Rede física continua existindo. Virtualização não impõe spine-leaf nem troca modelos de nuvem sozinha.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Arquiteto propôs three-tier completo para um escritório de 12 pessoas com um switch e um firewall. Qual crítica é a mais correta?",
+    "alternativas": [
+      "O design está oversized; o porte pede SOHO ou no máximo two-tier simples, não core dedicado multi-tier",
+      "Todo site com firewall exige spine-leaf",
+      "12 usuários invalidam qualquer switch de acesso",
+      "Three-tier é proibido em empresas com SaaS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "12 usuários não justificam Access+Distribution+Core completos. Spine-leaf não é mandatório com firewall. Switch de acesso e SaaS não proíbem hierarquia — o problema é o oversize.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cliente pede “servidor na nuvem para eu instalar Windows Server e meu ERP”. Qual classificação está correta?",
+    "alternativas": [
+      "SaaS, pois qualquer coisa na nuvem é aplicativo pronto",
+      "IaaS — infraestrutura/VM sob responsabilidade parcial do cliente (SO e apps)",
+      "PaaS sem SO guest",
+      "Collapsed core de campus"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Instalar SO e ERP na VM é IaaS. SaaS seria usar app pronto. PaaS abstrai mais o SO. Collapsed core não é modelo de nuvem de compute.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Em spine-leaf, qual afirmação é verdadeira?",
+    "alternativas": [
+      "Spines conectam todos os PCs de usuário final no campus",
+      "Leafs nunca sobem para mais de um spine",
+      "Leafs conectam servidores e tipicamente sobem para todos os spines; spines não ligam servers entre si",
+      "É o único desenho válido para SOHO"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Padrão leaf-server e leaf–todos os spines. Spines não agregam mesas de SOHO. Dual-home a spines é o normal, não “um spine só” como regra.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Hypervisor instalado como programa no laptop do instrutor, sobre o Windows, para labs. Que tipo é?",
+    "alternativas": [
+      "Tipo 1 bare-metal de DC",
+      "SaaS de virtualização sem host",
+      "Container runtime sem SO host",
+      "Tipo 2 — hypervisor sobre o SO host"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "App de virtualização no desktop = tipo 2. Tipo 1 é bare-metal. Não é SaaS nem definição de container runtime.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Campus grande com vários prédios: precisa de core de alta disponibilidade separado da camada que aplica política e agrega o access. Qual escolha?",
+    "alternativas": [
+      "Apenas SOHO com um AP",
+      "Three-tier (Access, Distribution, Core)",
+      "Somente um switch L2 único para multi-prédio",
+      "IaaS no lugar de qualquer comutação local"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Separar core de distribution/política é three-tier. SOHO e um único L2 não escalam multi-prédio com HA de backbone. IaaS não remove a LAN de campus.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "App monolítica legada exige SO Windows completo, drivers e isolamento forte de kernel. O time debate container puro vs VM. O que é mais coerente no fundamentals?",
+    "alternativas": [
+      "Container sempre substitui qualquer SO guest sem exceção",
+      "SaaS de e-mail resolve o isolamento de kernel do ERP",
+      "Spine-leaf remove a necessidade de virtualizar a app",
+      "VM oferece isolamento de máquina/SO completo mais alinhado a esse legado"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Legado com SO completo pede VM. Container compartilha kernel e nem sempre cabe. E-mail SaaS e spine-leaf não resolvem o requisito de SO da app.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Oversubscription, em visão leve de campus, significa principalmente que:",
+    "alternativas": [
+      "Todo uplink deve ser 100× a soma dos access sem exceção",
+      "SOHO proíbe qualquer uplink",
+      "Containers eliminam a necessidade de uplinks físicos",
+      "A soma das portas de access pode superar a capacidade dos uplinks de agregação, equilibrando custo e tráfego típico"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Oversubscription é a relação access vs uplink planejada. Não exige 100× nem proíbe SOHO. Containers não apagam uplinks do campus.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual camada three-tier prioriza transporte rápido e resiliente entre blocos, com menos funções de borda de usuário?",
+    "alternativas": [
+      "Access",
+      "Distribution apenas de impressoras USB",
+      "Core",
+      "SaaS de Wi-Fi doméstico"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Core é backbone entre módulos. Access é borda de usuário. Distribution agrega/política. SaaS doméstico não é tier.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Banco de dados gerenciado pelo provedor (você não patcha o SO do DB server) é exemplo típico de:",
+    "alternativas": [
+      "IaaS de VM bare-metal sua",
+      "PaaS (ou DBaaS no guarda-chuva de plataforma)",
+      "SOHO de três spines",
+      "Collapsed core L2 puro"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "DB gerenciado abstrai SO/plataforma → PaaS/DBaaS. IaaS seria a VM com SO sob sua gestão. SOHO/spines não classificam o serviço de banco.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Filial com 8 usuários recebe proposta de “2 spines + 4 leafs MLAG”. Com base só em fundamentals, o que fazer?",
+    "alternativas": [
+      "Aceitar: spine-leaf é obrigatório abaixo de 10 usuários",
+      "Aceitar: three-tier exige spines nos APs",
+      "Recusar o oversize e preferir SOHO/two-tier alinhado ao inventário pequeno",
+      "Trocar tudo por containers no lugar de switch de acesso"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "8 usuários não pedem fabric DC. Spine-leaf não é mandatório em SOHO. Containers não substituem o desenho de acesso cabeado/wireless adequado ao porte.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Snapshot de VM antes de um patch crítico serve principalmente para:",
+    "alternativas": [
+      "Converter a VM em SaaS automaticamente",
+      "Criar spine-leaf virtual no notebook",
+      "Eliminar a necessidade de isolamento entre VMs",
+      "Ponto de restauração/rollback rápido da VM (benefício de virtualização)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Snapshot facilita voltar atrás após mudança. Não vira SaaS, não cria fabric nem remove isolamento entre VMs.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Distribution no three-tier costuma:",
+    "alternativas": [
+      "Conectar só teclados USB",
+      "Agregar uplinks de access e aplicar política, frequentemente com L3 de bloco",
+      "Substituir o provedor de Internet SaaS",
+      "Ser o único lugar onde VMs tipo 2 rodam obrigatoriamente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Distribution agrega e aplica política/L3. Não é porta USB nem definição de SaaS ou hypervisor tipo 2.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cargas críticas no DC on-prem (spine-leaf) e e-mail em Microsoft 365. Qual leitura de modelo é correta?",
+    "alternativas": [
+      "Híbrido de localização de cargas: fabric local + SaaS, sem contradizer as arquiteturas",
+      "Impossível: SaaS proíbe qualquer switch on-prem",
+      "Spine-leaf vira automaticamente IaaS do e-mail",
+      "Tudo deve ser SOHO se houver um app SaaS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Campus/DC local e SaaS coexistem. SaaS não bane switches. Spine-leaf não transforma e-mail em IaaS. SOHO não é obrigatório por usar um SaaS.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que collapsed core reduz custo frente ao three-tier em muitos campus médios?",
+    "alternativas": [
+      "Porque elimina todos os switches de access",
+      "Porque obriga spine-leaf em cada andar",
+      "Porque mescla papéis de distribution e core, com menos camadas/dispositivos",
+      "Porque transforma o campus em SaaS"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Menos camada dedicada de core separado reduz hardware e complexidade. Access continua existindo. Não impõe spine-leaf nem vira SaaS.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Microserviço novo, deploy frequente, time quer empacotar só a app e dependências com mínimo overhead. Caminho mais alinhado:",
+    "alternativas": [
+      "Container",
+      "Obrigatoriamente VM bare-metal tipo 1 por app sem exceção",
+      "SaaS de impressora local",
+      "Three-tier no notebook do dev"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Containers são leves para empacotar app/deps. VM completa é mais pesada. SaaS de impressora e three-tier no laptop não respondem ao requisito de deploy da app.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Falha de um uplink access→distribution em campus reduntante bem desenhado. A ideia fundamentals é:",
+    "alternativas": [
+      "Todo o site Internet cai para sempre sem remédio de design",
+      "Redundância de uplinks/caminhos reduz o impacto; o tráfego pode usar o caminho alternativo",
+      "Containers no core eliminam L1",
+      "SaaS remove a necessidade de uplinks físicos no access"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Design com dual-home/caminhos alternativos mitiga falha de enlace. Não é “queda eterna” por definição. Containers e SaaS não apagam a física do access.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual confusão clássica a prova tenta evitar sobre nuvem?",
+    "alternativas": [
+      "Achar que IaaS e SaaS são a mesma coisa e que “nuvem = sempre VM que eu administro”",
+      "Saber que SaaS entrega app e IaaS entrega infra",
+      "Separar PaaS de IaaS corretamente",
+      "Relacionar e-mail Office a SaaS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A armadilha é misturar modelos: achar que tudo na nuvem é VM IaaS ou que SaaS = alugar servidor. As outras opções são afirmações corretas, não confusões.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Em um two-tier, o “core colapsado” significa que:",
+    "alternativas": [
+      "Não existe camada de access",
+      "Só há spine-leaf de impressão",
+      "O cliente usa apenas PaaS",
+      "As funções de distribution e core compartilham a mesma camada de design (não há core separado)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Collapsed core une distribution+core. Access permanece. Não é spine-leaf de impressão nem sinônimo de PaaS.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Provedor entrega VMs, storage e redes virtuais; você instala middleware e app. Isso é:",
+    "alternativas": [
+      "SaaS puro de app final",
+      "Apenas unique local IPv6",
+      "IaaS",
+      "SOHO de três cores"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Infra virtual + você gerencia o restante da pilha = IaaS. SaaS seria app pronta. IPv6 ULA e SOHO não classificam o serviço cloud.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Escolha de arquitetura no CCNA deve combinar principalmente:",
+    "alternativas": [
+      "Somente a cor do rack",
+      "Somente se o CEO usa SaaS de e-mail",
+      "Somente o número de containers no laptop",
+      "Porte do site, custo, tipo de tráfego (user-campus vs server east-west) e necessidade de camadas dedicadas"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Porte, custo, tráfego e necessidade de tiers definem SOHO/two/three/spine-leaf. Cor de rack, e-mail SaaS isolado ou containers no laptop não bastam como critério único.",
+    "part_id": "1.6"
+  }
+]

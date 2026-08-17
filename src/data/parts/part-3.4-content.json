@@ -1,0 +1,144 @@
+{
+  "part_id": "3.4",
+  "title": "IPv6: endereçamento, SLAAC, estático e OSPFv3 leve",
+  "blueprint_module": "3.0",
+  "weight_percent": 25,
+  "topic_list": [
+    "Tipos de endereço: GUA, link-local, ULA, multicast",
+    "FE80::/10, FC00::/7 (fd00::/8), FF02::1 / FF02::2",
+    "ipv6 address, ipv6 enable e EUI-64",
+    "SLAAC e Router Advertisement (RA)",
+    "Flags M/O e DHCPv6 (conceito leve)",
+    "Rota estática IPv6 e default ::/0",
+    "show ipv6 interface brief / route / neighbors",
+    "Dual-stack IPv4+IPv6",
+    "OSPFv3 leve na interface (area 0)",
+    "Falhas: sem GUA, RA suppress, ::/0 ausente",
+    "Link-local obrigatório vs GUA opcional até configurar",
+    "Compressão e notação de prefixo /64"
+  ],
+  "study_notes": [
+    {
+      "heading": "Tipos de endereço IPv6 na conectividade",
+      "bullets": [
+        "GUA (Global Unicast): endereço roteável globalmente; faixa comum de estudo 2000::/3 (ex.: 2001:db8::/32 de documentação).",
+        "Link-local: FE80::/10; obrigatório em toda interface IPv6 ativa; usado para comunicação no enlace (ND, next-hop local, OSPFv3 Hellos).",
+        "Unique Local (ULA): fc00::/7 (na prática fd00::/8); privado de site, análogo conceitual aos privados IPv4.",
+        "Multicast: FF00::/8; no enlace FF02::1 (all-nodes), FF02::2 (all-routers); OSPFv3 pode usar FF02::5/6 em materiais que citam grupos OSPF.",
+        "Loopback ::1/128; default route ::/0; endereço não especificado ::/128.",
+        "Não existe broadcast IPv6 — funções de “todos no link” usam multicast."
+      ],
+      "exam_tips": [
+        "Só FE80 na interface = IPv6 “ligado” no link, mas sem GUA não há destino global/roteável típico de servidor."
+      ]
+    },
+    {
+      "heading": "Configuração: enable, address e EUI-64",
+      "bullets": [
+        "ipv6 unicast-routing no roteador habilita encaminhamento IPv6 (hosts não precisam disso para ter endereço).",
+        "ipv6 enable na interface gera/ativa link-local sem necessariamente configurar GUA.",
+        "ipv6 address 2001:db8:1:1::1/64 configura GUA estática com prefixo /64 típico de LAN.",
+        "ipv6 address 2001:db8:1:1::/64 eui-64 monta o Interface ID a partir do MAC (insere FFFE e inverte o bit U/L no modelo clássico).",
+        "Várias GUAs e um link-local podem coexistir na mesma interface.",
+        "Sem ipv6 address/enable (e sem SLAAC recebendo RA), a interface pode ficar sem IPv6 utilizável."
+      ],
+      "exam_tips": [
+        "eui-64 = prefixo + IID do MAC. Estático = você define o host ID completo."
+      ]
+    },
+    {
+      "heading": "SLAAC, RA e DHCPv6 (conceito)",
+      "bullets": [
+        "SLAAC: o host monta GUA com prefixo do Router Advertisement (RA) + Interface ID (EUI-64 ou privacy).",
+        "RS (Router Solicitation) pede RA; o roteador envia RA periodicamente e em resposta a RS.",
+        "Flag A (autonomous): permite SLAAC no prefixo. Flag M: DHCPv6 stateful para endereço. Flag O: DHCPv6 para outras opções (DNS) mesmo com SLAAC.",
+        "ipv6 nd ra suppress (ou equivalente) no roteador/SVI impede RA — hosts podem ficar só com link-local.",
+        "DHCPv6 stateful entrega IPv6 como o DHCP IPv4; stateless combina SLAAC + opções via DHCP.",
+        "Prefixo de LAN típico /64 para SLAAC funcionar de forma padrão."
+      ],
+      "exam_tips": [
+        "Host sem GUA + só FE80 → cheque RA (suppress), prefixo, e se há roteador IPv6 no link."
+      ]
+    },
+    {
+      "heading": "Rotas estáticas IPv6 e default",
+      "bullets": [
+        "ipv6 route <prefixo>/<length> <next-hop> [AD] instala estática (next-hop costuma ser link-local + interface de saída em multiacesso, ou GUA do peer).",
+        "Default IPv6: ipv6 route ::/0 <next-hop> — gateway of last resort IPv6.",
+        "show ipv6 route mostra códigos (C, L, S, O etc. conforme fontes); S* ou default candidata para ::/0.",
+        "Sem ::/0 e sem rota mais específica, destinos remotos IPv6 falham mesmo com GUA local.",
+        "Next-hop link-local exige especificar a interface de saída em muitos casos (next-hop só FE80 é ambíguo entre links)."
+      ],
+      "exam_tips": [
+        "IPv4 default 0.0.0.0/0 · IPv6 default ::/0. Dual-stack precisa de default em cada pilha se for usar as duas."
+      ]
+    },
+    {
+      "heading": "OSPFv3 leve (nível exam)",
+      "bullets": [
+        "OSPFv3 carrega prefixos IPv6; ativa-se por interface: ipv6 ospf <process-id> area <area-id> (e ipv6 router ospf / router-id no processo).",
+        "Hellos OSPFv3 usam link-local; a interface precisa de IPv6 ativo (link-local no mínimo).",
+        "Single-area de estudo: area 0; vizinhos na mesma área/subnet lógica do link.",
+        "show ipv6 ospf neighbor / show ipv6 route ospf (nomes variam por plataforma) verificam adjacency e rotas O.",
+        "Falha comum: IPv6 unicast-routing off, interface sem ipv6 ospf area, ou só IPv4 OSPF sem processo v3."
+      ],
+      "exam_tips": [
+        "OSPFv3 ≠ “OSPF IPv4 com endereço v6”. Precisa de config IPv6/OSPFv3 na interface."
+      ]
+    },
+{
+      "heading": "Dual-stack e verificação",
+      "bullets": [
+        "Dual-stack: nó com IPv4 e IPv6 ao mesmo tempo; cada pilha tem endereços, rotas e defaults próprios.",
+        "show ipv6 interface brief: endereços e estado (up/up) por interface.",
+        "show ipv6 interface <if>: link-local, GUA, joined groups, RA/ND detalhes.",
+        "show ipv6 neighbors: cache ND (análogo conceitual ao ARP).",
+        "show ipv6 route: tabela de encaminhamento IPv6.",
+        "show run | include ipv6: unicast-routing, addresses, routes, ospf, ra suppress."
+      ],
+      "exam_tips": [
+        "IPv4 ok e IPv6 falha: cheque GUA, ::/0 e RA — não assuma que a default IPv4 serve para IPv6."
+      ]
+    },
+    {
+      "heading": "Troubleshooting clássico IPv6",
+      "bullets": [
+        "Só FE80:: → falta GUA (estático/SLAAC) ou RA suprimido.",
+        "GUA presente, sem saída remota → falta ::/0 ou rota mais específica; next-hop/interface.",
+        "Ping entre link-locals exige -I / interface de saída no host.",
+        "EUI-64 “estranho”: confira bit U/L invertido e FFFE no meio do IID.",
+        "OSPFv3 sem neighbor: link-local up? ipv6 ospf area na if? area/timers? unicast-routing?",
+        "Ordem mental: IPv6 enable/address → GUA/LL → ND → rota/default → (OSPFv3 se dinâmico)."
+      ],
+      "exam_tips": [
+        "Separe: (1) tem endereço? (2) tem vizinho ND/roteador? (3) tem rota? (4) dual-stack confusão."
+      ]
+    }
+  ],
+  "key_commands": [
+    "ipv6 unicast-routing",
+    "ipv6 enable",
+    "ipv6 address <GUA>/<prefix-length>",
+    "ipv6 address <prefix>/<length> eui-64",
+    "ipv6 nd ra suppress",
+    "ipv6 route <prefix>/<length> <next-hop>",
+    "ipv6 route ::/0 <next-hop>",
+    "ipv6 router ospf <process-id>",
+    "ipv6 ospf <process-id> area <area-id>",
+    "show ipv6 interface brief",
+    "show ipv6 interface <interface>",
+    "show ipv6 route",
+    "show ipv6 route static",
+    "show ipv6 neighbors",
+    "show ipv6 ospf neighbor"
+  ],
+  "must_know": [
+    "Link-local FE80::/10 em toda interface IPv6 ativa; GUA é o endereço roteável “de verdade” para destinos remotos.",
+    "ULA fc00::/7 (fd00::/8); multicast FF02::1 all-nodes, FF02::2 all-routers no link.",
+    "SLAAC usa RA (prefixo /64 típico); ra suppress deixa hosts sem GUA automática.",
+    "EUI-64 gera IID a partir do MAC (FFFE + flip U/L no modelo clássico).",
+    "Default IPv6 = ::/0; estática com ipv6 route; dual-stack exige config/rotas em cada pilha.",
+    "OSPFv3: ipv6 ospf <pid> area na interface; Hellos em link-local.",
+    "show ipv6 interface brief e show ipv6 route são a base do diagnóstico de endereçamento e default."
+  ]
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5101 — Auditoria: “enable está fraco”. Backup da running foi parar em repositório amplo da equipe.",
+    "cli_output": "R1# show run | include enable|username|password|secret|service\nenable password Cisco123\nenable secret 5 $1$mERr$hx5rVt7rPNoS4wqbXKX7m0\nservice password-encryption\nusername ops password 7 0822455D0A16544541\n\nR1# show privilege\nCurrent privilege level is 15\n\nR1# show run | section line vty\nline vty 0 4\n login local\n transport input ssh\n\nR1# show run | include transport\n transport input ssh\n\n! Nota: enable password ainda presente em paralelo ao secret; username usa password 7 (não secret)",
+    "alternativas": [
+      "Só existe enable secret; enable password está ausente",
+      "transport input telnet only no section vty",
+      "show privilege prova nível 1 apenas",
+      "enable password legado ainda na running (e user com password 7) — secret existe, mas password em claro/fraco e tipo 7 violam hardening"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Há enable password Cisco123 e secret; username com password 7, não secret. VTY já em SSH. Privilege 15 na sessão atual. Remova enable password, migre users para secret; tipo 7 não salva se a config vazar. Eixo: password vs secret / tipo 7.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5102 — Sniffer no span port capturou usuário e senha em texto durante “acesso remoto”. Equipe jura que usa secret forte.",
+    "cli_output": "R1# show run | include enable|username|secret|password\nenable secret 9 $9$xxxxxxxx\nusername netadmin secret 9 $9$yyyyyyyy\n\nR1# show run | section line vty\nline vty 0 4\n login local\n transport input telnet\n\nR1# show run | include transport\n transport input telnet\n\nR1# show privilege\nCurrent privilege level is 1\n\n! Captura de lab (resumo): sessão Telnet com “netadmin / ****” legível em ASCII no payload",
+    "alternativas": [
+      "enable secret ausente na running",
+      "transport input telnet — sessão de gerenciamento em cleartext; secret forte no device não cifra o Telnet",
+      "login local está ausente",
+      "username netadmin usa password em claro tipo 0 no include"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "enable secret e username secret 9 estão ok; VTY com transport input telnet e login local. O sniffer lê Telnet, não o hash do secret. Corrija para transport input ssh. Privilege 1 só mostra user mode da sessão de exemplo.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5103 — login local nas VTY; Authentication failed para todos. Ninguém configurou usuários com secret.",
+    "cli_output": "SW1# show run | include enable|username|password|secret\nenable secret 5 $1$abcd$efghijklmnop\n! nenhuma linha username\n\nSW1# show run | section line vty\nline vty 0 15\n login local\n transport input ssh\n\nSW1# show run | section line console\nline console 0\n login local\n\nSW1# show privilege\nCurrent privilege level is 15\n\n! Cliente SSH: Permission denied (publickey,password)",
+    "alternativas": [
+      "transport input telnet only impede SSH no section",
+      "enable secret ausente",
+      "login local sem username na running — database local vazio; autenticação VTY/console falha",
+      "show privilege nível 1 prova que o enable secret não existe"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "login local exige username; include não lista nenhum. enable secret e transport ssh ok; privilege 15 é da sessão console do admin. Crie username <user> secret. Não é Telnet-only nem falta de enable secret.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5104 — show run no projetor da sala de reunião exibiu senhas legíveis. Não há service password-encryption.",
+    "cli_output": "R1# show run | include enable|username|password|secret|service password\nenable password LabPass1\nusername temp password Summer2024\n! (sem enable secret)\n! (sem service password-encryption)\n\nR1# show run | section line vty\nline vty 0 4\n password VtyVisible\n login\n transport input ssh\n\nR1# show privilege\nCurrent privilege level is 15\n\nR1# show run | include transport\n transport input ssh",
+    "alternativas": [
+      "service password-encryption e secrets tipo 5/9 protegem todas as linhas do output",
+      "Todas as senhas já estão como secret 9 no include",
+      "transport input telnet explica o projetor",
+      "Senhas em claro (enable password, username password, VTY password) e ausência de service password-encryption — config legível no show run"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "enable password, username password e password de VTY aparecem legíveis; sem service password-encryption e sem enable/username secret. SSH no transport não esconde a running no projetor. Migre para secret, ative password-encryption como camada extra e evite exibir full run em público.",
+    "part_id": "5.1"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5105 — Estagiário plugou console e caiu direto no prompt sem senha. Remoto também preocupa a equipe.",
+    "cli_output": "R1# show run | section line console\nline console 0\n exec-timeout 0 0\n ! sem login / sem password / sem login local\n\nR1# show run | section line vty\nline vty 0 4\n transport input all\n ! sem login / sem password / sem login local\n\nR1# show run | include enable|username|secret|password\nenable secret 5 $1$qqqq$rrrrrrrrrr\n! sem username\n\nR1# show privilege\nCurrent privilege level is 1\n\nR1# show run | include transport\n transport input all",
+    "alternativas": [
+      "Console e VTY sem método de autenticação (login/password/login local) — acesso de linha aberto; transport all ainda expõe Telnet",
+      "enable secret ausente no include",
+      "login local + username secret já configurados nas duas linhas",
+      "show privilege 15 prova que o estagiário já estava authenticated como root"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Console e VTY sem login/password/login local = linhas abertas. transport input all mantém Telnet. enable secret existe mas só protege o enable após entrar na linha. Privilege 1 é user EXEC. Configure autenticação nas linhas e restrinja transport a ssh.",
+    "part_id": "5.1"
+  }
+]

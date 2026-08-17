@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Pipeline grava artefatos em s3://corp-build/app/v1.2.0.tgz. O que identifica esse objeto no bucket?",
+    "alternativas": [
+      "A object key (ex. app/v1.2.0.tgz) e versionId se versioning estiver ativo",
+      "O Security Group da subnet onde o CI roda",
+      "O hostname do NAT Gateway da VPC de build",
+      "O ID da route table da subnet pública do ALB"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Objetos S3 são endereçados por bucket + key (prefixos são parte da key); versionId entra com versioning. SG, NAT e route table não identificam o objeto. Tip de prova: se a pergunta é 'onde está o arquivo no S3?', a resposta é key — não componente de VPC.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "App role precisa ler um prefixo; outra conta também. Quando a bucket policy entra além da IAM identity policy?",
+    "alternativas": [
+      "Bucket policy só existe se o bucket estiver em Glacier Deep Archive",
+      "IAM anexa ao principal; bucket policy anexa ao bucket — útil em cross-account e condições no recurso",
+      "IAM nunca pode permitir s3:GetObject em objetos",
+      "Bucket policy desliga automaticamente o Block Public Access"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Identity-based autoriza o principal; resource-based no bucket autoriza Principals (inclusive de outra conta) e condições no recurso. Ambas podem Allow/Deny GetObject; BPA é controle separado. Tip de prova: cross-account S3 → pense bucket policy + identity na conta de origem.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Compliance exige impedir que policies/ACLs tornem o bucket legível na Internet por engano. Qual controle priorizar?",
+    "alternativas": [
+      "Habilitar Transfer Acceleration em todos os prefixos",
+      "Substituir SSE-S3 por desligar encryption",
+      "S3 Block Public Access no bucket e/ou na conta",
+      "Criar CRR para outra Região como único controle de exposição"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "BPA bloqueia grants e policies públicas acidentais — primeira linha contra Principal * GetObject. Transfer Acceleration e CRR não substituem BPA; desligar encryption piora segurança. Tip de prova: 'público acidental' → BPA antes de discutir CloudFront.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Dados sensíveis exigem auditoria e controle de chave de criptografia em repouso. SSE-S3 ou SSE-KMS?",
+    "alternativas": [
+      "SSE-S3 quando se precisa de CloudTrail de uso de CMK e key policy fina",
+      "SSE-KMS (CMK ou AWS managed) quando se precisa de controle/auditoria via KMS",
+      "Nenhuma encryption at rest é permitida no S3 Associate",
+      "SSE-KMS só funciona se o bucket for público"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "SSE-KMS integra KMS para grants, key policy e auditoria; SSE-S3 é mais simples com chaves do S3. Encryption at rest é central no domínio seguro; público não é requisito de KMS. Tip de prova: 'controle de chave/auditoria' → KMS; 'simples default' → SSE-S3.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Estagiário sobrescreveu config/prod.json. Versioning está Enabled. Qual benefício direto?",
+    "alternativas": [
+      "É possível recuperar a versão anterior do objeto (histórico), em vez de depender só de backup externo",
+      "O bucket deixa de exigir IAM para GetObject",
+      "O bucket torna-se público automaticamente para rollback",
+      "O bucket é convertido em sistema de arquivos EBS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Versioning mantém versões não atuais após overwrite/delete (com delete marker na exclusão). Não remove IAM nem força público. Tip de prova: overwrite acidental + versioning on → list-object-versions / restaurar versão. (aws-1.3 #5)",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Logs com acesso <1 GET/mês há 90 dias ainda em Standard sem lifecycle. Qual meta principal de uma rule para STANDARD_IA?",
+    "alternativas": [
+      "Aumentar o custo de armazenamento quente propositalmente",
+      "Desabilitar a criptografia default do bucket",
+      "Forçar Block Public Access off no bucket",
+      "Reduzir custo de dados pouco acessados (storage class mais barata conforme padrão de acesso)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Lifecycle transition para IA/Glacier é alavanca do domínio custo; dados frios em Standard incham a fatura. Não desliga encryption nem BPA. Tip de prova: logs frios + custo alto → lifecycle, não 'comprar mais requests'. (aws-1.3 #6)",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "EC2 app precisa GetObject só em s3://dados/app/*. Qual identidade/permissão é o design preferido?",
+    "alternativas": [
+      "Access key do root no código da aplicação",
+      "Bucket 100% público com Principal * GetObject",
+      "IAM role da instância com least privilege s3:GetObject no prefixo app/*",
+      "Desligar CloudTrail para o GetObject 'funcionar mais rápido'"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: IAM role da instância com least privilege s3:GetObject no prefixo app/*. Isso resolve o cenário: EC2 app precisa GetObject só em s3://dados/app/*. Qual identidade/permissão é o … O distractor «Access key do root no código da aplicação» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.3), não em controles de outro domínio.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "GetObject retorna AccessDenied com 'explicit deny in an identity-based policy'. O que fazer?",
+    "alternativas": [
+      "Adicionar Allow s3:* sem inspecionar o Deny",
+      "Publicar o objeto com ACL public-read e ignorar IAM",
+      "Trocar só a região default do CLI",
+      "Localizar e ajustar o statement Deny na policy do principal que bloqueia GetObject"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Deny explícito vence Allow; o remédio é o statement Deny (ou o contexto Condition que o ativa). Allow genérico e ACL pública não 'vencem' Deny e pioram segurança. Tip de prova: texto explicit deny = caçar Deny, não empilhar Allow.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Bucket policy Principal \"*\" Action s3:GetObject e get-public-access-block ausente/desligado. Qual risco?",
+    "alternativas": [
+      "Objetos podem ficar legíveis publicamente na Internet",
+      "O bucket é apagado automaticamente em 24h",
+      "O versioning desliga sozinho em todos os objetos",
+      "O KMS apaga todas as CMK da conta"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Objetos podem ficar legíveis publicamente na Internet. Isso resolve o cenário: Bucket policy Principal \"*\" Action s3:GetObject e get-public-access-block ausent… O distractor «O bucket é apagado automaticamente em 24h» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.3), não em controles de outro domínio.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "TShoot de acesso: qual CLI inspeciona o documento de autorização anexado ao bucket?",
+    "alternativas": [
+      "aws ec2 describe-route-tables",
+      "aws iam list-users",
+      "aws s3api get-bucket-policy --bucket <nome>",
+      "aws sts assume-role sem RoleArn válido"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "get-bucket-policy devolve a resource policy do bucket — essencial junto com IAM do caller. Rotas EC2 e list-users não mostram a policy do bucket. Tip de prova: AccessDenied S3 → get-bucket-policy + get-public-access-block + policies da role.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "get-caller-identity = assumed-role/app-reader. list-attached-role-policies de app-reader = vazio. Bucket policy Allow GetObject só para role data-etl no prefixo reports/*. app-reader falha GetObject em reports/q1.pdf. Causa raiz?",
+    "alternativas": [
+      "O objeto está em Glacier Deep Archive e por isso IAM é ignorado",
+      "O Block Public Access concede GetObject a qualquer role da conta",
+      "app-reader não tem Allow (IAM vazio) e a bucket policy não a inclui — só data-etl está autorizada no resource",
+      "Falta Internet Gateway na subnet do caller para APIs S3 públicas"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Evidência fecha: sem identity Allow e bucket policy só para data-etl, app-reader não tem caminho Allow efetivo. BPA não libera roles internas; IGW não é requisito típico do endpoint S3 público. Tip de prova: em AccessDenied S3, cruze principal vs Principal da bucket policy e attaches IAM.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Compliance aceita encryption at rest gerenciada pelo S3 sem CMK própria. Qual opção descreve SSE-S3?",
+    "alternativas": [
+      "Criptografia em repouso no servidor com chaves gerenciadas pelo Amazon S3",
+      "Obrigatoriedade de usar apenas HTTP sem TLS em todos os puts",
+      "Requisito de Client VPN para cada GetObject",
+      "Substituição completa do IAM por ACLs públicas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Criptografia em repouso no servidor com chaves gerenciadas pelo Amazon S3. Isso resolve o cenário: Compliance aceita encryption at rest gerenciada pelo S3 sem CMK própria. Qual op… O distractor «Obrigatoriedade de usar apenas HTTP sem TLS em todos os puts» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.3), não em controles de outro domínio.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "aws s3 rm s3://b/config.json com versioning Enabled. O que acontece em geral?",
+    "alternativas": [
+      "Todas as versões são apagadas irrecuperáveis imediatamente",
+      "O bucket inteiro é removido da conta",
+      "Cria-se um delete marker (IsLatest); versões anteriores permanecem recuperáveis",
+      "O Block Public Access desliga automaticamente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Delete com versioning adiciona delete marker; listagem corrente 'some' o objeto, mas list-object-versions mostra histórico. Não apaga o bucket nem desliga BPA. Tip de prova: sumiu + versioning on → delete marker, não 'recriar conta'.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cost Explorer: S3 Standard alto em logs frios; get-bucket-lifecycle-configuration retorna NoSuchLifecycleConfiguration. Problema típico?",
+    "alternativas": [
+      "Custo de storage mais alto que o necessário sem transition para classes mais baratas",
+      "Impossibilidade total de usar IAM no bucket",
+      "Perda automática e irreversível de versioning",
+      "Bloqueio default de todo PutObject pela AWS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem lifecycle, dados frios permanecem em Standard e elevam custo — domínio 4. IAM e versioning não são desligados por isso. Tip de prova: NoSuchLifecycleConfiguration + Standard em arquivo frio = crie lifecycle. (aws-1.3 #14)",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Site estático: S3 website público vs CloudFront com origem privada (menção SAA). Qual contraste de segurança?",
+    "alternativas": [
+      "São idênticos: ambos exigem Principal * no bucket sempre",
+      "Website S3 clássico costuma exigir leitura pública do bucket; CloudFront pode servir origem privada com controle na borda",
+      "CloudFront elimina a necessidade de TLS em trânsito",
+      "Origem privada força ACL AllUsers READ"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Website endpoint tradicional expõe leitura pública; padrões modernos usam CloudFront + OAI/OAC (ideia) mantendo bucket privado. TLS permanece necessário. Tip de prova: 'sem bucket público' → CloudFront + origem privada, não Principal *.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "IAM role tem Allow PutObject; bucket policy tem Deny PutObject para essa role. Resultado do put-object?",
+    "alternativas": [
+      "Put sempre funciona porque IAM vence resource policy",
+      "Falha só se faltar Internet Gateway",
+      "Falha só se o ETag estiver vazio",
+      "Put é negado — Deny explícito na bucket policy prevalece sobre o Allow do IAM"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Put é negado — Deny explícito na bucket policy prevalece sobre o Allow do IAM. Isso resolve o cenário: IAM role tem Allow PutObject; bucket policy tem Deny PutObject para essa role. R… O distractor «Put sempre funciona porque IAM vence resource policy» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.3), não em controles de outro domínio.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "get-public-access-block: BlockPublicAcls e RestrictPublicBuckets = true. Efeito?",
+    "alternativas": [
+      "Ajuda a impedir exposição pública via ACL e policies públicas no bucket",
+      "Desliga o versioning de todos os objetos",
+      "Cria SCP de Organizations forçando SSE-KMS em toda a org",
+      "Configura CRR para us-west-2 automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Ajuda a impedir exposição pública via ACL e policies públicas no bucket. Isso resolve o cenário: get-public-access-block: BlockPublicAcls e RestrictPublicBuckets = true. Efeito?… O distractor «Desliga o versioning de todos os objetos» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.3), não em controles de outro domínio.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Conta B precisa ler bucket da conta A sem tornar o bucket público. Padrão comum?",
+    "alternativas": [
+      "Compartilhar access key de root da conta A no chat",
+      "Bucket policy na A permitindo o principal da B + permissões IAM/role na B",
+      "Desligar BPA e abrir Principal * GetObject global",
+      "Usar apenas NACL da VPC da B para autorizar a API S3"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Cross-account usa resource policy no bucket A e identity na B (frequentemente AssumeRole). Root keys e * público são inseguros; NACL não autoriza API S3. Tip de prova: cross-account S3 = bucket policy + principal na conta origem.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Bucket com default encryption SSE-S3. Cliente faz PutObject sem header x-amz-server-side-encryption. Resultado típico?",
+    "alternativas": [
+      "O Put é rejeitado em 100% dos casos sem exceção configurável",
+      "O bucket é convertido em website hosting automaticamente",
+      "O objeto é armazenado cifrado em repouso conforme a default encryption do bucket",
+      "O versioning é suspenso automaticamente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Default encryption aplica SSE no Put quando configurada, sem exigir que o cliente envie o header em muitos fluxos modernos. Não vira website nem desliga versioning. Tip de prova: default encryption = rede de segurança at rest no bucket.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo da part S3 foundations (aws-1.3)?",
+    "alternativas": [
+      "Block Public Access e bucket policy",
+      "SSE-S3 vs SSE-KMS (ideia)",
+      "Lifecycle transition e versioning",
+      "S3 Object Lambda deep, Batch Operations full e Transfer Acceleration deep"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O piloto cobre acesso, BPA, encryption, versioning e lifecycle. Object Lambda, Batch Ops e Transfer Acceleration deep ficam de fora. Tip de prova: não escolha Object Lambda se o problema é só IAM/BPA/lifecycle. (aws-1.3 #20)",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Quem consegue get-bucket-policy com sucesso, em geral?",
+    "alternativas": [
+      "Principal com s3:GetBucketPolicy (sem Deny) — tipicamente role/admin de plataforma",
+      "Qualquer usuário anônimo da Internet por default",
+      "Somente o serviço EC2 Auto Scaling",
+      "Somente quando o NAT Gateway da VPC está desligado"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Principal com s3:GetBucketPolicy (sem Deny) — tipicamente role/admin de plataforma. Isso resolve o cenário: Quem consegue get-bucket-policy com sucesso, em geral?… O distractor «Qualquer usuário anônimo da Internet por default» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.3), não em controles de outro domínio.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Objeto sumiu na listagem s3 ls; versioning Enabled. Qual próximo check?",
+    "alternativas": [
+      "Recriar a VPC de produção",
+      "list-object-versions (ou console de versões) para delete marker ou VersionId anterior",
+      "Desligar rotação de chaves KMS da conta",
+      "Abrir 0.0.0.0/0 em um Security Group 'do bucket'"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: list-object-versions (ou console de versões) para delete marker ou VersionId anterior. Isso resolve o cenário: Objeto sumiu na listagem s3 ls; versioning Enabled. Qual próximo check?… O distractor «Recriar a VPC de produção» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.3), não em controles de outro domínio.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Lifecycle expira noncurrent versions após 90 dias. Trade-off custo vs resiliência?",
+    "alternativas": [
+      "Aumenta sem limite o número de versões para sempre",
+      "Desliga o Block Public Access",
+      "Reduz custo de versioning antigo e encurta a janela de recuperação dessas versões",
+      "Torna o bucket public-read automaticamente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Reduz custo de versioning antigo e encurta a janela de recuperação dessas versões. Isso resolve o cenário: Lifecycle expira noncurrent versions após 90 dias. Trade-off custo vs resiliênci… O distractor «Aumenta sem limite o número de versões para sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.3), não em controles de outro domínio.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PutObject AccessDenied; get-caller-identity mostra a role correta; IAM da role não lista s3:PutObject. Causa raiz?",
+    "alternativas": [
+      "Falta Allow s3:PutObject (e Resource do prefixo/bucket) na role",
+      "Volume EBS root com pouco espaço no cliente CLI",
+      "Falta de Elastic IP associado à role IAM",
+      "Hostname DNS privado da VPC incorreto apenas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Falta Allow s3:PutObject (e Resource do prefixo/bucket) na role. Isso resolve o cenário: PutObject AccessDenied; get-caller-identity mostra a role correta; IAM da role n… O distractor «Volume EBS root com pouco espaço no cliente CLI» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.3), não em controles de outro domínio.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "No nível desta part, como tratar S3 Cross-Region Replication (CRR)?",
+    "alternativas": [
+      "Como lab completo multi-region com failover de app obrigatório em toda questão",
+      "Como recurso proibido de mencionar no SAA-C03",
+      "Como recurso exclusivo de Glacier Deep Archive",
+      "Como ideia de resiliência/DR de objetos; implementação deep fora do piloto foundations"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "CRR pode aparecer como opção de DR de dados; o lab multi-region completo não é o foco de aws-1.3. Não é proibido nem só Glacier. Tip de prova: foundations = versioning/lifecycle; CRR = ideia, não runbook completo. (aws-1.3 #25)",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Bucket policy com Condition aws:SecureTransport = true no Allow. Efeito prático?",
+    "alternativas": [
+      "Permite apenas HTTP claro sem TLS",
+      "Desliga o versioning do bucket",
+      "Altera o MTU das ENIs da VPC",
+      "Restringe o acesso à API S3 a conexões HTTPS (TLS)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Restringe o acesso à API S3 a conexões HTTPS (TLS). Isso resolve o cenário: Bucket policy com Condition aws:SecureTransport = true no Allow. Efeito prático?… O distractor «Permite apenas HTTP claro sem TLS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.3), não em controles de outro domínio.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Allow GetObject em logs/* só para role Logger; user Dev (só console password) tenta GetObject em logs/a.txt. Resultado?",
+    "alternativas": [
+      "Allow implícito a todos os users da conta",
+      "Dev obtém o objeto porque tem senha de console",
+      "AccessDenied para Dev — autenticação de console não concede o prefixo logs/",
+      "Block Public Access concede GetObject a Dev automaticamente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: AccessDenied para Dev — autenticação de console não concede o prefixo logs/. Isso resolve o cenário: Allow GetObject em logs/* só para role Logger; user Dev (só console password) te… O distractor «Allow implícito a todos os users da conta» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.3), não em controles de outro domínio.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mental de AccessDenied em s3:GetObject nesta part?",
+    "alternativas": [
+      "Só recriar o bucket com outro nome global",
+      "Só aumentar IOPS do EBS do laptop do analista",
+      "Só desligar MFA do root user",
+      "Principal → IAM Allow → bucket policy → Deny → BPA → key/ARN → KMS se SSE-KMS"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Ordem lógica isola identidade, policies, BPA, key correta e key policy KMS. Recriar bucket ou mexer em EBS/MFA root não é o primeiro passo. Tip de prova: memorize a ordem principal → allow → deny → BPA → encryption. (aws-1.3 #28)",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "API online com latência de milissegundos serve objetos a cada request. Glacier Flexible Retrieval vs Standard?",
+    "alternativas": [
+      "Glacier Flexible é ideal para hot path de API em ms sempre",
+      "Standard nunca pode ser cifrado em repouso",
+      "Classes Glacier são para arquivo frio com restore/latência maior — inadequadas para leitura quente frequente",
+      "Standard é sempre mais barato que qualquer classe Glacier em todos os cenários"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Classes Glacier são para arquivo frio com restore/latência maior — inadequadas para leitura quente frequente. Isso resolve o cenário: API online com latência de milissegundos serve objetos a cada request. Glacier F… O distractor «Glacier Flexible é ideal para hot path de API em ms sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.3), não em controles de outro domínio.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo de design S3 foundations no SAA-C03 (esta part):",
+    "alternativas": [
+      "Bucket sempre Principal * e BPA desligado",
+      "Access key de IAM user embutida em todo mobile app",
+      "Sempre desligar versioning e lifecycle para 'simplificar'",
+      "Privado por padrão (IAM + BPA), encryption adequada, versioning/lifecycle conforme RPO e custo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Núcleo: least privilege, bloquear público acidental, cifrar, versionar e lifecycle. Público *, keys no app e desligar controles são anti-patterns. Tip de prova: se a opção combina privado + encryption + lifecycle/versioning sob requisito, tende a ser a correta.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  }
+]

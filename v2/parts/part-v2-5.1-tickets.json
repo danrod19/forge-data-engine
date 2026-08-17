@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-8841: flapping de MAC no building A e lentidão intermitente. O digital network assistant recomenda shutdown imediato do uplink Port-channel1 'para limpar a tabela MAC'. Avalie se deve seguir a AI.",
+    "cli_output": "AI-Assistant suggestion:\n  Action: interface Port-channel1 ; shutdown\n  Reason: MAC flapping detected — clear path via uplink bounce\n\nSW-ACCESS-A# show logging | include ERR_DISABLE|FLAP|BPDU\n%PM-4-ERR_DISABLE: bpduguard error detected on Gi1/0/24, putting Gi1/0/24 in err-disable state\n%ETHCNTR-3-LOOP_BACK_DETECTED: Keepalive packet loop-back detected on Gi1/0/24\n\nSW-ACCESS-A# show interfaces status err-disabled\nPort      Name               Status       Reason\nGi1/0/24  User-PC-Finance    err-disabled bpduguard\n\nSW-ACCESS-A# show spanning-tree interface Gi1/0/24\nVlan Role Sts Cost  Prio.Nbr Type\n---- ---- --- ----- -------- ----\nVLAN0030                    (interface err-disabled)\n\nSW-CORE# show etherchannel 1 summary | include Po1|P\nGroup  Port-channel  Protocol    Ports\n------+-------------+-----------+-------------------\n1      Po1(SU)         LACP      Gi1/0/1(P) Gi1/0/2(P)",
+    "alternativas": [
+      "Aplicar shutdown em Port-channel1 conforme a AI, pois flapping sempre se resolve no core",
+      "Recarregar o core switch para reconstruir todas as tabelas MAC do campus",
+      "Rejeitar o shutdown do uplink; tratar Gi1/0/24 err-disabled por BPDU Guard (causa na borda)",
+      "Desabilitar Spanning Tree globalmente e manter o Port-channel up"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A evidência mostra err-disable por BPDU Guard na porta de acesso Gi1/0/24 e Port-channel1 saudável (SU). A sugestão da AI de derrubar o uplink é destrutiva e desalinhada. O operador rejeita a recomendação e isola a porta de borda — validação clássica de agentic AI com show/logging.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-9012: rota estática sumiu após manutenção. O assistente agentic cola um comando de diagnóstico; o roteador rejeita a syntax. Qual a postura correta?",
+    "cli_output": "AI-Assistant suggestion:\n  Run: show ip route-map-fast-diagnostic detail all-vrf deep\n  Then: repair-static-route auto-heal 10.20.0.0/16\n\nR1# show ip route-map-fast-diagnostic detail all-vrf deep\n           ^\n% Invalid input detected at '^' marker.\n\nR1# show ip route 10.20.0.0 255.255.0.0\n% Network not in table\n\nR1# show run | include ip route 10.20\n(no output)\n\nR1# show ip route static | include 10.20\n(no static matches)\n\nR1# show version | include Cisco IOS\nCisco IOS XE Software, Version 17.09.04a",
+    "alternativas": [
+      "Rejeitar a CLI inventada e diagnosticar com comandos válidos (show run/route); a estática não está na config",
+      "Insistir no comando da AI três vezes — alucinação se corrige com retry",
+      "Executar write erase para o auto-heal funcionar",
+      "Ativar BGP em todos os switches de acesso para substituir a estática"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O IOS rejeita o comando sugerido: alucinação de CLI. Comandos válidos mostram que a rota estática simplesmente não está configurada. O operador descarta a syntax inválida e segue TShoot real (repor a estática se desejado, checar next-hop), sem write erase nem gambiarras.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-9120: alarme de erros na WAN edge. O assistente resume o syslog e aponta Gi0/0/1. Você deve decidir se a hipótese confere com o estado atual.",
+    "cli_output": "AI-Assistant suggestion:\n  Hypothesis: physical/link degradation on Gi0/0/1 (CRC/input errors rising)\n  Next checks: show interfaces Gi0/0/1 ; verify SFP/cable ; avoid core reload\n\nEDGE# show logging | include Gi0/0/1|CRC|LINK\n%LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/0/1, changed state to up\n%LINK-3-UPDOWN: Interface GigabitEthernet0/0/1, changed state to up\n%SYS-5-CONFIG_I: (unrelated) Configured from console\n%LINEPROTO-5-UPDOWN: (earlier flaps on Gi0/0/1 overnight)\n\nEDGE# show interfaces Gi0/0/1 | include error|CRC|packets input|reliability\n  1542213344 packets input, 0 no buffer, 18220 input errors, 17901 CRC, 0 frame\n  reliability 240/255, txload 12/255, rxload 40/255\n\nEDGE# show interfaces Gi0/0/1 status\nPort      Name     Status    Vlan  Duplex Speed Type\nGi0/0/1   WAN-ISP  connected routed a-full a-1000 1000BaseSX SFP\n\nEDGE# ping 203.0.113.1 repeat 20\nSuccess rate is 85 percent (17/20)",
+    "alternativas": [
+      "Descartar a AI e recarregar o edge sem backup",
+      "Aceitar a hipótese de problema no link Gi0/0/1 e seguir checklist L1 (erros/CRC/perda) antes de mudanças amplas",
+      "Remover a default route porque a AI falou em CRC",
+      "Desligar OSPF no edge para limpar os contadores"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "CRC/input errors elevados, reliability degradada e perda no ping confirmam a hipótese do assistente sobre o link WAN. Aqui a agentic AI acertou a correlação; o operador aceita a hipótese e avança no isolamento L1 (cabo, SFP, provedor), sem reload ou remoção de roteamento sem necessidade.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-9305: um notebook na VLAN 40 não abre a intranet. Horário de fechamento financeiro. A AI recomenda clear ip ospf process no ABR do campus.",
+    "cli_output": "AI-Assistant suggestion:\n  Action: clear ip ospf process\n  Target: ABR-CAMPUS-1\n  Reason: force reconvergence to fix single host path\n\nABR-CAMPUS-1# show ip ospf neighbor\nNeighbor ID     Pri State       Dead Time Address         Interface\n10.0.0.1          1 FULL/DR     00:00:38  10.0.0.1        Gi0/0/0\n10.0.0.2          1 FULL/BDR    00:00:35  10.0.0.2        Gi0/0/0\n10.0.0.5          1 FULL/DROTHER 00:00:31 10.0.0.5        Gi0/0/1\n\nABR-CAMPUS-1# show ip route 10.40.0.0\nO    10.40.0.0/24 [110/2] via 10.0.0.5, 05:12:01, GigabitEthernet0/0/1\n\nSW-ACC# show mac address-table interface Gi1/0/18\n   40    0050.56ab.1234    DYNAMIC     Gi1/0/18\n\nSW-ACC# show interfaces Gi1/0/18 status\nPort      Name        Status    Vlan Duplex Speed\nGi1/0/18  NB-FINANCE  connected 40   a-full a-1000\n\nPC: ipconfig → 10.40.0.88/24 gw 10.40.0.1 (gw ping FAIL from PC)",
+    "alternativas": [
+      "Executar clear ip ospf process agora; o horário crítico exige reconvergência total",
+      "Desligar todos os uplinks do building para forçar novo SPF",
+      "Aplicar default route estática apontando para o notebook",
+      "Recusar o clear OSPF (adjacências FULL e rota da VLAN ok); isolar host/porta/gateway na VLAN 40"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "OSPF está FULL e o prefixo da VLAN 40 existe. O sintoma é de um host com falha ao gateway. clear ip ospf process no ABR em horário crítico tem blast radius enorme e não é suportado pela evidência. Rejeita-se a AI e isola-se a borda (SVI, porta, IP do cliente).",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-9450: equipe de NOC não consegue SSH no roteador de borda a partir da estação de gestão. Usuários reportam aplicação OK. A AI culpa 'ACL de data plane no caminho dos usuários' e pede remoção de access-group nas interfaces LAN.",
+    "cli_output": "AI-Assistant suggestion:\n  Root cause: data-plane ACL blocking traffic\n  Action: no ip access-group USER-IN in  (all LAN interfaces)\n\nOPS-PC: ping 10.50.1.10 (app VIP) → success 0% loss\nOPS-PC: ssh admin@203.0.113.10 → Connection timed out\n\nEDGE# show ip interface brief | include 203.0.113.10|Gi0/0/0\nGigabitEthernet0/0/0   203.0.113.10  YES NVRAM  up    up\n\nEDGE# show run | section line vty\nline vty 0 4\n access-class MGMT-ONLY in\n transport input ssh\n login local\n\nEDGE# show access-lists MGMT-ONLY\nStandard IP access list MGMT-ONLY\n 10 permit 10.255.0.0 0.0.255.255\n 20 deny   any log\n\nEDGE# show vrf brief\n  Name                        Default RD\n  MGMT                        65000:99\n\nEDGE# show logging | include MGMT-ONLY|VTY|login\n%SEC-6-IPACCESSLOGS: list MGMT-ONLY denied 10.10.8.44\n(OPS-PC source 10.10.8.44 not in 10.255.0.0/16)",
+    "alternativas": [
+      "Remover todas as ACLs de LAN do data plane como a AI pediu",
+      "Desabilitar SSH e liberar telnet sem ACL",
+      "Manter data plane; corrigir acesso de gestão (OPS-PC fora de MGMT-ONLY / VRF-MGMT) em vez de culpar usuários",
+      "Apagar a VRF MGMT para simplificar o roteamento de produção"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Aplicação de usuários ok e SSH de gestão negado pela access-class MGMT-ONLY (log mostra deny do IP da OPS-PC). A AI com contexto incompleto misturou planos. Ação correta: ajustar origem de gestão/ACL de VTY/VRF, não remover ACLs de data plane.",
+    "part_id": "v2-5.1"
+  }
+]

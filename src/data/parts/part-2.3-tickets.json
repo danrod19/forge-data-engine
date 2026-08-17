@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8401 — Após rack de access novo, o tráfego inter-prédio “escolheu o caminho pior”. NOC esperava o core como Root da VLAN 10.",
+    "cli_output": "Core-SW# show spanning-tree vlan 10 root\n                                       Root    Hello Max Fwd\nVlan                   Root ID         Cost    Time  Age Dly  Root Port\n---------------- -------------------- ------- ----- --- ---  ------------\nVLAN0010         32768 0050.56aa.core1 0       2    20  15\n\nAccess-New# show spanning-tree vlan 10\nVLAN0010\n  Spanning tree enabled protocol rstp\n  Root ID    Priority    24576\n             Address     0050.56bb.acc9\n             This bridge is the root\n  Bridge ID  Priority    24576  (priority 24576 sys-id-ext 10)\n             Address     0050.56bb.acc9\n\nCore-SW# show spanning-tree vlan 10 | include Root ID|Bridge ID|Priority\n  Root ID    Priority    24576\n             Address     0050.56bb.acc9\n  Bridge ID  Priority    32768  (priority 32768 sys-id-ext 10)\n             Address     0050.56aa.core1\n\n# nota NOC: Access-New recebeu \"spanning-tree vlan 10 priority 24576\" por engano no baseline",
+    "alternativas": [
+      "Core-SW é Root porque priority 32768 é sempre menor que 24576",
+      "Root inesperado: Access-New com priority 24576 e This bridge is the root; Core tem 32768 e aponta Root ID 0050.56bb.acc9",
+      "show spanning-tree root no Core prova que o core é root com Root Cost 0 local e Address core1 como Root ID no recorte de Access",
+      "RSTP desabilitado no Access-New (protocol rstp no output é cosmético)"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Access-New declara This bridge is the root com priority 24576; o Core lista Root ID desse access e BID local 32768. Menor priority vence — o access virou root. 32768 não é menor que 24576. Protocol rstp está enabled.",
+    "part_id": "2.3"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8402 — Analista júnior quer “desbloquear” Gi1/0/48 porque está BLK e acha que o cabo está ruim. O uplink Gi1/0/47 está OK.",
+    "cli_output": "Access1# show spanning-tree vlan 20\nVLAN0020\n  Root ID    Priority    24576\n             Address     0050.56aa.dist1\n             Cost        4\n             Port        47 (GigabitEthernet1/0/47)\n  Bridge ID  Priority    32768\n             Address     0050.56cc.acc1\n\nInterface           Role Sts Cost      Prio.Nbr Type\n------------------- ---- --- --------- -------- --------------------------------\nGi1/0/47            Root FWD 4         128.47   P2p\nGi1/0/48            Altn BLK 4         128.48   P2p\n\nAccess1# show interfaces status | include Gi1/0/47|Gi1/0/48\nGi1/0/47  upl-dist-a   connected  trunk  a-full  a-1000  10/100/1000BaseTX\nGi1/0/48  upl-dist-b   connected  trunk  a-full  a-1000  10/100/1000BaseTX\n\nAccess1# show spanning-tree interface Gi1/0/48 detail | include role|status|cost\n  Port role is Alternate\n  Port state is Discarding\n  Port path cost 4",
+    "alternativas": [
+      "Gi1/0/48 notconnect no status prova falha L1 exclusiva",
+      "Root Port é Gi1/0/48 porque está BLK",
+      "Ambas as portas em Designated FWD no output",
+      "Gi1/0/47 Root FWD e Gi1/0/48 Altn BLK/Discarding com ambas connected: bloqueio STP legítimo no caminho redundante, não cabo morto"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Roles Root/Altn e status connected nos dois uplinks mostram redundância STP. BLK não é notconnect. RP é 47, não 48. Não há duas Designated FWD no recorte.",
+    "part_id": "2.3"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8403 — Estagiário aplicou “otimização de boot” no uplink e, ao plugar um switch de lab no Gi1/0/48, a rede “quase caiu” com loop momentâneo.",
+    "cli_output": "Access2# show running-config interface Gi1/0/48\ninterface GigabitEthernet1/0/48\n description UPLINK-TO-DIST\n switchport mode trunk\n spanning-tree portfast\n spanning-tree portfast trunk\n\nAccess2# show spanning-tree interface Gi1/0/48 detail | include portfast|Bpdu|role|status\n  Portfast is enabled\n  Link type is point-to-point by default\n  Bpdu guard is disabled\n  Port role is Designated\n  Port state is Forwarding\n\nAccess2# show interfaces Gi1/0/48 switchport | include Operational|Administrative\nAdministrative Mode: trunk\nOperational Mode: trunk\n\n# incidente: switch de lab plugado em Gi1/0/48 durante janela; broadcast storm curto até desconectar",
+    "alternativas": [
+      "PortFast (inclusive trunk) no uplink Gi1/0/48 com BPDU Guard disabled: edge indevida em link entre switches — risco de loop ao conectar outro switch",
+      "PortFast em trunk uplink é a proteção padrão recomendada com Guard disabled",
+      "Operational Mode access no output elimina qualquer risco de loop",
+      "Port role Alternate Discarding no detalhe prova que o link já estava bloqueado"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Config e detail mostram PortFast enabled no trunk de uplink e Guard disabled, role Designated Forwarding. Isso é anti-padrão. Mode é trunk, não access. Não está Alternate Discarding.",
+    "part_id": "2.3"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8404 — Porta do PC do RH ficou laranja/errada e sumiu da rede. Usuário jura que só “ligou um switch pequenininho” para mais tomadas.",
+    "cli_output": "Access3# show interfaces status | include Gi1/0/12\nGi1/0/12  PC-RH   err-disabled  10  auto   auto   10/100/1000BaseTX\n\nAccess3# show interfaces Gi1/0/12\nGigabitEthernet1/0/12 is down, line protocol is down (err-disabled)\n\nAccess3# show running-config interface Gi1/0/12\ninterface GigabitEthernet1/0/12\n switchport access vlan 10\n switchport mode access\n spanning-tree portfast\n spanning-tree bpduguard enable\n\nAccess3# show logging | include BPDU|GUARD|Gi1/0/12\n%SPANTREE-2-BLOCK_BPDUGUARD: Received BPDU on port Gi1/0/12 with BPDU Guard enabled. Disabling port.\n%PM-4-ERR_DISABLE: bpduguard error detected on Gi1/0/12, putting Gi1/0/12 in err-disable state\n\nAccess3# show spanning-tree interface Gi1/0/12 detail | include portfast|Bpdu guard\n  Portfast is enabled\n  Bpdu guard is enabled",
+    "alternativas": [
+      "err-disabled por duplex mismatch CRC no show logging de BPDU",
+      "PortFast disabled e por isso a porta foi para learning eterno",
+      "BPDU Guard: log BLOCK_BPDUGUARD e err-disabled em Gi1/0/12 com PortFast+Guard na access — BPDU de switch indevido na porta do usuário",
+      "Root Bridge perdeu a eleição e derrubou todas as access ports do switch"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Status err-disabled e log bpduguard com PortFast+Guard na access batem com BPDU na edge. Não é CRC duplex no log. PortFast está enabled. Não há evidência de derrubar todas as access por root.",
+    "part_id": "2.3"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8405 — NOC esperava Root Port no uplink de 10G (Gi1/1/1), mas o switch insiste em Gi1/0/1 (1G) como RP. Redundância “estranha”.",
+    "cli_output": "Agg1# show spanning-tree vlan 30\nVLAN0030\n  Root ID    Priority    24576\n             Address     0050.56aa.core1\n             Cost        19\n             Port        1 (GigabitEthernet1/0/1)\n  Bridge ID  Priority    32768\n             Address     0050.56dd.agg1\n\nInterface           Role Sts Cost      Prio.Nbr Type\n------------------- ---- --- --------- -------- --------------------------------\nGi1/0/1             Root FWD 19        128.1    P2p\nGi1/1/1             Altn BLK 2         128.65   P2p\n\nAgg1# show spanning-tree interface Gi1/0/1 detail | include cost|role|Root\n  Port path cost 19\n  Port role is Root\n  Designated root has priority 24576 address 0050.56aa.core1\n\nAgg1# show spanning-tree interface Gi1/1/1 detail | include cost|role\n  Port path cost 2\n  Port role is Alternate\n\nAgg1# show running-config | include pathcost|Gi1/0/1|Gi1/1/1\ninterface GigabitEthernet1/0/1\n spanning-tree vlan 30 cost 2\ninterface GigabitEthernet1/1/1\n spanning-tree vlan 30 cost 100\n\n# nota: custos manuais invertidos em relação à velocidade real",
+    "alternativas": [
+      "Root Port é Gi1/0/1 (cost 19 na tabela de interface / root port) enquanto Gi1/1/1 está Altn com cost efetivo piorado pela config manual — path cost configura a eleição, não só a velocidade “no olho”",
+      "Gi1/1/1 Root FWD no output de roles",
+      "Menor cost listado em Gi1/1/1 detail (2) sem config manual prova que 10G sempre vence mesmo com cost 100",
+      "Alternate BLK em Gi1/0/1 indica que o cabo 1G está notconnect"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A árvore mostra RP Gi1/0/1 e Altn Gi1/1/1; o running-config impõe costs manuais (2 no 1G e 100 no 10G), distorcendo a expectativa do NOC. Gi1/1/1 não é Root FWD. Status não mostra notconnect no 1G.",
+    "part_id": "2.3"
+  }
+]

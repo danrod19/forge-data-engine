@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3301: R1 e R2 não formam neighbor no link de campus. Hellos não estabelecem FULL.",
+    "cli_output": "R1# show ip ospf interface GigabitEthernet0/0/0 | include Area|Network Type|Hello|Dead|MTU\n  Network Type BROADCAST, Cost: 1\n  Topology-MTID    Cost    Disabled    Shutdown      Topology Name\n  Transmit Delay is 1 sec, State DR, Priority 1\n  Hello 10, Dead 40\n  Area 0\n  MTU is 1500\n\nR2# show ip ospf interface GigabitEthernet0/0/0 | include Area|Network Type|Hello|Dead|MTU\n  Network Type BROADCAST, Cost: 1\n  Hello 10, Dead 40\n  Area 1\n  MTU is 1500\n\nR1# show ip ospf neighbor\n(no neighbors)\n\nR2# show run interface Gi0/0/0 | include ospf\n ip ospf 1 area 1\n\nR1# show run interface Gi0/0/0 | include ospf\n ip ospf 1 area 0",
+    "alternativas": [
+      "Area mismatch (0 vs 1) — alinhar area-id no link para single-area/adjacência",
+      "MTU mismatch (ambos 1500)",
+      "RID duplicado explícito nos outputs",
+      "Falta de voice vlan no WAN"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Area 0 no R1 e area 1 no R2 no mesmo link impedem adjacência. Timers e MTU batem. Corrija para a mesma area. Não há evidência de RID duplicado nem de voice na WAN.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3302: neighbor oscila/trava em EXSTART entre R1-R2 no link p2p Ethernet.",
+    "cli_output": "R1# show ip ospf neighbor\nNeighbor ID     Pri   State           Dead Time   Address         Interface\n2.2.2.2           0   EXSTART/  -     00:00:35    10.0.0.2        Gi0/0/1\n\nR2# show ip ospf neighbor\nNeighbor ID     Pri   State           Dead Time   Address         Interface\n1.1.1.1           0   EXSTART/  -     00:00:32    10.0.0.1        Gi0/0/1\n\nR1# show interfaces Gi0/0/1 | include MTU\n  MTU 1500 bytes, BW 1000000 Kbit/sec\n\nR2# show interfaces Gi0/0/1 | include MTU\n  MTU 1400 bytes, BW 1000000 Kbit/sec\n\nR1# show ip ospf interface Gi0/0/1 | include Network Type|Area\n  Network Type POINT_TO_POINT, Area 0\nR2# show ip ospf interface Gi0/0/1 | include Network Type|Area\n  Network Type POINT_TO_POINT, Area 0",
+    "alternativas": [
+      "Area mismatch (ambos area 0)",
+      "Falta de passive-interface no WAN",
+      "Hello 10 vs 30 (não mostrado)",
+      "Stuck EXSTART por MTU 1500 vs 1400 — alinhar MTU (ou política mtu-ignore)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "EXSTART nos dois lados com MTU diferente é o clássico. Area e p2p batem. Ajuste MTU para o mesmo valor. Passive no WAN pioraria; não há mismatch de area.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3303: WAN entre R1-R2 sem neighbor; LANs de usuário estão no OSPF.",
+    "cli_output": "R1# show run | section router ospf\nrouter ospf 1\n router-id 1.1.1.1\n passive-interface default\n no passive-interface GigabitEthernet0/0/0\n network 10.0.0.0 0.0.0.3 area 0\n network 10.40.0.0 0.0.0.255 area 0\n\nR1# show run interface Gi0/0/1\ninterface GigabitEthernet0/0/1\n description WAN-TO-R2\n ip address 10.0.0.1 255.255.255.252\n ip ospf 1 area 0\n\nR1# show ip ospf interface brief\nInterface    PID   Area   IP Address/Mask    Cost  State Nbrs F/C\nGi0/0/0      1     0      10.10.10.1/30      1     P2P   1/1\nGi0/0/1      1     0      10.0.0.1/30        1     P2P   0/0\nLo0          1     0      1.1.1.1/32         1     LOOP  0/0\nVl40         1     0      10.40.0.1/24       1     DR    0/0\n\nR1# show ip ospf interface Gi0/0/1 | include passive|Hello|suppress\n  No Hellos (Passive interface)",
+    "alternativas": [
+      "MTU 0 no WAN",
+      "passive-interface default mantém Gi0/0/1 passiva — falta no passive-interface Gi0/0/1 no WAN-TO-R2",
+      "Area 1 vs 0 no R2 apenas (não mostrado no R1)",
+      "RID 1.1.1.1 inválido"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "No Hellos (Passive interface) em Gi0/0/1 com passive default e apenas Gi0/0/0 com no passive explica Nbrs 0/0 no WAN. Adicione no passive-interface Gi0/0/1. RID 1.1.1.1 é válido.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3304: adjacências instáveis após clone de config; dois routers com o mesmo RID.",
+    "cli_output": "R1# show ip ospf\n Routing Process \"ospf 1\" with ID 10.10.10.10\n\nR2# show ip ospf\n Routing Process \"ospf 1\" with ID 10.10.10.10\n\nR3# show ip ospf neighbor\nNeighbor ID     Pri State   Dead Time Address       Interface\n10.10.10.10       1 FULL/DR 00:00:35  10.0.0.1      Gi0/0/0\n10.10.10.10       1 FULL/BDR 00:00:33 10.0.0.2      Gi0/0/0\n%OSPF-4-DUP_RTRID_AREA: Detected router with duplicate router ID\n\nR1# show run | include router-id\n router-id 10.10.10.10\nR2# show run | include router-id\n router-id 10.10.10.10\n\nR1 Lo0 is 1.1.1.1/32; R2 Lo0 is 2.2.2.2/32 (not used as RID)",
+    "alternativas": [
+      "Manter RID duplicado; FULL com mesmo ID é ideal",
+      "Desligar OSPF só no R3",
+      "Apagar as loopbacks",
+      "Corrigir RID único (ex. R1 1.1.1.1, R2 2.2.2.2) e reconvergir o processo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Log DUP_RTRID e mesmo process ID 10.10.10.10 em R1/R2 são RID duplicado. Use RID alinhado às loopbacks distintas e clear process com cuidado. Não mantenha duplicata.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3305: IPv4 entre filiais ok via OSPFv2 FULL; hosts IPv6 não roteiam. R1/R2 dual-stack.",
+    "cli_output": "R1# show ip ospf neighbor\nNeighbor ID  State    Address     Interface\n2.2.2.2      FULL/  - 10.0.0.2    Gi0/0/1\n\nR1# show ipv6 ospf neighbor\n% OSPFv3 is not running ou empty table\n\nR1# show run interface Gi0/0/1\ninterface GigabitEthernet0/0/1\n ip address 10.0.0.1 255.255.255.252\n ip ospf 1 area 0\n ipv6 address 2001:db8:0:12::1/64\n (no ipv6 ospf / ospfv3 command)\n\nR1# show ipv6 route ospf\n(no OSPF routes)\n\nR1# show run | include ipv6 unicast|ipv6 router ospf|router ospfv3\nipv6 unicast-routing\n (no ospfv3 process enabled on interfaces)",
+    "alternativas": [
+      "Aumentar Hello do OSPFv2 resolve IPv6",
+      "passive-interface default no v2 anuncia GUA automaticamente",
+      "Falta OSPFv3 na interface/processo — FULL v2 não cria neighbor/rotas IPv6; configurar ipv6 ospf/ospfv3 area e verify neighbor v3",
+      "RID IPv6 /128 obrigatório no lugar do 32-bit"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "IPv6 na interface sem ospfv3/ipv6 ospf e neighbor v3 vazio explicam ausência de rotas OIPv6. Habilite OSPFv3 e RID 32-bit válido. Hello v2 e passive v2 não carregam o plano IPv6.",
+    "part_id": "v2-3.3"
+  }
+]

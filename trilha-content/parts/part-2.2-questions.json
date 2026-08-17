@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual é a função principal de uma VLAN em um switch L2?",
+    "alternativas": [
+      "Criar domínios de broadcast lógicos separados",
+      "Substituir o roteamento inter-VLAN por hubs",
+      "Eliminar a necessidade de endereços MAC",
+      "Forçar todas as portas a mode trunk"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "VLAN segmenta broadcast domains lógicos. Não elimina MAC nem obriga trunk em todas as portas. Inter-VLAN ainda precisa de L3 — VLAN sozinha não “substitui” roteamento entre redes.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Porta configurada com switchport mode access e switchport access vlan 20 serve tipicamente para:",
+    "alternativas": [
+      "Uplink que carrega VLANs 10–50 simultaneamente",
+      "Endpoint (PC/impressora) em uma única VLAN de dados (20)",
+      "Negociação DTP desirable obrigatória",
+      "Native VLAN de todos os trunks do chassis"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Access + access vlan 20 amarra o endpoint à VLAN 20. Uplink multi-VLAN é trunk. DTP desirable e native de todos os trunks não definem essa porta access.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual protocolo de tagging é o padrão de trunk Ethernet no CCNA moderno?",
+    "alternativas": [
+      "ISL exclusivo em todas as plataformas atuais",
+      "HDLC entre PCs",
+      "802.1Q",
+      "PPPoE na porta access"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "802.1Q é o encapsulamento de trunk padrão. ISL é legado. HDLC/PPPoE não são o tagging de VLAN entre switches no modelo desta parte.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Frames da native VLAN em um trunk 802.1Q tipicamente atravessam:",
+    "alternativas": [
+      "Sempre com tag 0x8100 obrigatória",
+      "Apenas se estiverem no allowed list como tagged-only",
+      "Somente após DTP desligar o link",
+      "Untagged (sem tag), por definição de native"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Native = untagged no trunk. Outras VLANs vão tagged. Allowed ainda importa, mas a marca da native é a ausência de tag, não tag forçada 0x8100.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "PC na VLAN 10 e servidor na VLAN 20 no mesmo switch: para se comunicarem de ponta a ponta em IP, é necessário:",
+    "alternativas": [
+      "Roteamento inter-VLAN (L3), não apenas switching L2",
+      "Apenas aumentar o aging da tabela MAC",
+      "Configurar as duas portas como native VLAN 1",
+      "Desabilitar 802.1Q no chassis"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "VLANs diferentes = broadcast domains diferentes; precisa de L3. Aging MAC, native 1 em access e desligar 802.1Q não unem as VLANs em L2 puro.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show vlan brief é o comando mais útil para ver:",
+    "alternativas": [
+      "Native VLAN de todos os trunks e allowed-and-active",
+      "Quais portas access estão em cada VLAN",
+      "Tabela de roteamento OSPF",
+      "Estado EtherChannel LACP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show vlan brief lista VLANs e membros access. Native/allowed de trunk → show interfaces trunk. OSPF e EtherChannel estão fora do foco deste comando.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show interfaces trunk serve principalmente para inspecionar:",
+    "alternativas": [
+      "Apenas o inventário de SFP de cobre",
+      "Somente access VLAN de PCs",
+      "Interfaces trunk, native VLAN e VLANs allowed/active no uplink",
+      "Senhas de enable secret"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O comando resume trunks, native e allowed. Não é inventário genérico de SFP, membership access de PCs nem secrets.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Native VLAN diferente nos dois extremos do trunk (mismatch) costuma causar:",
+    "alternativas": [
+      "Funcionamento perfeito sem qualquer risco",
+      "Problemas com tráfego untagged e sintomas sutis de conectividade/VLAN errada",
+      "Criação automática da VLAN no allowed list",
+      "Conversão de todas as portas access em trunk"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Native mismatch desalinha untagged e gera falhas confusas. Não é inofensivo, não cria VLAN no allowed nem transforma access em trunk.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "VLAN 30 está no allowed de um lado do trunk, mas não existe no show vlan do switch remoto. Efeito prático:",
+    "alternativas": [
+      "O allowed sozinho cria e ativa a VLAN 30 no remoto",
+      "O trunk vira access automaticamente na VLAN 30",
+      "DTP remove a native VLAN",
+      "Sem a VLAN existente/active no remoto, o encaminhamento útil da VLAN 30 fica comprometido"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Allowed não cria VLAN. É preciso existir (e estar active) no banco do switch. DTP/native não resolvem VLAN inexistente.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "DTP, em visão leve do CCNA, serve para:",
+    "alternativas": [
+      "Negociar dinamicamente se a porta opera como trunk ou não",
+      "Calcular máscaras VLSM",
+      "Autenticar usuários 802.1X na access VLAN",
+      "Substituir o protocolo 802.1Q por ISL sempre"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "DTP negocia trunking. Não faz VLSM, 802.1X nem obriga ISL no lugar de 802.1Q.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PC obtém IP 10.10.20.50/24 mas o gateway 10.10.10.1 não responde. show vlan brief mostra a porta do PC na VLAN 20 e o SVI do gateway está na VLAN 10. Causa mais provável:",
+    "alternativas": [
+      "Native mismatch em um trunk inexistente no PC",
+      "Allowed VLAN 20 removida do uplink do PC",
+      "802.1Q tag obrigatória em toda porta access",
+      "Porta access na VLAN errada em relação à subnet/gateway esperados"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Access VLAN 20 com IP de outra lógica (gateway na 10) é membership errado. PC não usa trunk/allowed como uplink de switch. Access não exige tag 802.1Q no host típico.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Entre dois switches, só a native VLAN “parece funcionar”; VLANs 10 e 20 não passam. Uma hipótese alinhada ao content:",
+    "alternativas": [
+      "Allowed contém 10 e 20 e as VLANs existem nos dois lados com trunk up",
+      "show interfaces trunk lista 10 e 20 em allowed-and-active nos dois lados",
+      "Native mismatch é impossível se a native for 1",
+      "Ambos os lados estão em mode access (ou trunk não operacional), então só o untagged/access coincide"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Sintoma clássico de um lado access ou trunk quebrado: só a VLAN untagged/access flui. As outras opções descrevem trunks saudáveis ou mito sobre native 1.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show interfaces trunk exibe Gi1/0/1 com native 1 e allowed 1,10,20. O outro switch tem native 99 no mesmo link. Risco principal:",
+    "alternativas": [
+      "Nenhum, pois allowed ignora native",
+      "Apenas perda de DTP forever",
+      "Native mismatch: untagged cai em VLANs diferentes em cada extremo",
+      "Criação automática da VLAN 99 no allowed do primeiro switch"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Native 1 vs 99 é mismatch. Allowed não anula o problema do untagged. DTP e auto-criação de 99 no allowed não são o efeito descrito.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "VLAN 40 existe nos dois switches, mas switchport trunk allowed vlan 10,20 no uplink. Hosts na 40 não se falam entre andares. Correção típica:",
+    "alternativas": [
+      "Mudar os PCs para mode trunk",
+      "Remover a VLAN 40 do show vlan brief",
+      "Desligar 802.1Q e usar só hubs",
+      "Incluir a VLAN 40 no allowed do trunk (add/lista) nos extremos"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "VLAN fora do allowed não atravessa o trunk. PCs em trunk, apagar VLAN ou voltar a hubs não corrigem o allowed.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual par de comandos diferencia melhor membership access vs estado de trunk?",
+    "alternativas": [
+      "show ip route e show ip ospf neighbor",
+      "show vlan brief e show interfaces trunk",
+      "ping e traceroute apenas",
+      "show mac address-table aging-time e clear counters"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show vlan brief → access; show interfaces trunk → uplinks/native/allowed. Rotas OSPF, só ping e aging MAC não substituem essa leitura de VLAN/trunk.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show interfaces Gi1/0/24 switchport indica Administrative Mode: trunk e Operational Mode: trunk, Access Mode VLAN: 1 (default). Isso significa que:",
+    "alternativas": [
+      "A interface opera como trunk; o campo access VLAN não define o multiplex 802.1Q do uplink",
+      "A porta é access na VLAN 1 apesar do mode trunk",
+      "Native VLAN foi apagada do IOS",
+      "DTP está proibido em qualquer chassis"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Operational trunk confirma trunk. Access Mode VLAN é irrelevante para o tagging multi-VLAN do trunk em operação. Native não “some” só por esse campo; DTP não fica proibido globalmente por essa linha.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que colocar o PC do usuário em switchport mode trunk “aberto” é má prática nesta parte?",
+    "alternativas": [
+      "Porque trunk proíbe obter IP por DHCP em qualquer design",
+      "Porque access vlan nunca deve ser configurada em redes modernas",
+      "Porque o PC tipicamente não processa 802.1Q multi-VLAN como um switch e a porta deveria ser access na VLAN de dados",
+      "Porque native VLAN deixa de existir se houver um PC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Endpoint usa access na VLAN correta. Trunk no PC é indevido e confuso. DHCP pode existir em designs corretos; access vlan e native continuam conceitos válidos.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um lado do link está switchport mode access vlan 10; o outro switchport mode trunk native vlan 10 allowed 10,20,30. Comportamento mais provável:",
+    "alternativas": [
+      "Todas as VLANs 20 e 30 passam perfeitamente",
+      "DTP cria automaticamente subinterfaces no PC",
+      "Apenas o tráfego da VLAN 10 (untagged/access) tende a funcionar de forma consistente; 20/30 não multiplexam de verdade",
+      "Allowed 20,30 força o lado access a virar trunk"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Access × trunk: só a VLAN access/native comum se comporta bem; as demais não têm tagging de ponta a ponta. Allowed no trunk não converte o outro lado em trunk.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Boa prática citada no content sobre native VLAN de produção:",
+    "alternativas": [
+      "Usar sempre VLAN 1 untagged e ignorar alinhamento entre lados",
+      "Alinhar a mesma native nos dois extremos e evitar depender de VLAN 1 como native “esquecida”",
+      "Remover native de todos os trunks 802.1Q da norma",
+      "Configurar native diferente de propósito para isolar broadcasts"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Mesma native nos dois lados e cuidado com VLAN 1 default são práticas do material. Native diferente de propósito e “remover native da norma” não são a orientação dada.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "switchport trunk allowed vlan add 50 no uplink. O que o comando NÃO faz sozinho?",
+    "alternativas": [
+      "Inclui 50 na lista allowed da interface trunk",
+      "Ajuda o tráfego da 50 a ser candidato a passar no trunk se a VLAN existir",
+      "Cria automaticamente a VLAN 50 no banco global do switch se ela não existir",
+      "Altera a configuração de allowed daquela porta"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "add 50 mexe no allowed da interface; não cria a VLAN no switch. Ainda é preciso vlan 50 / existência active para forwarding útil.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Tag 802.1Q no frame do trunk identifica principalmente:",
+    "alternativas": [
+      "O VLAN ID (e campos de prioridade) daquele frame tagged",
+      "O endereço IP de origem do roteador",
+      "A senha do VTY",
+      "O aging time da CAM"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A tag carrega o VLAN ID (e PCP etc.). Não transporta IP de gateway, senha VTY nem aging da MAC table.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Técnico confia só em show vlan brief para validar o uplink entre switches. Por que isso é insuficiente?",
+    "alternativas": [
+      "Porque show vlan brief lista rotas OSPF",
+      "Porque show vlan brief não substitui show interfaces trunk para native, allowed e estado de trunk do uplink",
+      "Porque trunks aparecem sempre como access na VLAN 999",
+      "Porque o comando desliga o DTP ao ser executado"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Uplink trunk exige show interfaces trunk (e switchport). show vlan brief foca VLANs e access members, não o detalhe operacional do trunk.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "switchport nonegotiate em uma porta trunk explícita tem o efeito prático de:",
+    "alternativas": [
+      "Apagar a native VLAN",
+      "Converter a porta em access vlan 1",
+      "Desligar DTP, evitando negociação dinâmica indesejada",
+      "Permitir todas as VLANs mesmo fora do allowed"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "nonegotiate desliga DTP. Não apaga native, não vira access sozinho nem ignora allowed.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Host na VLAN 15 não pega DHCP do servidor na mesma VLAN em outro switch. Portas access estão corretas. show interfaces trunk: allowed 1,10,20. Diagnóstico:",
+    "alternativas": [
+      "VLAN 15 ausente do allowed no trunk entre switches",
+      "Native mismatch é a única causa possível com allowed 1,10,20",
+      "O servidor DHCP exige mode trunk no PC",
+      "show vlan brief prova que o trunk carrega 15"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Allowed sem 15 impede a VLAN no uplink. Pode haver outras causas no mundo real, mas o CLI dado aponta missing allowed. PC em trunk e show vlan brief no lugar de trunk estão errados aqui.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Frame tagged chega ao switch de destino pelo trunk e sai por porta access da VLAN 20. O que ocorre com a tag na entrega ao PC?",
+    "alternativas": [
+      "A tag permanece e o PC deve entender 802.1Q sempre",
+      "O switch remove a tag ao enviar o frame na porta access da VLAN correspondente",
+      "A tag vira endereço IP do gateway",
+      "A tag é convertida em native VLAN 999 automaticamente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Na access, o frame sai untagged na VLAN da porta. PC comum não precisa processar 802.1Q. Tag não vira IP nem native 999 mágica.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual afirmação sobre VLAN 1 no contexto desta parte é a mais prudente?",
+    "alternativas": [
+      "É a única VLAN que pode ser native em 802.1Q",
+      "Deve ser a access VLAN de todos os servidores",
+      "Não existe em switches Cisco",
+      "Costuma ser default; designs evitam usá-la como native/dados de produção sem planejamento"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "VLAN 1 é default e frequentemente desaconselhada como native/dados sem critério. Não é a única native possível nem obrigatória em todos os servers.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dois switches com trunk 802.1Q, native 10 em ambos, allowed 10,20,30, VLANs criadas. Ainda assim VLAN 30 não passa. Próxima verificação útil no content:",
+    "alternativas": [
+      "Confirmar se a VLAN 30 está active e se o allowed-and-active no show interfaces trunk realmente inclui 30 nos dois lados",
+      "Assumir que native 10 bloqueia todas as outras VLANs forever",
+      "Colocar os PCs em mode dynamic auto e encerrar",
+      "Apagar o 802.1Q e usar apenas access entre cores"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Checklist: existência/active e allowed-and-active. Native 10 não bloqueia por si as tagged 20/30. dynamic auto nos PCs e remover 802.1Q não são o próximo passo correto.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Diferença conceitual entre DTP e a lista allowed de VLANs:",
+    "alternativas": [
+      "DTP escolhe quais VLAN IDs existem no banco global; allowed negocia speed",
+      "São o mesmo protocolo com nomes diferentes",
+      "DTP negocia se o link vira trunk; allowed define quais VLANs o trunk já estabelecido transporta",
+      "Allowed substitui completamente o 802.1Q"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "DTP = negociação de modo trunk/access. Allowed = filtro de VLANs no trunk. Não são o mesmo nem trocam os papéis com o banco de VLANs/speed/802.1Q.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem mental de troubleshooting “host não fala com o outro switch na mesma VLAN”:",
+    "alternativas": [
+      "Só limpar MAC table em loop e ignorar VLAN",
+      "Verificar access VLAN correta → trunk operacional → native alinhada → VLAN no allowed e existente nos dois lados",
+      "Começar pelo canal Wi-Fi 6 GHz do PC cabeado",
+      "Desabilitar show interfaces trunk para reduzir CPU"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O content recomenda access → trunk → native → allowed/existência. Loop de clear MAC, Wi-Fi e desligar show trunk não são o fluxo.",
+    "part_id": "2.2"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Analista diz: “native diferente não importa se o allowed tiver todas as VLANs”. Por que está errado?",
+    "alternativas": [
+      "Porque allowed apaga o conceito de untagged",
+      "Porque 802.1Q não usa native em trunk",
+      "Porque PCs exigem native mismatch para DHCP",
+      "Porque frames untagged da native ainda existem e, com IDs diferentes em cada lado, o untagged cai em VLANs distintas — allowed não corrige isso"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Native mismatch afeta untagged independentemente do allowed das tagged. Allowed não elimina untagged nem o risco do desalinhamento. DHCP não exige mismatch.",
+    "part_id": "2.2"
+  }
+]

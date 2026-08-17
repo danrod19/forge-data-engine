@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1201: EC2 web-01 em subnet rotulada 'public' não alcança a Internet (curl https://example.com timeout). SSH de bastion interno funciona.",
+    "cli_output": "$ aws ec2 describe-instances --instance-ids i-0web01 --query Reservations[].Instances[].{SubnetId:SubnetId,PublicIp:PublicIpAddress,SGs:SecurityGroups}\nSubnetId: subnet-0puba\nPublicIp: 3.88.10.20\nSGs: [ sg-web ]\n\n$ aws ec2 describe-security-groups --group-ids sg-web --query SecurityGroups[].IpPermissionsEgress\nOutbound: 0.0.0.0/0 all protocols Allow\n\n$ aws ec2 describe-route-tables --filters Name=association.subnet-id,Values=subnet-0puba\nRoutes:\n  10.0.0.0/16 -> local\n  (no 0.0.0.0/0 entry)\n\n$ aws ec2 describe-internet-gateways --filters Name=attachment.vpc-id,Values=vpc-0app\nIGW igw-0app State: available attached to vpc-0app\n\n$ curl -m 5 https://example.com\nConnection timed out",
+    "alternativas": [
+      "Adicionar rota 0.0.0.0/0 → igw-0app na route table da subnet-0puba",
+      "Remover o IP público da instância",
+      "Criar Deny no NACL default para 443",
+      "Anexar AmazonS3FullAccess à role da instância"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "IGW está attached e SG egress allow, mas a RT da subnet não tem 0.0.0.0/0→IGW. Sem essa rota não há path à Internet. Remover EIP e Deny 443 pioram; IAM S3 não cria rota. o, ou Allow genérico que não remove Deny/rota/BPA. Tip de prova: ancore a resposta em uma linha do output (Deny, rota ausente, policy Principal, delete marker, lifecycle ausente).",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1202: ALB health checks fail em target i-0app01:8080. Da mesma VPC, nc para 8080 timeout. App process escuta em 0.0.0.0:8080 (logs OK).",
+    "cli_output": "$ aws elbv2 describe-target-health --target-group-arn arn:aws:elasticloadbalancing:...:targetgroup/app/...\nTarget i-0app01:8080 State: unhealthy Reason: Target.Timeout\n\n$ aws ec2 describe-instances --instance-ids i-0app01 --query Reservations[].Instances[].SecurityGroups\nGroupId: sg-app\n\n$ aws ec2 describe-security-groups --group-ids sg-app\nInbound:\n  TCP 22  Source 10.0.0.0/16\n  (no rule for 8080)\nOutbound: all allow\n\n$ aws ec2 describe-security-groups --group-ids sg-alb\nInbound: TCP 443 0.0.0.0/0\nOutbound: all allow\n\n$ aws ec2 describe-network-acls --filters Name=association.subnet-id,Values=subnet-0priva\nNACL entries: allow 0.0.0.0/0 inbound/outbound (default-like)\n\nApp log: Listening on 8080",
+    "alternativas": [
+      "Trocar o ALB para Network Load Balancer sem revisar SG",
+      "Adicionar inbound no sg-app TCP 8080 com Source = sg-alb (ou CIDR das subnets do ALB)",
+      "Remover a rota local 10.0.0.0/16",
+      "Desligar o target group health check permanentemente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "App escuta e NACL allow; falta Allow 8080 no SG do target a partir do ALB. Isso explica timeout de health. Remover rota local quebra a VPC; desligar health esconde o problema. o, ou Allow genérico que não remove Deny/rota/BPA. Tip de prova: ancore a resposta em uma linha do output (Deny, rota ausente, policy Principal, delete marker, lifecycle ausente).",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1203: EC2 em subnet privada não consegue yum/apt update (timeout para repositórios). Sem IP público por design.",
+    "cli_output": "$ aws ec2 describe-instances --instance-ids i-0worker --query Reservations[].Instances[].{Subnet:SubnetId,PublicIp:PublicIpAddress}\nSubnet: subnet-0privb\nPublicIp: null\n\n$ aws ec2 describe-route-tables --filters Name=association.subnet-id,Values=subnet-0privb\nRoutes:\n  10.0.0.0/16 -> local\n  (no 0.0.0.0/0)\n\n$ aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=vpc-0app\nNatGatewayId: nat-0a  SubnetId: subnet-0puba  State: available\n\n$ aws ec2 describe-route-tables --filters Name=association.subnet-id,Values=subnet-0priva\nRoutes:\n  10.0.0.0/16 -> local\n  0.0.0.0/0 -> nat-0a\n\n$ aws ec2 describe-security-groups --group-ids sg-worker\nOutbound: 0.0.0.0/0 allow all\n\ncurl -m 5 https://amazonlinux-2-repos... → timeout",
+    "alternativas": [
+      "Atribuir EIP público e abrir SSH 0.0.0.0/0",
+      "Mover o NAT para dentro do RDS",
+      "Adicionar 0.0.0.0/0 → nat-0a na route table de subnet-0privb (espelhar a private que já tem NAT)",
+      "Remover o NAT available da VPC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "NAT está available e outra privada já usa 0.0.0.0/0→nat; privb não tem a rota. SG egress ok. EIP público fere o design; remover NAT piora. o, ou Allow genérico que não remove Deny/rota/BPA. Tip de prova: ancore a resposta em uma linha do output (Deny, rota ausente, policy Principal, delete marker, lifecycle ausente).",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1204: Após hardening, API na 443 falha de clientes externos. SG do ALB permite 443 de 0.0.0.0/0. Antes do change de NACL funcionava.",
+    "cli_output": "$ aws ec2 describe-security-groups --group-ids sg-alb\nInbound: TCP 443 Source 0.0.0.0/0 Allow\nOutbound: all allow\n\n$ aws elbv2 describe-load-balancers --names corp-alb\nState: active  Scheme: internet-facing\nSubnets: subnet-0puba, subnet-0pubb\n\n$ aws ec2 describe-network-acls --network-acl-ids acl-0edge\nAssociations: subnet-0puba, subnet-0pubb\nEntries (inbound):\n  100  Deny  TCP 443  0.0.0.0/0\n  200  Allow TCP 443  0.0.0.0/0\n  *    Deny  all     0.0.0.0/0\nEntries (outbound):\n  100  Allow all 0.0.0.0/0\n  *    Deny all\n\n# Nota: regras NACL avaliadas por número ascendente; 100 Deny casa antes do 200 Allow\n\nClient: curl https://api.example.com → timeout",
+    "alternativas": [
+      "Abrir porta 22 no ALB",
+      "Remover o Internet Gateway",
+      "Duplicar o Allow no Security Group outra vez",
+      "Remover/reordenar o Deny TCP 443 rule 100 na NACL (Deny casa antes do Allow 200)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "SG allow e ALB internet-facing ok; NACL rule 100 Deny 443 tem precedência numérica sobre Allow 200. Corrija a NACL. Mais Allow no SG ou abrir 22 não contorna o Deny da subnet. o, ou Allow genérico que não remove Deny/rota/BPA. Tip de prova: ancore a resposta em uma linha do output (Deny, rota ausente, policy Principal, delete marker, lifecycle ausente).",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1205: RFP pedia aplicação production multi-AZ. Após incidente na us-east-1a, app ficou 100% down. Inventário de rede/compute:",
+    "cli_output": "$ aws ec2 describe-subnets --filters Name=vpc-id,Values=vpc-0prod\nsubnet-0puba   AZ=us-east-1a  MapPublicIp=true\nsubnet-0priva  AZ=us-east-1a  MapPublicIp=false\n(no subnets in us-east-1b or 1c)\n\n$ aws elbv2 describe-load-balancers --names prod-alb\nAvailabilityZones: [ us-east-1a ]\nScheme: internet-facing\n\n$ aws ec2 describe-instances --filters Name=tag:Env,Values=prod\ni-0app1  AZ=us-east-1a  Subnet=subnet-0priva\ni-0app2  AZ=us-east-1a  Subnet=subnet-0priva\n\n$ aws rds describe-db-instances --db-instance-identifier prod-db\nMultiAZ: false  AvailabilityZone: us-east-1a\n\nPost-mortem: power event / capacity issue limited to us-east-1a",
+    "alternativas": [
+      "Aumentar o instance type na mesma AZ única",
+      "Criar subnets (e ALB/targets/DB conforme serviço) em pelo menos uma segunda AZ e redistribuir a carga",
+      "Remover o ALB e usar só IP público em uma instância",
+      "Desligar health checks para mascarar a AZ down"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Inventário mostra tudo em us-east-1a: SPOF de AZ. Multi-AZ exige subnets e serviços em ≥2 AZ. Upsize na mesma AZ e remover ALB não atendem o RFP de multi-AZ. o, ou Allow genérico que não remove Deny/rota/BPA. Tip de prova: ancore a resposta em uma linha do output (Deny, rota ausente, policy Principal, delete marker, lifecycle ausente).",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6501 — Switch novo não entra no inventário do DNA Center. Usuários do site já navegam pelo gateway local.",
+    "cli_output": "DNA-UI: Discovery job SITE-BR\nStatus: FAILED for 10.80.80.2\nDetail: Authentication failed (SSH) / SNMP timeout\nReachability probe: ICMP OK\n\nDNA inventory:\n10.80.80.2  SW-NEW  UNMANAGED  last_error=bad credentials\n\nSW-NEW# show ip interface brief | include Vlan80\nVlan80   10.80.80.2   YES manual up  up\n\nSW-NEW# show run | include username|snmp-server community\nusername netops secret 9 $9$NEWKEY\nsnmp-server community OldComm ro\n\n! DNA discovery profile ainda usa user cisco / community public\nPC-SITE# ping 8.8.8.8\nReply from 8.8.8.8",
+    "alternativas": [
+      "ICMP fail prova device down L3",
+      "Inventário já mostra MANAGED/in-sync",
+      "Data plane de Internet do site está down",
+      "Discovery falha por credencial SSH/SNMP incorreta no perfil DNA apesar de ICMP ok — gestão/auth, não outage de user"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "ICMP OK + auth failed/SNMP timeout + community/user divergentes do profile. User ping Internet ok. Atualize credenciais de discovery. Ticket de inventário/discovery do 6.5.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6502 — Assurance do site fica vermelho; helpdesk jura que a rede caiu. Testes de usuário contradizem.",
+    "cli_output": "DNA Assurance SITE-X:\nOverall Health: POOR\nIssue: Telemetry export delayed / device management KPI degraded\n\nEDGE# show ip ospf neighbor\n2.2.2.2   FULL/BDR\n\nEDGE# show ip route | include 10.50\nO  10.50.0.0/16 [110/2] via 10.0.0.2\n\nPC# ping 10.50.1.10\nReply from 10.50.1.10: time=2ms\nPC# ping 8.8.8.8\nReply from 8.8.8.8: time=15ms\n\nEDGE# show ip interface brief | include up\nGi0/0 up/up   Gi0/1 up/up\n\n! Sensor de telemetria do assurance com fila atrasada no log do controller",
+    "alternativas": [
+      "OSPF DOWN e rota 10.50 ausente — control plane morto",
+      "Assurance POOR por telemetria/gestão; data plane e OSPF ok nos testes — correlacionar antes de declarar outage",
+      "Ping de user 0% prova queda total",
+      "Interfaces administratively down no brief"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Health POOR por telemetria; FULL OSPF; pings ok; interfaces up. Assurance ≠ data plane down. Investigue export/sensor. Evite outage falso. Tema assurance do 6.5.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6503 — Automação model-driven no switch falha; CLI show continua normal.",
+    "cli_output": "SW1# show ip interface brief | include GigabitEthernet0/0\nGigabitEthernet0/0   10.1.1.1   YES manual up  up\n\nSW1# show run | include restconf|netconf|ip http\nip http secure-server\n! sem restconf / sem netconf-yang\n\n$ curl -i -k -u netops:*** https://10.1.1.1/restconf/data/ietf-interfaces:interfaces\nHTTP/1.1 404 Not Found\nContent-Type: application/yang-data+json\n{\"errors\":{\"error\":[{\"error-message\":\"RESTCONF not enabled or path not found\"}]}}\n\nSW1# show version | include IOS\nCisco IOS XE Software\n\n! Apos restconf enable + path correto, GET retorna 200 (teste posterior do lab)",
+    "alternativas": [
+      "CLI brief down prova interface morta",
+      "RESTCONF 200 com interfaces no primeiro curl",
+      "RESTCONF desabilitado/path 404 no device — API model-driven falha enquanto CLI legada ok",
+      "NETCONF always-on e curl mostra 201 Created"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Interface up na CLI; run sem restconf/netconf-yang; curl 404. Habilite RESTCONF e use path YANG. Não é interface down. Ticket RESTCONF/device API do 6.5.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6504 — Mudar banner e NTP em 120 access switches até o fim do dia. Analista abriu 120 sessões SSH manuais.",
+    "cli_output": "CHANGE-REQUEST: baseline banner + ntp on all access switches (count=120)\nDeadline: same business day\n\nDNA: sites already inventoried; no approved intent template for NTP yet\n\nControl-node# cat inventory.ini | findstr access\n[access]\n# 120 host entries present\n\nControl-node# head -20 ntp_banner.yml\n- hosts: access\n  tasks:\n    - name: banner\n      cisco.ios.ios_banner: ...\n    - name: ntp\n      cisco.ios.ios_ntp: ...\n\n# ansible-playbook -i inventory.ini ntp_banner.yml --check\n# predicted changed on 120 hosts, 0 unreachable in dry-run sample\n\nNOC-NOTE: single-switch emergency last week used CLI — different change type",
+    "alternativas": [
+      "Escala 120 hosts pede automacao (Ansible playbook/inventory ou DNA policy quando existir); CLI pontual e para emergencia 1 box",
+      "CLI hop-a-hop em 120 hosts e a escolha escalavel correta",
+      "Somente SNMP trap configura NTP em massa",
+      "Desligar inventário DNA e resolver so com Telnet"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "120 boxes + playbook pronto = Ansible (ou policy DNA se template existir). CLI em massa e o anti-padrão. SNMP trap nao aplica baseline. Sintese de ferramenta 6.4+6.5.",
+    "part_id": "6.5"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6505 — Script RESTCONF tenta setar interface description; CLI ainda mostra description antiga.",
+    "cli_output": "SW1# show run interface GigabitEthernet1/0/1\ninterface GigabitEthernet1/0/1\n description OLD-UPLINK\n no shutdown\n\n$ curl -i -k -u netops:*** -X PATCH \\\n  -H \"Content-Type: application/yang-data+json\" \\\n  -d '{\"ietf-interfaces:interface\":{\"name\":\"GigabitEthernet1/0/1\",\"description\":\"NEW-UPLINK\"}}' \\\n  https://10.1.1.1/restconf/data/ietf-interfaces:interfaces/interface=WrongName\nHTTP/1.1 404 Not Found\n{\"errors\":{\"error\":[{\"error-tag\":\"invalid-value\",\"error-message\":\"uri path /interface=WrongName does not match device YANG instance\"}]}}\n\nSW1# show restconf\nRESTCONF is enabled\n\n! Path YANG/URI usa WrongName; instancia real e GigabitEthernet1/0/1\n! PATCH no path correto retorna 204 e description NEW-UPLINK (lab posterior)",
+    "alternativas": [
+      "RESTCONF disabled no show restconf",
+      "CLI prova que a interface nao existe",
+      "201 Created no PATCH com path WrongName",
+      "YANG/URI path errado (WrongName) → 404 model-driven; CLI ainda mostra config legada — corrija o path do modelo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "RESTCONF enabled; 404 invalid-value no path WrongName; CLI mostra Gi1/0/1 com description OLD. Ajuste URI/YANG ao nome real. Model-driven vs CLI no mesmo box. Tema YANG mismatch do 6.5.",
+    "part_id": "6.5"
+  }
+]

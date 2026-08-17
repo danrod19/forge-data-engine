@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Comando correto para rota estática à rede 10.20.0.0/24 via next-hop 192.0.2.1?",
+    "alternativas": [
+      "ip route 10.20.0.0 255.255.255.0 192.0.2.1",
+      "ip route 10.20.0.0 0.0.0.255 192.0.2.1",
+      "ip default-network 10.20.0.0",
+      "ip route 192.0.2.1 255.255.255.0 10.20.0.0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A sintaxe é prefixo, máscara de sub-rede (não wildcard) e next-hop. 255.255.255.0 cobre /24. Inverter destino e next-hop ou usar wildcard quebra a rota. Depois confira com show ip route static.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual linha configura a default route via 203.0.113.1?",
+    "alternativas": [
+      "ip route 255.255.255.255 0.0.0.0 203.0.113.1",
+      "ip route 0.0.0.0 0.0.0.0 203.0.113.1",
+      "ip route 0.0.0.0 255.255.255.255 203.0.113.1",
+      "ip route any any 203.0.113.1"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Default IPv4 é 0.0.0.0 com máscara 0.0.0.0 apontando ao next-hop (ou interface). Aparece como S* quando ativa e define gateway of last resort. Máscara /32 em 0.0.0.0 não é default clássica.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Código S* em show ip route indica?",
+    "alternativas": [
+      "Rota OSPF inter-area",
+      "Rota conectada",
+      "Rota estática default (candidate default)",
+      "Rota local /32 da interface"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "S = static; o asterisco marca candidate default. C/L são connected/local; OIA seria OSPF. Use show ip route para ver se o gateway of last resort está setado.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Administrative Distance padrão de uma rota estática IPv4 é?",
+    "alternativas": [
+      "110",
+      "120",
+      "255",
+      "1"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Static default AD é 1 (muito preferida). OSPF 110 e RIP 120 são IGP. AD 255 costuma significar não usável. Floating sobe o AD no final do comando ip route.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Floating static de backup para 10.0.0.0/8 com next-hop 10.9.9.2 e AD 210 (primária AD 1):",
+    "alternativas": [
+      "ip route 10.0.0.0 255.0.0.0 10.9.9.2 210",
+      "ip route 10.0.0.0 255.0.0.0 10.9.9.2 1",
+      "ip route 10.0.0.0 255.0.0.0 10.9.9.2 0",
+      "ip route 10.0.0.0 0.0.0.0 10.9.9.2 210"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Mesmo prefixo/máscara da primária com AD maior (210) fica de reserva. AD 1 ou 0 compete/anula o papel de floating. Máscara 0.0.0.0 mudaria o significado do prefixo.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Host route para 10.1.1.50 via 192.168.1.1?",
+    "alternativas": [
+      "ip route 10.1.1.0 255.255.255.0 192.168.1.1",
+      "ip route 10.1.1.50 255.255.255.255 192.168.1.1",
+      "ip route 10.1.1.50 0.0.0.0 192.168.1.1",
+      "ip route 255.255.255.255 10.1.1.50 192.168.1.1"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Host route usa máscara 255.255.255.255 (/32). /24 cobriria a subnet inteira. Isso é longest match mais específica que uma rota de rede maior.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Gateway of last resort is not set. Significado prático?",
+    "alternativas": [
+      "Há default OSPF ativa",
+      "Há S* ativa",
+      "Não há default route selecionada — destinos sem match mais específico falham",
+      "Todas as rotas static têm AD 255"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Sem default ativa, só prefixos na tabela (C/S/O…) são alcançáveis. Falta ip route 0.0.0.0/0 ou a default não está instalada. S* presente marcaria last resort.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Duas rotas para o mesmo /24: static AD 1 e static AD 210. Qual fica na tabela enquanto ambas válidas?",
+    "alternativas": [
+      "As duas em load-balance obrigatório",
+      "Só a de AD 210",
+      "Nenhuma",
+      "A de menor AD (1); a 210 fica de floating se configurada igual e a 1 cair"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Menor AD vence para o mesmo prefixo. A de 210 só assume se a melhor deixar de ser válida. Não é ECMP automático só por ter duas statics com ADs diferentes.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Next-hop da static está down e a rota some do show ip route. Comportamento típico?",
+    "alternativas": [
+      "Sem permanent, a static deixa de ser instalada se o next-hop/interface dependente não está usable",
+      "A rota fica para sempre com AD 0",
+      "Vira rota connected",
+      "Converte em OSPF"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Por padrão a static depende de reachability do next-hop/interface. Cai o path, some a S. permanent (ideia) pode manter a entrada — saiba o default de TShoot sem permanent.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Comando útil para listar só estáticas?",
+    "alternativas": [
+      "show vlan brief",
+      "show spanning-tree",
+      "show ip route static",
+      "show ip ospf database"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "show ip route static filtra entradas S/S*. VLAN e STP não mostram tabela de roteamento IP. OSPF database é outro protocolo.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Primária: ip route 172.16.0.0 255.255.0.0 10.0.0.2. Backup com AD 5. Problema como floating?",
+    "alternativas": [
+      "AD 5 é inválida e IOS rejeita",
+      "AD 5 ainda é baixa e pode não ser o desenho de backup desejado se outra fonte tiver AD maior; para backup de static AD 1 use AD bem maior (ex. 200+). Se ambas static, 5 ainda perde para 1 — ok, mas confira a intenção",
+      "Backup com AD 5 sempre vence a primária AD 1",
+      "Floating exige máscara 0.0.0.0"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Com duas statics, AD 1 vence AD 5 — o backup só entra se a de AD 1 sumir. AD 5 é válida mas pouco ‘folgada’ se no futuro houver IGP. O erro grave é AD do backup ≤ primária.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Rota ip route 10.1.1.0 255.255.255.0 10.2.2.2 mas o destino real é 10.1.2.10. Sintoma?",
+    "alternativas": [
+      "Sempre usa a static por longest match /8",
+      "A /24 10.1.1.0 não cobre 10.1.2.10 — pacote não usa essa static (precisa outra rota/default)",
+      "AD 1 força o match",
+      "S* engole o host"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A máscara define o que a rota cobre. 10.1.2.10 não está em 10.1.1.0/24. Sem outra rota, unreachable. Não confunda com default a menos que exista S*.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Exit-interface Ethernet sem next-hop em multiacesso. Risco/ideia CCNA?",
+    "alternativas": [
+      "É sempre inválido no IOS",
+      "Pode depender de proxy ARP e ser menos previsível; em muitos designs prefere-se next-hop (ou ambos)",
+      "Torna a rota OSPF",
+      "Define AD 255 automaticamente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Em Ethernet, static só com exit-if pode gerar comportamento de ARP para o destino. Next-hop explícito é mais claro. Não vira OSPF nem AD 255 sozinha.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip route: S 10.10.0.0/16 [1/0] via 192.168.1.1. O que é [1/0]?",
+    "alternativas": [
+      "VLAN 1 e porta 0",
+      "[AD/métrica] — AD 1 de static e métrica 0 típica de static",
+      "Processo OSPF 1",
+      "Hello 1 / Dead 0"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "No IOS, [administrative distance/metric] aparece na rota. Static costuma ser [1/0]. Não é VLAN nem timer OSPF.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem mental de TShoot: host remoto unreachable, LAN local ok.",
+    "alternativas": [
+      "Desligar todas as interfaces",
+      "Só limpar ARP e ignorar a tabela",
+      "show ip route <destino> → existe S/S*/O? → show run ip route → next-hop/interface up?",
+      "Só PortFast resolve roteamento"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Confirme se há rota que cobre o destino, se é a esperada e se o next-hop está reachable. PortFast é L2 edge, não substitui static.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Floating com AD 1 e primária também AD 1 para o mesmo /24. Efeito?",
+    "alternativas": [
+      "A segunda sempre fica só de backup",
+      "Não há floating real — mesma AD; pode instalar uma/ambas conforme desempate, sem hierarquia de backup clara",
+      "IOS recusa a segunda linha sempre",
+      "Vira default route"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Floating exige AD pior (maior) na backup. AD iguais não criam cascata primária/backup clássica. Ajuste a backup para 100–250 conforme design.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Stub site: só LAN connected e precisa de Internet. Config mínima típica?",
+    "alternativas": [
+      "Só host routes para cada site da Internet",
+      "Só OSPF area 0 sem default",
+      "Default route estática 0.0.0.0/0 via CE/next-hop do provider",
+      "Negar ip route e usar só ARP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Stub costuma usar S* via edge. Host routes para ‘toda a Internet’ não escalam. ARP não roteia off-subnet.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Longest match: destino 10.1.1.10 com rotas 10.1.0.0/16 e 10.1.1.0/24. Qual vence?",
+    "alternativas": [
+      "Sempre a default",
+      "Sempre a de maior AD",
+      "A /16 por ser maior bloco",
+      "A /24 por ser mais específica (longest match)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Entre prefixos que cobrem o destino, o mais longo (/24) ganha. AD só desempata o mesmo prefixo/fonte. Default só se nada mais casar.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Blackhole: static aponta next-hop 10.0.0.2 mas esse IP não responde e não há outra rota. Sintoma?",
+    "alternativas": [
+      "Pacotes seguem a static e se perdem se o next-hop/path estiver inválido — unreachable ou silêncio no path",
+      "IOS converte em connected",
+      "Sempre faz load-balance com OSPF",
+      "Gera S* automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Se a rota está instalada mas o next-hop é mau, o tráfego pode ser enviado ao buraco. Corrija next-hop ou remova a rota. Não vira connected sozinha.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show run | include ip route mostra a floating, mas show ip route não lista. Causa comum?",
+    "alternativas": [
+      "Static nunca aparece no show ip route",
+      "S* esconde todas as S",
+      "AD 210 é proibida",
+      "Há rota melhor (menor AD / mais específica) ativa, ou next-hop da floating inválido para instalação"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Config != tabela. Floating fica de fora enquanto a primária vale, ou se o backup não tem path válido. show ip route static e o AD da ativa explicam.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/0 e next-hop omitido em Ethernet. Pontos de atenção?",
+    "alternativas": [
+      "Pode instalar default via interface; em multiacesso avalie se o design exige next-hop explícito",
+      "É sintaxe inválida sempre",
+      "Só funciona com OSPF",
+      "Define AD 110"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "IOS aceita default via exit-if; o comportamento de resolução depende do tipo de link. Em muitos casos next-hop é mais limpo. Não força AD de OSPF.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após falha do link da static primária, a floating AD 200 entra. O que o show ip route deve mostrar para esse prefixo?",
+    "alternativas": [
+      "Ainda só a primária com AD 1",
+      "Nenhuma rota nunca mais",
+      "A static de AD 200 como ativa (via do backup)",
+      "Apenas rotas L de todos os hosts"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Caindo a melhor, a floating assume e aparece com seu AD. Esse é o verify do desenho de backup. Não deve permanecer a primária se o path dela morreu.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Diferença prática network route vs host route?",
+    "alternativas": [
+      "Host route /32 casa um único IP; network route cobre um bloco (ex. /24)",
+      "Host route usa máscara 0.0.0.0",
+      "Network route só existe em IPv6",
+      "Host route tem AD 255 obrigatório"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A máscara define o alcance. /32 é host; /24 é rede. AD default de static continua 1 salvo floating.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo desta part?",
+    "alternativas": [
+      "Default 0.0.0.0/0",
+      "Floating AD",
+      "show ip route static",
+      "PBR, VRF e redistribuição completa com route-maps"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O foco é static/default/floating e leitura da tabela. PBR/VRF/redistribute avançado ficam de fora do CCNA desta part.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Código S sem asterisco vs S*?",
+    "alternativas": [
+      "S é default; S* é host",
+      "S é estática de prefixo; S* marca default estática candidata",
+      "S é OSPF; S* é static",
+      "São idênticos sempre"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Asterisco indica candidate default. S sozinha é static ‘normal’. Ambos podem coexistir com outras fontes na tabela.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Next-hop 10.0.0.2 não está em nenhuma rede connected e não há rota para ele. Risco?",
+    "alternativas": [
+      "A static pode não instalar ou ser recursive problem — next-hop precisa ser alcançável",
+      "IOS inventa connected /30",
+      "AD vira 0",
+      "Sempre funciona por proxy DNS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Next-hop deve ser resolvível (em geral via connected). Sem isso a rota falha em instalar ou cai em recursão inválida. DNS não resolve next-hop de ip route.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Duas defaults: S* via ISP1 AD 1 e S via ISP2 AD 210. Qual é last resort enquanto ISP1 up?",
+    "alternativas": [
+      "ISP2 por ser floating",
+      "Nenhuma",
+      "Load-balance 50/50 obrigatório",
+      "ISP1 (menor AD); ISP2 só se a de AD 1 sair"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Default com menor AD é o gateway of last resort. Floating default com AD 210 é backup. Não há ECMP só por ter duas defaults com ADs diferentes.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após corrigir o next-hop, o que verificar?",
+    "alternativas": [
+      "Apenas o banner",
+      "Apenas a cor do LED",
+      "show ip route <destino>, AD/via, e teste de reachability (ping/traceroute)",
+      "Apenas show vlan brief"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Confirme instalação e encaminhamento real. LED/banner/VLAN não validam a static sozinhos.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ip route 192.168.0.0 255.255.0.0 10.0.0.1 cobre 192.168.10.5?",
+    "alternativas": [
+      "Não, só /24",
+      "Não, só host 192.168.0.0",
+      "Sim — /16 192.168.0.0/16 inclui 192.168.10.5",
+      "Só se houver S*"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "255.255.0.0 é /16; 192.168.10.5 está dentro de 192.168.0.0/16. S* não é requisito para esse match. Confunda com /24 e o resultado muda.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo Configure/Verify static IPv4 no CCNA:",
+    "alternativas": [
+      "Só BGP full table",
+      "Só redistribuição mútua OSPF-EIGRP",
+      "Só VRF lite obrigatório",
+      "ip route (rede/host/default), floating com AD, leitura S/S* e TShoot de next-hop/máscara/backup"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O núcleo é static, default, floating e show ip route. BGP/VRF/redistribute avançado não são o foco desta part.",
+    "part_id": "v2-3.2"
+  }
+]

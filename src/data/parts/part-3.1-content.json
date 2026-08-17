@@ -1,0 +1,136 @@
+{
+  "part_id": "3.1",
+  "title": "Rotas estáticas, default, floating e AD",
+  "blueprint_module": "3.0",
+  "weight_percent": 25,
+  "topic_list": [
+    "Rota estática IPv4: ip route rede máscara next-hop",
+    "Next-hop IP vs exit-interface",
+    "Default route 0.0.0.0/0 (e ::/0 em visão leve)",
+    "Códigos de rota: C, L, S, S*",
+    "Administrative Distance (tabela mental CCNA)",
+    "Floating static: mesma rede, AD maior = backup",
+    "Longest match vs AD na escolha do caminho",
+    "Quando a estática entra ou sai da tabela",
+    "show ip route e show ip route static",
+    "Interface down / next-hop unreachable",
+    "Overlapping prefixes e expectativa de encaminhamento",
+    "Troubleshoot: rota presente mas tráfego não segue"
+  ],
+  "study_notes": [
+    {
+      "heading": "Rota estática: o que é e para que serve",
+      "bullets": [
+        "Rota estática é um caminho configurado manualmente pelo administrador (não aprendido por protocolo dinâmico).",
+        "Forma clássica IPv4: ip route <rede> <máscara> <next-hop-ip> [AD opcional] ou ip route <rede> <máscara> <interface-de-saída>.",
+        "Útil em designs pequenos, stub networks, default para a Internet e backup (floating) de um caminho dinâmico.",
+        "A rota só é útil se o roteador puder alcançar o next-hop e a interface relacionada estiver operacional (com nuances por tipo de configuração).",
+        "IPv6 (visão leve): ipv6 route com prefixo/prefix-length e next-hop; default ::/0 no mesmo espírito da default IPv4."
+      ],
+      "exam_tips": [
+        "Estática = controle manual. Dinâmica = OSPF etc. Floating = estática de backup com AD maior."
+      ]
+    },
+    {
+      "heading": "Next-hop IP vs exit-interface",
+      "bullets": [
+        "Next-hop IP: o roteador encaminha para o IP do vizinho (precisa de resolução do next-hop, em geral via rede conectada).",
+        "Exit-interface: aponta a interface de saída (comum em links ponto a ponto; em multiacesso Ethernet o next-hop IP é preferível na prática moderna).",
+        "Combinar interface + next-hop é padrão robusto em alguns designs (fully specified static).",
+        "Erro clássico: next-hop em outra subnet não alcançável → rota pode não instalar ou não encaminhar.",
+        "Exit-interface em Ethernet sem next-hop pode gerar comportamentos indesejados (proxy ARP legado) — a prova valoriza entender next-hop claro."
+      ],
+      "exam_tips": [
+        "Leia o comando: o último argumento é next-hop ou interface? Isso muda o troubleshooting."
+      ]
+    },
+    {
+      "heading": "Default route e códigos na tabela",
+      "bullets": [
+        "Default route IPv4: 0.0.0.0/0 — “gateway of last resort” quando não há match mais específico.",
+        "Na tabela costuma aparecer como S* (estática candidate default) quando é default estática.",
+        "Códigos comuns: C = connected, L = local (host /32 da interface), S = static, O = OSPF, D = EIGRP, B = BGP (eBGP AD típico 20).",
+        "show ip route lista a tabela ativa; show ip route static filtra estáticas; show ip route <prefix> mostra candidatos e por que uma venceu.",
+        "Gateway of last resort no cabeçalho do show ip route indica se há default instalada."
+      ],
+      "exam_tips": [
+        "S* = default estática. Sem S*/gateway of last resort, tráfego a destinos desconhecidos falha (salvo outras defaults)."
+      ]
+    },
+    {
+      "heading": "Administrative Distance (AD)",
+      "bullets": [
+        "AD mede a “confiança” da fonte da rota: menor AD vence entre rotas para o MESMO prefixo (mesmo comprimento de máscara).",
+        "Valores mentais CCNA: Connected 0 · Static 1 · eBGP 20 · EIGRP 90 · OSPF 110 · RIP 120 · iBGP 200 · Unknown/incompleto 255.",
+        "Estática com AD default 1 costuma preferir-se a OSPF (110) para o mesmo prefixo.",
+        "AD não substitui longest match: um /24 mais específico vence um /16 mesmo que o /16 tenha AD melhor.",
+        "AD configurável na estática: ip route … <1–255> (255 = não confiar / não instalar como usável em muitos contextos)."
+      ],
+      "exam_tips": [
+        "Mesmo prefixo → menor AD. Prefixos diferentes → longest match primeiro."
+      ]
+    },
+    {
+      "heading": "Floating static (rota de backup)",
+      "bullets": [
+        "Floating static: mesma rede/máscara que a rota primária, mas com AD maior (pior) para só entrar se a primária sair.",
+        "Exemplo: primária OSPF (AD 110) ou estática AD 1; floating ip route … 200 entra só quando a primária some.",
+        "Enquanto a primária estiver na tabela, a floating NÃO aparece como ativa (fica “na reserva”).",
+        "A primária some se a interface de saída cair, o next-hop ficar unreachable ou o protocolo retirar a rota.",
+        "Erro clássico do NOC: “floating não assume” — na verdade a primária ainda está up/instalada."
+      ],
+      "exam_tips": [
+        "Floating = AD maior. Se a principal ainda está no show ip route, a floating não deve assumir."
+      ]
+    },
+    {
+      "heading": "Longest match, overlap e encaminhamento",
+      "bullets": [
+        "O roteador escolhe o prefixo mais longo que casa com o destino (longest match) antes de comparar AD entre iguais.",
+        "Ex.: destino 10.1.1.50 casa com 10.1.1.0/24 e 10.0.0.0/8 → usa /24.",
+        "Overlapping: duas estáticas /24 e /16; o tráfego para hosts do /24 usa o /24, não a “rota maior”.",
+        "Rota existe na tabela ≠ caminho fim a fim ok: pode faltar return path, ACL, NAT, ou ARP no next-hop.",
+        "Rota “sumiu”: interface down, next-hop fora da connected, ou AD/config removida."
+      ],
+      "exam_tips": [
+        "Most specific wins. AD só desempatar o mesmo prefixo/fonte de mesmo length."
+      ]
+    },
+    {
+      "heading": "Troubleshooting com show ip route",
+      "bullets": [
+        "Confirme se o prefixo está instalado e com qual código (S, S*, O, C…).",
+        "Confira next-hop e interface de saída na linha da rota.",
+        "show ip interface brief: interfaces up/up necessárias para connected e muitas estáticas.",
+        "show run | include ip route: veja AD e next-hop configurados (incluindo floating).",
+        "Se a estática não instala: next-hop não está em rede connected, interface down, ou conflito de config.",
+        "Se instala mas não encaminha: longest match para outro prefixo, CEF///return path, ou next-hop sem ARP."
+      ],
+      "exam_tips": [
+        "Fluxo: config ip route → interface/next-hop alcançável? → rota na tabela? → longest match do destino? → caminho de volta?"
+      ]
+    }
+  ],
+  "key_commands": [
+    "ip route <network> <mask> <next-hop>",
+    "ip route <network> <mask> <exit-interface>",
+    "ip route <network> <mask> <next-hop> <AD>",
+    "ip route 0.0.0.0 0.0.0.0 <next-hop>",
+    "ipv6 route <prefix>/<length> <next-hop>",
+    "show ip route",
+    "show ip route static",
+    "show ip route <prefix>",
+    "show ip route 0.0.0.0",
+    "show running-config | include ip route",
+    "show ip interface brief"
+  ],
+  "must_know": [
+    "Rota estática default AD = 1; floating usa AD maior para backup do mesmo prefixo.",
+    "Default IPv4 = 0.0.0.0/0 (S*); sem ela, destinos não cobertos por rotas mais específicas falham.",
+    "Entre o mesmo prefixo, menor AD vence; entre prefixos diferentes, longest match manda.",
+    "AD mental: C 0 · S 1 · eBGP 20 · EIGRP 90 · OSPF 110 · RIP 120.",
+    "Next-hop deve ser alcançável; interface down costuma retirar a estática da tabela.",
+    "Códigos: C connected, L local, S static, S* default estática.",
+    "Floating “não assume” quase sempre porque a primária ainda está instalada."
+  ]
+}

@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Site público HTTPS com app em EC2 privadas multi-AZ. Onde colocar o ALB internet-facing?",
+    "alternativas": [
+      "Somente em uma subnet privada sem IGW",
+      "Somente na mesma ENI de cada EC2 de app",
+      "Em pelo menos duas subnets públicas de AZs diferentes, com targets no TG em privadas",
+      "Substituído por NAT Gateway na borda"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Internet-facing exige nodes do ALB em subnets públicas multi-AZ para HA e path via IGW; targets ficam em privadas. NAT não termina HTTPS de usuários. Tip de prova: usuários Internet + HA → ALB público ≥2 AZ; app privada.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ALB retorna 503; describe-target-health mostra todos Unhealthy e ASG desired=2. Processos na app sobem na 8080. Health check path=/health retorna 404. Causa mais direta?",
+    "alternativas": [
+      "Falta de Elastic IP em cada target",
+      "Reserved Instance bloqueando o listener 443",
+      "Health check path incorreto (404) marca targets unhealthy e o ALB fica sem backend saudável",
+      "S3 versioning desligado na conta"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "404 no path de health faz o TG marcar unhealthy; com zero healthy o ALB responde 503 mesmo com instances running. EIP e RI não definem health HTTP. Tip de prova: 503 + Unhealthy → path/porta/SG do health antes de recriar o ALB.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Padrão de Security Group entre ALB e targets EC2 na porta do target group 8080?",
+    "alternativas": [
+      "sg-app 0.0.0.0/0 em todas as portas e sg-alb sem inbound",
+      "sg-alb inbound 443 (clientes); sg-app inbound 8080 com Source = sg-alb",
+      "Somente NACL Deny all entre públicas e privadas",
+      "Sem Security Groups se o ASG estiver enabled"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: sg-alb inbound 443 (clientes); sg-app inbound 8080 com Source = sg-alb. Isso resolve o cenário: Padrão de Security Group entre ALB e targets EC2 na porta do target group 8080?… O distractor «sg-app 0.0.0.0/0 em todas as portas e sg-alb sem inbound» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ASG com min=2, desired=2, max=2, subnets só em us-east-1a. Requisito: sobreviver à queda de uma AZ. Qual falha de design?",
+    "alternativas": [
+      "max=2 impede On-Demand",
+      "min=2 é inválido com ALB",
+      "Launch template não pode ter AMI",
+      "ASG em uma única AZ é SPOF — precisa de subnets em ≥2 AZ"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: ASG em uma única AZ é SPOF — precisa de subnets em ≥2 AZ. Isso resolve o cenário: ASG com min=2, desired=2, max=2, subnets só em us-east-1a. Requisito: sobreviver… O distractor «max=2 impede On-Demand» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O que um target group faz no caminho do ALB?",
+    "alternativas": [
+      "Substitui o Internet Gateway da VPC",
+      "Cria snapshots EBS a cada health check",
+      "Agrupa targets (IP/instance) e aplica health checks + roteamento do listener",
+      "Define o preço Spot da frota sozinho"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Agrupa targets (IP/instance) e aplica health checks + roteamento do listener. Isso resolve o cenário: O que um target group faz no caminho do ALB?… O distractor «Substitui o Internet Gateway da VPC» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Multi-constraint: HA multi-AZ, custo controlado e health fail-fast se /ready falhar. Qual desenho atende os três?",
+    "alternativas": [
+      "Uma EC2 On-Demand com EIP e health desligado",
+      "ALB multi-AZ + ASG multi-AZ com min≥2, health em /ready, tipos right-sized (evita overprovision fixo enorme)",
+      "NLB em uma AZ com desired 20 always",
+      "Somente CloudFront sem origem de compute"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "ALB+ASG multi-AZ com min≥2 cobre HA; health /ready remove targets ruins; right-size controla custo vs frota fixa inchada. EIP único e health off falham HA e fail-fast. Tip de prova: HA+health+custo → multi-AZ ASG/ALB + health path real + capacity sob controle.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Após scale-in, usuários com upload longo veem conexão cortada. Qual ajuste de ALB/ASG (ideia)?",
+    "alternativas": [
+      "Aumentar deregistration delay (connection draining) para drenar conexões antes do terminate",
+      "Remover o target group do ASG",
+      "Desligar todos os health checks permanentemente",
+      "Colocar o ASG desired em 0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Aumentar deregistration delay (connection draining) para drenar conexões antes do terminate. Isso resolve o cenário: Após scale-in, usuários com upload longo veem conexão cortada. Qual ajuste de AL… O distractor «Remover o target group do ASG» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Launch template do ASG define AMI, instance type, sg-app e instance profile. Qual papel no scale-out?",
+    "alternativas": [
+      "Apenas renomeia tags do ALB",
+      "Substitui o listener HTTPS",
+      "É o blueprint de cada nova instance lançada pelo ASG",
+      "Desliga o cooldown de scaling"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "LT (ou LC legado) fixa a config de launch no scale-out; sem LT coerente o ASG não sobe instances corretas. Não mexe sozinho no listener. Tip de prova: ASG não lança → descreva launch template + subnets + service quota. (aws-1.5 #8)",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Métrica típica de target tracking com ALB para escalar web tier (ideia)?",
+    "alternativas": [
+      "Número de snapshots EBS na conta",
+      "Request count por target (ALB) ou CPU utilization da ASG",
+      "Tamanho do bucket S3 de logs",
+      "Quantidade de IAM users"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Request count por target (ALB) ou CPU utilization da ASG. Isso resolve o cenário: Métrica típica de target tracking com ALB para escalar web tier (ideia)?… O distractor «Número de snapshots EBS na conta» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ALB internal vs internet-facing: quando internal?",
+    "alternativas": [
+      "Sempre que houver HTTPS",
+      "Somente com Spot instances",
+      "Somente em us-east-1",
+      "Quando só clientes da VPC/rede privada devem alcançar o balanceador (ex. service-to-service)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Quando só clientes da VPC/rede privada devem alcançar o balanceador (ex. service-to-service). Isso resolve o cenário: ALB internal vs internet-facing: quando internal?… O distractor «Sempre que houver HTTPS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "describe-target-health: State=unhealthy Reason=Target.Timeout. App escuta 8080; NACL allow; sg-app só tem 22 de bastion. Diagnóstico?",
+    "alternativas": [
+      "Falta inbound 8080 no sg-app com Source do ALB — health e tráfego timeout",
+      "A AMI não pode rodar atrás de ALB",
+      "Cooldown-out do ASG bloqueia pacotes TCP",
+      "HTTPS no listener exige WAF obrigatório"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Falta inbound 8080 no sg-app com Source do ALB — health e tráfego timeout. Isso resolve o cenário: describe-target-health: State=unhealthy Reason=Target.Timeout. App escuta 8080; … O distractor «A AMI não pode rodar atrás de ALB» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ASG desired=0, min=0, max=10, TG attached a ALB de produção. Sintoma esperado?",
+    "alternativas": [
+      "ALB anuncia 200 sem backends",
+      "ASG lança 10 instances imediatamente sempre",
+      "Clientes recebem 503 (ou falha) por ausência de targets healthy registrados",
+      "O launch template é apagado"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Clientes recebem 503 (ou falha) por ausência de targets healthy registrados. Isso resolve o cenário: ASG desired=0, min=0, max=10, TG attached a ALB de produção. Sintoma esperado?… O distractor «ALB anuncia 200 sem backends» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Multi-constraint: reduzir custo noturno mas manter HA diurna com health rigoroso. Abordagem?",
+    "alternativas": [
+      "max=1 e health path em endpoint que sempre 500",
+      "Schedule/min dinâmico (ex. min=2 dia, min=0 ou baixo noite) + health /ready estável + ALB multi-AZ",
+      "Terminate manual diário de todas as AZ sem ALB",
+      "Uma instance Spot permanente com EIP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Scheduled scaling ou ajuste de min/desired corta custo à noite; min≥2 e multi-AZ de dia mantêm HA; health estável evita flapping. Health 500 e max=1 quebram HA. Tip de prova: custo+HA → scheduled capacity + multi-AZ + health saudável, não max=1.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que registrar o ASG no target group do ALB?",
+    "alternativas": [
+      "Para o ASG criar VPCs automaticamente",
+      "Para desligar Security Groups",
+      "Para instances novas entrarem no balanceamento e unhealthy serem gerenciadas no caminho ELB",
+      "Para converter ALB em NLB"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Para instances novas entrarem no balanceamento e unhealthy serem gerenciadas no caminho ELB. Isso resolve o cenário: Por que registrar o ASG no target group do ALB?… O distractor «Para o ASG criar VPCs automaticamente» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Listener 443 no ALB sem certificado ACM (ideia HTTPS). O que falta no desenho seguro de borda?",
+    "alternativas": [
+      "Certificado no listener HTTPS (ACM) e policy TLS adequada",
+      "gp3 IOPS no volume do ALB (ALB não usa EBS de cliente assim)",
+      "Instance store em cada node do ALB gerenciado",
+      "Desligar o health check"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Certificado no listener HTTPS (ACM) e policy TLS adequada. Isso resolve o cenário: Listener 443 no ALB sem certificado ACM (ideia HTTPS). O que falta no desenho se… O distractor «gp3 IOPS no volume do ALB (ALB não usa EBS de cliente assim)» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cooldown-out em scaling policy evita qual problema?",
+    "alternativas": [
+      "Impede qualquer scale-out para sempre",
+      "Substitui o max do ASG",
+      "Apaga o launch template",
+      "Oscilação rápida scale-out/in (flapping) após picos transitórios"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Oscilação rápida scale-out/in (flapping) após picos transitórios. Isso resolve o cenário: Cooldown-out em scaling policy evita qual problema?… O distractor «Impede qualquer scale-out para sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ALB em 2 AZ; ASG só em subnet us-east-1a. Incidente derruba 1a. Resultado?",
+    "alternativas": [
+      "ALB continua com targets healthy na 1b automaticamente",
+      "Sem targets em outras AZ, a app fica indisponível apesar do ALB multi-AZ",
+      "O ASG migra EBS multi-attach para 1b sozinho",
+      "Route 53 remove a necessidade de multi-AZ no ASG"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Sem targets em outras AZ, a app fica indisponível apesar do ALB multi-AZ. Isso resolve o cenário: ALB em 2 AZ; ASG só em subnet us-east-1a. Incidente derruba 1a. Resultado?… O distractor «ALB continua com targets healthy na 1b automaticamente» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Health check success codes = 200; app /health devolve 200 só se DB up. Benefício?",
+    "alternativas": [
+      "Remove targets que não estão realmente prontos para tráfego (dependência crítica)",
+      "Aumenta o desired do ASG automaticamente para 100",
+      "Desliga o listener 443",
+      "Converte targets em Spot obrigatoriamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Remove targets que não estão realmente prontos para tráfego (dependência crítica). Isso resolve o cenário: Health check success codes = 200; app /health devolve 200 só se DB up. Benefício… O distractor «Aumenta o desired do ASG automaticamente para 100» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "TShoot: scaling activity Failed: Launching a new EC2 instance. Status: subnet has no more free addresses. Ação?",
+    "alternativas": [
+      "Aumentar desired mesmo assim sem mudar rede",
+      "Só trocar o health path",
+      "Usar subnets com CIDR/IPs livres ou adicionar subnets ao ASG; capacity IP esgotada",
+      "Remover o ALB"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Usar subnets com CIDR/IPs livres ou adicionar subnets ao ASG; capacity IP esgotada. Isso resolve o cenário: TShoot: scaling activity Failed: Launching a new EC2 instance. Status: subnet ha… O distractor «Aumentar desired mesmo assim sem mudar rede» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo desta part ALB/ASG foundations?",
+    "alternativas": [
+      "Health checks e 503",
+      "ASG min/desired/max multi-AZ",
+      "SG ALB → target",
+      "NLB/GLB deep, path routing lab completo, Blue/Green CodeDeploy full, predictive scaling"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: NLB/GLB deep, path routing lab completo, Blue/Green CodeDeploy full, predictive scaling. Isso resolve o cenário: Fora de escopo profundo desta part ALB/ASG foundations?… O distractor «Health checks e 503» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cross-zone load balancing no ALB (ideia): efeito prático?",
+    "alternativas": [
+      "Nodes do ALB podem distribuir a targets em todas as AZ habilitadas, não só na AZ do node",
+      "Obriga todos os targets a ter Elastic IP",
+      "Desliga health checks",
+      "Impede ASG multi-AZ"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Com cross-zone, o ALB balanceia entre AZs de forma mais uniforme; default moderno costuma habilitar no ALB. Não exige EIP nem desliga health. Tip de prova: uneven targets por AZ → entenda cross-zone no ALB. (aws-1.5 #21)",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "App stateful em sticky session (ideia) vs scale-in agressivo. Risco?",
+    "alternativas": [
+      "Nenhum — sticky ignora terminate",
+      "Usuários grudados em instance que será terminada sofrem erro se não houver draining/re-sessão",
+      "O ASG não pode ter max > 1",
+      "O ALB deixa de usar HTTPS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Usuários grudados em instance que será terminada sofrem erro se não houver draining/re-sessão. Isso resolve o cenário: App stateful em sticky session (ideia) vs scale-in agressivo. Risco?… O distractor «Nenhum — sticky ignora terminate» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "sg-alb permite 443; sg-app permite 8080 de sg-alb; health na 8080/health OK. Ainda unhealthy com Target.FailedHealthChecks e código 401 no access log do health. Causa?",
+    "alternativas": [
+      "Falta de IGW na subnet do ALB",
+      "ASG desired baixo demais",
+      "Endpoint de health exige autenticação (401) — ajuste path público de readiness ou success codes",
+      "Instance type t3 não suporta ALB"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Endpoint de health exige autenticação (401) — ajuste path público de readiness ou success codes. Isso resolve o cenário: sg-alb permite 443; sg-app permite 8080 de sg-alb; health na 8080/health OK. Ain… O distractor «Falta de IGW na subnet do ALB» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ASG max=4, desired=4, CPU 90% sustentado; policy target tracking CPU 50%. Por que não sobe mais?",
+    "alternativas": [
+      "Porque o ALB não existe",
+      "Porque Spot é obrigatório",
+      "Porque health checks estão off",
+      "Porque desired já está no max — aumente max (e cotas) se a carga exige mais capacity"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Porque desired já está no max — aumente max (e cotas) se a carga exige mais capacity. Isso resolve o cenário: ASG max=4, desired=4, CPU 90% sustentado; policy target tracking CPU 50%. Por qu… O distractor «Porque o ALB não existe» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Replace de instance unhealthy pelo ASG com ELB health check habilitado. O que o ASG faz (ideia)?",
+    "alternativas": [
+      "Marca a instance para replace/terminate e lança outra para manter desired",
+      "Remove o ALB da VPC",
+      "Desliga o listener 443",
+      "Converte o volume root em io2 automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Marca a instance para replace/terminate e lança outra para manter desired. Isso resolve o cenário: Replace de instance unhealthy pelo ASG com ELB health check habilitado. O que o … O distractor «Remove o ALB da VPC» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "503 intermitente durante deploy rolling do ASG. Mitigação alinhada a health?",
+    "alternativas": [
+      "Health check grace period / ensure novos targets fiquem healthy antes de derrubar os antigos demais",
+      "desired=0 durante todo o deploy",
+      "Health path apontando para URL externa 500 fixo",
+      "Remover todas as subnets de uma AZ no meio do deploy sem plano"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Health check grace period / ensure novos targets fiquem healthy antes de derrubar os antigos demais. Isso resolve o cenário: 503 intermitente durante deploy rolling do ASG. Mitigação alinhada a health?… O distractor «desired=0 durante todo o deploy» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ALB access logs (ideia) ajudam em qual TShoot?",
+    "alternativas": [
+      "Ver códigos HTTP, tempos e targets escolhidos para correlacionar 5xx/timeouts",
+      "Redimensionar EBS automaticamente",
+      "Criar IAM users",
+      "Alterar o CIDR da VPC"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Ver códigos HTTP, tempos e targets escolhidos para correlacionar 5xx/timeouts. Isso resolve o cenário: ALB access logs (ideia) ajudam em qual TShoot?… O distractor «Redimensionar EBS automaticamente» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Design: API interna só para microserviços na VPC, com HA. Scheme do ALB?",
+    "alternativas": [
+      "internet-facing com 0.0.0.0/0 e sem SG",
+      "internal em subnets privadas multi-AZ (ou scheme internal) com SG só dos clients",
+      "Sem ALB, só EIP em uma instance",
+      "CloudFront obrigatório na VPC privada"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: internal em subnets privadas multi-AZ (ou scheme internal) com SG só dos clients. Isso resolve o cenário: Design: API interna só para microserviços na VPC, com HA. Scheme do ALB?… O distractor «internet-facing com 0.0.0.0/0 e sem SG» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mental 503 / unhealthy nesta part?",
+    "alternativas": [
+      "Só recriar a conta AWS",
+      "Só aumentar o TTL do DNS",
+      "Só desligar o versioning S3",
+      "Target health → health path/porta → SG ALB→app → ASG desired/min e AZs → listener/TG"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Target health → health path/porta → SG ALB→app → ASG desired/min e AZs → listener/TG. Isso resolve o cenário: Checklist mental 503 / unhealthy nesta part?… O distractor «Só recriar a conta AWS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.5), não em controles de outro domínio.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo ALB+ASG foundations no SAA-C03:",
+    "alternativas": [
+      "Um EC2 com EIP e health checks desligados em produção multi-AZ",
+      "ASG single-AZ com desired 0 atrás de ALB público",
+      "sg-app 0.0.0.0/0 e sem target group",
+      "ALB multi-AZ + targets privados multi-AZ + health real + SG em camadas + ASG min/desired/max com scaling e draining"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O desenho resiliente combina borda multi-AZ, backends privados saudáveis, least privilege de SG e capacity automática. EIP único, desired 0 e SG aberto são anti-patterns. Tip de prova: se a opção une multi-AZ, health, SG source=ALB e capacity ASG, costuma ser a correta.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  }
+]

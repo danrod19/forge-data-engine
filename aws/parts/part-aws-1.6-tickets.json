@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1601: App pay-api timeout ao abrir conexão JDBC no RDS pay-db (porta 5432). CPU do RDS baixa.",
+    "cli_output": "$ aws rds describe-db-instances --db-instance-identifier pay-db \\\n  --query 'DBInstances[0].{Status:DBInstanceStatus,AZ:AvailabilityZone,MultiAZ:MultiAZ,Public:PubliclyAccessible,SG:VpcSecurityGroups,Endpoint:Endpoint}'\nStatus: available\nAZ: us-east-1a\nMultiAZ: true\nPublic: false\nEndpoint: pay-db.xxxx.us-east-1.rds.amazonaws.com:5432\nSG: [sg-db]\n\n$ aws ec2 describe-security-groups --group-ids sg-db\nInbound:\n  TCP 22 Source sg-bastion\n  (no 5432)\nOutbound: all\n\n$ aws ec2 describe-security-groups --group-ids sg-app\nInbound: TCP 8080 Source sg-alb\nOutbound: all\n\n$ aws ec2 describe-instances --filters Name=tag:App,Values=pay-api\ni-0app1 running  SG: sg-app  Subnet: subnet-0priva\n\n# App log: Connection timed out connecting to pay-db...:5432",
+    "alternativas": [
+      "Adicionar inbound no sg-db TCP 5432 com Source = sg-app",
+      "Habilitar PubliclyAccessible true e 0.0.0.0/0 na 5432",
+      "Desligar Multi-AZ para 'melhorar latência de auth'",
+      "Recriar o ALB listener na 5432"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "RDS available e timeout com sg-db sem 5432 do sg-app é filtragem de SG. Tornar público 0.0.0.0/0 resolve mal e expõe o DB; ALB não termina JDBC. Tip de prova: timeout JDBC + available → SG do RDS na porta do engine com Source do app.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1602: Após failover Multi-AZ (evento AWS), app ficou 2–3 min sem writes e depois voltou no mesmo hostname.",
+    "cli_output": "$ aws rds describe-events --source-type db-instance --source-identifier shop-db --duration 120\nMessage: Multi-AZ instance failover completed\nMessage: DB instance restarted\nMessage: Failover to standby complete\n\n$ aws rds describe-db-instances --db-instance-identifier shop-db\nDBInstanceStatus: available\nMultiAZ: true\nEndpoint.Address: shop-db.xxxx.us-east-1.rds.amazonaws.com  (unchanged)\nAvailabilityZone: us-east-1b   # was us-east-1a before event\n\n$ aws rds describe-db-instances --db-instance-identifier shop-db-rr\nReadReplicaSourceDBInstanceIdentifier: shop-db\nStatus: available\n\n# App errors window 02:14–02:16: communications link failure; then recover with retry",
+    "alternativas": [
+      "É esperado em failover Multi-AZ: breve RTO e reconexão no endpoint; app deve ter retry — não indica perda total de Multi-AZ",
+      "Prova de que Multi-AZ está desligado",
+      "Exige abrir 0.0.0.0/0 no sg-db para o failover funcionar",
+      "Indica que apenas a read replica pode receber writes daqui pra frente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Eventos de failover Multi-AZ + AZ mudando com mesmo endpoint e janela curta de erro batem com RTO de failover; retry recupera. Replica não vira writer automático neste cenário clássico. Tip de prova: failover Multi-AZ → downtime curto + mesmo endpoint; implemente retry.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1603: Instância dev-db foi deletada acidentalmente. Precisam dos dados de ontem.",
+    "cli_output": "$ aws rds describe-db-instances --db-instance-identifier dev-db\nDBInstanceNotFound fault\n\n$ aws rds describe-db-snapshots --db-instance-identifier dev-db\n[]   # empty\n\n$ aws rds describe-db-instances --filters Name=db-instance-id,Values=dev-db\n(no pending)\n\n# Last known config from CMDB:\nBackupRetentionPeriod: 0\nDeletionProtection: false\nMultiAZ: false\nPreferredBackupWindow: (n/a — backups disabled)\n\n$ aws rds describe-db-cluster-snapshots 2>/dev/null || true\n(no cluster — instance was RDS MySQL single)\n\n# No manual snapshot tickets in the last 30 days",
+    "alternativas": [
+      "Restaurar com PITR de 7 dias mesmo com retention 0",
+      "Multi-AZ recria a instance apagada automaticamente em 24h",
+      "Sem automated backup (retention 0) e sem snapshot manual, não há restore RDS — dados indisponíveis no serviço",
+      "Basta recriar o Security Group com o mesmo nome"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Instance not found + zero snapshots + retention 0 = sem caminho de restore. Multi-AZ não sobrevive a delete da instance. Tip de prova: delete RDS sem snapshot/backup = perda; ligue retention e deletion protection em dados valiosos.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1604: Achado de security review no RDS crm-db de 'produção'.",
+    "cli_output": "$ aws rds describe-db-instances --db-instance-identifier crm-db \\\n  --query 'DBInstances[0].{Public:PubliclyAccessible,MultiAZ:MultiAZ,SGs:VpcSecurityGroups,Subnets:DBSubnetGroup.Subnets}'\nPublic: true\nMultiAZ: false\nSGs: [sg-crm-db]\nSubnets:\n  - subnet-0puba  AZ=us-east-1a\n  - (only one subnet in group — also 1a)\n\n$ aws rds describe-db-subnet-groups --db-subnet-group-name crm-subnets\nSubnets: [subnet-0puba]   # single AZ us-east-1a  MapPublicIpOnLaunch related public tier\n\n$ aws ec2 describe-security-groups --group-ids sg-crm-db\nInbound:\n  TCP 3306  0.0.0.0/0\nOutbound: all\n\n$ aws ec2 describe-subnets --subnet-ids subnet-0puba\nMapPublicIpOnLaunch: true\n# Tag: Tier=public",
+    "alternativas": [
+      "Marcar como compliant porque tem endpoint DNS",
+      "Corrigir: PubliclyAccessible false, SG 3306 só de sg-app, subnet group privado em ≥2 AZ e avaliar Multi-AZ se HA for requisito",
+      "Abrir também 5432 0.0.0.0/0 para 'compatibilidade'",
+      "Remover o DB subnet group inteiro e usar EC2 na mesma pública sem SG"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Public true + 3306 world open + subnet group single public AZ são três falhas (exposição e SPOF). O remédio é private multi-AZ group, SG do app e Multi-AZ se HA. Tip de prova: achado RDS público 0.0.0.0/0 + 1 AZ → private, SG app, multi-AZ subnet/HA.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1605: Writes falhando com 'No space left' / storage-full no RDS orders-db.",
+    "cli_output": "$ aws rds describe-db-instances --db-instance-identifier orders-db \\\n  --query 'DBInstances[0].{Status:DBInstanceStatus,Alloc:AllocatedStorage,MaxAlloc:MaxAllocatedStorage,StorageType:StorageType,StorageEncrypted:StorageEncrypted}'\nStatus: storage-full\nAlloc: 100\nMaxAlloc: 100\nStorageType: gp3\nStorageEncrypted: true\n\n$ aws cloudwatch get-metric-statistics --namespace AWS/RDS --metric-name FreeStorageSpace \\\n  --dimensions Name=DBInstanceIdentifier,Value=orders-db ...\n# Datapoints near 0 bytes free\n\n$ aws rds describe-db-instances --db-instance-identifier orders-db \\\n  --query 'DBInstances[0].{MultiAZ:MultiAZ,BackupRetentionPeriod:BackupRetentionPeriod}'\nMultiAZ: true\nBackupRetentionPeriod: 7\n\n# App: INSERT/UPDATE failing; SELECT still intermittently ok",
+    "alternativas": [
+      "Abrir 0.0.0.0/0 na porta do engine",
+      "Desligar Multi-AZ para liberar disco do standby como se fosse o primary",
+      "Só recriar o ALB",
+      "Aumentar AllocatedStorage e/ou MaxAllocatedStorage (autoscaling) — FreeStorageSpace ~0 explica writes falhando"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Status storage-full e FreeStorageSpace ~0 com MaxAlloc=Alloc fechado exigem mais storage (e autoscaling). SG e ALB não liberam GiB; desligar Multi-AZ não é o fix de disco. Tip de prova: storage-full RDS → modify storage / max allocated storage.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  }
+]

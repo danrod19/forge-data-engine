@@ -1,29 +1,45 @@
 /**
  * Progresso real do Modo Estudo — persistido em localStorage.
- * Conta questões únicas acertadas por domínio CCNA.
+ * Chave Módulo 1: ccna-forge-estudo-m1 (por part_id).
+ * Chave legada: ccna-forge-estudo-progress (domínios oficiais) — mantida.
  */
 
 import type { DomainId } from "@/data/domains";
 import { CCNA_DOMAINS } from "@/data/domains";
+import { MODULE_1_PARTS } from "@/data/module-1-fundamentos";
+import { MODULE_2_PARTS } from "@/data/module-2-acesso";
+import { MODULE_3_PARTS } from "@/data/module-3-ip";
+import { MODULE_4_PARTS } from "@/data/module-4-services";
+import { MODULE_5_PARTS } from "@/data/module-5-security";
+import { MODULE_6_PARTS } from "@/data/module-6-automation";
+import { v2PartsIndex } from "@/data/v2-banks";
 
 export const ESTUDO_PROGRESS_KEY = "ccna-forge-estudo-progress";
+/** Progresso do Estudo por partes do Módulo 1.0 */
+export const ESTUDO_M1_PROGRESS_KEY = "ccna-forge-estudo-m1";
+
+/** Progresso namespaced por track (multi-cert). */
+export type EstudoTrackId = "ccna-v1" | "ccna-v2" | "aws";
+
+export function estudoProgressKeyForTrack(track: EstudoTrackId): string {
+  return `ccna-forge-estudo-progress:${track}`;
+}
 
 export interface DomainProgressEntry {
-  /** Quantidade de questões únicas já acertadas neste domínio */
+  /** Quantidade de questões únicas já acertadas neste domínio/part */
   completed: number;
-  /** Tamanho do pool de questões do domínio (atualizado a cada sessão) */
+  /** Tamanho do pool de questões (atualizado a cada sessão) */
   total: number;
   /** ISO 8601 da última prática */
   lastPracticed: string;
   /**
    * IDs únicos acertados (interno — garante completed sem double-count).
-   * Opcional na leitura de dados legados.
    */
   masteredIds?: number[];
 }
 
 export type EstudoProgressMap = Partial<
-  Record<DomainId, DomainProgressEntry>
+  Record<DomainId | string, DomainProgressEntry>
 >;
 
 function isBrowser(): boolean {
@@ -56,7 +72,6 @@ function normalizeEntry(
   const lastPracticed =
     typeof o.lastPracticed === "string" ? o.lastPracticed : "";
 
-  // Preferir IDs quando existirem; senão usar completed salvo
   const completed =
     masteredIds.length > 0
       ? completedFromIds
@@ -70,20 +85,30 @@ function normalizeEntry(
   };
 }
 
-/** Lê o mapa completo do localStorage (seguro em SSR). */
-export function loadEstudoProgress(): EstudoProgressMap {
+function loadProgressFromKey(
+  storageKey: string,
+  knownIds: string[]
+): EstudoProgressMap {
   if (!isBrowser()) return {};
   try {
-    const raw = localStorage.getItem(ESTUDO_PROGRESS_KEY);
+    const raw = localStorage.getItem(storageKey);
     if (!raw) return {};
     const parsed = JSON.parse(raw) as unknown;
     if (!parsed || typeof parsed !== "object") return {};
 
     const map: EstudoProgressMap = {};
-    for (const domain of CCNA_DOMAINS) {
-      const entry = (parsed as Record<string, unknown>)[domain.id];
+    for (const id of knownIds) {
+      const entry = (parsed as Record<string, unknown>)[id];
       if (entry !== undefined) {
-        map[domain.id] = normalizeEntry(entry);
+        map[id] = normalizeEntry(entry);
+      }
+    }
+    // também carrega ids extras (ex.: 1.4-drill)
+    for (const [key, entry] of Object.entries(
+      parsed as Record<string, unknown>
+    )) {
+      if (map[key] === undefined && entry !== undefined) {
+        map[key] = normalizeEntry(entry);
       }
     }
     return map;
@@ -92,20 +117,87 @@ export function loadEstudoProgress(): EstudoProgressMap {
   }
 }
 
-/** Persiste o mapa completo. */
+/** Lê o mapa completo do localStorage (domínios legados). */
+export function loadEstudoProgress(): EstudoProgressMap {
+  return loadProgressFromKey(
+    ESTUDO_PROGRESS_KEY,
+    CCNA_DOMAINS.map((d) => d.id)
+  );
+}
+
+/** Progresso do Estudo por part_id (v2 + v1 legados + drill). */
+export function loadEstudoM1Progress(): EstudoProgressMap {
+  const ids = [
+    ...v2PartsIndex.map((p) => p.part_id),
+    ...MODULE_1_PARTS.map((p) => p.part_id),
+    ...MODULE_2_PARTS.map((p) => p.part_id),
+    ...MODULE_3_PARTS.map((p) => p.part_id),
+    ...MODULE_4_PARTS.map((p) => p.part_id),
+    ...MODULE_5_PARTS.map((p) => p.part_id),
+    ...MODULE_6_PARTS.map((p) => p.part_id),
+    "1.4-drill",
+  ];
+  return loadProgressFromKey(ESTUDO_M1_PROGRESS_KEY, ids);
+}
+
+/**
+ * Progresso namespaced por track — nunca mistura CCNA V1 / V2 / AWS.
+ * CCNA: se a chave do track estiver vazia, migra uma vez do progresso M1 legado.
+ */
+export function loadEstudoProgressForTrack(
+  track: EstudoTrackId,
+  knownIds: string[]
+): EstudoProgressMap {
+  const key = estudoProgressKeyForTrack(track);
+  const map = loadProgressFromKey(key, knownIds);
+  if (Object.keys(map).length > 0) return map;
+
+  // Migração suave só para tracks CCNA a partir da chave module1 legada
+  if (track === "ccna-v1" || track === "ccna-v2") {
+    const legacy = loadEstudoM1Progress();
+    if (Object.keys(legacy).length > 0) {
+      saveEstudoProgressForTrack(track, legacy);
+      return legacy;
+    }
+  }
+  return {};
+}
+
+export function saveEstudoProgressForTrack(
+  track: EstudoTrackId,
+  map: EstudoProgressMap
+): void {
+  if (!isBrowser()) return;
+  try {
+    localStorage.setItem(estudoProgressKeyForTrack(track), JSON.stringify(map));
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Persiste o mapa completo (legado). */
 export function saveEstudoProgress(map: EstudoProgressMap): void {
   if (!isBrowser()) return;
   try {
     localStorage.setItem(ESTUDO_PROGRESS_KEY, JSON.stringify(map));
   } catch {
-    // quota / private mode — ignora silenciosamente
+    /* ignore */
   }
 }
 
-/** Entrada de um domínio (sempre definida). */
+export function saveEstudoM1Progress(map: EstudoProgressMap): void {
+  if (!isBrowser()) return;
+  try {
+    localStorage.setItem(ESTUDO_M1_PROGRESS_KEY, JSON.stringify(map));
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Entrada de um domínio/part (sempre definida). */
 export function getDomainProgress(
   map: EstudoProgressMap,
-  domainId: DomainId,
+  domainId: DomainId | string,
   poolTotal?: number
 ): DomainProgressEntry {
   const entry = map[domainId] ?? emptyEntry(poolTotal ?? 0);
@@ -113,48 +205,53 @@ export function getDomainProgress(
     return {
       ...entry,
       total: poolTotal,
-      // completed não pode ultrapassar o pool atual
       completed: Math.min(entry.completed, poolTotal || entry.completed),
     };
   }
   return entry;
 }
 
-/** Percentual 0–100 para o domínio. */
+/** Percentual 0–100. */
 export function getDomainProgressPercent(entry: DomainProgressEntry): number {
   const total = entry.total;
   if (!total || total <= 0) {
-    // Sem pool conhecido: se há completed, não inventar 100%
     return 0;
   }
   return Math.min(100, Math.round((entry.completed / total) * 100));
 }
 
-/** Média aritmética do progresso dos 6 domínios (0–100). */
+/** Média aritmética do progresso (0–100). */
 export function getOverallProgressPercent(
   map: EstudoProgressMap,
-  poolTotals: Partial<Record<DomainId, number>>
+  poolTotals: Partial<Record<string, number>>,
+  ids?: string[]
 ): number {
-  if (CCNA_DOMAINS.length === 0) return 0;
+  const list =
+    ids ??
+    (Object.keys(poolTotals).length > 0
+      ? Object.keys(poolTotals)
+      : CCNA_DOMAINS.map((d) => d.id));
+  if (list.length === 0) return 0;
   let sum = 0;
-  for (const d of CCNA_DOMAINS) {
-    const entry = getDomainProgress(map, d.id, poolTotals[d.id]);
+  for (const id of list) {
+    const entry = getDomainProgress(map, id, poolTotals[id]);
     sum += getDomainProgressPercent(entry);
   }
-  return Math.round(sum / CCNA_DOMAINS.length);
+  return Math.round(sum / list.length);
 }
 
 export interface RecordPracticeInput {
-  domainId: DomainId;
-  /** IDs das questões acertadas nesta sessão */
+  domainId: DomainId | string;
   correctQuestionIds: number[];
-  /** Tamanho atual do pool do domínio */
   poolTotal: number;
+  /** default: legado ESTUDO_PROGRESS_KEY */
+  storage?: "legacy" | "module1" | "track";
+  /** Obrigatório quando storage === "track" */
+  track?: EstudoTrackId;
 }
 
 /**
  * Atualiza progresso após uma sessão de prática.
- * Conta apenas IDs únicos acertados (não reconta o mesmo ID).
  */
 export function recordDomainPractice(
   map: EstudoProgressMap,
@@ -180,7 +277,18 @@ export function recordDomainPractice(
     ...map,
     [input.domainId]: next,
   };
-  saveEstudoProgress(updated);
+
+  if (input.storage === "track" && input.track) {
+    saveEstudoProgressForTrack(input.track, updated);
+  } else if (input.storage === "module1") {
+    saveEstudoM1Progress(updated);
+    // espelha no namespace do track v2 se possível
+    if (input.track) {
+      saveEstudoProgressForTrack(input.track, updated);
+    }
+  } else {
+    saveEstudoProgress(updated);
+  }
   return updated;
 }
 

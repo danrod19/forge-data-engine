@@ -4,6 +4,55 @@
 
 ## Entradas Recentes
 
+- **2026-08-15** — Deploy prep multi-track (Vercel Hobby, sem Stripe)
+  - README: Tracks, scripts, Deploy Vercel, checklist QA pós-deploy
+  - `.env.example` (Supabase opcional; Stripe comentado) · `.gitignore` permite example
+  - `vercel.json` headers de segurança · `npm run qa:tracks` imprime checklist
+  - `next.config.ts` documenta static export (`out/`)
+
+- **2026-08-15** — Simulado V2 mix ~30% troubleshooting (tickets)
+  - `V2_SIMULADO_TICKET_RATIO = 0.30` em `simulado-questions.ts`
+  - Sessão ccna-v2: ~70% traditional + ~30% tickets (IDs únicos, Fisher–Yates)
+  - UX: CLI no Simulado para tickets, badge no resultado, labels Home/config
+  - ccna-v1 e aws: sem mix (comportamento anterior)
+
+- **2026-08-15** — Multi-track Fase 3 (Estudo AWS + Sobre SAA/V2)
+  - `domains-aws.ts`: 8 domínios (Identity…Observability) a partir de parts 1.1–1.12
+  - `EstudoMode` dual via `useTrack()`; progresso `ccna-forge-estudo-progress:{track}` (sem misturar)
+  - `SobreProvaAws` + `SobreProva` por track (V1 clássico · V2 troubleshooting · AWS SAA)
+  - Placeholders AWS removidos; polish labels V2 (Trilha, Simulado, Home)
+  - JSON de questões intocados; `tsc` + `npm run build` OK
+
+- **2026-08-14** — Reconsolidate v2 + sync app (P0+P1+P2)
+  - 16 parts → traditional **477** (480−3 dedupe) · tickets **80** · free/PRO 160/317
+  - `src/data/*_v2*` atualizado; loaders dinâmicos (Simulado/Trilha/Estudo)
+
+- **2026-08-14** — Banco CCNA v2.0 como fonte primária do app
+  - `questions_v2_traditional.json` + `tickets_v2.json` + `parts_index_v2.json`
+  - Simulado default `v2`; Trilha e Estudo leem part_id v2; legados mantidos como fallback
+
+- **2026-08-14** — Módulo 6.0 (Automação e Programabilidade) integrado ao app
+  - `questions_module6_traditional.json` (149; 1 dedupe interno em 6.5) + merge FINAL 1185→1334
+  - `tickets_module6.json` (25); Trilha curada m1–m6 (155); `tickets_all_merged` 540→565
+  - Simulado chip Automação 6.0 + curated 1–6; Estudo 6.1–6.5; domains `ap-1`…`ap-5`
+  - Contents em `src/data/parts/part-6.*-content.json` via `module-6-automation.ts`
+
+- **2026-08-13** — Módulo 5.0 (Security) integrado ao app
+  - `questions_module5_traditional.json` (150) + merge FINAL 1035→1185
+  - `tickets_module5.json` (25); Trilha curada m1–m5 (130); `tickets_all_merged` 515→540
+  - Simulado chip Segurança 5.0; Estudo 5.1–5.5; domains `sec-1`…`sec-5`
+
+- **2026-08-13** — Módulo 4.0 (IP Services) integrado ao app
+  - `questions_module4_traditional.json` (150) + merge FINAL 885→1035
+  - `tickets_module4.json` (25); Trilha curada m1–m4 (105); `tickets_all_merged` 490→515
+  - Simulado chip Serviços IP 4.0; Estudo 4.1–4.5; domains `svc-1`…`svc-5`
+
+- **2026-08-12** — Módulo 3.0 (IP Connectivity) integrado ao app
+  - `questions_module3_traditional.json` (150) + merge em `questions_traditional_FINAL.json` (735→885)
+  - `tickets_module3.json` (25); Trilha curada m1+m2+m3 (80); `tickets_all_merged` 465→490
+  - Simulado: fonte curated 1+2+3 e filtro módulo 3.0; Estudo partes 3.1–3.5; domains `ip-1`…`ip-5`
+
+- **2026-07-30** — Build de produção: `tsconfig.json` exclui `supabase`, `out`, `.next` do typecheck do Next (Edge Functions Deno não entram no `next build`)
 - **2026-07-30** — Alinhamento Context-as-Code (versão canônica)
   - PROMPT_BASE.md, DECISIONS.md, TASKS.md e CHANGELOG.md reescritos no padrão rigoroso da arquitetura
   - Ordem de precedência, travas e protected paths consolidados

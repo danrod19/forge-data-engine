@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9401 — Servidor “com IPv6 ligado” não é alcançável por GUA a partir de outra VLAN. Admin jura que ativou IPv6 na interface.",
+    "cli_output": "SRV# show ipv6 interface brief\nGigabitEthernet0/0     [up/up]\n    FE80::A1B2:C3D4:E5F6:1\nVlan1                  [administratively down/down]\n    unassigned\n\nSRV# show running-config interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n ipv6 enable\n no ipv6 address\n\nSRV# show ipv6 route\nIPv6 Routing Table - default - 1 entries\nCodes: C - Connected, L - Local\nL   FE80::/10 [0/0]\n     via GigabitEthernet0/0, receive\n\nPC-TEST# ping 2001:db8:10::50\n% Unrecognized host or address, or protocol not running.",
+    "alternativas": [
+      "Há GUA 2001:db8 na interface no brief",
+      "ipv6 enable sem ipv6 address: só FE80 no brief e rota L FE80 — falta GUA estática/SLAAC para destino global",
+      "Default ::/0 via 2001:db8:0:1::1 está instalada",
+      "Interface administratively down no Gi0/0"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Brief mostra só FE80; run tem ipv6 enable sem address; tabela sem GUA nem ::/0. Gi0/0 está up/up. Sem GUA o servidor não é alcançável por endereço global.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9402 — PCs da VLAN 40 não montam GUA via SLAAC; só aparecem link-local. Gateway IPv4 funciona.",
+    "cli_output": "Dist# show running-config interface Vlan40\ninterface Vlan40\n ip address 10.40.40.1 255.255.255.0\n ipv6 address 2001:DB8:40:0::1/64\n ipv6 nd ra suppress\n\nDist# show ipv6 interface Vlan40 | include RA|FF02|FE80|2001\n  IPv6 is enabled, link-local address is FE80::1\n  Global unicast address(es):\n    2001:DB8:40:0::1, subnet is 2001:DB8:40:0::/64\n  ND DAD is enabled\n  ND reachable time is 30000 milliseconds\n  ND advertised reachable time is 0\n  Hosts use stateless autoconfig for addresses. (RA suppressed)\n  Joined group address(es):\n    FF02::1\n    FF02::2\n\nPC# ipconfig\n   IPv6 Address. . . . . . . . . . . :\n   Link-local IPv6 Address . . . . . : fe80::b1c2:d3e4:f5a6:7788%12\n   IPv4 Address. . . . . . . . . . . : 10.40.40.50\n   Default Gateway . . . . . . . . . : 10.40.40.1",
+    "alternativas": [
+      "Hosts têm GUA 2001:db8:40 no ipconfig",
+      "Vlan40 sem endereço IPv6 no Dist",
+      "ipv6 nd ra suppress na SVI: RA não chega aos hosts — SLAAC não forma GUA; só FE80 no PC",
+      "FF02::2 ausente impede IPv4"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "ra suppress na SVI com GUA no roteador; PC só FE80 e IPv4. Sem GUA no host. FF02::2 está joined no Dist.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9403 — Dual-stack: sites IPv4 ok, portais só-IPv6 falham. Host tem GUA na LAN.",
+    "cli_output": "PC# ipconfig\n   IPv4 Address. . . . . . . . . . . : 192.168.10.20\n   Default Gateway . . . . . . . . . : 192.168.10.1\n   IPv6 Address. . . . . . . . . . . : 2001:db8:10:0:a:b:c:d\n   Link-local IPv6 Address . . . . . : fe80::a:b:c:d%8\n   Default Gateway . . . . . . . . . : fe80::1%8\n\nPC# route print -6 | findstr /i \"::/0\"\n  (no ::/0 entry)\n\nR1# show ipv6 route\nC   2001:DB8:10::/64 [0/0]\n     via Vlan10, directly connected\nL   2001:DB8:10::1/128 [0/0]\n     via Vlan10, receive\n\nR1# show running-config | include ipv6 route\n\nR1# show ip route | include Gateway\nGateway of last resort is 203.0.113.1 to network 0.0.0.0\n\nPC# ping 2001:db8:99::10\nDestination net unreachable.",
+    "alternativas": [
+      "R1 tem ipv6 route ::/0 na running",
+      "PC sem GUA no ipconfig",
+      "Gateway of last resort IPv4 ausente",
+      "GUA local ok, mas sem ::/0 no PC e sem ipv6 route default no R1 — default IPv4 não serve IPv6; net unreachable remoto"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Sem ::/0 no host e sem ipv6 route no R1; IPv4 tem last resort. PC tem GUA. Falta default IPv6 na pilha/roteador.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9404 — Auditoria de EUI-64: endereço “não parece” o MAC da placa. Time suspeita de bug.",
+    "cli_output": "R1# show interface GigabitEthernet0/0 | include address is|bia\n  Hardware is CSR vNIC, address is 0011.2233.4455 (bia 0011.2233.4455)\n\nR1# show running-config interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n ipv6 address 2001:DB8:1:1::/64 eui-64\n\nR1# show ipv6 interface brief GigabitEthernet0/0\nGigabitEthernet0/0     [up/up]\n    FE80::211:22FF:FE33:4455\n    2001:DB8:1:1:211:22FF:FE33:4455\n\n# MAC 0011.2233.4455 → EUI-64 clássico: 0211:22FF:FE33:4455 (U/L flip + FFFE)\n# FE80 e GUA mostram 211:22FF:FE33:4455",
+    "alternativas": [
+      "EUI-64 válido: MAC 0011.2233.4455 vira IID 0211:22FF:FE33:4455 (FFFE + bit U/L) — 2001:DB8:1:1:211:22FF:FE33:4455 no brief",
+      "O endereço ignora o MAC e usa só ::1",
+      "eui-64 na running está ausente",
+      "Interface down/down impede qualquer IID"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "MAC e eui-64 batem com FFFE e flip do 7º bit (00→02). Brief up/up com GUA derivada. Não é ::1 nem config ausente.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9405 — Dual-stack WAN: OSPFv2 Full, mas IPv6 entre sites não aprende rotas. “OSPFv3 não sobe”.",
+    "cli_output": "R1# show ip ospf neighbor\nNeighbor ID  Pri  State      Dead Time  Address     Interface\n2.2.2.2        0  FULL/ -    00:00:38   10.0.0.2    GigabitEthernet0/0/0\n\nR1# show ipv6 ospf neighbor\n%OSPFv3 is not enabled on GigabitEthernet0/0/0\n\nR1# show running-config interface GigabitEthernet0/0/0\ninterface GigabitEthernet0/0/0\n ip address 10.0.0.1 255.255.255.252\n ipv6 address 2001:DB8:0:12::1/64\n ipv6 enable\n ! sem ipv6 ospf 1 area 0\n\nR1# show run | include ipv6 router ospf|router ospf\nrouter ospf 1\n router-id 1.1.1.1\n network 10.0.0.0 0.0.0.3 area 0\n! (sem ipv6 router ospf)\n\nR1# show ipv6 interface brief GigabitEthernet0/0/0\nGigabitEthernet0/0/0   [up/up]\n    FE80::1\n    2001:DB8:0:12::1",
+    "alternativas": [
+      "OSPFv3 enabled com Full na tabela ipv6 ospf neighbor",
+      "Interface sem GUA e sem link-local",
+      "IPv6 up (FE80+GUA) e OSPFv2 Full, mas sem ipv6 ospf area / ipv6 router ospf — OSPFv3 não habilitado na interface; dual-stack L3 ok não implica v3",
+      "ipv6 address ausente no run da interface"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "OSPFv3 not enabled; run só tem OSPFv2 network. Interface tem FE80 e GUA. Falta ativar OSPFv3 no IPv6 da if/processo.",
+    "part_id": "3.4"
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8601 — APs novos no 4º andar não publicam o SSID corporativo. LEDs “estranhos”; PoE ok segundo o júnior.",
+    "cli_output": "WLC# show ap summary\nNumber of APs: 42\nAP Name       Slots  AP Model   Ethernet MAC   Location   Country  IP Address    State\nAP-3A         2      2802I      00a1.b200.0001  Floor3     BR       10.50.2.11    Registered\nAP-4A         2      2802I      00a1.b200.004a  Floor4     BR       10.50.40.12   Not Joined\nAP-4B         2      2802I      00a1.b200.004b  Floor4     BR       10.50.40.13   Not Joined\n\nWLC# show ap join stats summary AP-4A\nDiscovery phase .............. Failed / incomplete\nJoin phase ................... Not started\nLast failure ............... CAPWAP discovery timeout / no WLC response path\n\nSwitch-F4# show vlan brief | include 40|2\n2    AP-MGMT   active    Gi1/0/1-4\n40   USERS     active    Gi1/0/10-24\n\nSwitch-F4# show interfaces status | include Gi1/0/20|Gi1/0/21\nGi1/0/20  AP-4A   connected  40  a-full  a-1000  10/100/1000BaseTX\nGi1/0/21  AP-4B   connected  40  a-full  a-1000  10/100/1000BaseTX\n\n# APs receberam DHCP 10.50.40.x (USERS); WLC management em 10.50.2.1; ACL inter-VLAN bloqueia CAPWAP de USERS→MGMT",
+    "alternativas": [
+      "APs Registered no 4º andar com Join phase complete no stats",
+      "State Not Joined + discovery failed: APs na VLAN 40 (USERS) com IP 10.50.40.x — management/caminho CAPWAP até a WLC incorreto",
+      "PoE down em Gi1/0/20-21 (notconnect no status)",
+      "SSID CORP disabled é a única linha do show ap summary"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Not Joined e discovery failed com portas na VLAN 40 e IPs de usuários batem com falha de join/CAPWAP. Status connected, não notconnect. Summary não lista SSID disabled como causa.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8602 — Visitantes no SSID GUEST associam, mas caem na rede interna e alcançam file servers. Segurança em pânico.",
+    "cli_output": "WLC# show wlan summary\nWLAN ID  WLAN Profile Name / SSID   Status    Interface Name\n1        CORP / CORP-WIFI           Enabled   vlan10-users\n2        GUEST / GUEST-WIFI         Enabled   vlan10-users\n\nWLC# show wireless interface summary\nInterface Name   VLAN ID   IP Address     Type\nvlan10-users     10        10.10.10.5     Dynamic\nvlan99-guest     99        10.99.0.5      Dynamic\n\nWLC# (WLAN 2 detail)\n  Interface ................ vlan10-users\n  Security ................. open / webauth disabled\n\nSwitch-Core# show vlan brief | include 10|99\n10   USERS    active\n99   GUEST    active    (SVI 10.99.0.1 up)\n\nClient-GUEST> ipconfig\n   IPv4: 10.10.10.88  Mask: 255.255.255.0  Gateway: 10.10.10.1",
+    "alternativas": [
+      "GUEST-WIFI Enabled em interface vlan99-guest no show wlan summary",
+      "Cliente com IP 10.99.0.0/24 prova binding correto",
+      "WLAN 2 GUEST mapeada para vlan10-users (mesma de CORP) — binding SSID→VLAN errado; deveria ser vlan99-guest",
+      "Status Disabled na WLAN 2 no summary"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Summary e detail mostram GUEST na interface vlan10-users; cliente pega 10.10.10.x. Interface guest 99 existe mas não está na WLAN 2. WLAN está Enabled, não Disabled.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8603 — Notebooks não veem/associam ao SSID CORP-WIFI após “manutenção de WLANs”. APs joined normalmente.",
+    "cli_output": "WLC# show ap summary | include Registered|Number\nNumber of APs: 40\n... all listed State = Registered\n\nWLC# show wlan summary\nWLAN ID  WLAN Profile Name / SSID   Status     Interface Name\n1        CORP / CORP-WIFI           Disabled   vlan10-users\n2        GUEST / GUEST-WIFI         Enabled    vlan99-guest\n\nWLC# show wlan 1\nWLAN Identifier...................... 1\nProfile Name......................... CORP\nNetwork Name (SSID).................. CORP-WIFI\nStatus............................... Disabled\nSecurity............................. WPA2 PSK\n\nClient# netsh wlan show networks | findstr CORP\n  (no CORP-WIFI listed)\n\nWLC# show client summary\nNumber of Clients................ 12  (all on GUEST-WIFI)",
+    "alternativas": [
+      "APs Not Joined impedem qualquer SSID",
+      "Security open no wlan 1 detail",
+      "SSID typo: Network Name é GUEST-WIFI no profile CORP",
+      "WLAN 1 CORP-WIFI Status Disabled com APs Registered — SSID corporativo fora do ar; clientes não associam"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "wlan summary/detail: CORP Disabled; APs Registered; redes do cliente sem CORP. Não é join fail nem open security no detail (WPA2 PSK).",
+    "part_id": "2.5"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8604 — Open space lento no Wi-Fi no horário de almoço. Survey mostra três APs “gritando” no mesmo canal.",
+    "cli_output": "WLC# show ap config general AP-Hall-1 | include Channel|Power|Oper\n  AP Primary SSID............... CORP-WIFI\n  2.4GHz Channel................ 6\n  2.4GHz Tx Power............... 1 (Highest / 8 of 8)\n  5GHz Channel.................. 36\n\nWLC# show ap config general AP-Hall-2 | include Channel|Power\n  2.4GHz Channel................ 6\n  2.4GHz Tx Power............... 1 (Highest)\n  5GHz Channel.................. 36\n\nWLC# show ap config general AP-Hall-3 | include Channel|Power\n  2.4GHz Channel................ 6\n  2.4GHz Tx Power............... 2\n  5GHz Channel.................. 36\n\n# planta: AP-Hall-1/2/3 cobrem o mesmo open space com forte sobreposição\n# reclamação concentrada em clientes 2.4GHz; 5GHz também co-channel 36",
+    "alternativas": [
+      "Canais 1, 6 e 11 distribuídos nos três APs no output",
+      "Tx Power Lowest em todos com canais non-overlapping",
+      "RF: três APs no canal 6 (2,4) e canal 36 (5) com potência alta — co-channel interference no open space",
+      "CAPWAP Not Joined em Hall-2 no config general"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Configs mostram canal 6 e 36 repetidos com Tx alto. Não há 1/6/11 distribuídos nem power low. Join não aparece como Not Joined nesse recorte de config general de canal/power.",
+    "part_id": "2.5"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8605 — Filial perdeu o link WAN para a WLC central. Usuários locais no SSID FILIAL-DATA sumiram; o desenho era para continuar imprimindo localmente.",
+    "cli_output": "WLC-HQ# show ap config general AP-Filial-01 | include Mode|Flex|Group\n  AP Mode......................... Local\n  FlexConnect VLAN Enable......... Disabled\n  AP Group Name................... default-group\n\nWLC-HQ# show ap summary | include AP-Filial-01\nAP-Filial-01   ...  State: Registered (CAPWAP up via WAN before outage)\n\n# durante a queda WAN (relato NOC + captura local):\nAP-Filial-01  CAPWAP .............. Down (WLC unreachable)\nSSID FILIAL-DATA ............... Down / not serving (central dependency)\n\nDESIGN-DOC (trecho)\n  \"Branch should use FlexConnect local switching for FILIAL-DATA VLAN 50\"\n\nSwitch-Filial# show vlan brief | include 50\n50   FILIAL-DATA   active    Gi1/0/10-20\n\n# após reconfig pilot em lab:\nAP Mode......................... FlexConnect\nFlexConnect VLAN mapping SSID FILIAL-DATA -> VLAN 50 local = OK when CAPWAP down",
+    "alternativas": [
+      "AP em Local mode (FlexConnect disabled): com CAPWAP down na WAN o SSID centralizado cai — design pedia FlexConnect local switching para VLAN 50",
+      "AP já estava FlexConnect com VLAN mapping 50 no primeiro show",
+      "LAG da WLC-HQ é a causa direta do SSID na filial no output do AP Mode",
+      "show vlan 50 down no switch filial prova ausência de VLAN local"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Config mostra Local mode e FlexConnect disabled; na queda CAPWAP o SSID para. Doc pedia FlexConnect. VLAN 50 está active no switch. LAG da HQ não aparece como Mode do AP.",
+    "part_id": "2.5"
+  }
+]

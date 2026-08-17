@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Um switch L2 toma a decisão de encaminhamento de um frame Ethernet principalmente com base em:",
+    "alternativas": [
+      "Endereço MAC de destino no quadro",
+      "Endereço IP de destino na tabela CAM",
+      "Número de porta TCP do payload",
+      "Máscara de sub-rede do host de origem"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A comutação L2 usa o MAC de destino do frame. A CAM/tabela MAC associa MAC→porta, não IP. Porta TCP e máscara são conceitos de L4/L3, não a chave da decisão L2 pura.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Como o switch aprende dinamicamente um endereço MAC?",
+    "alternativas": [
+      "Lendo o MAC de destino de todos os broadcasts",
+      "Registrando o MAC de origem do frame na porta de entrada",
+      "Consultando o DNS do endpoint",
+      "Envelhecendo entradas estáticas a cada segundo"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O aprendizado dinâmico usa o MAC de origem na porta que recebeu o frame. Destino serve para encaminhar; DNS não popula a CAM; aging age entradas dinâmicas, não “ensina” MAC por segundo em estática.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "MAC de destino conhecido em outra porta: qual ação o switch executa?",
+    "alternativas": [
+      "Flood para todas as portas inclusive a de entrada",
+      "Filter e descarta sempre o frame",
+      "Forward apenas pela porta aprendida do destino",
+      "Roteia pelo IP default gateway"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Known unicast em outra porta → forward seletivo. Flood é para unknown/broadcast. Filter aplica quando o destino está na mesma porta de entrada. Switch L2 não roteia por IP.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O que é unknown unicast do ponto de vista do switch?",
+    "alternativas": [
+      "Apenas frames com destino FFFF.FFFF.FFFF",
+      "Frame cujo MAC de destino não está na tabela MAC",
+      "Qualquer frame com IP privado",
+      "Frame cujo MAC de origem é estático"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Unknown unicast = destino unicast ausente da tabela → tipicamente flood. Broadcast é FFFF.FFFF.FFFF, outro caso. IP privado e MAC estático de origem não definem unknown unicast.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Host novo acaba de ligar na Gi1/0/5. O primeiro frame unicast para um destino ainda não aprendido tende a ser:",
+    "alternativas": [
+      "Filtrado e descartado na Gi1/0/5",
+      "Encaminhado só se houver rota OSPF",
+      "Convertido em ARP reply pelo switch",
+      "Flooded para as demais portas do domínio L2 (exceto a de entrada)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Sem entrada do destino, unknown unicast é flooded no domínio L2, sem voltar pela porta de entrada. Não depende de OSPF nem vira ARP reply no switch L2.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Frame unicast chega na porta onde o MAC de destino já está aprendido. O switch:",
+    "alternativas": [
+      "Sempre faz flood completo do VLAN",
+      "Apaga a entrada MAC imediatamente",
+      "Faz filter: não reenvia o frame de volta por essa porta",
+      "Muda o frame para broadcast"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Destino na mesma porta de entrada → filter (não ecoa). Flood seria unknown/broadcast. Não apaga MAC nem converte em broadcast.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual comando lista as associações dinâmicas MAC→porta no IOS?",
+    "alternativas": [
+      "show ip route",
+      "show mac address-table dynamic",
+      "show vlan brief apenas",
+      "show spanning-tree root"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show mac address-table dynamic exibe entradas aprendidas. show ip route é L3. VLAN brief e STP não substituem a tabela MAC.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Aging time da tabela MAC serve para:",
+    "alternativas": [
+      "Congelar MACs estáticos para sempre",
+      "Apagar portas administratively down",
+      "Remover entradas dinâmicas ociosas após um tempo sem reaprendizado",
+      "Forçar flood de todos os unicasts conhecidos"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Aging remove dinâmicas sem tráfego recente. Estáticas não “envelhecem” como dinâmicas. Não é o mecanismo de admin down nem de flood forçado de known unicast.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Principal diferença prática entre hub e switch no encaminhamento:",
+    "alternativas": [
+      "Hub decide por MAC de destino; switch repete em todas as portas",
+      "Switch isola colisões por porta e encaminha por MAC; hub compartilha o meio e repete",
+      "Hub monta tabela CAM completa; switch não aprende MAC",
+      "Ambos roteiam por IP na CAM"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Switch comuta por MAC e microsegmenta; hub é domínio de colisão compartilhado. A opção A inverte os papéis. CAM é do switch. Nenhum “roteia por IP na CAM”.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Frame com destino FFFF.FFFF.FFFF em um switch L2 típico:",
+    "alternativas": [
+      "É encaminhado só para a porta do default gateway",
+      "É filtrado se o aging estiver ativo",
+      "É tratado como known unicast se houver entrada .0000",
+      "É flooded no domínio L2, exceto a porta de entrada"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Broadcast L2 é flooded no domínio. Não vai só ao gateway por definição de L2. Aging e entrada .0000 não transformam broadcast em unicast seletivo.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PC-A em Gi1/0/3 pings PC-B. Após o primeiro fluxo, show mac address-table dynamic mostra o MAC de B em Gi1/0/8. O próximo unicast A→B deve:",
+    "alternativas": [
+      "Ser forwarded apenas para Gi1/0/8",
+      "Ser flooded em todas as portas inclusive Gi1/0/3",
+      "Ser dropado porque unicast não usa MAC",
+      "Exigir clear mac address-table a cada pacote"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Destino conhecido em Gi1/0/8 → forward seletivo. Flood seria se ainda fosse unknown. Unicast usa MAC. clear a cada pacote não é necessário nem desejável.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Logs mostram o mesmo MAC alternando entre Gi1/0/10 e Gi1/0/11 a cada segundos. Diagnóstico mais coerente:",
+    "alternativas": [
+      "Aging normal de 5 minutos",
+      "MAC flapping — possível loop, cabo errado ou dispositivo com bridge inadequada",
+      "Forward seletivo saudável de known unicast",
+      "Filter esperado quando destino está em outra porta"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "MAC flapping = mesmo MAC em portas diferentes em sequência rápida. Não é aging normal nem forward/filter saudáveis descritos assim.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após clear mac address-table dynamic, o primeiro unicast a um host silencioso costuma:",
+    "alternativas": [
+      "Ser filtrado para sempre",
+      "Usar rota estática IPv4 na CAM",
+      "Ser flooded até o destino gerar tráfego e o MAC ser reaprendido",
+      "Impedir show interfaces status de listar a porta"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Tabela limpa → unknown unicast → flood até reaprendizado pelo MAC de origem do destino. Não vira rota IP na CAM nem quebra o status da interface.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show interfaces status mostra Gi1/0/4 notconnect. O MAC do PC dessa porta não aparece na tabela. Conclusão inicial:",
+    "alternativas": [
+      "O switch perdeu a rota OSPF do PC",
+      "Flood excessivo apagou o status da porta",
+      "Filter removeu o MAC estático do fabricante",
+      "Problema de L1/enlace (cabo, energia, porta/remoto) antes de culpar aging"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "notconnect indica falta de enlace: sem frames, sem aprendizado. OSPF não explica status L1. Flood não “apaga” notconnect. Filter não remove MAC de fabricante estático por definição do cenário.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Técnico vê flooding alto de unknown unicast contínuo após mover um servidor. Causa provável alinhada ao content:",
+    "alternativas": [
+      "Broadcast FFFF foi desabilitado no chassis",
+      "O servidor mudou de porta e o tráfego de retorno não estabilizou o MAC na porta nova, ou a entrada antiga envelheceu/assimétrica",
+      "show mac address-table dynamic força flood eterno",
+      "Full-duplex obriga flood de known unicast"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Unknown unicast contínuo aponta destino não aprendido/estável na porta correta. Broadcast desabilitado e full-duplex forçando flood de known não batem com o modelo. O comando show não “força flood eterno”.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual campo do frame o switch usa para popular a tabela MAC?",
+    "alternativas": [
+      "FCS apenas",
+      "EtherType apenas",
+      "MAC de destino apenas",
+      "MAC de origem"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Aprendizado = origem. Destino orienta forward/flood. FCS e EtherType não são a chave da CAM.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Comparando switch full-duplex moderno e hub half-duplex legado, colisões:",
+    "alternativas": [
+      "Aumentam em toda porta full-duplex do switch",
+      "Só existem se a tabela MAC tiver aging zero",
+      "Deixam de ser o problema central em links full-duplex dedicados no switch; no hub o domínio de colisão é compartilhado",
+      "São resolvidas roteando por IP na CAM"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Full-duplex ponto a ponto no switch elimina o modelo clássico de colisão do meio compartilhado. Hub mantém domínio grande. Aging e CAM IP não definem colisão.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show mac address-table dynamic interface Gi1/0/12 não lista o MAC do notebook, mas a porta está connected e o usuário gera tráfego. Próximo passo útil:",
+    "alternativas": [
+      "Assumir que o switch roteia por IP e ignorar L2",
+      "Verificar se o tráfego realmente sai por essa porta (cabo/host/VLAN errada em cenários com VLAN) e capturar se o MAC de origem aparece em outra interface",
+      "Desligar aging para sempre no padrão da prova",
+      "Trocar todo unicast por broadcast manualmente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Connected sem MAC local sugere host silencioso noutro caminho, cabo na porta errada ou frames não chegando com a origem esperada. Não se “ignora L2” nem se resolve com broadcast manual.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "CSMA/CD, no nível fundamentals desta parte, descreve:",
+    "alternativas": [
+      "Algoritmo de roteamento da tabela MAC",
+      "Aprendizado de MAC por SNMP",
+      "Método legado de acesso ao meio half-duplex com detecção de colisão",
+      "Flood seletivo de known unicast"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "CSMA/CD é do Ethernet half-duplex compartilhado. Não é roteamento CAM, SNMP de aprendizado nem definição de forward de known unicast.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um frame known unicast NÃO deve ser:",
+    "alternativas": [
+      "Forwarded pela porta do destino aprendido",
+      "Filtrado se destino está na porta de entrada",
+      "Usado para atualizar o aging da origem ao passar tráfego",
+      "Flooded para todas as portas como se o destino fosse desconhecido"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Known unicast não se comporta como unknown: não precisa flood total. Forward/filter e refresh de aging da origem com tráfego são coerentes.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PC liga, gera ARP request (broadcast). No switch L2, esse frame:",
+    "alternativas": [
+      "É flooded no domínio L2 e o switch pode aprender o MAC do PC pela origem",
+      "É dropado porque broadcast não tem MAC de origem",
+      "Vira unicast apenas para a porta do DNS",
+      "Exige entrada estática prévia do PC"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Broadcast é flooded; a origem do PC ainda é aprendida. Broadcast tem origem válida. Não vira unicast de DNS por padrão nem exige MAC estática prévia.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual comando é o mais direto para limpar só entradas dinâmicas e forçar reaprendizado?",
+    "alternativas": [
+      "show interfaces status",
+      "show mac address-table",
+      "clear mac address-table dynamic",
+      "show interfaces Gi1/0/1"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "clear mac address-table dynamic limpa dinâmicas. Os show apenas exibem estado/tabela/interface.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Domínio de broadcast L2, em visão introdutória desta parte, é:",
+    "alternativas": [
+      "O conjunto de dispositivos que recebem um frame broadcast Ethernet no segmento L2",
+      "Apenas a porta onde o aging é zero",
+      "A tabela CAM completa do roteador",
+      "O mesmo que unknown unicast em single host"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Broadcast domain = quem recebe FFFF.FFFF.FFFF. Não é aging zero, nem CAM de roteador, nem sinônimo simples de unknown unicast.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Host A e B na mesma L2. MAC de B sumiu por aging. A envia unicast a B. Comportamento esperado do switch:",
+    "alternativas": [
+      "Filter eterno do frame de A",
+      "Flood do unicast (unknown) até B responder e ser reaprendido",
+      "Encaminhar só se houver IP na CAM",
+      "Converter o frame em CSMA/CD no full-duplex"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem MAC de B → unknown unicast → flood; resposta de B reensina a porta. Não há filter eterno nem IP na CAM. Full-duplex não “converte CSMA” o frame.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que o switch não reenvia o frame pela porta de entrada no flood?",
+    "alternativas": [
+      "Porque o MAC de destino é sempre a porta de entrada",
+      "Porque aging proíbe flood",
+      "Porque hubs exigem esse comportamento no switch",
+      "Porque a origem já está naquele segmento e reenviar seria inútil/eco"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A porta de entrada já “viu” o frame; reenviar nela não ajuda e gera eco. Destino não é “sempre” a porta de entrada. Aging e hub não definem essa regra.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show interfaces Gi1/0/7 connected, full a-1000, mas CRC alto. Impacto em L2:",
+    "alternativas": [
+      "Frames corrompidos podem ser descartados e a aprendizagem/encaminhamento fica intermitente — trate L1 antes de culpar só a lógica forward/flood",
+      "CRC alto preenche a CAM com rotas OSPF",
+      "CRC alto desativa aging automaticamente",
+      "CRC alto transforma filter em flood de known unicast estável"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Erros L1 geram perda e sintomas “fantasma” em L2. CRC não popula OSPF na CAM nem redefine aging/filter como nas outras opções.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual afirmação sobre entradas MAC estáticas vs dinâmicas está alinhada ao content?",
+    "alternativas": [
+      "Dinâmicas envelhecem sem tráfego; o aging clássico não é o mesmo mecanismo das estáticas permanentes",
+      "Estáticas somem no aging a cada minuto por padrão da prova",
+      "Dinâmicas nunca são aprendidas pela origem",
+      "Estáticas são flood de unknown unicast"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Aging age dinâmicas ociosas; estáticas não se comportam como “somem todo minuto” por aging padrão. Aprendizado dinâmico é pela origem. Estática ≠ flood.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Um analista júnior diz: “flood só acontece com broadcast”. Por que está incompleto?",
+    "alternativas": [
+      "Porque known unicast também sempre faz flood",
+      "Porque filter é o mesmo que flood",
+      "Porque aging é um tipo de flood",
+      "Porque unknown unicast também é flooded quando o destino não está na tabela"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Flood cobre broadcast/multicast de interesse e unknown unicast. Known unicast faz forward. Filter e aging não são flood.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Porta de acesso, no foco desta parte, é tipicamente:",
+    "alternativas": [
+      "O ponto onde o endpoint se conecta à rede L2 do switch",
+      "A tabela CAM do roteador de borda",
+      "O algoritmo CSMA/CD full-duplex obrigatório",
+      "O comando clear mac address-table"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Access port = borda de host no switch. Não é a CAM do roteador, nem definição de CSMA full-duplex, nem o comando clear.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem mental recomendada para “A não fala com B na mesma L2”:",
+    "alternativas": [
+      "Só clear mac address-table em loop infinito",
+      "Assumir que o switch roteia por IP e pular status de porta",
+      "Começar pelo DNS AAAA do host",
+      "L1 (status/erros) → tabela MAC (aprendeu nas portas certas?) → se o comportamento é forward ou flood esperado"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O content recomenda L1 → MAC table → forward/flood antes de L3/DNS. Clear em loop e “roteia por IP” são atalhos ruins para o cenário L2.",
+    "part_id": "2.1"
+  }
+]

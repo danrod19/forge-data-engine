@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6201 — Pipeline de inventário parou. Orquestrador não lista devices no DNA/controller.",
+    "cli_output": "$ curl -i https://dnac.lab.local/dna/intent/api/v1/network-device\nHTTP/1.1 401 Unauthorized\nWWW-Authenticate: Bearer\nContent-Type: application/json\n\n{\"error\": \"Invalid or missing token\", \"code\": 401}\n\n$ env | findstr TOKEN\nAPI_TOKEN=\n\n$ curl -i -H \"Authorization: Bearer expired.token.here\" https://dnac.lab.local/dna/intent/api/v1/network-device\nHTTP/1.1 401 Unauthorized\n{\"error\": \"Token expired\"}\n\n$ ping dnac.lab.local\nReply from 10.255.0.10: time=1ms\n\n! Apos obter token novo: GET retorna 200 (teste manual do admin)",
+    "alternativas": [
+      "404 Not Found no path network-device em todos os testes",
+      "Ping 0% prova controller offline L3",
+      "200 OK com inventário no primeiro curl sem token",
+      "401 por token ausente/expirado — autenticação de API; reachability ok e path existe"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Ambos os curls retornam 401; ping ok. Não é 404 nem outage L3. Renove o Bearer token e reinjecte no pipeline. Eixo auth de API northbound, não data plane de usuário.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6202 — Script de detalhe de device quebra após upgrade de API. Inventário geral ainda lista equipamentos.",
+    "cli_output": "$ curl -i -H \"Authorization: Bearer VALID\" https://dnac.lab.local/dna/intent/api/v1/network-device\nHTTP/1.1 200 OK\n[{\"id\":\"dev-001\",\"hostname\":\"SW-A\"},{\"id\":\"dev-002\",\"hostname\":\"SW-B\"}]\n\n$ curl -i -H \"Authorization: Bearer VALID\" https://dnac.lab.local/dna/intent/api/v1/network-device/dev-00X\nHTTP/1.1 404 Not Found\n{\"error\": \"Device not found\", \"path\": \"/network-device/dev-00X\"}\n\n$ curl -i -H \"Authorization: Bearer VALID\" https://dnac.lab.local/dna/intent/api/v1/network-device/dev-001\nHTTP/1.1 200 OK\n{\"id\":\"dev-001\",\"hostname\":\"SW-A\",\"managementIp\":\"10.1.1.1\"}\n\n! Script hardcodou id dev-00X (typo) apos migracao de catalogo",
+    "alternativas": [
+      "401 em todas as chamadas com token VALID",
+      "URI/id inexistente (dev-00X) gera 404; lista e id correto retornam 200 — recurso/URI errado",
+      "503 Service Unavailable em todo o cluster",
+      "POST foi usado no lugar de GET no output"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "GET lista 200; GET dev-00X 404; GET dev-001 200. Token ok. Corrija o id/URI no script. Não é 401/503 nem confusão de verbo no recorte.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6203 — Automação “cria VLAN” não altera o controller. Dev jura que a API “responde”.",
+    "cli_output": "$ curl -i -X GET -H \"Authorization: Bearer VALID\" -H \"Content-Type: application/json\" \\\n  -d \"{\\\"name\\\":\\\"VLAN50\\\",\\\"id\\\":50}\" \\\n  https://ctrl.lab/api/v1/vlan\nHTTP/1.1 405 Method Not Allowed\nAllow: GET, HEAD\n{\"error\": \"GET not allowed with create body; use POST /api/v1/vlan\"}\n\n$ curl -i -X POST -H \"Authorization: Bearer VALID\" -H \"Content-Type: application/json\" \\\n  -d \"{\\\"name\\\":\\\"VLAN50\\\",\\\"id\\\":50}\" \\\n  https://ctrl.lab/api/v1/vlan\nHTTP/1.1 201 Created\n{\"id\":50,\"name\":\"VLAN50\"}\n\n! Documentacao da API: Create VLAN = POST /api/v1/vlan\n! Pipeline CI usava GET com body por engano",
+    "alternativas": [
+      "404 no recurso /vlan em ambos os testes",
+      "401 Token expired no POST de sucesso",
+      "GET usado para create (405); POST correto retorna 201 — método HTTP errado no pipeline",
+      "200 OK no GET com body prova create bem-sucedido"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "GET com body de create → 405 Allow GET/HEAD. POST → 201 Created. Contrato CRUD exige POST para create. Ajuste o verbo no CI. Não é 404 nem 401 no POST ok.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6204 — Portal de change management e scripts REST falham juntos. Usuários da rede seguem navegando.",
+    "cli_output": "$ curl -i https://dnac.lab.local/dna/intent/api/v1/network-device\ncurl: (28) Operation timed out after 30001 milliseconds\n\n$ curl -i https://dnac.lab.local/dna/intent/api/v1/network-device\nHTTP/1.1 503 Service Unavailable\nRetry-After: 60\n{\"error\": \"API gateway unavailable\", \"cluster\": \"degraded\"}\n\nCTRL# show cluster\nNode-1: NOT_READY\nNode-2: NOT_READY\nNorthbound VIP: partial\n\nPC-USER# ping 8.8.8.8\nReply from 8.8.8.8: time=14ms\n\nACCESS# show ip interface brief | include up\nVlan10  10.10.10.2  YES manual up  up",
+    "alternativas": [
+      "Timeout/503 no northbound — API/controller degradado; encaminhamento de usuário permanece ok",
+      "404 em todos os devices do inventário local do access",
+      "401 por token em todas as linhas do curl",
+      "Data plane do usuário down (ping 8.8.8.8 falha)"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Timeout e 503 com cluster NOT_READY = disponibilidade da API. User ping e SVI up. Não é 401/404 do script nem outage de data plane. Restaure o controller/API gateway.",
+    "part_id": "6.2"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #6205 — Dashboard mostra “sucesso” (HTTP 200) mas o hostname do switch no inventário não atualiza. Script grava em campo errado.",
+    "cli_output": "$ curl -i -X PUT -H \"Authorization: Bearer VALID\" -H \"Content-Type: application/json\" \\\n  -d \"{\\\"host_label\\\":\\\"SW-CORE-NEW\\\"}\" \\\n  https://ctrl.lab/api/v1/network-device/dev-001\nHTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  \"id\": \"dev-001\",\n  \"hostname\": \"SW-CORE-OLD\",\n  \"host_label\": \"SW-CORE-NEW\",\n  \"managementIp\": \"10.1.1.1\",\n  \"warning\": \"Unknown field host_label ignored by schema v2; use hostname\"\n}\n\n$ curl -s -H \"Authorization: Bearer VALID\" https://ctrl.lab/api/v1/network-device/dev-001 | findstr hostname\n\"hostname\": \"SW-CORE-OLD\"\n\n! API v2 renomeou o campo; documentacao antiga citava host_label\n! Status 200 mascara o no-op funcional para o operador",
+    "alternativas": [
+      "404 Not Found no PUT",
+      "401 em todas as requests com Bearer VALID",
+      "201 Created com hostname SW-CORE-NEW no GET seguinte",
+      "200 OK com body/warning: campo host_label ignorado — payload/schema incorreto; hostname real permanece SW-CORE-OLD"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Status 200 não garante o efeito desejado: warning diz que host_label foi ignorado; hostname segue OLD. Corrija o JSON para o campo hostname da v2. Não é 401/404. Ticket de ler o body além do status.",
+    "part_id": "6.2"
+  }
+]

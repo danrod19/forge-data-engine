@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1111: API PutItem falha com ProvisionedThroughputExceeded em horários de pico.",
+    "cli_output": "$ aws dynamodb describe-table --table-name Orders\nBillingModeSummary.BillingMode: PROVISIONED\nProvisionedThroughput:\n  ReadCapacityUnits: 5\n  WriteCapacityUnits: 5\n\n$ aws cloudwatch get-metric-statistics --namespace AWS/DynamoDB \\\n  --metric-name WriteThrottleEvents --dimensions Name=TableName,Value=Orders ...\n# spikes matching traffic peaks\n\n$ aws cloudwatch get-metric-statistics ... ConsumedWriteCapacityUnits\n# saturates near 5\n\n# App errors:\nProvisionedThroughputExceededException: The level of configured write capacity...\n\n# Hot key analysis (sample): 70% of writes PK=TENANT#1",
+    "alternativas": [
+      "Aumentar WCU (e/ou auto scaling) e/ou redesenhar PK para reduzir hot tenant — 5 WCU satura e TENANT#1 concentra writes",
+      "Abrir 443 no SG da tabela (N/A)",
+      "Trocar só o runtime da Lambda",
+      "Criar CNAME no apex"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1111: API PutItem falha com ProvisionedThroughputExceeded em horários de pico.…), a ação correta é: Aumentar WCU (e/ou auto scaling) e/ou redesenhar PK para reduzir hot tenant — 5 WCU satura e TENANT#1 concentra writes. «Abrir 443 no SG da tabela (N/A)» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.11.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1112: Lambda order-api AccessDenied em GetItem.",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:sts::111122223333:assumed-role/order-api-role/...\n\n$ aws iam list-attached-role-policies --role-name order-api-role\nAWSLambdaBasicExecutionRole\n# logs only\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/order-api --filter-pattern \"AccessDenied\"\n... not authorized to perform: dynamodb:GetItem\non resource: arn:aws:dynamodb:us-east-1:111122223333:table/Orders\n\n$ aws dynamodb describe-table --table-name Orders\nTableStatus: ACTIVE\n# table healthy; RCU plenty",
+    "alternativas": [
+      "Anexar policy com dynamodb:GetItem no ARN da tabela Orders à role order-api-role",
+      "Só aumentar RCU para 1000",
+      "Só mudar para on-demand",
+      "Só habilitar TTL"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1112: Lambda order-api AccessDenied em GetItem.…), a ação correta é: Anexar policy com dynamodb:GetItem no ARN da tabela Orders à role order-api-role. «Só aumentar RCU para 1000» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.11.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1113: Endpoint de listagem de pedidos por customer está lento e caro; código usa Scan.",
+    "cli_output": "$ # App code path (review):\n# Scan Orders with FilterExpression customerId = :c\n\n$ aws dynamodb describe-table --table-name Orders\nKeySchema: HASH userId, RANGE orderId\n# no GSI on customerId\nBillingMode: PAY_PER_REQUEST\n\n$ aws cloudwatch get-metric-statistics --metric-name ConsumedReadCapacityUnits \\\n  --dimensions Name=TableName,Value=Orders\n# high read consumption correlated with list-by-customer API\n\n$ aws xray / logs: Scan latency multi-second as table grows\n# Table item count: 12M+",
+    "alternativas": [
+      "Introduzir access pattern com PK=customerId (tabela ou GSI) e trocar Scan por Query",
+      "Manter Scan e reduzir timeout da API para 100ms",
+      "Desligar encryption",
+      "Remover a sort key apenas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1113: Endpoint de listagem de pedidos por customer está lento e caro; código usa Scan.…), a ação correta é: Introduzir access pattern com PK=customerId (tabela ou GSI) e trocar Scan por Query. «Manter Scan e reduzir timeout da API para 100ms» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.11.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1114: Novo requisito Query por email; só existe PK=userId.",
+    "cli_output": "$ aws dynamodb describe-table --table-name Users\nKeySchema: HASH userId\nAttributeDefinitions: userId S, email S\nGlobalSecondaryIndexes: []\nLocalSecondaryIndexes: []\n\n$ # Product request: login lookup by email must be Query under 20ms\n# Current code: Scan + FilterExpression email = :e  (p99 multi-second)\n\n$ aws cloudwatch ... UserErrors / successful requests\n# functional but not scalable",
+    "alternativas": [
+      "Criar GSI com PK=email (projection adequada) e passar o login a Query no índice",
+      "Criar LSI com PK=email (LSI não pode mudar a PK da base)",
+      "Só aumentar memory da Lambda",
+      "Só abrir 0.0.0.0/0 no SG"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1114: Novo requisito Query por email; só existe PK=userId.…), a ação correta é: Criar GSI com PK=email (projection adequada) e passar o login a Query no índice. «Criar LSI com PK=email (LSI não pode mudar a PK da base)» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.11.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1115: Tabela analytics com tráfego quase zero a semana e picos de batch mensal; está PROVISIONED 2000/2000 ociosa.",
+    "cli_output": "$ aws dynamodb describe-table --table-name AnalyticsEvents\nBillingModeSummary.BillingMode: PROVISIONED\nProvisionedThroughput: RCU 2000 WCU 2000\n\n$ aws cloudwatch get-metric-statistics --metric-name ConsumedWriteCapacityUnits ...\n# most days near 0; one day month-end spike to ~1500 WCU for 3 hours\n\n$ aws ce / cost explorer note:\n# DynamoDB cost dominated by provisioned capacity idle time\n\n# Team rejects multi-hour capacity planning meetings",
+    "alternativas": [
+      "Migrar para on-demand (ou auto scaling agressivo) — provisioned 2000 ocioso a maior parte do mês é desperdício com pico curto",
+      "Manter 2000/2000 e fazer Scan diário para 'esquentar'",
+      "Apagar a tabela toda segunda",
+      "Trocar PK para status"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1115: Tabela analytics com tráfego quase zero a semana e picos de batch mensal; está PROVISI…), a ação correta é: Migrar para on-demand (ou auto scaling agressivo) — provisioned 2000 ocioso a maior parte do mês é desperdício com pico curto. «Manter 2000/2000 e fazer Scan diário para 'esquentar'» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.11.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  }
+]

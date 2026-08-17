@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7601 — Proposta de “modernização” para a filial de 7 pessoas inclui spine-leaf e core three-tier. Inventário real foi anexado para validação.",
+    "cli_output": "INVENTARIO-FILIAL-07\n  Endpoints: 7 PCs + 1 impressora\n  1x ISR-1121 (WAN/NAT/VPN)     BR-FIL07-R1\n  1x CBS250-16T (access)        BR-FIL07-SW1\n  1x AP1815 (autônomo)\n\nBR-FIL07-R1# show ip interface brief\nGi0/0/0  198.51.100.20  YES DHCP   up  up  (WAN)\nGi0/0/1  192.168.7.1    YES manual up  up  (LAN)\n\nBR-FIL07-SW1# show cdp neighbors\nDevice ID        Local Intrfce   Capability  Platform\nBR-FIL07-R1      Gi1/0/1         R S I        ISR1121\nBR-FIL07-AP1     Gi1/0/8         T            AP1815\n\nPROPOSTA-ARQUITETO:\n  \"2x Spine + 4x Leaf + Core three-tier dedicado + 2x distribution\"",
+    "alternativas": [
+      "CDP sem leaf prova que spine-leaf já está em produção e deve expandir",
+      "Inventário é SOHO (roteador+switch+AP, 7 endpoints); spine-leaf/three-tier completo é oversized para o porte",
+      "Default WAN no ISR exige fabric leaf por PC",
+      "Seven PCs tornam collapsed core ilegal"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Inventário e CDP mostram SOHO clássico. A proposta com spines/leafs/core multi-tier não encontra base no porte. Não há leaf em produção. WAN no ISR não manda fabric DC. Collapsed core não é “ilegal” — aqui o fit é SOHO.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7602 — Campus de 3 prédios discute se precisa de core separado ou collapsed core. Diagrama textual do NOC foi colado.",
+    "cli_output": "CAMPUS-MEDIO (rascunho atual)\n  Predio-A/B/C: ~180 access ports total\n  Access switches: 12x (um por andar)\n  Agregacao atual: 2x 9300 em stack  (AGG1)\n  Links AGG1 <-> WAN edge: 2x 10G\n  NAO existe par de core separado hoje\n  Crescimento previsto: +1 predio em 18 meses, politica L3 na agregacao\n\nshow cdp neighbors (AGG1) — trecho\n  Access-A1 ... Access-C4  (todos uplinks no AGG1)\n  Edge-FW1\n\nOPCAO-1: manter AGG1 como collapsed core (two-tier)\nOPCAO-2: inserir par Core dedicado e rebaixar AGG a distribution only",
+    "alternativas": [
+      "Com ~180 portas, um único tier de agregação/backbone e crescimento moderado, two-tier (collapsed core) costuma bastar; three-tier só se houver necessidade clara de core dedicado separado",
+      "Todo campus com 12 access switches obriga spine-leaf de DC",
+      "Sem core separado o CDP não funciona",
+      "WAN edge 10G proíbe collapsed core para sempre"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O rascunho já opera collapsed (access→AGG→edge) com porte médio. Two-tier é coerente; three-tier é opcional se o crescimento/política exigir core separado. Spine-leaf não é mandatório. CDP não depende de core dedicado. 10G no edge não proíbe collapsed core.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7603 — Pedido do negócio: “servidor na nuvem”. O ticket de compras veio como SaaS ilimitado. O time de app precisa instalar Windows e o ERP próprio.",
+    "cli_output": "TICKET-COMPRAS #C-9921\n  Item solicitado: \"Cloud Server SaaS Enterprise Unlimited\"\n  Justificativa usuario: \"subir Windows Server, SQL e ERP legados\"\n  Restricoes:\n    - precisamos de RDP/admin no SO\n    - patch mensal do Windows pela equipe interna\n    - backup de VM sob nosso controle\n\nEMAIL-ARQUITETO (trecho)\n  \"SaaS = app pronta (ex.: e-mail). IaaS = VM/infra. PaaS = plataforma.\"\n\nCATALOGO-PROVEDOR (mock)\n  SKU-SAAS-MAIL   ... aplicacao de e-mail\n  SKU-IAAS-VM     ... vCPU/RAM/disk + hypervisor gerenciado, SO guest do cliente\n  SKU-PAAS-DB     ... banco gerenciado sem SO guest",
+    "alternativas": [
+      "SKU-SAAS-MAIL atende RDP e patch de Windows do ERP",
+      "SKU-PAAS-DB entrega SO Windows completo para o ERP monólito",
+      "Requisito de SO guest, RDP e patch interno casa com IaaS (SKU-IAAS-VM), não com SaaS de app pronta do ticket de compras",
+      "Qualquer SKU cloud é SaaS se a palavra “Enterprise” aparecer"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O pedido exige administrar Windows/ERP — fronteira de IaaS. SaaS-mail e PaaS-DB do catálogo não entregam esse SO guest. O rótulo “SaaS” no ticket de compras está incorreto frente aos requisitos listados.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7604 — Time debate empacotar o novo microserviço. Requisitos de isolamento e runtime foram colados no ticket de plataforma.",
+    "cli_output": "REQ-PLATAFORMA v1.3\n  - App: API Node.js + deps npm\n  - Deploy: 20x/dia em CI\n  - Isolamento: processo/namespace suficiente; NAO precisa kernel Windows dedicado\n  - Startup alvo: < 3 segundos por instancia\n  - Imagem deve caber em pipeline de registry\n\nLAB-HYPERVISOR (opcao A)\n  VM full: Windows Server 2022 + app  | boot ~90s | vCPU 4 / RAM 8GB\n\nLAB-CONTAINER (opcao B)\n  image: node:20-alpine + app         | start ~2s  | CPU 0.5 / RAM 256MB\n\nCOMENTARIO-DEV\n  \"Nao temos driver de kernel custom. So runtime de app.\"",
+    "alternativas": [
+      "Com app stateless leve, deploys frequentes e sem kernel guest dedicado, container (opção B) atende melhor que VM full Windows",
+      "VM de 90s é obrigatória para qualquer API Node",
+      "SaaS de e-mail substitui o registry de imagens",
+      "Requisito de <3s prova que só three-tier resolve o runtime"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Os requisitos e o lab mostram container rápido e leve vs VM pesada sem necessidade de SO Windows. E-mail SaaS e three-tier não respondem ao empacotamento da API.",
+    "part_id": "1.6"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7605 — DC novo com forte tráfego server↔server; a mesma planilha de BoM foi copiada por engano para a filial de 5 PCs.",
+    "cli_output": "DC-PROJETO (válido)\n  48 racks app/db | east-west alto\n  Leaf por rack | dual-home a 4 spines | 100G fabric\n  Justificativa: paths curtos server-server\n\nFILIAL-05 (BoM colado por engano)\n  Endpoints: 5\n  Mesmo BoM: 4 spines + 48 leafs + 100G\n\nshow inventory FILIAL-05 (hoje)\n  NAME: \"Chassis\"  DESCR: \"C1111-8P\" \n  NAME: \"Switch\"   DESCR: \"CBS110-8T\"\n\nANALISE-CUSTO\n  BoM DC na filial = 40x o CAPEX do site atual",
+    "alternativas": [
+      "Filial de 5 PCs deve herdar 48 leafs porque east-west de DC é universal",
+      "C1111+CBS110 já é spine-leaf de produção",
+      "100G fabric é o mínimo CCNA para qualquer SOHO",
+      "Spine-leaf se justifica no DC (east-west/racks); na filial o inventário e o CAPEX pedem SOHO/two-tier — copiar o BoM do DC é incorreto"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O DC com racks e east-west valida spine-leaf; a filial com 5 endpoints e C1111/CBS110 é SOHO. Replicar 48 leafs é oversize. O inventário atual não é fabric de spines.",
+    "part_id": "1.6"
+  }
+]

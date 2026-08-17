@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual comando configura uma rota estática IPv4 para 192.168.10.0/24 via next-hop 10.0.0.2?",
+    "alternativas": [
+      "ip route 192.168.10.0 255.255.255.0 10.0.0.2",
+      "ip route 10.0.0.2 255.255.255.0 192.168.10.0",
+      "ipv6 route 192.168.10.0/24 10.0.0.2",
+      "show ip route 192.168.10.0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A ordem é rede, máscara, next-hop. Inverter rede/next-hop está errado. ipv6 route não serve para esse IPv4. show apenas exibe.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "A default route IPv4 é representada por:",
+    "alternativas": [
+      "192.168.0.0/16",
+      "0.0.0.0/0",
+      "255.255.255.255/32",
+      "127.0.0.0/8"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "0.0.0.0/0 é a default. As outras são ranges específicos ou especiais, não a default genérica.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O código S* em show ip route indica tipicamente:",
+    "alternativas": [
+      "Rota OSPF inter-area",
+      "Rede connected",
+      "Default route estática (candidate default)",
+      "Rota local /32 da interface"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "S* marca estática default. O é OSPF, C connected, L local.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Administrative Distance default de uma rota estática é:",
+    "alternativas": [
+      "110",
+      "120",
+      "20",
+      "1"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Static AD default = 1. 110 OSPF, 120 RIP, 20 eBGP.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Floating static usa, para o mesmo prefixo da rota primária:",
+    "alternativas": [
+      "AD maior (pior) para só instalar se a primária sair",
+      "AD 0 igual a connected",
+      "Sempre AD menor que 1",
+      "Máscara /0 obrigatória"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Backup com AD maior. Não é AD 0 nem /0 obrigatório (pode ser qualquer prefixo).",
+    "part_id": "3.1"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Entre 10.1.1.0/24 (AD 110) e 10.0.0.0/8 (AD 1) para destino 10.1.1.50, o roteador usa:",
+    "alternativas": [
+      "Sempre a de menor AD (/8)",
+      "Nenhuma, pois AD 110 é inválida",
+      "A mais específica /24 (longest match), independentemente da AD do /8",
+      "Apenas se houver S*"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Longest match vence entre prefixos de comprimentos diferentes. AD só compara o mesmo prefixo.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "AD típica do OSPF na tabela mental CCNA:",
+    "alternativas": [
+      "1",
+      "20",
+      "110",
+      "255"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "OSPF 110. Static 1, eBGP 20, 255 não usável típico.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Código C em show ip route significa:",
+    "alternativas": [
+      "Rota connected (rede diretamente ligada)",
+      "Candidate default apenas",
+      "Rota estática",
+      "Rota RIP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "C = connected. S static, R RIP, S* default estática.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ip route 0.0.0.0 0.0.0.0 203.0.113.1 configura:",
+    "alternativas": [
+      "Rota host para 203.0.113.1/32 apenas",
+      "ACL deny any",
+      "Null route de descarte",
+      "Default route estática via next-hop 203.0.113.1"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "0/0 com next-hop é default estática. Não é ACL nem host route isolada.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Se a interface de saída de uma estática for para down, o efeito típico é:",
+    "alternativas": [
+      "A rota costuma ser removida da tabela de encaminhamento ativa",
+      "A rota permanece com AD 0",
+      "A rota vira S* automaticamente",
+      "O next-hop vira 0.0.0.0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Interface down remove/desativa a estática dependente. Não vira default nem AD 0 magicamente.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Primária: O 10.0.0.0/8 via OSPF. Floating: ip route 10.0.0.0 255.0.0.0 10.9.9.2 200. A OSPF está up. O que show ip route mostra para 10.0.0.0/8?",
+    "alternativas": [
+      "A estática AD 200 como ativa, porque número maior vence",
+      "Ambas ativas em ECMP",
+      "A rota OSPF (AD 110) ativa; a floating fica de fora enquanto a OSPF existir",
+      "Apenas a floating, pois static sempre ganha de OSPF"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Mesmo prefixo: menor AD vence (110 < 200). Floating só assume se OSPF sair. Static default 1 ganha de OSPF, mas aqui a floating tem 200.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Next-hop 10.1.1.2 configurado, mas 10.1.1.0/24 não está connected no roteador. Resultado comum:",
+    "alternativas": [
+      "A estática instala com AD 0",
+      "A estática pode não instalar ou não ser utilizável porque o next-hop não é alcançável via connected",
+      "Vira default S* sozinha",
+      "Converte-se em rota L local"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Next-hop precisa ser resolvido (em geral via rede connected). Sem isso a rota falha. Não vira S* nem L.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "AD típica eBGP vs static default:",
+    "alternativas": [
+      "eBGP 110, static 120",
+      "eBGP 1, static 20",
+      "eBGP 20, static 1 — static default costuma preferir-se a eBGP no mesmo prefixo",
+      "Ambos 255"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Static 1, eBGP 20. No mesmo prefixo a estática default vence o eBGP.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Destino 172.16.5.10. Tabela tem S 172.16.0.0/16 e S 172.16.5.0/24. Qual rota encaminha?",
+    "alternativas": [
+      "Sempre /16 por ter sido configurada primeiro",
+      "Nenhuma se AD for igual",
+      "172.16.5.0/24 por longest match",
+      "ECMP obrigatório entre as duas"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Prefixo mais longo vence. Ordem de config e ECMP forçado não se aplicam assim.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip route não lista gateway of last resort. Interpretação:",
+    "alternativas": [
+      "Não há default route instalada (ou candidata) — destinos sem match específico falham",
+      "Todas as rotas são S*",
+      "O roteador só tem OSPF",
+      "AD de static virou 0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem gateway of last resort/default, não há caminho genérico. Não implica só OSPF nem AD 0.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Código L na tabela de roteamento IOS moderno:",
+    "alternativas": [
+      "Rota LISP apenas",
+      "Rota local (/32 do IP da interface)",
+      "Floating static",
+      "Default route"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "L = local host route da interface. Não é floating nem default.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ip route 10.0.0.0 255.0.0.0 GigabitEthernet0/0 (Ethernet multiacesso) sem next-hop. Preocupação prática/CCNA:",
+    "alternativas": [
+      "É sempre superior a next-hop IP em multiacesso",
+      "Exit-interface em multiacesso pode ser problemática; next-hop IP costuma ser preferível",
+      "Cria automaticamente AD 255",
+      "Instala S* default"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Em Ethernet, next-hop IP é o desenho limpo. Exit-if sozinha pode depender de proxy ARP. Não define AD 255 nem default.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Floating com AD 1 e primária OSPF AD 110 para o mesmo /24. A floating:",
+    "alternativas": [
+      "Nunca instala porque 1 > 110",
+      "Só instala se o /24 for default",
+      "Fica sempre atrás da OSPF",
+      "Instala no lugar da OSPF (1 < 110) — na prática não é “backup”, é primária"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "AD 1 vence 110: a estática assume como principal. Floating de verdade precisa AD pior que a primária.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip route static serve para:",
+    "alternativas": [
+      "Listar apenas rotas estáticas da tabela",
+      "Apagar todas as estáticas",
+      "Configurar floating AD 200",
+      "Mostrar só interfaces down"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Filtro de estáticas no show. Não configura nem apaga rotas.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "AD do RIP na memorização CCNA:",
+    "alternativas": [
+      "90",
+      "110",
+      "1",
+      "120"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "RIP 120. EIGRP 90, OSPF 110, static 1.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Rota estática na tabela, ping ao destino falha, next-hop responde ARP. Próximo eixo possível:",
+    "alternativas": [
+      "Return path, ACL, ou outro prefixo com longest match diferente do esperado",
+      "Apagar a connected da LAN",
+      "Aumentar AD da estática para 255 para “forçar”",
+      "Trocar S por C manualmente no show"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Rota presente ≠ caminho fim a fim. Return/ACL/longest match. AD 255 e editar código no show não resolvem.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Default IPv6 em visão leve do content:",
+    "alternativas": [
+      "0.0.0.0/0 apenas",
+      "FF00::/8",
+      "FE80::/10",
+      "::/0"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "::/0 é default IPv6. FE80 link-local, FF00 multicast, 0/0 é IPv4.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Primária estática AD 1 cai (interface down). Floating AD 210 para o mesmo prefixo. O que ocorre?",
+    "alternativas": [
+      "Nada; floating nunca instala",
+      "A floating pode instalar e passar a encaminhar como backup",
+      "A connected assume AD 210",
+      "Todas as rotas viram S*"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Com a primária fora, a floating com AD maior entra. Não vira connected nem S* em massa.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show running-config | include ip route é útil para:",
+    "alternativas": [
+      "Ver next-hop e AD configurados, inclusive floatings que ainda não estão ativas",
+      "Só listar rotas OSPF instaladas",
+      "Mostrar CEF adjacencies",
+      "Substituir show ip interface brief"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A running mostra o que foi configurado (floatings “na reserva”). Não é tabela OSPF ativa nem CEF.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que “menor AD sempre vence qualquer rota” está errado?",
+    "alternativas": [
+      "Porque AD 255 sempre vence",
+      "Porque connected nunca tem AD",
+      "Porque longest match de um prefixo mais específico pode vencer um menos específico com AD melhor",
+      "Porque static nunca compete com OSPF"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Longest match tem prioridade sobre AD entre prefixos diferentes. Static vs OSPF no mesmo prefixo usa AD.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Gateway of last resort is 203.0.113.1 no show ip route indica:",
+    "alternativas": [
+      "Não há default",
+      "Há default route apontando (direta ou indiretamente) para esse caminho de last resort",
+      "Apenas rota L para 203.0.113.1",
+      "OSPF desabilitado"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A linha de last resort sinaliza default. Não prova OSPF off nem só rota L.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Estática e OSPF para 192.168.0.0/24 (AD 1 vs 110). Qual fica na tabela?",
+    "alternativas": [
+      "OSPF, pois dinâmico sempre vence",
+      "Ambas em load-balance 50/50",
+      "Nenhuma até clear ip route *",
+      "A estática (AD 1)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Mesmo prefixo, AD 1 < 110 → static. Não há ECMP automático entre fontes diferentes assim.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Comando para inspecionar candidatos/detalhe de um prefixo:",
+    "alternativas": [
+      "ip route 0.0.0.0 0.0.0.0 null0 apenas",
+      "show vlan brief",
+      "show ip route <prefixo>",
+      "channel-group 1 mode on"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "show ip route <prefix> aprofunda o match. Os outros não são o show de tabela de rotas do prefixo.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "NOC configura floating AD 5 e primária estática AD 1. A floating “nunca assume” com a primária up. Avaliação:",
+    "alternativas": [
+      "Bug: AD 5 deveria vencer 1",
+      "Comportamento esperado: 1 < 5, primária permanece; floating só com primária fora",
+      "É preciso AD 0 na floating",
+      "Floating exige código O na tabela"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Menor AD fica ativa. Floating com 5 só entra se a de 1 sair. Não precisa ser O nem AD 0.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem mental de troubleshooting de estática:",
+    "alternativas": [
+      "Só aumentar todos os AD para 1",
+      "Apagar connected e confiar em S*",
+      "Ignorar longest match",
+      "Config → next-hop/interface alcançável? → rota na tabela? → longest match do destino? → caminho de volta?"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O fluxo do content cobre install e forward. Atalhos de AD/connected/longest match invertidos não substituem o método.",
+    "part_id": "3.1"
+  }
+]

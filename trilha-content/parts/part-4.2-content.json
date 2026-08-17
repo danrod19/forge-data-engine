@@ -1,0 +1,142 @@
+{
+  "part_id": "4.2",
+  "title": "DHCP e DNS",
+  "blueprint_module": "4.0",
+  "weight_percent": 10,
+  "topic_list": [
+    "Papéis: cliente DHCP, servidor DHCP e relay",
+    "Processo DORA (Discover, Offer, Request, Ack)",
+    "Pool IOS: network, default-router, dns-server, lease",
+    "Exclusões de endereço e conflitos",
+    "show ip dhcp binding e show ip dhcp conflict",
+    "ip helper-address: servidor em outra subnet",
+    "Onde colocar o helper (interface do cliente/SVI)",
+    "DNS: nome → IP; papel do host e do roteador",
+    "ip name-server e ip domain-lookup no device",
+    "Falhas: sem IP, sem gateway no pool, scope errado",
+    "Falhas: helper ausente, DNS não configurado no client",
+    "Checklist: PC não recebe IP / não resolve nome"
+  ],
+  "study_notes": [
+    {
+      "heading": "DHCP: o que o exame espera",
+      "bullets": [
+        "DHCP entrega automaticamente IP, máscara, gateway (default-router) e, em geral, DNS aos hosts.",
+        "Cliente envia pedidos em broadcast no segmento; servidor responde com oferta da pool correta.",
+        "Servidor pode ser o próprio roteador/L3 (IOS) ou um servidor dedicado em outra VLAN/subnet.",
+        "Sem DHCP (ou com pool/helper errados), o host fica sem IP válido ou com APIPA/endereço incompleto e “não navega”.",
+        "DHCP não substitui roteamento: após o lease, o host ainda precisa de gateway e rotas corretas."
+      ],
+      "exam_tips": [
+        "Sintoma “sem IP” → pool, exclusões, helper, L2 da VLAN — nessa ordem mental."
+      ]
+    },
+    {
+      "heading": "DORA em nível de prova",
+      "bullets": [
+        "Discover: cliente procura servidor (broadcast).",
+        "Offer: servidor oferece IP e opções do pool.",
+        "Request: cliente pede/aceita a oferta (pode haver mais de um servidor).",
+        "Ack: servidor confirma o lease — a partir daí o host usa o IP.",
+        "Broadcasts DORA não atravessam roteadores sem relay; daí o helper-address.",
+        "Não é necessário decorar campos de pacote byte a byte no CCNA — foque a sequência e o papel do relay."
+      ],
+      "exam_tips": [
+        "DORA = Discover → Offer → Request → Ack. Relay reencaminha o Discover para o servidor remoto."
+      ]
+    },
+    {
+      "heading": "Pool no IOS: parâmetros que quebram a rede",
+      "bullets": [
+        "network: define o scope (rede/máscara) de onde saem os IPs oferecidos.",
+        "default-router: gateway que o host deve usar — sem isso, o PC pode pegar IP e não sair da subnet.",
+        "dns-server: servidores DNS entregues ao cliente (opção comum no pool).",
+        "lease: duração do empréstimo; default existe, mas labs cobram o conceito.",
+        "ip dhcp excluded-address: reserva IPs de gateway, servidores e estáticos fora do range dinâmico.",
+        "Scope errado (network de outra VLAN) → cliente na VLAN A recebe oferta inútil ou nenhuma oferta válida."
+      ],
+      "exam_tips": [
+        "IP ok + sem saída = confira default-router no pool e o IP da SVI/gateway real."
+      ]
+    },
+    {
+      "heading": "Binding, conflito e verificação",
+      "bullets": [
+        "show ip dhcp binding: lista IP ↔ MAC (e tipo/lease) conhecidos pelo servidor IOS.",
+        "show ip dhcp conflict: endereços que o servidor detectou em conflito (ex.: ping/ARP antes de oferecer).",
+        "Conflito: outro host já usa o IP (estático indevido, APIPA residual, duplicata) — o IP pode ficar marcado e não ser reoferecido até clear.",
+        "show run | section dhcp (ou | include dhcp) mostra pools, exclusões e helpers relacionados.",
+        "Cliente sem binding novo + pool “cheio” de conflitos = investigar endereço duplicado e exclusões."
+      ],
+      "exam_tips": [
+        "Binding prova que o servidor leaseou; ausência + helper/pool errados guiam o TShoot."
+      ]
+    },
+    {
+      "heading": "Relay: ip helper-address",
+      "bullets": [
+        "Quando o servidor DHCP não está na mesma subnet do cliente, o Discover broadcast morre no roteador sem ajuda.",
+        "ip helper-address <IP-do-servidor> na interface L3 (ou SVI) voltada ao cliente transforma/encaminha o pedido ao servidor.",
+        "Helper na interface errada (só na WAN, só em outra VLAN) → a VLAN do PC continua sem relay.",
+        "Um helper por servidor (pode haver múltiplos helpers se houver servidores redundantes).",
+        "Helper não “inventa” pool: o servidor remoto deve ter scope para a subnet do cliente (giaddr/relay info)."
+      ],
+      "exam_tips": [
+        "Servidor em outra subnet = helper na interface do cliente, não “em qualquer lugar do core”."
+      ]
+    },
+    {
+      "heading": "DNS no host e no roteador",
+      "bullets": [
+        "DNS resolve nome (FQDN) em endereço IP para aplicações e para o próprio admin no CLI (ping site.com).",
+        "No host: DNS costuma vir do DHCP (dns-server no pool) ou configuração manual/estática.",
+        "No roteador/switch L3: ip name-server <IP> define para onde o device envia queries; ip domain-lookup habilita resolução no CLI.",
+        "Host com IP e gateway ok mas “site não abre por nome” e IP numérico funciona → problema de DNS, não de rota básica.",
+        "Roteador sem name-server: o device não resolve nomes; hosts da LAN podem continuar ok se tiverem DNS próprio via DHCP."
+      ],
+      "exam_tips": [
+        "Separe: PC não resolve nome (DNS do host) vs roteador não faz ping por nome (name-server no IOS)."
+      ]
+    },
+    {
+      "heading": "Checklist unificado de falhas",
+      "bullets": [
+        "PC sem IP: L2/VLAN → pool network do scope → exclusões → servidor up → helper se cross-subnet.",
+        "PC com IP mas sem saída: default-router no pool; IP do gateway; rota no gateway.",
+        "Só uma VLAN quebra: helper ausente nessa SVI ou pool sem network daquela subnet.",
+        "Conflito/duplicata: show ip dhcp conflict / binding; remova IP estático indevido; clear conflict se aplicável.",
+        "Não resolve nome: DNS no host (ipconfig) e/ou dns-server no pool; teste ping por IP vs por nome.",
+        "Admin no roteador: ip name-server + domain-lookup se o CLI precisar resolver FQDN."
+      ],
+      "exam_tips": [
+        "Não culpe DNS se o host nem tem IP; não culpe DHCP se ping por IP funciona e só o nome falha."
+      ]
+    }
+  ],
+  "key_commands": [
+    "ip dhcp excluded-address <low> [<high>]",
+    "ip dhcp pool <nome>",
+    "network <rede> <máscara>",
+    "default-router <gateway> [...]",
+    "dns-server <ip> [...]",
+    "lease <dias> [<horas> [<minutos>]]",
+    "ip helper-address <ip-servidor>",
+    "show ip dhcp binding",
+    "show ip dhcp conflict",
+    "show ip dhcp pool",
+    "show running-config | section dhcp",
+    "show running-config | include helper|name-server",
+    "ip name-server <ip>",
+    "ip domain-lookup",
+    "show ip interface brief"
+  ],
+  "must_know": [
+    "DORA: Discover → Offer → Request → Ack; relay (helper) é necessário se o servidor está em outra subnet.",
+    "Pool: network (scope), default-router (gateway do host), dns-server, lease; exclusões protegem IPs estáticos.",
+    "ip helper-address na interface L3/SVI do cliente encaminha DHCP ao servidor remoto.",
+    "Sem default-router no pool: host pode obter IP e não sair da subnet.",
+    "show ip dhcp binding / conflict verificam leases e IPs em disputa.",
+    "DNS no host (via DHCP ou manual) resolve nomes para o usuário; ip name-server no IOS é para o device.",
+    "Scope/network errado ou helper na interface errada = VLAN específica sem IP."
+  ]
+}

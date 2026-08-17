@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7401 — Notebook novo “não sai da VLAN de usuários”. Ping no gateway falha; o júnior jura que o IP está “na mesma faixa 192.168.10”.",
+    "cli_output": "PC-USER> ipconfig\n   IPv4 Address. . . . . . . . . . . : 192.168.10.20\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 192.168.10.1\n\nPC-USER> ping 192.168.10.1\nEsgotado o tempo limite do pedido.\n\nDist1# show ip interface brief | include Vlan10\nVlan10   192.168.10.1   YES manual   up   up\n\nDist1# show running-config interface Vlan10\ninterface Vlan10\n ip address 192.168.10.1 255.255.255.128\n\nDist1# show ip route | include 192.168.10\nC        192.168.10.0/25 is directly connected, Vlan10\n\n# DHCP pool (trecho do servidor) — máscara entregue aos PCs:\n   Network: 192.168.10.0  Mask: 255.255.255.0  Gateway: 192.168.10.1",
+    "alternativas": [
+      "O gateway 192.168.10.1 está em outra cidade porque o ping falhou",
+      "PC em 192.168.10.0/24 (máscara .0) e SVI em 192.168.10.0/25 (.128): planos diferentes — host .20 e gateway .1 só coincidem na /25 se ambos usarem /25; com /24 no PC o desenho fica inconsistente com a rota C 192.168.10.0/25",
+      "SVI up/up prova que o notebook está em 169.254.0.0/16",
+      "Bastaria usar broadcast 192.168.10.255 como gateway do PC"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "No CLI o PC tem /24 e a SVI Vlan10 tem 255.255.255.128 com rota conectada 192.168.10.0/25. Há mismatch de máscara entre host e gateway/infra. O IP .1 existe na SVI up/up, não “em outra cidade”. Não há APIPA no ipconfig. Gateway = broadcast .255 é inválido.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7402 — Após “padronizar gateways no .0 da VLAN”, a subnet 10.50.4.0/26 ficou muda. Servidor de impressão não arrega pacotes ao default gateway.",
+    "cli_output": "PRINT-SRV> ipconfig\n   IPv4 Address. . . . . . . . . . . : 10.50.4.10\n   Subnet Mask . . . . . . . . . . . : 255.255.255.192\n   Default Gateway . . . . . . . . . : 10.50.4.0\n\nPRINT-SRV> ping 10.50.4.0\nEsgotado o tempo limite do pedido.\n\nDist2# show running-config interface Vlan40\ninterface Vlan40\n ip address 10.50.4.1 255.255.255.192\n\nDist2# show ip interface brief | include Vlan40\nVlan40   10.50.4.1   YES manual   up   up\n\n# cálculo de referência no runbook do time:\n# 10.50.4.0/26 → rede 10.50.4.0 | hosts 10.50.4.1–10.50.4.62 | broadcast 10.50.4.63",
+    "alternativas": [
+      "O gateway correto no output do servidor está em 10.50.4.0, endereço de rede /26; a SVI utilizável está em 10.50.4.1 — por isso o ping ao .0 falha",
+      "10.50.4.0/26 tem broadcast 10.50.4.0 e por isso o .0 é o melhor gateway",
+      "Vlan40 up/up com .1 indica que o servidor deveria usar 10.50.4.63 como gateway",
+      "Máscara .192 no servidor está errada; o correto seria /24 para qualquer VLAN 40"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "/26 → bloco 64; rede .0, hosts .1–.62, broadcast .63. O ipconfig do servidor aponta gateway 10.50.4.0 (rede), enquanto a SVI está 10.50.4.1. Broadcast não é .0. Usar .63 como gateway também é inválido. A máscara .192 do servidor está coerente com o /26 documentado.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7403 — Usuário diz que “já tem IP, então a rede está ok”, mas não acessa nada interno nem a Internet. Helpdesk leu 169.254 e fechou como “configurado”.",
+    "cli_output": "PC-FIN> ipconfig /all\n   Ethernet adapter Ethernet:\n   DHCP Enabled. . . . . . . . . . . : Yes\n   Autoconfiguration Enabled . . . . : Yes\n   IPv4 Address. . . . . . . . . . . : 169.254.88.17(Preferred)\n   Subnet Mask . . . . . . . . . . . : 255.255.0.0\n   Default Gateway . . . . . . . . . :\n   DHCP Server . . . . . . . . . . . :\n   Autoconfiguration IPv4 Address. . : 169.254.88.17\n\nPC-FIN> ping 192.168.20.1\nEsgotado o tempo limite do pedido.\n\nAccess1# show mac address-table dynamic interface Gi1/0/12\n  20    0050.56aa.fin1    DYNAMIC   Gi1/0/12\n\nAccess1# show interfaces Gi1/0/12 status\nPort      Name       Status    Vlan  Duplex  Speed  Type\nGi1/0/12  PC-FIN     connected 20    a-full  a-1000 10/100/1000BaseTX",
+    "alternativas": [
+      "169.254.88.17 é unicast privado RFC 1918 equivalente a 10/8",
+      "Sem default gateway no output o host usará automaticamente 127.0.0.1 como saída",
+      "MAC aprendido na VLAN 20 prova que o DHCP entregou 192.168.20.x com sucesso",
+      "IP 169.254.88.17/16 (APIPA), sem DHCP Server e sem gateway no ipconfig: o host não recebeu lease — não é endereçamento corporativo válido"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O ipconfig mostra 169.254.88.17 Preferred, Autoconfiguration, DHCP Server vazio e gateway vazio — APIPA típico de falha de DHCP. 169.254/16 não é RFC1918. 127.0.0.1 é loopback, não substitui gateway. MAC na porta só confirma L2; não prova lease 192.168.20.x.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7404 — Link serial/Ethernet /30 entre R1 e R2 não forma adjacência de roteamento. Um lado “aceita” o IP, o outro recusa ou não responde ping.",
+    "cli_output": "R1# show running-config interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n description LINK-R1-R2\n ip address 10.255.0.0 255.255.255.252\n\nR1# show ip interface brief | include GigabitEthernet0/0\nGigabitEthernet0/0   10.255.0.0   YES manual   up   up\n\nR2# show running-config interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n description LINK-R2-R1\n ip address 10.255.0.1 255.255.255.252\n\nR2# show ip interface brief | include GigabitEthernet0/0\nGigabitEthernet0/0   10.255.0.1   YES manual   up   up\n\nR2# ping 10.255.0.0\n.....  Success rate is 0 percent (0/5)\n\n# bloco /30 10.255.0.0/30:\n# rede 10.255.0.0 | hosts 10.255.0.1 e 10.255.0.2 | broadcast 10.255.0.3",
+    "alternativas": [
+      "R1 usa 10.255.0.0/30, que é o endereço de rede do /30; hosts válidos no link são .1 e .2 — o ping a .0 falha e o endereçamento de R1 está incorreto",
+      "Em /30 todos os quatro IPs (.0–.3) são hosts utilizáveis iguais",
+      "R2 com .1 está no broadcast do /30 e por isso não deveria pingar",
+      "Máscara .252 exige wildcard 0.0.0.0 para o link funcionar"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "No /30: .0=rede, .1 e .2=hosts, .3=broadcast. O CLI de R1 mostra ip address 10.255.0.0 255.255.255.252 (rede). R2 .1 é host válido; broadcast seria .3. Não há quatro hosts iguais. Wildcard 0.0.0.0 não é requisito de IP de interface /30.",
+    "part_id": "1.4"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7405 — Duas VLANs “novas” no mesmo /24: impressoras e IoT. Após o cutover, hosts de IoT colidem com impressoras e o Dist reporta rede inconsistente.",
+    "cli_output": "DOC-ENDEREÇAMENTO (pós-mudança)\n  VLAN 50 PRINT  192.168.50.0/26   gateway 192.168.50.1\n  VLAN 60 IOT    192.168.50.32/26  gateway 192.168.50.33\n\nDist3# show ip interface brief | include Vlan50|Vlan60\nVlan50   192.168.50.1    YES manual   up   up\nVlan60   192.168.50.33   YES manual   up   up\n\nDist3# show ip route | include 192.168.50\nC        192.168.50.0/26 is directly connected, Vlan50\nC        192.168.50.32/26 is directly connected, Vlan60\n\nPRINT-01> ipconfig\n   IPv4: 192.168.50.40  Mask: 255.255.255.192  Gateway: 192.168.50.1\n\nIOT-CAM> ipconfig\n   IPv4: 192.168.50.40  Mask: 255.255.255.192  Gateway: 192.168.50.33\n\n# verificação de blocos:\n# 192.168.50.0/26  → .0–.63\n# 192.168.50.32/26 → sobrepõe .32–.63 com o bloco anterior",
+    "alternativas": [
+      "Os dois hosts com .40 estão corretos porque gateways diferentes separam as subnets magicamente",
+      "Vlan50 e Vlan60 up/up provam que não há sobreposição possível em VLSM",
+      "192.168.50.0/26 ocupa .0–.63; 192.168.50.32/26 invade o mesmo intervalo — sobreposição VLSM visível nas rotas C e no IP .40 duplicado em PRINT e IOT",
+      "O correto seria manter ambos como /24 192.168.50.0 e usar o mesmo gateway .1"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Dois /26 alinhados sem colisão seriam .0/26 e .64/26. .32/26 não é o próximo bloco livre e cruza .0–.63. O show ip route lista ambas as conectadas e os ipconfigs mostram o mesmo 192.168.50.40 em “redes” que se sobrepõem. Gateways diferentes não legalizam overlap. Colapsar tudo em um /24 único anula a segmentação pretendida.",
+    "part_id": "1.4"
+  }
+]

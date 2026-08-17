@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Host Windows mostra 169.254.23.10/16, gateway vazio, 'mídia conectada'. Qual a interpretação mais correta?",
+    "alternativas": [
+      "Cliente não obteve lease DHCPv4 (APIPA); investigar Discover/Offer, L2, helper ou server/pool",
+      "IP de produção normal em redes Cisco",
+      "Indica que OSPF elegeu DR com sucesso",
+      "Significa duplex full e CRC zero"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "169.254.x.x é APIPA: o cliente desistiu de obter DHCPv4. Não é endereço de produção nem sinal de OSPF saudável. O Diagnose segue cliente → L2 → helper → server/pool para descobrir por que não houve Offer/Ack.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Ordem conceitual do handshake DHCPv4 (DORA)?",
+    "alternativas": [
+      "Ack → Request → Offer → Discover",
+      "Discover → Offer → Request → Ack",
+      "Offer → Discover → Ack → Request",
+      "Request → Ack → Discover → Offer"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "DORA: Discover, Offer, Request, Ack. Se o Discover não chega ou não há Offer, o cliente não avança para Request/Ack e fica sem IP válido. Memorizar a ordem ajuda a localizar em qual passo o fluxo parou.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "DHCP server está em 10.10.10.53; PCs na VLAN 40 (10.40.0.0/24) ficam em APIPA. SVI 40 up, sem helper. Causa mais provável?",
+    "alternativas": [
+      "Falta de banner motd no SVI",
+      "Excesso de rotas estáticas no PC",
+      "Ausência de ip helper-address no SVI da VLAN 40 para o server remoto",
+      "STP desabilitado globalmente como requisito de DHCP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Discover é broadcast e não cruza L3 sozinho. Com server em outra subnet, o relay (helper) no SVI do cliente é obrigatório. Banner e rotas estáticas no PC não substituem o helper. Configure ip helper-address 10.10.10.53 no SVI 40.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show ip dhcp pool LAB mostra Leased 254 / Free 0 em rede /24 com poucos excluded. Novos PCs falham. Diagnóstico?",
+    "alternativas": [
+      "Duplex mismatch em todas as portas",
+      "Falta de AAAA na zona pública",
+      "Problema exclusivo de console cable",
+      "Pool esgotado — sem endereços livres para novos leases"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Free 0 indica esgotamento do pool. Novos clientes não recebem Offer útil. Amplie o escopo, reduza excluded desnecessários, libere leases antigos ou corrija o dimensionamento. Não é L1 nem DNS AAAA.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "PC tem 10.40.0.50/24, gateway 10.99.0.1 (inalcançável), DNS 10.40.0.53. Ping ao gateway falha. Onde está a falha de atribuição?",
+    "alternativas": [
+      "Option default-router (gateway) incorreta no pool DHCP",
+      "Cabo de console USB",
+      "Falta de NetFlow no access",
+      "Hostname do switch muito longo"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O host recebeu IP na subnet 10.40, mas o gateway apontado (10.99.0.1) não pertence ao segmento. Isso é option default-router errada. Corrija o pool e renove o lease. Console e NetFlow não definem o gateway do PC.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual comando no router ajuda a ver leases ativos DHCPv4?",
+    "alternativas": [
+      "show spanning-tree summary",
+      "show ip dhcp binding",
+      "show version | include reload",
+      "show users"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show ip dhcp binding lista bindings ativos (IP, MAC, lease). É ferramenta central no Diagnose do server. STP summary e show users não substituem a visão de leases DHCP.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Host IPv6 mostra apenas fe80::/10; a política exige GUA via DHCPv6 stateful. Qual linha de investigação?",
+    "alternativas": [
+      "Apenas aumentar MTU do Port-channel",
+      "Somente trocar o patch de cobre do uplink de Internet",
+      "RA/flags M-O, pool/interface DHCPv6 e se o cliente solicita IA_NA — não parar no link-local",
+      "Apagar todas as rotas estáticas IPv4"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Só link-local indica que não veio GUA por SLAAC/DHCP como esperado. No modelo CCNA, verifique RA, flags que levam a DHCPv6 stateful, pool e interface do server/relay v6. MTU e IPv4 estáticas não explicam ausência de GUA.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ip helper-address foi configurado no interface Gi0/0 (uplink) mas não no SVI Vlan30 dos usuários. Sintoma na VLAN 30?",
+    "alternativas": [
+      "DHCP funciona melhor sem broadcast",
+      "Helper no uplink serve automaticamente todas as VLANs SVI",
+      "STP gera leases sozinho",
+      "Clientes da VLAN 30 continuam sem relay adequado — helper deve estar no SVI/interface do segmento do cliente"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O relay precisa enxergar o Discover no segmento do cliente; por isso o helper fica no SVI/interface dessa VLAN. Colocar só no uplink não atende a VLAN 30. Corrija a interface do helper.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Pool network 10.40.0.0 /24 mas SVI e hosts estão em 10.41.0.0/24. O que ocorre?",
+    "alternativas": [
+      "Escopo/network do pool desalinhado do segmento — leases inadequados ou falha de serviço coerente",
+      "DHCP passa a usar automaticamente a mask do OSPF",
+      "Todos os hosts ganham 169.254 e isso é desejável",
+      "Helper-address deixa de ser necessário em qualquer desenho"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O network do pool deve corresponder à subnet servida. Pool em 10.40 com segmento 10.41 é erro de escopo. Corrija network/default-router/dns do pool. OSPF não redefine o pool DHCP.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Diferença conceitual útil no CCNA: SLAAC vs DHCPv6 stateful?",
+    "alternativas": [
+      "SLAAC usa apenas IPv4 APIPA; stateful usa só OSPF",
+      "SLAAC forma endereço a partir do RA; stateful o servidor DHCP entrega o endereço (IA_NA)",
+      "Ambos proíbem link-local",
+      "Stateful remove a necessidade de qualquer RA na LAN"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "SLAAC deriva GUA com base no RA; DHCPv6 stateful atribui endereço via servidor. Na prática ainda há interação com RA/flags. Link-local continua existindo. Entender a origem do endereço guia o Diagnose quando só há fe80::.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PC em APIPA; porta access up na VLAN correta; server DHCP local na mesma VLAN com service dhcp desabilitado. Causa?",
+    "alternativas": [
+      "Serviço DHCP no router/server desligado — não há Offer apesar do L2 ok",
+      "Falta de ip helper para server na mesma broadcast domain (desnecessário se server local ok)",
+      "Excesso de AAAA no DNS",
+      "Root bridge com prioridade 0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "L2 ok e server na mesma VLAN apontam para o serviço/pool no server. service dhcp off (ou daemon parado) impede Offer. Helper não é o foco se o server está no mesmo segmento e deveria ouvir o Discover localmente.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ACL no caminho entre relay e server nega UDP 67/68. Sintoma?",
+    "alternativas": [
+      "Hosts obtêm IP mais rápido",
+      "Relay e server não completam a troca DHCP — clientes sem lease",
+      "Apenas PTR deixa de funcionar",
+      "Spanning-tree vira rapid-pvst sozinho"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "DHCP usa UDP 67/68. ACL que bloqueia essas portas entre helper e server quebra o fluxo unicast do relay. Clientes ficam sem IP. PTR e STP não são o mecanismo.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ipconfig: IP 10.40.0.88/24, GW 10.40.0.1 (ping ok), DNS 192.0.2.53 (timeout). Navegação por IP ok, por nome falha. Relação com DHCP?",
+    "alternativas": [
+      "Problema exclusivo de CRC na fibra do ISP",
+      "Falta de VLAN nativa",
+      "Option dns-server do pool (ou DHCP) aponta para resolvedor morto — renove após corrigir",
+      "APIPA em andamento"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O host tem lease e gateway bons; a option de DNS está legada/inalcançável. É Diagnose de options (liga ao 4.4) com origem no DHCP. Corrija dns-server no pool e faça renew. Não é APIPA nem CRC do ISP como primeira causa.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip dhcp pool: Excluded 10.40.0.1–10.40.0.250, network /24. Quantos IPs restam aproximadamente para clientes dinâmicos?",
+    "alternativas": [
+      "250",
+      "Cerca de 4–5 endereços utilizáveis dinâmicos (faixa residual após excluded)",
+      "1024",
+      "Nenhum host precisa de IP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Excluded quase toda a /24 deixa pouquíssimos endereços livres (ex.: 251–254). O pool 'existe' mas está inutilizável na prática. Reduza excluded ou amplie a rede. Esse é um clássico de esgotamento por máscara de exclusão.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor ordem de Diagnose para PC em 'Obtendo endereço IP…' há minutos?",
+    "alternativas": [
+      "reload core → write erase → ver cabo",
+      "debug all global → desligar STP",
+      "Cliente (APIPA?) → L2/VLAN → helper se server remoto → pool/service/bindings → options",
+      "Mudar default route da empresa inteira"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A ordem do content evita escopo excessivo: confirme o estado do cliente, L2, relay, server/pool e só então options. Reload e write erase não são o primeiro passo de DHCP.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Flag M no RA (modelo conceitual) indica aos hosts que devem usar DHCPv6 para endereço. Hosts ignoram e só ficam com link-local. O que checar no router?",
+    "alternativas": [
+      "Apenas o banner login",
+      "Somente a senha enable",
+      "Se o Port-channel tem LACP rate fast apenas",
+      "Se DHCPv6 server/relay e pool estão ativos na interface/LAN e se há binding v6"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Indicar M no RA não basta se o serviço DHCPv6 não estiver operacional na LAN. Verifique pool, interface e relay v6. Banner e enable não atribuem GUA.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Host recebe 10.30.0.20/24 na VLAN 40 (SVI 10.40.0.1). Sintoma de qual falha?",
+    "alternativas": [
+      "Funcionamento ideal de helper",
+      "APIPA saudável",
+      "DHCPv6 GUA correto",
+      "Lease/pool de rede errada (VLAN/pool cruzado) — IP fora do segmento real"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Endereço 10.30 em segmento 10.40 indica pool ou relay apontando escopo errado, ou VLAN/pool inconsistente. O host não terá gateway coerente. Corrija network do pool e a membership VLAN.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Para que serve excluded-address no DHCP do IOS?",
+    "alternativas": [
+      "Excluir portas do STP",
+      "Reservar IPs (SVI, servers fixos) fora do range dinâmico do pool",
+      "Bloquear UDP 53 sempre",
+      "Desligar IPv6 link-local"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "excluded-address evita que o pool entregue IPs já usados por SVI, impressoras estáticas etc. Exagerar nas exclusões esgota o pool. Não é ferramenta de STP nem DNS.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SLAAC fornece GUA; DNS IPv6 não vem. Qual mecanismo conceitual pode completar options?",
+    "alternativas": [
+      "Apagar o RA",
+      "Forçar APIPA v4 em todos os hosts",
+      "DHCPv6 stateless (options) quando a política/RA usa flag O — nível CCNA",
+      "Somente MX records"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Stateless DHCPv6 entrega options (ex.: DNS) sem necessariamente atribuir o endereço; o endereço pode vir de SLAAC. Flag O no modelo do exame aponta para other configuration. MX não configura DNS do host via RA.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Interface do router que hospeda o pool está administratively down. Clientes na LAN ligada a essa interface?",
+    "alternativas": [
+      "Continuam com Offer normalmente",
+      "Ganham IPs da tabela ARP apenas",
+      "Recebem GUA IPv6 automaticamente do OSPFv2",
+      "Tendem a falhar no DHCP se dependem desse server/interface no segmento"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Server com interface/SVI down não serve o segmento corretamente. Levante a interface e valide service dhcp e o pool. ARP e OSPFv2 não substituem DORA.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Comando no cliente Windows para forçar nova negociação DHCPv4 após corrigir o pool?",
+    "alternativas": [
+      "format c:",
+      "shutdown /s /t 0 no DHCP server apenas",
+      "ipconfig /release seguido de ipconfig /renew",
+      "tracert apenas para 127.0.0.1"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "release/renew reinicia o DORA e puxa options novas. format e shutdown do server não são o procedimento de cliente. Após corrigir default-router/dns no pool, o renew é essencial.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dois helpers no SVI: um para 10.10.10.53 (DHCP) e outro para 10.10.10.25 (não DHCP). Risco operacional?",
+    "alternativas": [
+      "Helper só aceita um IP na vida do IOS",
+      "Broadcasts UDP reencaminhados também a serviços não DHCP — pode ser intencional (ex. outros UDP) mas deve ser consciente",
+      "Elimina a necessidade de pool",
+      "Converte a VLAN em L3 port automaticamente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "ip helper-address encaminha vários UDP broadcasts por padrão, não só DHCP. Múltiplos helpers são válidos, mas cada destino recebe o tráfego. Não crie helpers 'por engano' para hosts irrelevantes.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip dhcp conflict lista 10.40.0.15. Impacto?",
+    "alternativas": [
+      "Significa que o STP está errado",
+      "Garante lease infinito a todos",
+      "O IOS pode evitar reofertar o IP em conflito até limpeza — indique IP já em uso indevido",
+      "Desliga o helper-address"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Conflitos marcam endereços problemáticos (resposta a ping/gratuito ARP etc.). Remova o dispositivo estático indevido ou ajuste excluded/bindings. Não é contador de STP.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Host dual-stack: IPv4 via DHCP ok; IPv6 só fe80::. App prefere v6 e falha. Foco 1.7?",
+    "alternativas": [
+      "Apenas aumentar a largura do WAN IPv4",
+      "Somente CRC no cobre",
+      "Apenas registro MX",
+      "Atribuição IPv6 (RA/DHCPv6) — obter GUA/options, não só link-local"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Com v4 ok e app preferindo v6, a falha de atribuição IPv6 (GUA) é o alvo do 1.7. Corrija RA/DHCP v6. WAN IPv4 e MX não entregam GUA local.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Porta do PC em VLAN 50; DHCP pool e helper configurados só para VLAN 40. Sintoma no PC?",
+    "alternativas": [
+      "Sem Offer da infraestrutura da VLAN 40 — membership VLAN errada impede o fluxo no segmento certo",
+      "Recebe sempre o pool da 40 por mágica de MAC",
+      "APIPA vira GUA IPv6",
+      "Helper global ignora VLAN"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O Discover sai na VLAN da porta. Se o host está na 50 e o serviço na 40, não há match. Corrija access VLAN ou configure pool/helper na 50. MAC não cruza VLAN de access sozinho.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual evidência no router confirma que um MAC obteve lease 10.40.0.77?",
+    "alternativas": [
+      "show banner motd",
+      "show ip dhcp binding | include 10.40.0.77",
+      "show clock apenas",
+      "show flash:"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Bindings associam IP↔MAC↔lease. É a prova no server IOS de que o Ack foi dado. Banner e flash não mostram leases.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "DHCPv6 relay no gateway da LAN aponta para server 2001:db8:1::53, mas a ACL IPv6 bloqueia UDP 547. Efeito?",
+    "alternativas": [
+      "Relay v6 não completa comunicação com o server — hosts podem ficar sem GUA stateful",
+      "IPv4 DORA acelera",
+      "APIPA IPv4 desaparece",
+      "STP vira MST sozinho"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "DHCPv6 client/server/relay usam portas UDP (547 no server/relay). ACL que bloqueia quebra o stateful. Abra o caminho ou ajuste a ACL. Não afeta STP nem APIPA v4 diretamente.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Teste: PC com IP estático correto na subnet navega; no DHCP volta para APIPA. O que isso isola?",
+    "alternativas": [
+      "Falha L1 total do cabo (improvável se estático ok no mesmo patch)",
+      "Problema só de DNS AAAA",
+      "Falha no processo DHCP (helper/server/pool), não na conectividade L3 básica do segmento",
+      "Necessidade de desligar o SVI"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Estático funcional prova L2/L3 do segmento e gateway. APIPA no modo DHCP localiza a falha no serviço DORA/helper/pool. Mantenha o SVI; conserte o DHCP.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Pool com default-router 10.40.0.1 correto; técnico esquece dns-server. Impacto típico?",
+    "alternativas": [
+      "Host pode ter IP e gateway ok, mas resolução de nomes ausente/errada até option DNS ser configurada",
+      "APIPA imediato sempre",
+      "Quebra de todas as adjacências OSPF no core",
+      "Conversão automática para DHCPv6 only"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem option DNS o cliente pode operar por IP e ainda falhar por nome. Não é APIPA se o lease v4 veio. OSPF do core não depende dessa option do PC. Configure dns-server e renew.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo do Diagnose 1.7 no CCNA:",
+    "alternativas": [
+      "Sempre começar com fine-tuning de LLM no DHCP server",
+      "Configurar Windows Server MMC completo em toda ocorrência",
+      "Implementar DHCPv6-PD multi-homed enterprise no primeiro passo",
+      "Cliente (APIPA/GUA) → L2 → helper → server/pool/excluded → options; v6 com RA/DHCP conforme política"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O blueprint pede Diagnose cliente e router com ferramentas de show e raciocínio de fluxo. Não exige MMC enterprise, PD profundo nem IA. Siga a ordem e use evidência de binding/pool/ipconfig.",
+    "part_id": "v2-1.7"
+  }
+]

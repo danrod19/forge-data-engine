@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4701: mesa Gi1/0/12 caiu; usuário ligou um hub com 2 notebooks. Porta vermelha no painel.",
+    "cli_output": "SW# show interfaces Gi1/0/12 status\nPort      Name       Status         Vlan Duplex Speed\nGi1/0/12  MESA-12    err-disabled   40   auto   auto\n\nSW# show port-security interface Gi1/0/12\nPort Security              : Enabled\nPort Status                : Secure-shutdown\nViolation Mode             : Shutdown\nMaximum MAC Addresses      : 1\nTotal MAC Addresses        : 1\nConfigured MAC Addresses   : 0\nSticky MAC Addresses       : 1\nLast Source Address:Vlan   : aabb.cc00.0202:40\nSecurity Violation Count   : 1\n\nSW# show port-security address | include Gi1/0/12\nAABB.CC00.0101   1   Gi1/0/12   Sticky\n\nLog: %PM-4-ERR_DISABLE: psecure-violation error detected on Gi1/0/12",
+    "alternativas": [
+      "Falta de OSPF area 0",
+      "RA Guard no uplink",
+      "Port-security violation (max 1 / sticky) — hub com MAC extra → err-disabled",
+      "DHCP snooping trust ausente no core fiber"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Secure-shutdown, psecure-violation e max 1 com sticky do primeiro MAC explicam o err-disabled ao aparecer o segundo. Remova o hub, limpe sticky se precisar e reative a porta. Não é OSPF nem RA Guard.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4702: após habilitar DHCP snooping, VLAN 40 inteira em APIPA. Server em VLAN 10 via uplink Gi1/0/1.",
+    "cli_output": "SW# show ip dhcp snooping\nSwitch DHCP snooping is enabled\nDHCP snooping is configured on following VLANs: 40\nDHCP snooping is operational on following VLANs: 40\n\nSW# show ip dhcp snooping | begin Interface\nInterface        Trusted    Rate limit (pps)\n----------------  -------    ----------------\nGigabitEthernet1/0/1   no         unlimited\nGigabitEthernet1/0/10  no         unlimited\nGigabitEthernet1/0/11  no         unlimited\n\nSW# show run interface Gi1/0/1\n description UPLINK-DIST\n switchport mode trunk\n (no ip dhcp snooping trust)\n\nPC> ipconfig → 169.254.x.x\nDHCP server 10.10.10.53 reachable from Dist (offers generated)",
+    "alternativas": [
+      "Port-security max 1 em todas as mesas",
+      "Uplink sem ip dhcp snooping trust — Offers legítimos tratados como untrusted/drop",
+      "DAI rate-limit apenas",
+      "Voice vlan ausente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Snooping on com Trusted no no uplink é o erro clássico: clientes sem IP. Configure trust em Gi1/0/1. Port-sec e voice não explicam APIPA em massa pós-snooping.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4703: host com IP estático 10.40.0.88 não comunica na VLAN; DAI e snooping ligados. DHCP clients ok.",
+    "cli_output": "SW# show ip dhcp snooping binding\nMacAddress          IpAddress        Lease(sec)  Type           VLAN  Interface\nAA:BB:CC:00:11:01   10.40.0.50       84200       dhcp-snooping  40    Gi1/0/20\n(no entry for 10.40.0.88)\n\nSW# show ip arp inspection vlan 40\nSource Mac Validation      : Disabled\nDestination Mac Validation : Disabled\nIP Address Validation      : Disabled\nVlan     Configuration    Operation   ACL Match    Static ACL\n----     -------------    ---------   ---------    ----------\n40       Enabled          Active\n\nSW# show ip arp inspection statistics vlan 40\nVlan      Forwarded        Dropped\n----      ---------        -------\n40        120              340\n\nSW# show run interface Gi1/0/22\n switchport mode access\n switchport access vlan 40\n (host static .88 — no dhcp)\n\nSW# show run | include arp inspection trust\nip arp inspection trust  (only on Gi1/0/1 uplink)",
+    "alternativas": [
+      "Porta do host deveria ser dhcp snooping trust (incorreto para access tipicamente)",
+      "Remover DAI do uplink trust",
+      "Problema de CRC na fibra do ISP",
+      "DAI dropa ARP do estático sem binding — criar static binding ou usar DHCP / ajustar inspeção"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Drops altos e binding sem .88 com host estático explicam ARP dropado pelo DAI. DHCP clients com binding funcionam. Adicione binding estático ou mude para DHCP. Não confie a access do host.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4704: hosts dual-stack perderam default IPv6 após 'hardening'. Router legítimo em Gi1/0/1.",
+    "cli_output": "SW# show run | section raguard|nd raguard\nipv6 nd raguard policy HOST\n device-role host\nipv6 nd raguard policy ROUTER\n device-role router\n\nSW# show run interface Gi1/0/10\n description PC-USER\n switchport mode access\n ipv6 nd raguard attach-policy HOST\n\nSW# show run interface Gi1/0/1\n description UPLINK-TO-ROUTER\n switchport mode trunk\n ipv6 nd raguard attach-policy HOST\n\nBefore: hosts had GUA via SLAAC from FE80::1 on router\nAfter: no RA seen by hosts; Fe80 default missing\nPCAP on access: no RA from router; RA from rogue laptop on Gi1/0/15 dropped (good)",
+    "alternativas": [
+      "Policy HOST no uplink do router bloqueia RA legítimo — usar policy ROUTER/trusted no Gi1/0/1; HOST só no access",
+      "Port-security max 1 causa perda de RA",
+      "DHCP snooping trust no PC resolve SLAAC",
+      "DAI desliga IPv6 automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "RA Guard HOST no uplink do router dropa o RA legítimo e quebra SLAAC, embora também bloqueie rogue (bom no access). Mova ROUTER policy para Gi1/0/1. Port-sec e DAI não substituem o papel do RA.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4705: após violação, porta err-disabled. Hub removido; precisa voltar ao ar com max 2 e sticky limpo.",
+    "cli_output": "SW# show interfaces Gi1/0/12 status\nGi1/0/12  MESA-12  err-disabled  40  auto auto\n\nSW# show port-security interface Gi1/0/12 | include Status|Maximum|Sticky|Violation\nPort Status                : Secure-shutdown\nViolation Mode             : Shutdown\nMaximum MAC Addresses      : 1\nSticky MAC Addresses       : 1\n\nSW# show run interface Gi1/0/12\ninterface GigabitEthernet1/0/12\n switchport mode access\n switchport access vlan 40\n switchport port-security\n switchport port-security mac-address sticky\n switchport port-security mac-address sticky aabb.cc00.0101\n switchport port-security maximum 1\n switchport port-security violation shutdown\n\nOps: user now has PC + IP phone (two MACs expected)",
+    "alternativas": [
+      "Apenas reload do core",
+      "Aumentar maximum para 2, limpar sticky antigo se necessário, no shutdown (ou recovery) na porta",
+      "Remover port-security e configurar OSPF na access",
+      "ip dhcp snooping trust na mesa do usuário"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Recovery exige corrigir a política (max 2 para phone+PC), limpar sticky obsoleto e reativar a interface. Reload do core e trust na mesa são incorretos. OSPF na access não substitui port-sec.",
+    "part_id": "v2-4.7"
+  }
+]

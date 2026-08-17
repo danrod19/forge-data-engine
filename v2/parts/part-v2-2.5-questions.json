@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Principal objetivo do Spanning Tree em uma LAN com caminhos redundantes?",
+    "alternativas": [
+      "Manter o L2 livre de loops de forwarding (árvore ativa sem ciclo)",
+      "Substituir o OSPF no core",
+      "Criptografar frames Ethernet",
+      "Atribuir endereços IPv6 GUA"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "STP/RSTP/PVST+ previnem loops de camada 2 quando há redundância de switches. Sem isso, broadcasts podem circular. Não roteia como OSPF nem cifra frames. O desenho elege root e bloqueia portas para uma topologia em árvore.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Como se elege o root bridge (ideia CCNA)?",
+    "alternativas": [
+      "Maior prioridade sempre vence",
+      "Menor Bridge ID (priority + system ID/MAC) vence",
+      "O switch com mais portas PoE",
+      "O primeiro a bootar fica root para sempre sem BPDU"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O root é o switch com o menor BID. Priority mais baixa (ex. 4096 vs 32768) favorece a eleição; em empate de priority, o MAC mais baixo decide. Não é PoE nem 'primeiro boot' isolado do protocolo.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Valores de prioridade STP tipicamente em passos de?",
+    "alternativas": [
+      "1",
+      "100",
+      "4096 (faixa 0–61440)",
+      "65535 apenas"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A prioridade configurável usa múltiplos de 4096 entre 0 e 61440. Isso permite root primary/secondary previsíveis. Passos de 1 não são o modelo clássico de priority de bridge.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Uso correto de spanning-tree portfast?",
+    "alternativas": [
+      "Em portas access de host (edge) para forwarding rápido",
+      "Em todos os uplinks de core",
+      "Em trunks para o data center apenas",
+      "Para desligar BPDU globalmente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "PortFast acelera a transição em portas de usuário. Em uplinks entre switches o risco de loop sobe se um BPDU aparecer sem proteção. Não desliga BPDU sozinho.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "BPDU Guard em porta PortFast: o que ocorre se um BPDU for recebido?",
+    "alternativas": [
+      "A porta pode ir a err-disabled (violação de edge)",
+      "O switch vira root automaticamente",
+      "O STP é desligado em todo o campus",
+      "A VLAN nativa muda para 999"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "BPDU Guard protege a mesa: BPDU inesperado (switch/hub plugado) derruba a porta em err-disabled. Isso evita loops. Não elege root nem altera native VLAN por si.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Papel da root port em um switch não-root?",
+    "alternativas": [
+      "Porta que bloqueia todos os BPDUs",
+      "Caminho escolhido em direção ao root bridge (melhor path cost)",
+      "Sempre a porta com PoE delivering",
+      "Interface L3 com IP OSPF"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Root port é o melhor caminho daquele switch até o root. Encaminha em direção ao root; não é definição de PoE nem de porta L3 OSPF.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show spanning-tree vlan 40 mostra uma porta Altn BLK com link connected. Interpretação?",
+    "alternativas": [
+      "Cabo necessariamente rompido",
+      "SFP ausente",
+      "Porta alternate bloqueada de propósito para evitar loop — link L1 pode estar up",
+      "DHCP pool esgotado"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Alternate/blocked com status connected é normal em topologia redundante. Não confunda com falha de cabo. O STP impede o segundo caminho ativo de dados.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Comando típico para forçar um switch a ser root da VLAN 10?",
+    "alternativas": [
+      "ip route 0.0.0.0 0.0.0.0 null0",
+      "switchport mode access",
+      "ip dhcp snooping trust",
+      "spanning-tree vlan 10 root primary (ou priority baixa)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "root primary (ou priority 4096/8192 conforme plataforma) influencia a eleição do root da VLAN. Rota e access mode não definem o BID STP.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Risco de PortFast em uplink entre dois switches?",
+    "alternativas": [
+      "Pode contribuir para loop se BPDUs/redundância não forem tratados — edge não é para inter-switch",
+      "Melhora sempre o root bridge",
+      "Desliga PoE no peer",
+      "Converte a porta em routed automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "PortFast assume host na ponta. Entre switches, a convergência 'rápida' sem o papel correto de STP edge pode facilitar loops. Use PortFast em access; uplinks sem PortFast de host.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Verify essencial após mudar priority do root?",
+    "alternativas": [
+      "show version apenas",
+      "show spanning-tree vlan <id> e conferir Root ID / Root Port",
+      "show flash: apenas",
+      "show users apenas"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show spanning-tree vlan confirma se o root passou a ser o switch desejado e como as roles se reorganizaram. version/flash não mostram a árvore L2.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Root no access switch de um andar; core com priority default. Sintoma típico?",
+    "alternativas": [
+      "Path de uplink/subótimo e bloqueios inesperados no desenho de campus",
+      "OSPF area mismatch automático",
+      "RA Guard desliga IPv4",
+      "TFTP vira obrigatório"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Root no access distorce a árvore: tráfego pode hairpin e portas certas bloqueiam. Coloque root no core/dist com primary/secondary. Não é efeito de OSPF/RA/TFTP.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Porta access com PortFast + BPDU Guard; usuário pluga switch não gerenciado. Resultado esperado?",
+    "alternativas": [
+      "err-disabled por BPDU Guard (BPDU detectado na edge)",
+      "Porta permanece FWD e cria loop garantido sem log",
+      "Root vira o switch não gerenciado sempre",
+      "VLAN 1 é apagada"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O switch não gerenciado pode gerar/propagar BPDUs; BPDU Guard derruba a porta. Isso protege o campus. Remova o device e recupere a interface.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Diferença conceitual forwarding vs blocking no STP?",
+    "alternativas": [
+      "Blocking envia todos os unicasts de usuário",
+      "Forwarding e blocking são idênticos no plano de dados",
+      "Forwarding encaminha frames de dados; blocking/discarding não encaminha dados (previne loop)",
+      "Blocking só existe em OSPF"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O estado blocked/discarding impede o segundo caminho ativo de dados. Forwarding participa da árvore ativa. Não é conceito de OSPF.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "spanning-tree vlan 20 priority 4096 no SW-CORE e 32768 nos access. Efeito?",
+    "alternativas": [
+      "CORE tende a ser root da VLAN 20 (priority menor)",
+      "Access vira root com mais chance",
+      "STP desliga na VLAN 20",
+      "Todas as portas ficam err-disabled"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "4096 < 32768 favorece o CORE como root, assumindo BID completo. É configure típico de desenho. Não desliga STP nem err-disable em massa.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem de Diagnose: PC sem rede; porta err-disabled; log BPDU Guard. Ação?",
+    "alternativas": [
+      "clear ip ospf process no ABR",
+      "write erase no access",
+      "Remover o device que gera BPDU, corrigir topologia e recuperar a porta (no shutdown/recovery)",
+      "Desligar PortFast em todo o core fiber"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O log aponta BPDU Guard. Não é OSPF. Tire o switch/hub da mesa, reative a porta e mantenha PortFast+Guard na access legítima.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Designated port (ideia)?",
+    "alternativas": [
+      "Sempre a porta com IP de management",
+      "Porta que só recebe BPDUs e nunca envia",
+      "Porta responsável por encaminhar no segmento em direção à árvore (não bloqueada como alternate)",
+      "Sinônimo de PortFast"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Designated port é a que encaminha no link/segmento na topologia STP. Não é o mesmo que PortFast. Management IP não define o papel STP.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após 'no spanning-tree vlan 30' em um anel de access, sintoma provável?",
+    "alternativas": [
+      "Melhora automática do QoS",
+      "Root bridge IPv6 via RA",
+      "SSH desabilitado",
+      "Loop/broadcast storm na VLAN 30 se houver redundância física"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Desligar STP na VLAN com caminhos paralelos reabre o ciclo L2. Storm e flapping são típicos. Não melhora QoS nem SSH.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PVST+ no nível CCNA (ideia)?",
+    "alternativas": [
+      "Um único tree para todo o campus sem noção de VLAN",
+      "Protocolo de roteamento IPv4",
+      "Uma instância de STP por VLAN (per-VLAN spanning tree)",
+      "Substituto de EtherChannel"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "PVST+ mantém topologia STP por VLAN, permitindo roots diferentes por VLAN no desenho. Não é IGP nem LACP. RSTP acelera convergência no mesmo universo conceitual.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Usuário reclama que o link 'morreu', mas show interfaces status = connected e STP = Altn BLK. Resposta correta ao helpdesk?",
+    "alternativas": [
+      "É caminho de backup bloqueado pelo STP — não troque o cabo às cegas; explique o papel alternate",
+      "Sempre SFP queimado",
+      "Sempre falta de default gateway no PC",
+      "Sempre ACL de VTY"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Connected + alternate blocked é topologia saudável com redundância. Trocar cabo não 'ativa' o path se o STP mantém o bloqueio por design. Gateway/ACL são outros domínios.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "spanning-tree portfast bpduguard default — efeito de política?",
+    "alternativas": [
+      "Desliga PortFast em todas as access",
+      "Força root em todos os access",
+      "Habilita MSTP region 0 apenas",
+      "Aplica BPDU Guard em portas PortFast por padrão (edge protegida)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A combinação default facilita edge seguro: PortFast + Guard nas portas de host. Não elege root em massa nem configura MSTP region.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Root secondary serve para quê?",
+    "alternativas": [
+      "Apagar a VLAN do primary",
+      "Definir backup preferencial de root se o primary falhar (priority intermediária)",
+      "Desligar BPDU Guard",
+      "Converter trunks em access"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "root secondary prepara um segundo switch com prioridade favorável, mas não tão baixa quanto primary. É design de resiliência. Não mexe em BPDU Guard nem mode access.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "MAC flapping entre dois uplinks + CPU alta + broadcasts. Suspeita STP?",
+    "alternativas": [
+      "Apenas DNS AAAA",
+      "Possível loop L2 — verifique se STP está ativo, roles e se há PortFast indevido em inter-switch",
+      "Apenas falta de username SSH",
+      "Apenas NAT overload"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Flapping e storm batem com loop. Valide spanning-tree e a config de edge. DNS/SSH/NAT não explicam MAC flap L2 clássico.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show spanning-tree interface Gi1/0/1: Root FWD. Significado?",
+    "alternativas": [
+      "Porta está err-disabled",
+      "Porta é alternate blocked",
+      "Porta não participa de STP",
+      "Porta é root port em forwarding — caminho ao root ativo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Role Root e estado FWD indicam o path ativo até o root. Não é blocked nem err-disabled. É leitura de verify saudável no não-root.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo desta part CCNA?",
+    "alternativas": [
+      "Root priority",
+      "PortFast em access",
+      "BPDU Guard",
+      "MSTP multi-região detalhado e pathcost long/short debate enterprise"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O foco é root, PortFast, BPDU Guard e show spanning-tree. MSTP region e debates long/short avançados ficam de lado no 200-301 operacional desta part.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dois switches com priority 32768; SW-A MAC menor. Quem tende a ser root?",
+    "alternativas": [
+      "Sempre SW-B",
+      "SW-A (mesmo priority, MAC/system ID menor no BID)",
+      "Nenhum; STP exige priority 0",
+      "O switch com mais VLANs"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Com priority igual, o desempate do BID usa o endereço de sistema (MAC). SW-A com MAC menor vence. Não é contagem de VLANs.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PC demora ~40s para obter IP; access sem PortFast. Relação com STP?",
+    "alternativas": [
+      "BPDU Guard remove o IP do host",
+      "Root secondary apaga o lease",
+      "Sem PortFast a porta passa por timers de listening/learning antes de forwarding — atrasa DHCP",
+      "Alternate port entrega DHCP mais rápido"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "PortFast evita a espera clássica de STP em host ports. BPDU Guard não 'remove IP'. Configure PortFast (e Guard) na access legítima.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Log: %SPANTREE-2-BLOCK_BPDUGUARD: Received BPDU on port Gi1/0/8 with BPDU Guard enabled. Next?",
+    "alternativas": [
+      "Ignorar; é informativo sem ação",
+      "Configurar o host como root bridge",
+      "Investigar o que está pluggado em Gi1/0/8 e recuperar a porta após remover o gerador de BPDU",
+      "Desligar todas as VLANs"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O log identifica BPDU Guard na interface. Remova o switch/hub indevido e reative a porta. Não promova host a root nem apague VLANs.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Root Port vs Designated Port no mesmo switch não-root (ideia)?",
+    "alternativas": [
+      "São sempre a mesma porta física",
+      "Root Port sobe ao root; Designated encaminha em outros segmentos onde o switch é o melhor",
+      "Designated só existe no root",
+      "Root Port fica sempre blocked"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Um não-root tem uma root port (ao root) e pode ter designated ports em segmentos onde vence. Root port não fica blocked por definição de papel.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor prática de root no campus de dois switches de distribuição?",
+    "alternativas": [
+      "root primary em todo access switch",
+      "priority 61440 no core e 0 no access",
+      "Desligar STP nas VLANs de servidor",
+      "root primary em Dist-A e root secondary em Dist-B para as VLANs de usuário"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Primary/secondary no dist/core dá controle e failover previsível. Root em todos os access é anti-padrão. Desligar STP em VLANs críticas com redundância é perigoso.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo Configure/Verify STP no CCNA (esta part):",
+    "alternativas": [
+      "Só MSTP region maps",
+      "Só NetFlow no lugar de BPDUs",
+      "Só LACP sem árvore",
+      "Root (priority/BID), PortFast edge, BPDU Guard, leitura de roles/states e prevenção de loop"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O pacote mental une root design, edge seguro e verify com show spanning-tree. MSTP avançado e NetFlow não substituem o controle de loop L2.",
+    "part_id": "v2-2.5"
+  }
+]

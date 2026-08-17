@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5401 — Auditoria de guest: “qualquer um entra e o Wireshark no notebook vizinho lê HTTP claro de usuários”.",
+    "cli_output": "WLC# show wlan 12\nWLAN Identifier.................................. 12\nProfile Name..................................... GUEST-OPEN\nNetwork Name (SSID).............................. Guest\nStatus........................................... Enabled\nSecurity\n   802.11 Authentication:........................ Open System\n   Static WEP Keys............................... Disabled\n   802.1X........................................ Disabled\n   Wi-Fi Protected Access (WPA/WPA2/WPA3)....... Disabled\n   CKIP ......................................... Disabled\n   IP Security................................... Disabled\n\nWLC# show wlan summary | include 12\n12    Guest          GUEST-OPEN     Enabled   UP\n\n! Cliente: Connected, Security: None\n! Captura no canal: frames de dados legíveis (HTTP) de outros hosts na mesma BSS",
+    "alternativas": [
+      "WPA2-AES e AKM PSK estão enabled no show wlan 12",
+      "802.1X está Enabled com RADIUS",
+      "WEP está Enabled como cipher principal",
+      "WLAN Open (WPA disabled, 802.11 Authentication Open) — sem confidencialidade WPA; tráfego exposto no ar"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "show wlan 12: Open System, WPA/WPA2/WPA3 Disabled, 802.1X Disabled. Cliente Security None. É o cenário Open inseguro do content — não há PSK/AES/Enterprise no output. Migrar guest para portal+WPA2/WPA3 ou segmentar com consciência do risco no ar.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5402 — Scanner de inventário antigo “só funciona com WEP”. Time reativou WEP na WLAN CORP-LEGACY.",
+    "cli_output": "WLC# show wlan 5\nWLAN Identifier.................................. 5\nProfile Name..................................... CORP-LEGACY\nNetwork Name (SSID).............................. CorpOld\nStatus........................................... Enabled\nSecurity\n   802.11 Authentication:........................ Shared Key\n   Static WEP Keys............................... Enabled\n   WEP Key sizes................................. 104-bit\n   802.1X........................................ Disabled\n   Wi-Fi Protected Access (WPA/WPA2/WPA3)....... Disabled\n\nWLC# show wlan summary\n5    CorpOld        CORP-LEGACY   Enabled   UP\n12   Guest          GUEST-OPEN    Enabled   UP\n20   Corp           CORP-WPA2     Enabled   UP\n\n! Nota de risco: CORP-WPA2 usa WPA2-AES; CORP-LEGACY ainda no ar com WEP",
+    "alternativas": [
+      "WPA3-SAE enabled na CORP-LEGACY",
+      "Static WEP 104-bit enabled e WPA disabled — WLAN legada insegura no ar (WEP quebrável)",
+      "Todas as WLANs do summary estão com WPA2 only",
+      "802.1X Enabled no show wlan 5"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "wlan 5: Static WEP Enabled, WPA disabled, 802.1X Disabled. É o anti-padrão WEP. Summary mostra outras WLANs, mas o achado do chamado é a legada. Isole/retire o scanner e desligue WEP.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5403 — Notebooks não entram em “CorpWiFi”. No celular a PSK recém-trocada funciona; no notebook o perfil ainda tem a senha antiga.",
+    "cli_output": "WLC# show wlan 20\nSSID............................................. CorpWiFi\nSecurity\n   Wi-Fi Protected Access (WPA/WPA2)............ Enabled\n   WPA2......................................... Enabled\n      AES Cipher................................ Enabled\n      TKIP Cipher............................... Disabled\n   AKM\n      PSK....................................... Enabled\n      802.1X.................................... Disabled\n   PSK Format................................... ASCII\n\nWLC# show client detail aaaa.bbbb.cccc\n! notebook problemático\nClient State..................................... Idle / excluded (auth)\nPolicy Type...................................... WPA2\nEncryption Cipher................................ CCMP (AES)\nAuthentication Key Management.................... PSK\nRecent failure................................... 4-way handshake failed / MIC failure (lab summary)\n\n! Admin confirmou PSK nova no WLC: C0rp!2026-Secure\n! Perfil Windows do notebook ainda com PSK antiga Corp2020",
+    "alternativas": [
+      "WLAN está Open no show wlan 20",
+      "Cipher só TKIP no WLC",
+      "PSK mismatch cliente vs WLC — WPA2-AES-PSK ok no AP; 4-way fail no notebook com senha antiga",
+      "AKM 802.1X Enabled e PSK Disabled no wlan 20"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "wlan 20: WPA2, AES on, TKIP off, PSK on. Cliente com 4-way fail e perfil com senha velha. Não é Open nem Enterprise. Atualize/recrie o perfil PSK no notebook com a passphrase nova.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5404 — RH exige login com usuário do AD no Wi-Fi. WLAN “Corp” está só com PSK de grupo. Clientes 802.1X falham.",
+    "cli_output": "WLC# show wlan 20\nSSID............................................. Corp\nSecurity\n   WPA2......................................... Enabled\n      AES Cipher................................ Enabled\n   AKM\n      PSK....................................... Enabled\n      802.1X.................................... Disabled\n   FT over-the-ds............................... Disabled\n\nWLC# show radius summary\n! (servidores RADIUS configurados no sistema para outras WLANs — omitido)\n\nClient log (supplicant):\nAuth type: PEAP / 802.1X\nResult: Association rejected / AKM not acceptable (lab paraphrase)\n\n! Perfil corporativo do notebook: EAP-PEAP + user AD\n! PSK de grupo CorpShared! ainda documentada no wiki antigo",
+    "alternativas": [
+      "WLAN exige Enterprise mas está só PSK (802.1X Disabled) — mismatch de AKM com cliente 802.1X/AD",
+      "AES Cipher Disabled no show",
+      "PSK e 802.1X ambos Enabled e o cliente errou o SSID apenas",
+      "WEP Enabled explica o PEAP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "show wlan: PSK Enabled, 802.1X Disabled, AES ok. Cliente PEAP/802.1X incompatível com AKM PSK-only. Política AD pede Enterprise: habilite 802.1X/RADIUS na WLAN (e desligue PSK se a policy exigir). Não é WEP nem AES off.",
+    "part_id": "5.4"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5405 — “WPA2 está on”, mas clientes modernos recusam e o scanner de compliance marca cipher fraco.",
+    "cli_output": "WLC# show wlan 8\nSSID............................................. StoreFloor\nSecurity\n   Wi-Fi Protected Access (WPA/WPA2)............ Enabled\n   WPA.......................................... Enabled\n   WPA2......................................... Enabled\n      AES Cipher................................ Disabled\n      TKIP Cipher............................... Enabled\n   AKM\n      PSK....................................... Enabled\n      802.1X.................................... Disabled\n\nWLC# show wlan 8 | include Cipher|WPA|AKM|Security\nWPA2......................................... Enabled\nAES Cipher................................ Disabled\nTKIP Cipher............................... Enabled\nPSK....................................... Enabled\n\nClient modern OS:\nCannot join — weak security / TKIP not allowed (lab summary)\n\n! Compliance: TKIP-only equivalent; AES absent",
+    "alternativas": [
+      "AES Cipher Enabled e TKIP Disabled no output",
+      "Security WPA completamente Disabled",
+      "Open System authentication only",
+      "WPA2 “on” mas só TKIP (AES Disabled) — cipher legado; falta AES/CCMP para hardening moderno"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "WPA2 Enabled com AES Disabled e TKIP Enabled + PSK. Label “WPA2” não basta sem AES. Clientes novos recusam TKIP. Habilite AES (idealmente AES-only) e desligue TKIP. Não é Open nem WPA total off.",
+    "part_id": "5.4"
+  }
+]

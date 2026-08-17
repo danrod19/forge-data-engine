@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1101: servidor de arquivos lento e timeouts. Após hardcode de duplex no switch, o problema piorou. Avalie o link de acesso.",
+    "cli_output": "SW-ACC# show interfaces Gi1/0/18 status\nPort      Name           Status       Vlan  Duplex  Speed Type\nGi1/0/18  SRV-FILES      connected    40    half    a-1000 10/100/1000BaseTX\n\nSW-ACC# show interfaces Gi1/0/18 | include duplex|collision|CRC|errors|reliability\n  Full-duplex, 1000Mb/s, media type is 10/100/1000BaseTX\n  0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored\n  41220 collisions, 18890 late collision, 0 deferred\n  reliability 245/255, txload 40/255, rxload 55/255\n\nSRV (peer NIC status tool):\n  Speed: 1.0 Gbps  Duplex: Full\n\nSW-ACC# show run interface Gi1/0/18 | include duplex|speed\n duplex half\n speed auto",
+    "alternativas": [
+      "Problema de default route no core; ignorar contadores",
+      "Mismatch de duplex (switch half vs servidor full) — alinhar duplex e revalidar late collisions",
+      "Limpar processo OSPF no ABR",
+      "Trocar o chassis do core sem olhar a porta"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Late collisions altos com half no switch e full no servidor são o clássico mismatch de duplex. A config mostra duplex half hardcoded. Alinhar (preferir auto/auto ou full/full) e observar se os contadores param. OSPF e troca de chassis não corrigem L1 do acesso.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1102: perda intermitente no uplink do building. Time de roteamento quer clear ip ospf process. Contadores do uplink:",
+    "cli_output": "EDGE# show ip ospf neighbor\nNeighbor ID     Pri State      Dead Time Address       Interface\n10.0.0.2          1 FULL/BDR   00:00:35  10.0.0.2      Gi0/0/1\n\nEDGE# show interfaces Gi0/0/1 | include error|CRC|collision|reliability|packets input\n  882114220 packets input, 0 no buffer\n  15440 input errors, 14990 CRC, 0 frame, 0 overrun\n  0 collisions, 0 late collision\n  reliability 230/255, txload 70/255, rxload 90/255\n\nEDGE# show interfaces Gi0/0/1 status\nPort      Name     Status    Vlan  Duplex Speed Type\nGi0/0/1   BLD-A    connected routed a-full a-1000 1000BaseSX SFP\n\nEDGE# show logging | include Gi0/0/1\n%LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/0/1, changed state to up\n(flaps earlier overnight)",
+    "alternativas": [
+      "Executar clear ip ospf process porque FULL ainda pode estar 'sujo'",
+      "Remover a default route estática",
+      "Investigar L1 do uplink (CRC/SFP/fibra/patch) — IGP está FULL; contadores apontam mídia",
+      "Desabilitar Spanning Tree globalmente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "OSPF FULL com CRC/input errors altos indica problema de mídia no link, não de adjacência lógica. clear ip ospf process é escopo errado. Trocar/limpar patch, validar SFP e fibra é o Diagnose 1.1 correto.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1103: novo link entre switches não sobe. Patch de cobre foi conectado à porta que espera SFP óptico.",
+    "cli_output": "SW-A# show interfaces Gi1/1/1\nGigabitEthernet1/1/1 is down, line protocol is down (notconnect)\n  Hardware is Gigabit Ethernet, address is aabb.cc00.0101\n  MTU 1500 bytes, BW 1000000 Kbit/sec\n  Keepalive set (10 sec)\n  Full Duplex, 1000Mbps, link type is auto, media type is unknown\n\nSW-A# show interfaces Gi1/1/1 status\nPort      Name       Status       Vlan Duplex Speed Type\nGi1/1/1   UPLINK-B   notconnect   1    auto   auto  No XCVR / SFP absent\n\nSW-A# show interfaces transceiver\n(no operational transceiver in Gi1/1/1)\n\nTech note: copper RJ45 patch hanging from the cage adapter incorrectly used.\nSW-B peer port also notconnect.",
+    "alternativas": [
+      "Forçar duplex half resolve notconnect óptico",
+      "O problema é pool DHCP da VLAN 1",
+      "Configurar HSRP para levantar o line protocol",
+      "Link down por SFP/mídia ausente ou tipo errado — instalar SFP correto e patch de fibra (ou usar porta cobre adequada)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "notconnect com SFP ausente e mídia desconhecida é falha de transceiver/cabo/tipo. Cobre na gaiola óptica errada não estabelece 1000BaseSX. Instale SFP e fibra corretos ou use porta RJ45 adequada. Half duplex, DHCP e HSRP não criam link L1.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1104: link de campus em fibra flapping. DOM do lado local:",
+    "cli_output": "SW-CORE# show interfaces Te1/1/1 transceiver detail\nITU Channel not available (Wavelength not available),\nTransceiver is internally calibrated.\n  Temperature = 32.10 C\n  Voltage      = 3.30 V\n  Tx Power     = -2.10 dBm\n  Rx Power     = -29.40 dBm   <<< low\n  Optical thresholds approximate:\n    Rx Power Warning low: -20 dBm  Alarm low: -24 dBm\n\nSW-CORE# show interfaces Te1/1/1 | include error|CRC|reliability\n  2200 input errors, 2100 CRC, 0 frame\n  reliability 210/255\n\nSW-CORE# show interfaces Te1/1/1 status\nPort      Name    Status    Vlan Duplex Speed Type\nTe1/1/1   CAMPUS  connected trunk a-full a-10G 10Gbase-SR\n\nField: patch recently reseated without cleaning; run is MM within short reach.",
+    "alternativas": [
+      "RX power abaixo do limiar com CRC — sujeira/patch/atenuação L1; limpar/trocar patch e revalidar DOM",
+      "Apagar o processo BGP do edge",
+      "Problema de access-class na VTY",
+      "Forçar speed 100 no TenGig resolve DOM"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Rx Power −29 dBm abaixo do alarm low, com CRC, aponta sinal óptico ruim. Limpeza e patch são a primeira linha. BGP e VTY não afetam DOM. Forçar 100 em 10G óptico não é o remédio.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1105: câmera IP a ~115 m de cabo Cat5e horizontal + patch. Não mantém 1G estável; erros altos.",
+    "cli_output": "SW-ACC# show interfaces Gi1/0/44 status\nPort      Name        Status    Vlan Duplex Speed Type\nGi1/0/44  CAM-PORTAO  connected 55   a-full a-100  10/100/1000BaseTX\n\nSW-ACC# show interfaces Gi1/0/44 | include error|CRC|runts|reliability|duplex\n  Full-duplex, 100Mb/s\n  9800 input errors, 9400 CRC, 400 runts\n  reliability 220/255\n\nSW-ACC# show interfaces Gi1/0/44 | include Last input|30 second\n  Last clearing of \"show interface\" counters 00:40:12\n  30 second input rate 1.2 Mbps\n\nCabling survey:\n  Horizontal Cat5e measured ~115 m IDF to camera junction\n  Peer attempts at 1000 often flap to notconnect\n  No SFP involved (copper only)",
+    "alternativas": [
+      "Configurar OSPF multi-area na câmera",
+      "O problema é apenas banner motd",
+      "Distância/categoria no cobre além do ideal para 1G — erros e queda para 100; encurtar run, melhorar cabeamento ou usar mídia adequada",
+      "Desligar CEF no access switch"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Canal ~115 m em Cat5e com falha a 1G e CRC em 100 é típico de distância/cabeamento inadequados. O status a-100 com erros confirma degradação L1. Encurtar, recabeamento ou fibra/midspan resolve; OSPF/CEF/banner não.",
+    "part_id": "v2-1.1"
+  }
+]

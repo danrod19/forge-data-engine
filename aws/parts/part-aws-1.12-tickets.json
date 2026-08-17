@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1121: CPU da EC2 > 90% por 15 min; alarme HighCPU nunca entrou em ALARM.",
+    "cli_output": "$ aws cloudwatch describe-alarms --alarm-names HighCPU\nStateValue: OK\nMetricName: CPUUtilization\nNamespace: AWS/EC2\nStatistic: Average\nPeriod: 300\nEvaluationPeriods: 3\nDatapointsToAlarm: 3\nThreshold: 95.0\nComparisonOperator: GreaterThanThreshold\nDimensions: [{Name: InstanceId, Value: i-0deadbeef}]\nTreatMissingData: missing\n\n$ aws cloudwatch get-metric-statistics --namespace AWS/EC2 --metric-name CPUUtilization \\\n  --dimensions Name=InstanceId,Value=i-0LIVE123 ...\n# Average ~92% last 15 min on LIVE instance\n\n$ aws ec2 describe-instances --instance-ids i-0deadbeef\nState: terminated\n# Alarm still points to old InstanceId after replace",
+    "alternativas": [
+      "Corrigir dimensão InstanceId para a instance atual (ou métrica de ASG) e reavaliar threshold 95 vs 90 — alarme olha série morta em OK",
+      "Só criar invalidation CloudFront",
+      "Só abrir 22 0.0.0.0/0",
+      "Apagar o log group da Lambda"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1121: CPU da EC2 > 90% por 15 min; alarme HighCPU nunca entrou em ALARM.…), a ação correta é: Corrigir dimensão InstanceId para a instance atual (ou métrica de ASG) e reavaliar threshold 95 vs 90 — alarme olha série morta em OK. «Só criar invalidation CloudFront» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.12.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1122: Alarme DiskFree fica INSUFFICIENT_DATA há dias.",
+    "cli_output": "$ aws cloudwatch describe-alarms --alarm-names DiskFree\nStateValue: INSUFFICIENT_DATA\nNamespace: CWAgent\nMetricName: disk_used_percent\nDimensions: [{Name: InstanceId, Value: i-0app1}, {Name: path, Value: /data}, {Name: device, Value: xvdf}]\nPeriod: 60\nEvaluationPeriods: 5\n\n$ aws ec2 describe-instances --instance-ids i-0app1\nState: stopped\n\n$ aws cloudwatch list-metrics --namespace CWAgent --metric-name disk_used_percent\n# no recent metrics for i-0app1\n\n# Agent not running while stopped; no PutMetricData",
+    "alternativas": [
+      "Instance stopped → sem datapoints do agent; inicie a instance/agent ou trate missing data / alarme em outro recurso — INSUFFICIENT_DATA não é OK",
+      "Subir o threshold para 1000%",
+      "Trocar o alarme para Sum de CPU de outra conta",
+      "Desligar o SNS topic de prod"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1122: Alarme DiskFree fica INSUFFICIENT_DATA há dias.…), a ação correta é: Instance stopped → sem datapoints do agent; inicie a instance/agent ou trate missing data / alarme em outro recurso — INSUFFICIENT_DATA não é OK. «Subir o threshold para 1000%» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.12.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1123: Fatura CloudWatch Logs em alta; dev log groups sem retention.",
+    "cli_output": "$ aws logs describe-log-groups --log-group-name-prefix /aws/lambda/dev\nlogGroupName: /aws/lambda/dev-api    retentionInDays: null\nlogGroupName: /aws/lambda/dev-worker retentionInDays: null\nstoredBytes: multi-GB each\n\n$ aws ce get-cost-and-usage ... \n# CloudWatch Logs storage trending up MoM\n\n# Prod groups correctly set retentionInDays: 30",
+    "alternativas": [
+      "put-retention-policy nos groups dev (ex. 7–14 dias) e reduzir log verbosity — null retention = keep forever",
+      "Aumentar reserved concurrency de todas as Lambdas",
+      "Criar mais dashboards high-resolution",
+      "Desabilitar alarmes de prod"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1123: Fatura CloudWatch Logs em alta; dev log groups sem retention.…), a ação correta é: put-retention-policy nos groups dev (ex. 7–14 dias) e reduzir log verbosity — null retention = keep forever. «Aumentar reserved concurrency de todas as Lambdas» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.12.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1124: ASG web-asg não sobe com CPU 85%; policy existe.",
+    "cli_output": "$ aws autoscaling describe-policies --auto-scaling-group-name web-asg\nPolicyName: scale-out-cpu\nAdjustment: +2\nMetricAggregationType: Average\n# Alarms: [cpu-high-web]\n\n$ aws cloudwatch describe-alarms --alarm-names cpu-high-web\nStateValue: OK\nMetricName: CPUUtilization\nNamespace: AWS/EC2\nDimensions: [{Name: AutoScalingGroupName, Value: web-asg-OLD}]\nThreshold: 60\nComparisonOperator: GreaterThanThreshold\nAlarmActions: [arn:aws:autoscaling:...:scalingPolicy:...:policyName/scale-out-cpu]\n\n$ aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names web-asg\nAutoScalingGroupName: web-asg\nDesiredCapacity: 2\n# CPU on current instances ~85% (from instance metrics)",
+    "alternativas": [
+      "Corrigir a dimensão AutoScalingGroupName do alarme para web-asg (não web-asg-OLD) para o estado ir a ALARM e acionar a policy",
+      "Apagar a scaling policy",
+      "Só aumentar o MaxSize sem alarme",
+      "Mudar o health check R53 do site"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1124: ASG web-asg não sobe com CPU 85%; policy existe.…), a ação correta é: Corrigir a dimensão AutoScalingGroupName do alarme para web-asg (não web-asg-OLD) para o estado ir a ALARM e acionar a policy. «Apagar a scaling policy» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.12.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1125: Lambda checkout Errors > 50/5min; time não recebeu page.",
+    "cli_output": "$ aws cloudwatch get-metric-statistics --namespace AWS/Lambda --metric-name Errors \\\n  --dimensions Name=FunctionName,Value=checkout --period 300 --statistics Sum\n# Sum Errors: 62, 71, 55 over last windows\n\n$ aws cloudwatch describe-alarms --alarm-name-prefix checkout\n# empty — no alarms\n\n$ aws sns list-topics\n# topic arn:aws:sns:us-east-1:111122223333:oncall exists with email sub ACTIVE\n\n# On-call: zero emails about checkout",
+    "alternativas": [
+      "Criar alarme Errors Sum com threshold/period adequados e AlarmActions = SNS oncall — métrica existe, falta alarme→SNS",
+      "Só aumentar memory da function",
+      "Só apagar o log group",
+      "Só desabilitar a function"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1125: Lambda checkout Errors > 50/5min; time não recebeu page.…), a ação correta é: Criar alarme Errors Sum com threshold/period adequados e AlarmActions = SNS oncall — métrica existe, falta alarme→SNS. «Só aumentar memory da function» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.12.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  }
+]

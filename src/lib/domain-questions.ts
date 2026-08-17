@@ -2,11 +2,15 @@ import type { Question } from "@/types/question";
 import { getQuestionPrompt } from "@/types/question";
 import type { CcnaDomain, DomainId } from "@/data/domains";
 import { CCNA_DOMAINS } from "@/data/domains";
-import { simuladoQuestions, shuffleQuestions } from "@/data/simulado-questions";
+import {
+  simuladoQuestions,
+  shuffleQuestions,
+} from "@/data/simulado-questions";
 
 /**
  * Filtra questões do banco por keywords do domínio.
  * Matching simples case-insensitive no enunciado + alternativas.
+ * Pool padrão: simuladoQuestions (v2 primary).
  */
 export function filterQuestionsByDomain(
   domain: CcnaDomain,

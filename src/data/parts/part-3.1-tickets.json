@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9101 — Link primário “caiu” no monitoramento, mas a floating static da filial não assumiu. NOC jura que a AD 200 está correta.",
+    "cli_output": "Edge# show ip route 10.50.0.0\nRouting entry for 10.50.0.0/16\n  Known via \"ospf 1\", distance 110, metric 20\n  Last update from 10.9.0.2 on GigabitEthernet0/0/0, 00:02:11 ago\n  * 10.9.0.2, from 10.9.0.2, 00:02:11 ago, via GigabitEthernet0/0/0\n\nEdge# show ip route | include 10.50.0.0\nO        10.50.0.0/16 [110/20] via 10.9.0.2, 00:02:11, GigabitEthernet0/0/0\n\nEdge# show running-config | include ip route 10.50\nip route 10.50.0.0 255.255.0.0 10.8.0.2 200\n\nEdge# show ip interface brief | include GigabitEthernet0/0/0|GigabitEthernet0/0/1\nGigabitEthernet0/0/0   10.9.0.1   YES manual up   up\nGigabitEthernet0/0/1   10.8.0.1   YES manual up   up\n\n# alarme de “primário” era só perda de SNMP no switch de acesso remoto; o link Gi0/0/0 OSPF ainda está up",
+    "alternativas": [
+      "A floating AD 200 vence OSPF 110 no mesmo /16",
+      "Floating configurada AD 200, mas O 10.50.0.0/16 [110/20] ainda instalada via Gi0/0/0 up/up — a primária OSPF impede a floating de assumir",
+      "Não há ip route floating na running-config",
+      "Gi0/0/0 down força a O a sumir no output"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show ip route mantém a OSPF AD 110; a floating 200 só entra se a O sair. Running tem a floating. Gi0/0/0 está up/up. AD maior não vence 110.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9102 — Filial não navega na Internet. LAN e servidor interno ok. “Falta default”, diz o analista sênior.",
+    "cli_output": "BR1# show ip route\nCodes: C - connected, S - static, R - RIP, O - OSPF\nGateway of last resort is not set\n\n      10.0.0.0/8 is variably subnetted\nC        10.10.10.0/24 is directly connected, Vlan10\nL        10.10.10.1/32 is directly connected, Vlan10\nC        10.20.20.0/30 is directly connected, GigabitEthernet0/0/0\nL        10.20.20.1/32 is directly connected, GigabitEthernet0/0/0\nO        10.50.0.0/16 [110/20] via 10.20.20.2, 00:40:00, GigabitEthernet0/0/0\n\nBR1# show ip route static\n\nBR1# show running-config | include ip route\n\nBR1# show ip interface brief | include Vlan10|GigabitEthernet0/0/0\nVlan10                 10.10.10.1   YES manual up  up\nGigabitEthernet0/0/0   10.20.20.1   YES manual up  up\n\nPC-LAN> ping 8.8.8.8\nEsgotado o tempo limite do pedido.",
+    "alternativas": [
+      "Gateway of last resort is not set e show ip route static/vazio e sem ip route na running: falta default 0.0.0.0/0 — LAN C/L e OSPF internas não cobrem a Internet",
+      "S* 0.0.0.0/0 está listada no início do show ip route",
+      "Vlan10 down impede qualquer default",
+      "Código O para 10.50.0.0/16 já é default route global"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "“Gateway of last resort is not set” e ausência de static/default na running explicam falha a 8.8.8.8. Não há S*. Interfaces up. O /16 não é default global.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9103 — Após queda do link WAN, a rota estática para o datacenter sumiu e não voltou com o cabo “reconectado frouxo”.",
+    "cli_output": "HQ# show running-config | include ip route 172.16.0.0\nip route 172.16.0.0 255.255.0.0 203.0.113.2\n\nHQ# show ip interface brief | include GigabitEthernet0/0/1\nGigabitEthernet0/0/1   203.0.113.1   YES manual down down\n\nHQ# show ip route 172.16.0.0\n% Network not in table\n\nHQ# show ip route static\n\n# cabo reinserido parcialmente — interface ainda down/down no brief\n# next-hop 203.0.113.2 pertence à subnet da Gi0/0/1",
+    "alternativas": [
+      "A rota S 172.16.0.0/16 permanece com Gi0/0/1 down no output",
+      "ip route foi removido da running-config",
+      "Gi0/0/1 down/down e Network not in table: next-hop 203.0.113.2 fica unreachable — a estática não instala até a interface/next-hop voltarem",
+      "AD 110 da estática perdeu para OSPF no mesmo prefixo no show"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Running ainda tem ip route; brief mostra Gi0/0/1 down/down; tabela sem 172.16/16. Next-hop na subnet da interface down → rota some. Não há S instalada nem AD 110 de estática no recorte.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9104 — NOC esperava que todo 10.0.0.0/8 saísse pelo firewall de borda, mas hosts 10.1.1.x usam o link do DC. “A estática /8 está lá!”",
+    "cli_output": "R1# show ip route 10.1.1.50\nRouting entry for 10.1.1.0/24\n  Known via \"static\", distance 1, metric 0\n  Routing Descriptor Blocks:\n  * 10.9.9.2, from 0.0.0.0, 01:12:00 ago\n      Route metric is 0, traffic share count is 1\n\nR1# show ip route | include 10.0.0.0|10.1.1.0\nS        10.0.0.0/8 [1/0] via 203.0.113.1\nS        10.1.1.0/24 [1/0] via 10.9.9.2\n\nR1# show running-config | include ip route 10\nip route 10.0.0.0 255.0.0.0 203.0.113.1\nip route 10.1.1.0 255.255.255.0 10.9.9.2\n\n# destino de teste: 10.1.1.50 (servidor DC)",
+    "alternativas": [
+      "show ip route 10.1.1.50 casa com 10.1.1.0/24 via 10.9.9.2 — longest match vence o /8 via firewall; não é “bug” da /8",
+      "Apenas 10.0.0.0/8 aparece para 10.1.1.50 no output",
+      "AD do /24 é 110 e por isso perde",
+      "Não existe ip route 10.1.1.0/24 na running"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A entry para 10.1.1.50 usa /24 static via 10.9.9.2; /8 existe mas é menos específica. Ambas AD 1. Running tem as duas rotas.",
+    "part_id": "3.1"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9105 — Time de WAN queria backup OSPF, mas a estática “roubou” o caminho e o OSPF não aparece para 192.168.100.0/24.",
+    "cli_output": "R2# show ip route 192.168.100.0\nRouting entry for 192.168.100.0/24\n  Known via \"static\", distance 1, metric 0\n  * 10.0.0.2, via GigabitEthernet0/0\n\nR2# show ip route ospf | include 192.168.100\n\nR2# show ip ospf database | include 192.168.100\n  (entrada de rede presente no LSDB — omitida)\n\nR2# show running-config | include ip route 192.168.100\nip route 192.168.100.0 255.255.255.0 10.0.0.2\n\nR2# show ip protocols | include ospf|Distance\nRouting Protocol is \"ospf 1\"\n  Distance: (default is 110)\n\n# intenção: estática só como backup com AD 200",
+    "alternativas": [
+      "OSPF AD 110 vence static 1 no mesmo /24 no output atual",
+      "Não há ip route na running-config",
+      "A rota ativa é O IA com distance 110",
+      "Estática AD 1 instala e oculta a OSPF (110) para o mesmo /24 — AD “errada” para backup; floating deveria ser AD > 110 (ex.: 200)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Known via static distance 1; OSPF default 110 e sem linha O para o prefixo na tabela. Running tem a estática sem AD extra. Para backup, a estática precisa de AD maior que 110.",
+    "part_id": "3.1"
+  }
+]

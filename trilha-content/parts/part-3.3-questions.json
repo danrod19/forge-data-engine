@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No single-area OSPF de estudo CCNA, as interfaces costumam estar em:",
+    "alternativas": [
+      "Área 0 (backbone)",
+      "Área 51 obrigatória",
+      "Área igual ao process-id",
+      "Sem área (OSPF não usa area)"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Single-area típico usa area 0. Process-id não precisa igualar a área. OSPF sempre usa area-id nas interfaces/network.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O process-id em router ospf 10:",
+    "alternativas": [
+      "Deve ser idêntico em todos os roteadores do domínio",
+      "É local ao roteador e não precisa coincidir com os vizinhos",
+      "É o mesmo que o Router-ID",
+      "É o Hello timer em segundos"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Process-id é local. RID e timers são outros parâmetros. Vizinhos não exigem mesmo process-id.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Ordem típica de escolha do Router-ID (sem manual):",
+    "alternativas": [
+      "Menor IP de interface física apenas",
+      "MAC da porta Gi0/0",
+      "Highest loopback up, senão highest interface up",
+      "Sempre 0.0.0.0"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Loopback preferida, depois interface. Manual tem prioridade quando configurado. Não é MAC nem 0.0.0.0.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "network 10.1.1.0 0.0.0.255 area 0 sob router ospf faz o quê?",
+    "alternativas": [
+      "Cria a VLAN 10",
+      "Define default route estática",
+      "Configura EtherChannel",
+      "Inclui interfaces cujo IP casa com 10.1.1.0/24 no OSPF área 0"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Network+wildcard seleciona interfaces para o processo/área. Não é VLAN, estática nem Po.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Hello/Dead timers diferentes nos dois lados de um link OSPF:",
+    "alternativas": [
+      "Impedem a formação correta de adjacency",
+      "Aumentam só o cost para 65535",
+      "Elegem dois DRs obrigatoriamente",
+      "Mudam o process-id automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Timers devem combinar. Não definem cost/DR dual/process-id sozinhos.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Em multi-access, ip ospf priority 0 significa:",
+    "alternativas": [
+      "Prioridade máxima para ser DR",
+      "Hello interval zero",
+      "O roteador não é elegível a DR/BDR naquele segmento",
+      "AD OSPF vira 0"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Priority 0 = inelegível DR/BDR. Maior priority favorece DR. Não zera Hello nem AD.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Código O e AD default das rotas OSPF na tabela:",
+    "alternativas": [
+      "S e AD 1",
+      "C e AD 0",
+      "O e AD 110",
+      "D e AD 90"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "OSPF = O, AD 110. S/1 static, C/0 connected, D/90 EIGRP.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "passive-interface GigabitEthernet0/1 sob OSPF:",
+    "alternativas": [
+      "Aumenta a priority para 255",
+      "Força DR na interface",
+      "Muda a área para 1",
+      "Impede Hellos (sem neighbor) na interface; a rede ainda pode ser anunciada"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Passive = sem Hellos/neighbor local. Não define DR/area/priority.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Estado Full em show ip ospf neighbor indica:",
+    "alternativas": [
+      "Adjacência completa / LSDB sincronizada com esse peer (no papel esperado)",
+      "Apenas cabo down",
+      "Timers nunca combinaram",
+      "RID duplicado resolvido"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Full = adjacência completa. Down/timers/RID são outros problemas.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Em empate de priority na eleição DR, vence:",
+    "alternativas": [
+      "O maior Router-ID",
+      "O menor cost",
+      "O process-id maior",
+      "Quem configurou passive primeiro"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Desempate DR: maior RID. Cost/process/passive não desempatam assim.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dois roteadores na mesma Ethernet: um Hello 10/Dead 40, outro Hello 5/Dead 20. Resultado esperado:",
+    "alternativas": [
+      "Adjacency Full estável sem ajustes",
+      "DR eleito duas vezes com Full dual",
+      "OSPF vira RIP automaticamente",
+      "Sem adjacency estável por mismatch de timers"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Hello/Dead devem coincidir. Não forma Full estável; não converte em RIP.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "network 10.0.0.0 0.0.0.255 area 0, mas a interface do link é 10.1.1.1/24. Efeito:",
+    "alternativas": [
+      "A interface 10.1.1.1 não entra no OSPF por esse statement — sem Hellos nesse link se não houver outro network/ip ospf",
+      "Wildcard 0.0.0.255 sempre cobre qualquer 10.x.x.x",
+      "A área vira 10 automaticamente",
+      "O RID vira 10.0.0.0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "0.0.0.255 com 10.0.0.0 casa 10.0.0.0–10.0.0.255, não 10.1.1.1. Interface fica de fora do processo.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "R1 e R2 com o mesmo router-id 1.1.1.1. Risco principal:",
+    "alternativas": [
+      "Melhor convergência",
+      "Cost sempre 1",
+      "Hello vira 1 segundo",
+      "Instabilidade/problemas de adjacência e identificação no domínio OSPF"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "RID deve ser único. Duplicata causa problemas de estabilidade, não melhora convergência.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Access com priority 1 e RID alto vira DR; core com priority 0. Interpretação:",
+    "alternativas": [
+      "Core com priority 0 não disputa DR; access pode ser DR se for o elegível — ajuste priority no core ou 0 no access",
+      "Priority 0 obriga o core a ser DR",
+      "RID nunca entra na eleição",
+      "DR só existe em point-to-point"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Priority 0 = não elegível. Core não vira DR. RID desempataria se ambos elegíveis.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip ospf neighbor mostra 2-Way/DROTHER com vários peers na LAN. Isso:",
+    "alternativas": [
+      "É normal em multi-access: Full tipicamente com DR/BDR, 2-Way com outros DROTHERs",
+      "Sempre indica falha de MTU",
+      "Prova timers mismatch com todos",
+      "Significa area mismatch"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Em broadcast, não há Full com todos os vizinhos. 2-Way com DROTHER é esperado.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ip ospf cost 50 na interface:",
+    "alternativas": [
+      "Define o Dead timer como 50",
+      "Define a priority como 50",
+      "Muda o process-id para 50",
+      "Sobrescreve o cost calculado por bandwidth para aquela interface"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Cost manual na interface. Não é timer, priority nem process-id.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Vizinho Full, mas prefixo da LAN do vizinho não aparece em show ip route ospf. Eixo possível:",
+    "alternativas": [
+      "Apenas Hello mismatch (impossível com Full)",
+      "Rede não anunciada/coberta no processo do vizinho, filtragem, ou outro problema de prefixo — não de discovery",
+      "Cabo fisicamente cortado agora",
+      "Priority 0 em ambos impede qualquer rota"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Full = adjacency ok; falta de rota é anúncio/LSDB/prefixo. Hello mismatch não sustenta Full.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Point-to-point serial/Ethernet p2p OSPF vs multi-access:",
+    "alternativas": [
+      "P2P também elege sempre DR e BDR obrigatórios",
+      "Multi-access nunca usa Hello",
+      "P2P forma Full sem eleição DR/BDR da mesma forma que Ethernet multi-access",
+      "P2P usa apenas RIP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "P2P: Full direto, sem DR/BDR. Multi-access usa DR/BDR e Hellos.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip ospf interface exibe Hello 10, Dead 40, Area 0, State DR. Útil para:",
+    "alternativas": [
+      "Só listar rotas BGP",
+      "Configurar channel-group",
+      "Apagar o RID",
+      "Diagnosticar timers, área, papel DR/BDR/P2P e parâmetros do link OSPF"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Comando-chave de interface OSPF. Não é BGP/EtherChannel/clear RID.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Áreas diferentes no mesmo link (area 0 vs area 1) entre dois routers:",
+    "alternativas": [
+      "Formam adjacency normalmente",
+      "Só afeta o cost",
+      "Impede neighbor/adjacency OSPF naquele link",
+      "Converte ambos em BDR"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Area deve ser igual no segmento. Mismatch = sem adjacency.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Menor cost OSPF em um caminho significa, no SPF:",
+    "alternativas": [
+      "Caminho preferido em relação a costs maiores para o mesmo prefixo",
+      "AD melhor que static sempre",
+      "Hello mais rápido",
+      "RID menor"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Métrica OSPF = cost menor vence. AD static vs OSPF é outro eixo; Hello/RID não são a métrica de path.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "router-id 2.2.2.2 manual é preferível porque:",
+    "alternativas": [
+      "Elimina a necessidade de area 0",
+      "Torna o RID previsível e estável (não muda com interfaces)",
+      "Define priority 2 em todas as interfaces",
+      "Desliga passive-interface"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "RID manual estável. Não remove area 0 nem seta priority/passive global.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "MTU mismatch entre peers OSPF (quando aplicável) costuma:",
+    "alternativas": [
+      "Ser irrelevante em qualquer design",
+      "Aumentar só a priority",
+      "Travamento em ExStart/Exchange e falha em chegar a Full",
+      "Mudar a area para 0 automaticamente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "MTU incompatível impede completar DBD exchange. Não é cosmético nem muda area/priority.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip route ospf lista O 172.16.0.0/16 via 10.0.0.2. Isso prova:",
+    "alternativas": [
+      "Que não há neighbor",
+      "Que a rota foi aprendida via OSPF e está instalada com next-hop 10.0.0.2",
+      "Que a rota é estática AD 1",
+      "Que passive-interface está em todas as ifs"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Código O + via = rota OSPF ativa. Não é static; não prova ausência de neighbor nem passive global.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Interface LAN com passive-interface e network statement cobrindo a LAN:",
+    "alternativas": [
+      "Forma neighbor com todos os PCs",
+      "Não envia Hellos na LAN; ainda pode anunciar o prefixo da LAN aos outros routers",
+      "Remove a connected da tabela",
+      "Força DR em todos os PCs"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Passive evita adjacency na LAN de usuários e ainda permite anúncio. PCs não são routers OSPF típicos.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dois caminhos OSPF ao mesmo prefixo, costs 10 e 30. Qual é preferido?",
+    "alternativas": [
+      "Cost 30",
+      "Cost 10 (menor métrica)",
+      "Sempre ECMP com 10 e 30 iguais",
+      "O de maior RID apenas"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Menor cost vence. ECMP exige costs iguais. RID não escolhe path cost assim.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "clear ip ospf process é usado com cuidado porque:",
+    "alternativas": [
+      "Só apaga VLANs",
+      "Não tem efeito no RID",
+      "Reinicia o processo OSPF (adjacências/rotas caem temporariamente), útil após mudar RID",
+      "Converte OSPF em estáticas"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Clear reinicia o processo e impacta vizinhos/rotas. Usado após mudanças como RID. Não apaga VLANs nem vira static.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Vizinhos em subnets diferentes no mesmo link físico (10.1.1.1/24 e 10.1.2.1/24):",
+    "alternativas": [
+      "Formam Full se a area for 0",
+      "Timers iguais bastam para adjacency",
+      "OSPF ignora endereços IP",
+      "Não formam neighbor — precisam estar na mesma subnet"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Mesma subnet é requisito. Area/timers não compensam IPs em redes diferentes.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist “não forma vizinho OSPF”:",
+    "alternativas": [
+      "Só trocar o SFP por monomodo",
+      "Interface no processo, same subnet/area/timers, not passive, RID único, MTU/auth se aplicável",
+      "Desligar show ip ospf neighbor",
+      "Configurar default route e ignorar Hellos"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O content lista os parâmetros de adjacency. Atalhos ópticos/desligar show/default sem Hellos não fecham o diagnóstico.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip ospf exibe Router ID 3.3.3.3 e Number of areas 1, Area 0. Interpretação:",
+    "alternativas": [
+      "Há 3 áreas no processo",
+      "RID é 0.0.0.0",
+      "Processo multi-area obrigatório",
+      "Single-area com RID 3.3.3.3 na área 0 — coerente com single-area de estudo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "1 área (0) e RID 3.3.3.3. Não são 3 áreas nem RID zero.",
+    "part_id": "3.3"
+  }
+]

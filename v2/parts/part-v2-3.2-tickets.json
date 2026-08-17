@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3201: site stub — LAN 10.40.0.0/24 ok; Internet e redes remotas unreachable. Sem IGP.",
+    "cli_output": "EDGE# show ip route\nCodes: C - connected, S - static, R - RIP, M - mobile, B - BGP\n       D - EIGRP, O - OSPF, IA - OSPF inter area\nGateway of last resort is not set\n\n      10.0.0.0/8 is variably subnetted, 2 subnets, 2 masks\nC        10.40.0.0/24 is directly connected, Vlan40\nL        10.40.0.1/32 is directly connected, Vlan40\nC        203.0.113.0/30 is directly connected, GigabitEthernet0/0/1\nL        203.0.113.2/32 is directly connected, GigabitEthernet0/0/1\n\nEDGE# show run | include ip route\n (no ip route commands)\n\nEDGE# show ip interface brief | include Vlan40|Gi0/0/1\nVlan40                 10.40.0.1       YES NVRAM  up    up\nGigabitEthernet0/0/1   203.0.113.2     YES NVRAM  up    up\n\nPC 10.40.0.50: ping 10.40.0.1 OK; ping 8.8.8.8 FAIL (network unreachable on EDGE traceroute)",
+    "alternativas": [
+      "Falta PortFast na Vlan40",
+      "Falta default route (ou statics remotas) — configurar ip route 0.0.0.0 0.0.0.0 203.0.113.1",
+      "OSPF area mismatch",
+      "Máscara da LAN está errada no SVI"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Gateway of last resort is not set e só há C/L: sem S* para Internet. LAN e WAN links estão up. Adicione default via CE 203.0.113.1. PortFast/OSPF não explicam a tabela vazia de remotas.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3202: desenho pedia floating backup; a rota de ‘backup’ nunca fica de reserva — às vezes compete com a primária.",
+    "cli_output": "R1# show run | include ip route 10.20.0.0\nip route 10.20.0.0 255.255.0.0 10.0.0.2\nip route 10.20.0.0 255.255.0.0 10.0.0.6 1\n\nR1# show ip route 10.20.0.0\nS        10.20.0.0/16 [1/0] via 10.0.0.2\n                      [1/0] via 10.0.0.6\n\nR1# show ip interface brief | include 10.0.0.\nGigabitEthernet0/0/0   10.0.0.1    YES NVRAM  up  up\nGigabitEthernet0/0/1   10.0.0.5    YES NVRAM  up  up\n\nDesign intent: primary via 10.0.0.2 AD1; backup via 10.0.0.6 only if primary fails",
+    "alternativas": [
+      "Next-hop 10.0.0.6 está down",
+      "Máscara /16 está errada",
+      "Falta default route",
+      "Backup também com AD 1 — não é floating; subir AD do backup (ex. 210) para só assumir se a primária cair"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Duas statics com AD 1 instalam ambas (ECMP/candidates iguais). Floating exige AD maior no backup. Corrija para ip route ... 10.0.0.6 210. Links estão up.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3203: após queda do link WAN primário, a static some e o site fica sem rota; floating configurada não aparece.",
+    "cli_output": "EDGE# show run | include ip route\nip route 0.0.0.0 0.0.0.0 203.0.113.1\nip route 0.0.0.0 0.0.0.0 198.51.100.1 200\n\nEDGE# show ip interface brief | include Gi0/0/1|Gi0/0/2\nGigabitEthernet0/0/1   203.0.113.2     YES NVRAM  down  down\nGigabitEthernet0/0/2   198.51.100.2    YES NVRAM  down  down\n\nEDGE# show ip route static\n (empty / no S*)\n\nEDGE# show ip route\nGateway of last resort is not set\nC    10.40.0.0/24 is directly connected, Vlan40\n\nOps: secondary circuit also down (fiber cut both); floating next-hop 198.51.100.1 not reachable",
+    "alternativas": [
+      "Floating AD 200 é inválida",
+      "Default route não existe no running-config",
+      "Ambos next-hops/interfaces down — rotas static não instalam; floating só assume se o backup path estiver up",
+      "Precisa de OSPF para floating funcionar"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Config tem primária e floating, mas Gi0/0/1 e Gi0/0/2 down: nenhum next-hop usable. Floating não é mágica sem circuito backup up. OSPF não é requisito. Levante o path 198.51.100.0/30.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3204: rota estática ‘para o DC 10.50.1.0’ não leva ao host 10.50.2.20.",
+    "cli_output": "R1# show run | include ip route 10.50\nip route 10.50.1.0 255.255.255.0 10.0.0.2\n\nR1# show ip route 10.50.2.20\n% Network not in table\n\nR1# show ip route 10.50.1.0\nS        10.50.1.0/24 [1/0] via 10.0.0.2\n\nR1# show ip route static\nS        10.50.1.0/24 [1/0] via 10.0.0.2\n\nPC: ping 10.50.2.20 FAIL; traceroute stops at R1 (no route)\nDesign doc: DC servers live in 10.50.0.0/16 (includes .1 and .2 subnets)",
+    "alternativas": [
+      "Next-hop 10.0.0.2 está errado de AD",
+      "Floating AD faltando",
+      "Exit-interface obrigatória",
+      "Máscara/prefixo errado — /24 10.50.1.0 não cobre 10.50.2.20; usar 10.50.0.0 255.255.0.0 ou rota específica /24 de .2"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Network not in table para 10.50.2.20 com static só de 10.50.1.0/24 prova cobertura insuficiente. Ajuste o prefixo ao desenho /16 ou adicione 10.50.2.0/24. AD/exit-if não expandem a máscara.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3205: static via exit-interface Gi0/0/0 sem next-hop; comportamento estranho de ARP e encaminhamento no multiacesso.",
+    "cli_output": "R1# show run | include ip route 172.16\nip route 172.16.0.0 255.255.0.0 GigabitEthernet0/0/0\n\nR1# show ip route 172.16.0.0\nS        172.16.0.0/16 is directly connected, GigabitEthernet0/0/0\n\nR1# show ip interface brief | include Gi0/0/0\nGigabitEthernet0/0/0   10.0.0.1   YES NVRAM  up  up\n\nR1# show run interface Gi0/0/0\n ip address 10.0.0.1 255.255.255.0\n description LAN-SEGMENT-MULTIACCESS\n\nR2 (same LAN) is 10.0.0.2 — intended next-hop to reach 172.16.0.0/16\nOps note: proxy-ARP load / incomplete ARPs for remote destinations observed",
+    "alternativas": [
+      "Preferir next-hop 10.0.0.2 (ou exit-if + next-hop) em Ethernet multiacesso em vez de só exit-interface",
+      "Remover a static e usar só MAC table",
+      "Mudar AD para 255",
+      "Converter Gi0/0/0 em switchport access"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A rota aparece ‘directly connected’ via Gi0/0/0 sem next-hop — típico de static só com exit-if, com riscos de proxy ARP no multiacesso. O desenho queria 10.0.0.2. Reescreva ip route 172.16.0.0 255.255.0.0 10.0.0.2.",
+    "part_id": "v2-3.2"
+  }
+]

@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Na captura: ARP who-has 10.40.0.50 tell 10.40.0.1 repetido; nenhum is-at. show ip arp no gateway: Incomplete. Conclusão mais coerente?",
+    "alternativas": [
+      "Host/VLAN/L2: o IP não responde ARP no segmento — não começar por clear ospf no ABR",
+      "Falta de rota default na Internet exclusivamente",
+      "Certificado TLS expirado",
+      "DNS AAAA ausente no cliente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "ARP request sem reply e entrada Incomplete provam falha de resolução L2 para o host. Capture e show arp fecham o diagnóstico de segmento/VLAN/host down. OSPF, TLS e DNS não explicam who-has sem is-at na LAN.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Quando a captura de pacotes é mais útil do que só show interfaces?",
+    "alternativas": [
+      "Quando a porta está administratively down (show já basta)",
+      "Quando se precisa ver se frames/pacotes específicos saem e se há reply no fio",
+      "Quando o transceiver está ausente e notconnect",
+      "Quando o técnico não sabe o hostname do switch"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Capture responde 'o que está no fio'. Admin down e notconnect já estão claros no show. Use PCAP para hipóteses ambíguas de protocolo (ARP/ICMP/TCP/DHCP), não como primeiro passo de L1 óbvio.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Ideia correta de SPAN/monitor session no CCNA?",
+    "alternativas": [
+      "Criptografar todo o tráfego do campus",
+      "Substituir o Spanning Tree",
+      "Copiar tráfego de source (intf/VLAN) para um destination port com analisador",
+      "Apagar automaticamente ACLs"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "SPAN espelha tráfego para análise. Não é mecanismo de criptografia nem de STP. Configure source e destination corretos e valide com show monitor session.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Filtro Wireshark mais adequado para ver só ARP?",
+    "alternativas": [
+      "tcp.port==22",
+      "http",
+      "dns",
+      "arp"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O display filter arp isola who-has/is-at. tcp/http/dns servem a outros sintomas. No plantão, filtre estreito para achar request sem reply rapidamente.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "PCAP: ICMP echo request de 10.40.0.10 para 10.50.0.20; zero echo reply. Rota no cliente e no gateway existem. Próximo foco?",
+    "alternativas": [
+      "ACL/firewall/host destino ou path que dropa ICMP — L3 path/filtro, não 'sem default route local'",
+      "Somente pinagem T568A no core",
+      "Apenas voice vlan ausente",
+      "Sempre falta de PortFast"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Com request visível e sem reply, e rotas presentes, a captura aponta drop ou host silencioso no caminho. Não é misconfig de PortFast ou voice. Verifique ACL, host e hops intermediários.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "TCP SYN para 10.20.5.40:443 retransmitido 5 vezes; nenhum SYN-ACK. DNS do nome já resolveu para esse IP. Interpretação?",
+    "alternativas": [
+      "Problema de mask no DNS server apenas",
+      "Serviço/filtro/path até a porta TCP — não é falha de resolução de nome",
+      "Sucesso de three-way handshake",
+      "ARP incompleto obrigatório (não mostrado)"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Nome já virou IP; SYN sem SYN-ACK indica que o TCP não completa — serviço down, firewall ou path. Não é DNS. Handshake completo exigiria SYN-ACK.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Analisador no Gi1/0/48 não vê frames; host gera tráfego em Gi1/0/10. show monitor: source Gi1/0/2, dest Gi1/0/48. Causa?",
+    "alternativas": [
+      "Wireshark não funciona em Ethernet",
+      "STP bloqueia todo SPAN sempre",
+      "SPAN source errada — deve incluir a interface/VLAN do host sob teste",
+      "Falta de voice vlan no destination"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Capture vazia com source apontando para outra porta explica o vazio. Corrija source para Gi1/0/10 (ou VLAN correta). Destination ok não compensa source errada.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "DHCP Discover no PCAP do segmento; nenhum Offer. O que a captura prova?",
+    "alternativas": [
+      "Que o OSPF está FULL",
+      "Que o PTR público está correto",
+      "Que o telefone tem voice vlan",
+      "Que o Discover chega ao fio e não há Offer visível — foque server/relay/L2 (1.7)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Ver o Discover sem Offer no segmento é evidência forte para o fluxo DHCP. Não prova OSPF, PTR ou voice. Continue com helper/pool/server como em 1.7.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show mac address-table não tem o MAC do servidor na VLAN 40; captura mostra ARP who-has sem reply. Ação alinhada?",
+    "alternativas": [
+      "Isolar L2: VLAN, porta, host off, cabo — capture e MAC table convergem",
+      "Recarregar o ISP de Internet",
+      "Apagar todas as rotas estáticas do edge",
+      "Forçar duplex half em todos os uplinks"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem MAC aprendido e sem ARP reply, o destino não aparece no L2 da VLAN. Não comece pela WAN. Verifique se o host está na VLAN/porta certas e se responde.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual display filter ajuda a ver handshake TCP na porta 22?",
+    "alternativas": [
+      "arp",
+      "tcp.port == 22",
+      "bootp",
+      "stp"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "tcp.port == 22 isola SSH. Útil para ver SYN/SYN-ACK/RST. arp/bootp/stp são outros domínios de frame.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Link up, 0 CRC, ping falha. Vale capturar?",
+    "alternativas": [
+      "Sim, se show/arp/rota não fecham a causa — capture pode mostrar ARP/ICMP/TCP no fio",
+      "Nunca; CRC zero proíbe qualquer PCAP",
+      "Só depois de write erase",
+      "Só com ERSPAN multi-hop obrigatório"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "L1 limpo com falha de reachability é cenário típico para ir além do show básico. Capture não exige ERSPAN enterprise. write erase não é pré-requisito de Diagnose.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Comando para verificar se a sessão SPAN está com source e destination esperados?",
+    "alternativas": [
+      "show version",
+      "show monitor session [id]",
+      "show clock detail",
+      "show flash:"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show monitor session exibe sources, destination e estado da sessão. Essencial quando o PCAP vem vazio. version/clock não mostram SPAN.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Captura: ARP is-at do host ok; em seguida ICMP request sem reply. O que isso isola?",
+    "alternativas": [
+      "Falha exclusiva de pinagem do cabo de console",
+      "Problema só de native VLAN em todos os trunks",
+      "L2 local do host ok o suficiente para ARP; falha em ICMP/path/filtro/host acima do ARP",
+      "Sempre duplex mismatch"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "ARP completo prova reachability L2 básica ao host. Echo sem reply move o Diagnose para L3/ACL/host/firewall. Não conclua L1 de cabo de console por isso.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "TCP SYN → SYN-ACK → ACK visto na captura. Conclusão sobre o path até a aplicação?",
+    "alternativas": [
+      "ARP está quebrado",
+      "Three-way handshake ok — path e serviço aceitaram a conexão TCP; se a app falha, olhe camada acima",
+      "DHCP Discover falhou",
+      "SPAN destination está down"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Handshake completo prova que SYN-ACK voltou e a sessão TCP abriu. Problemas restantes tendem a ser app/auth/payload, não 'SYN filtrado'. ARP/DHCP não se concluem desse trecho.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor ordem de Diagnose L2/L3 com ferramentas?",
+    "alternativas": [
+      "Wireshark full campus → depois ver se a porta está up",
+      "write erase → capture → ping",
+      "Sintoma → ping/show mac/arp/interfaces → captura pontual se ainda ambíguo → conclusão",
+      "SPAN em todos os uplinks 24x7 sem filtro"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A ordem evita PCAP desnecessário e escopo excessivo. Capture fecha hipóteses após show/ping. SPAN massivo sem objetivo gera ruído e risco operacional.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Destination do SPAN é uma porta com usuário de produção e IP de dados. Risco/práticas?",
+    "alternativas": [
+      "É o desenho recomendado para voice vlan",
+      "Destination deve ser porta do analisador; misturar com usuário de produção é má prática e confunde o PCAP",
+      "Obrigatório para ARP funcionar",
+      "Substitui show mac address-table"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Porta destination do SPAN é para o sniffing station. Usar porta de usuário mistura tráfego e pode impactar o host. Não substitui show mac nem é requisito de ARP.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Filtro ip.addr==10.40.0.88 serve para quê?",
+    "alternativas": [
+      "Ver só frames STP",
+      "Apagar o host da CAM",
+      "Forçar PoE",
+      "Isolar pacotes onde 10.40.0.88 é origem ou destino IP"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "ip.addr==X filtra conversas desse IP em qualquer direção. Ideal no PCAP de um host. Não mexe em CAM nem PoE.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Quando NÃO priorizar captura?",
+    "alternativas": [
+      "Suspeita de SYN filtrado em app",
+      "DHCP Discover vs Offer no segmento",
+      "Interface administratively down e notconnect óbvios no show",
+      "ICMP sem reply com L2 ok"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Admin down/notconnect já fecham L1/admin no show. Capture não levanta link. Nos outros casos o PCAP agrega evidência de protocolo.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show arp: 10.40.0.50 Incomplete; PCAP no SVI: who-has 10.40.0.50 sem is-at. Próximo check útil?",
+    "alternativas": [
+      "Somente clear ip ospf process",
+      "Somente remover default route do edge",
+      "Se o host está up na VLAN/porta correta e se responde (cabo, VLAN, NIC, firewall host)",
+      "Somente desligar CDP globalmente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Evidência dupla (arp + capture) aponta L2/host. Valide membership e o endpoint. clear OSPF e mexer default route não criam is-at no segmento.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "TCP SYN → RST imediato do servidor. Leitura no nível CCNA?",
+    "alternativas": [
+      "Sempre cabo rompido",
+      "Sempre falta de helper-address",
+      "Sempre APIPA no cliente",
+      "Path chegou ao host; a porta/serviço recusou (closed/reset) — diferente de silêncio total"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "RST do destino prova reachability e resposta da pilha TCP. É distinto de retransmits sem resposta (filtro/path). Foque serviço/porta no host, não L1 genérico.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "monitor session 1 source vlan 40; destination Gi1/0/48. O analisador deve estar em?",
+    "alternativas": [
+      "Qualquer uplink de core",
+      "Obrigatoriamente no mesmo PC do usuário 40",
+      "Gi1/0/48 (destination), não em uma access aleatória sem ser dest da sessão",
+      "Na interface loopback0"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sniffer conecta no destination da sessão. Source VLAN 40 copia o tráfego da VLAN para Gi1/0/48. Loopback e uplinks aleatórios não recebem o mirror.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "O que a captura NÃO substitui?",
+    "alternativas": [
+      "A necessidade de interpretar e corrigir a causa (ACL, VLAN, serviço) com base na evidência",
+      "A visualização de SYN sem SYN-ACK",
+      "A confirmação de Discover sem Offer",
+      "A prova de ARP sem reply"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "PCAP é evidência, não remediação. Você ainda aplica o fix na VLAN/ACL/serviço. Os outros itens são exatamente o que a captura pode mostrar.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Muitos broadcasts ARP no segmento e lentidão. Capture ajuda a quê?",
+    "alternativas": [
+      "Apenas a configurar voice vlan",
+      "Apenas a eleger root bridge",
+      "Identificar quem gera who-has excessivo e se há reply storms — base para isolamento L2",
+      "A desligar automaticamente o PoE"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "PCAP mostra talkers de ARP/broadcast. Com isso você isola host ruidoso ou loop leve. Não configura voice nem root sozinho.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ping e traceroute já mostram quebra no hop X. Ainda precisa de SPAN?",
+    "alternativas": [
+      "Sempre, 100% dos casos",
+      "Nunca, em hipótese alguma",
+      "Só se o hop X for um access point Wi-Fi",
+      "Nem sempre — se o path já está claro, foque no hop; capture se precisar ver o protocolo dropado"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Ferramentas complementares: traceroute já aponta o hop. Capture é opcional para detalhe de protocolo. Evite SPAN automático em todo ticket.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PCAP DHCP: Discover e Request do cliente; Offer e Ack do server visíveis. Conclusão?",
+    "alternativas": [
+      "DORA completo no fio — se o host ainda falha, olhe config local/options/cliente, não 'Offer ausente'",
+      "Relay está necessariamente quebrado",
+      "Pool free 0 garantido",
+      "APIPA confirmado"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Ver Offer e Ack prova que o servidor respondeu no segmento. O problema pode ser no host aplicando o lease ou options. Não conclua pool vazio ou APIPA com DORA completo no PCAP.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show mac address-table: MAC do servidor na Gi1/0/5 VLAN 40. Capture na VLAN 40 vê tráfego do servidor. Isso sugere?",
+    "alternativas": [
+      "Servidor está em VLAN 1 nativa only",
+      "L2 learning e presença de tráfego coerentes com host ativo na 40/porta 5",
+      "SPAN destination down",
+      "OSPF DR failure"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "MAC table + frames na VLAN alinham localização L2 do servidor. Não indica VLAN 1 nem falha OSPF por si. Use isso como baseline antes de culpar L2 errado.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "TCP retransmissions de SYN sem SYN-ACK através de firewall. Hipótese forte?",
+    "alternativas": [
+      "Política do firewall dropando a porta/destino ou path assimétrico — capture nos dois lados ajuda",
+      "Sempre falta de description na interface",
+      "Sempre native VLAN mismatch em access PC",
+      "Sempre dual-stack AAAA only"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "SYN sem resposta costuma ser filtro ou path. Comparar PCAP antes/depois do firewall isola o drop. Description e native em access PC não são a primeira leitura desse padrão.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo do 2.4 no CCNA:",
+    "alternativas": [
+      "Ideia de monitor session",
+      "Ler ARP/ICMP/TCP simples no PCAP",
+      "Combinar show arp e capture",
+      "ERSPAN multi-hop enterprise, forense PCAP avançado e scripting tshark completo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O tópico pede ferramentas e leitura básica. ERSPAN/forense/tshark avançado excedem o 200-301. Foque padrões e SPAN local.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após corrigir ACL, ICMP reply aparece no PCAP. O que isso valida?",
+    "alternativas": [
+      "Que a captura e o fix de path/filtro estão coerentes — request e reply no fio",
+      "Que o SPAN deve ser removido para o ping funcionar",
+      "Que ARP nunca mais será necessário",
+      "Que o host virou root bridge"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Ver o reply após o fix fecha o loop de Diagnose com evidência. SPAN não precisa sumir para o ping; ARP continua útil. Root bridge é STP, não ICMP.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo do Diagnose 2.4:",
+    "alternativas": [
+      "Só NetFlow substitui qualquer PCAP no CCNA",
+      "Só show cdp neighbor resolve TCP SYN",
+      "Só recarregar o switch a cada captura",
+      "Use ping/show primeiro; SPAN+filtros para ver ARP/ICMP/TCP/DHCP no fio e concluir a causa"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Ferramentas em camadas: show/ping isolam; captura confirma padrões de protocolo. NetFlow não substitui leitura de SYN/ARP no exame. Evite reload como hábito de TShoot.",
+    "part_id": "v2-2.4"
+  }
+]

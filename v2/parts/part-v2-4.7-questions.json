@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Config mínima de port-security em access com max 1 e sticky?",
+    "alternativas": [
+      "switchport port-security; maximum 1; mac-address sticky; violation shutdown",
+      "ip dhcp snooping trust na porta do PC",
+      "ip ospf 1 area 0 na access do host",
+      "switchport mode trunk apenas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Port-security em access limita a um MAC e sticky grava o aprendido; shutdown err-disable em violação. Trust de snooping no PC e OSPF no host não são port-security. Trunk não é o modo típico de mesa com port-sec.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Porta em err-disabled após conectar hub com 3 PCs; max 1. Causa?",
+    "alternativas": [
+      "Falta de default route no core",
+      "Port-security violation — MACs acima do maximum",
+      "OSPFv3 RID duplicado",
+      "DNS AAAA ausente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Vários MACs em porta com maximum 1 disparam violation (tipicamente shutdown). Não é rota, OSPF nem DNS. Ajuste max ou remova o hub e recupere a porta.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Onde configurar ip dhcp snooping trust?",
+    "alternativas": [
+      "Em todas as portas de impressora IoT",
+      "Somente em loopback0",
+      "No uplink/path em direção ao DHCP server legítimo",
+      "Em toda access de usuário por padrão"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Trust marca de onde Offers legítimos podem vir. Access de usuário fica untrusted para bloquear rogue DHCP. Trust em todo access anula a proteção.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Snooping ativo; uplinks untrusted; clientes em APIPA. Hipótese?",
+    "alternativas": [
+      "Port-security sticky obrigatório",
+      "RA Guard no core apenas",
+      "DAI rate-limit 0 em todos",
+      "Offers do server legítimo dropados — falta trust no uplink"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Sem trust no caminho do server, o snooping trata Offer como inválido. Clientes ficam sem lease. Configure trust nos uplinks corretos e revalide bindings.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "DAI valida ARP principalmente com base em quê?",
+    "alternativas": [
+      "Tabela de bindings do DHCP snooping (e entradas estáticas se houver)",
+      "Tabela OSPF LSDB",
+      "Banner motd",
+      "VLAN nativa do trunk de Internet"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Dynamic ARP Inspection consulta o binding MAC–IP do snooping. Sem binding saudável, ARP legítimo pode ser dropado. LSDB e banner não alimentam DAI.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Objetivo do IPv6 RA Guard em porta de access?",
+    "alternativas": [
+      "Acelerar OSPFv2",
+      "Bloquear Router Advertisements ilegítimos vindos de hosts",
+      "Substituir port-security",
+      "Desligar DHCPv4"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "RA Guard impede que um host anuncie gateway IPv6 falso. RAs legítimos vêm do router/uplink trusted. Não substitui port-security nem desliga DHCPv4.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Violation mode protect vs shutdown (ideia)?",
+    "alternativas": [
+      "Protect descarta frames excedentes sem err-disable; shutdown coloca a porta em err-disabled",
+      "Protect apaga a VLAN",
+      "Shutdown só gera syslog e nunca cai a porta",
+      "Ambos forçam trunk"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Shutdown é punitivo (err-disabled); protect/restrict são mais suaves. No exame, err-disabled quase sempre aponta shutdown + violação.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show port-security interface Gi1/0/5: Secure-up, Max 2, Current 2. Interpretação?",
+    "alternativas": [
+      "Porta err-disabled",
+      "Snooping untrusted only",
+      "DAI trust ativo",
+      "Port-security ativo com 2 MACs dentro do limite — ainda não violou max"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Secure-up com current = max significa limite cheio mas operacional. Terceiro MAC ou MAC diferente (conforme config) pode violar. Não está err-disabled neste output.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Onde NÃO se deve aplicar policy de host RA Guard que dropa todo RA?",
+    "alternativas": [
+      "Na interface access de um PC",
+      "Na porta de uma impressora",
+      "No uplink/porta que enfrenta o router legítimo que envia RA",
+      "Em IoT camera access"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Bloquear RA no uplink do router legítimo quebra SLAAC/default v6. Host policies ficam no access; router/trusted no path do RA real.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Comando de verify de port-security na interface?",
+    "alternativas": [
+      "show port-security interface <intf>",
+      "show ip ospf neighbor",
+      "show boot",
+      "show flash:"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "show port-security interface exibe max, current, violation e status secure. OSPF e flash não verificam port-sec.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Sticky MAC serve para quê?",
+    "alternativas": [
+      "Converter sticky em rotas estáticas OSPF",
+      "Aprender MACs dinâmicos e gravá-los na config running (e save) como seguros",
+      "Desabilitar snooping",
+      "Forçar voice vlan"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sticky facilita fixar o MAC do host sem digitar à mão. Após write memory, persiste. Não mexe em OSPF nem voice vlan.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem correta de dependência DAI ↔ snooping?",
+    "alternativas": [
+      "DAI primeiro; snooping opcional sempre",
+      "Só DAI em L3 routed ports",
+      "DHCP snooping bindings alimentam DAI — configure snooping (e trust) de forma coerente antes/alongside DAI",
+      "DAI substitui completamente o snooping"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "DAI usa a binding table do snooping. Sem snooping saudável, DAI dropa ARP válido. Não substitua um pelo outro.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Host estático sem entrada no binding; DAI on. Sintoma possível?",
+    "alternativas": [
+      "ARP do host dropado — crie binding estático ou use DHCP, ou ajuste inspeção",
+      "Porta vira trunk sozinha",
+      "OSPF FULL obrigatório",
+      "RA Guard desliga IPv4"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem binding, DAI não confia no ARP do host estático. Mitigue com static binding ou DHCP. Não é efeito de trunk/OSPF.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Recuperar porta err-disabled por port-security (procedimento mental)?",
+    "alternativas": [
+      "Apenas apagar a VLAN 1",
+      "Remover a causa (MAC extra), limpar sticky se preciso, no shutdown / recovery",
+      "clear ip ospf process",
+      "reload do ISP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Err-disabled não some sozinho sem recovery. Corrija a violação e reative a porta. OSPF e ISP não reabilitam psecure.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Mapa trusted/untrusted correto?",
+    "alternativas": [
+      "Access trusted; uplink untrusted para snooping/DAI",
+      "Tudo untrusted inclusive o DHCP server port",
+      "Tudo trusted inclusive hubs de mesa",
+      "Access untrusted (host); uplink trusted (infra/server/router path)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A orientação CCNA é untrusted na borda de host e trusted no caminho da infraestrutura legítima. Inverter gera outage ou buraco de segurança.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show interfaces status: Gi1/0/8 err-disabled. Próximo verify de segurança L2?",
+    "alternativas": [
+      "show port-security interface Gi1/0/8 e logs de violation",
+      "show ip route ospf apenas",
+      "show version | include reload apenas",
+      "ping 8.8.8.8 no core apenas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Err-disabled em access frequentemente é port-security (ou BPDU Guard). show port-security confirma. Rota e ping no core não explicam o estado da porta de mesa.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Option-82 no contexto de snooping (ideia leve)?",
+    "alternativas": [
+      "Tipo de LSA OSPF",
+      "Informação de relay/circuito adicionada a mensagens DHCP — feature relacionada ao path DHCP",
+      "Modo de PortFast",
+      "Algoritmo de STP root"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Option-82 carrega metadados de onde o DHCP veio no ambiente com relay/snooping. Não é OSPF/STP. No CCNA basta a ideia, sem lab profundo.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "RA falso de um laptop na access: sem RA Guard. Risco?",
+    "alternativas": [
+      "Apenas CRC sobe no uplink de fibra",
+      "Hosts podem instalar default route IPv6 maliciosa e desviar tráfego v6",
+      "Port-security sticky apaga sozinho",
+      "DAI vira trust automático"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "RA define gateway/prefixo IPv6. RA falso redireciona hosts. RA Guard no access mitiga. CRC e sticky não são o vetor principal desse ataque.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ip arp inspection trust no uplink. Por quê?",
+    "alternativas": [
+      "Para desligar IPv4 no uplink",
+      "Porque o uplink não deve ser inspecionado como host — ARP de infra/router confiado",
+      "Para forçar err-disabled no core",
+      "Para habilitar voice vlan"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Trust no uplink evita dropar ARP legítimo da infraestrutura quando bindings de hosts não cobrem esses frames. Access permanece inspecionado.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "max 1 sticky; usuário liga telefone+PC no mesmo cabo sem voice design. Efeito típico?",
+    "alternativas": [
+      "Sempre melhora PoE",
+      "Sempre cria voice vlan 50",
+      "Dois MACs podem violar max 1 se ambos aparecem na access — ajuste max ou desenho voice",
+      "Desliga DHCP snooping"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Phone+PC podem expor dois MACs na porta. Com max 1, port-security viola. Aumente max ou use desenho voice adequado. Não cria voice vlan sozinho.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip dhcp snooping binding vazio com clientes DHCP ok há dias e DAI on. Risco operacional?",
+    "alternativas": [
+      "Bindings perdidos (reboot sem persistência) — DAI pode dropar ARP até reaprender",
+      "OSPF cai obrigatoriamente",
+      "RA Guard desliga",
+      "Port-security max vira 100"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "DAI depende de bindings. Tabela vazia após reboot sem database agent/persistência causa outage de ARP. Reaprenda DHCP ou restaure bindings.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual feature NÃO é foco do 4.7 CCNA nesta part?",
+    "alternativas": [
+      "Port-security",
+      "DHCP snooping",
+      "RA Guard",
+      "802.1X EAP-TLS full com ISE e posture"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A part cobre port-sec, snooping, DAI e RA Guard. 802.1X/ISE completo está fora. Não confunda camadas de acesso.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "errdisable recovery cause psecure-violation (ideia) faz o quê?",
+    "alternativas": [
+      "Apaga sticky MACs sempre",
+      "Desliga o switch em loop",
+      "Reabilita automaticamente portas err-disabled por port-security após intervalo",
+      "Configura DAI trust"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Recovery automática tira a porta de err-disabled após o timer se a causa for psecure. Ainda corrija a violação para não oscilar. Não configura DAI.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Rate-limit de DAI em access (ideia) protege contra?",
+    "alternativas": [
+      "Perda de OSPF RID",
+      "Falha de SFP óptico",
+      "Storm/flood de ARP na porta do host",
+      "Mask errada no PC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Rate-limit limita taxa de ARP inspecionado/processado na borda, mitigando abuso. Não corrige L1 óptico nem mask do cliente.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "RA Guard host na access + router policy no uplink. Resultado esperado?",
+    "alternativas": [
+      "RAs de PCs bloqueados; RAs do router legítimo permitidos no path trusted",
+      "Nenhum host obtém IPv4",
+      "Port-security max 0",
+      "DHCP Offer proibido no uplink"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Esse é o desenho mental correto de RA Guard. IPv4/DHCP/port-sec não são desligados por isso se bem configurados.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip dhcp snooping: Switch DHCP snooping is enabled; Interface Gi1/0/1 Trusted yes (uplink). Verify positivo de quê?",
+    "alternativas": [
+      "Port-security sticky full",
+      "Trust no uplink configurado — Offers legítimos podem passar",
+      "DAI desabilitado globalmente sempre",
+      "RA Guard em todas as VLANs"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Trusted yes no uplink é o Verify de snooping trust. Não implica sticky, estado DAI ou RA Guard.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "MAC sticky gravado do PC A; usuário troca para PC B sem limpar. Com max 1 violation shutdown?",
+    "alternativas": [
+      "PC B herda sticky automaticamente sempre",
+      "Violation vira protect sem config",
+      "PC B pode violar — limpe sticky/secure MAC ou atualize o permitido",
+      "Snooping apaga o sticky"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Sticky fixa o MAC A. Host B é MAC novo → violação com max 1. Remova o sticky antigo ou reconfigure. Não há herança automática.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ataque de rogue DHCP na access. Qual feature mitiga na borda?",
+    "alternativas": [
+      "Somente traceroute",
+      "Somente banner login",
+      "Somente passive-interface OSPF",
+      "DHCP snooping untrusted no access — dropa Offer do atacante"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Snooping untrusted bloqueia servers DHCP falsos na mesa. Traceroute e banner não filtram Offer. Passive OSPF é roteamento, não DHCP security.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "DAI drops altos em show ip arp inspection statistics na VLAN 40. Próximo check?",
+    "alternativas": [
+      "Apenas cor do LED do patch panel",
+      "Apenas hostname do switch",
+      "Apenas tamanho do banner",
+      "Bindings do snooping, trust de uplinks e hosts estáticos sem entrada"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Drops de DAI pedem revisão de binding/trust. LED e banner não explicam estatística de ARP inspection.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo Configure 4.7 na borda:",
+    "alternativas": [
+      "Tudo trusted em access e untrusted no DHCP server",
+      "Só NetFlow no lugar de port-security",
+      "Só WPA3 enterprise lab completo",
+      "Port-sec na access; snooping+DAI com uplink trust; RA Guard host no access e RA legítimo no uplink"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O pacote mental une as quatro features com trust correto. Inverter trust ou trocar por NetFlow/WPA3 lab não cobre o tópico desta part.",
+    "part_id": "v2-4.7"
+  }
+]

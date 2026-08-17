@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show interfaces Gi1/0/12 mostra late collisions subindo e o status local em half; o vizinho está a-full a-1000. Qual a causa mais provável?",
+    "alternativas": [
+      "Mismatch de duplex entre os lados do link",
+      "Falta de rota default no core",
+      "ACL de VTY bloqueando SSH",
+      "Pool DHCP esgotado na VLAN"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Late collisions combinadas com half de um lado e full no outro são o padrão clássico de duplex mismatch. Rota, ACL de gestão e DHCP não elevam late collisions na interface de acesso. O Diagnose L1 compara duplex/speed nos dois lados e corrige auto/hardcode.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Interface WAN com milhares de CRC e input errors; show ip ospf neighbor está FULL. Qual o foco correto?",
+    "alternativas": [
+      "clear ip ospf process no ABR",
+      "Camada física do link (cabo/SFP/sujeira) — contadores L1, não o IGP",
+      "Remover a default route",
+      "Desabilitar Spanning Tree no access"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "CRC e input errors apontam corrupção no recebimento (mídia). OSPF FULL indica adjacência saudável; reiniciar protocolo não corrige cabo ou óptica. Isolar L1 com patch, limpeza, SFP e distância é a ação alinhada ao tópico 1.1.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show interfaces status: Gi1/0/1 notconnect, Type 1000BaseSX SFP. Cabo de cobre UTP está plugado na porta SFP (via conversor inadequado/ausente). Qual diagnóstico?",
+    "alternativas": [
+      "Duplex half forçado no peer",
+      "Excesso de rotas OSPF",
+      "Mídia/SFP incompatível ou cabo/tipo errado para a porta óptica",
+      "Falta de AAA no VTY"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Porta com SFP óptico e estado notconnect com mídia inadequada é problema de tipo de cabo/interface. Não se resolve com AAA ou OSPF. Confirme SFP, patch de fibra correta ou porta cobre correta.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "DOM da fibra: RX power muito baixo (ex.: −28 dBm em link que deveria estar saudável), TX presente. Sintoma: flapping. Próxima hipótese L1?",
+    "alternativas": [
+      "ACL outbound no SVI",
+      "NAT overload mal configurado",
+      "Storm control em todas as portas",
+      "Patch suja/danificada, conector ruim ou alcance/atenuação excessiva"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "RX óptico fraco com TX ok aponta caminho de recebimento: sujeira, patch, fibra ou distância. ACL/NAT/storm control não explicam DOM baixo. Limpar/trocar patch e validar tipo MM/SM é o Diagnose correto.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Um lado está speed 100 duplex full hardcoded; o outro está em auto. Resultado frequente?",
+    "alternativas": [
+      "Mismatch de duplex (auto cai em half) com performance ruim e late collisions",
+      "IPv6 RA Guard ativado automaticamente",
+      "Port-channel vira L3 sem configuração",
+      "Todas as VLANs somem do trunk"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Hardcode em um lado e auto no outro é receita clássica de mismatch: o lado auto muitas vezes assume half. Sintomas incluem late collisions e lentidão. A correção é alinhar auto/auto ou hardcode idêntico nos dois lados — com preferência a auto em acessos modernos.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Link cobre de ~120 m em Cat5e entre switch e AP; erros de CRC e queda intermitente a 1G. Qual fator L1 é mais relevante?",
+    "alternativas": [
+      "Falta de banner motd",
+      "Distância acima do canal típico (~100 m) degradando o sinal",
+      "Ausência de NetFlow no access",
+      "Senha enable fraca"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Canal cobre Ethernet de campus costuma limitar-se a cerca de 100 m; 120 m favorece erros e instabilidade, especialmente a 1G. Banner, NetFlow e senha não geram CRC. Encurtar o run, melhorar categoria/caminho ou usar fibra/intermediate são caminhos de Diagnose.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show interfaces Gi0/0/1: line protocol is down, status is down; admin status up. SFP não aparece. Causa mais provável?",
+    "alternativas": [
+      "OSPF passive-interface",
+      "ACL deny any na interface",
+      "Cabo/SFP ausente ou link físico não estabelecido (down/down)",
+      "HSRP com prioridade baixa"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "down/down com SFP ausente indica falha de camada física/link, não de roteamento ou ACL. Verifique módulo, patch e se a porta não está em notconnect por mídia. OSPF/HSRP não levantam o link físico sozinhos.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Patch de fibra multimodo foi inserida em um SFP monomodo de longo alcance. Sintoma esperado?",
+    "alternativas": [
+      "Melhora automática do DOM",
+      "STP elege root mais rápido",
+      "EtherChannel LACP sobe sem cabo",
+      "Link down, erros altos ou níveis ópticos incompatíveis"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Misturar multimodo com SFP monomodo (e vice-versa) é erro de tipo de mídia. Resulta em link ruim ou down e leituras ópticas inconsistentes. Corrija SFP e patch do mesmo padrão e alcance adequado.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Contadores: 0 CRC no switch A; no switch B (mesmo link) CRC sobem só em B. O que isso sugere?",
+    "alternativas": [
+      "Problema de recepção no lado B (cabo/TX do peer/SFP/RX B) a investigar no caminho B",
+      "Necessidade de desligar IP routing em A",
+      "Trocar imediatamente o supervisor de ambos os cores",
+      "Problema exclusivo de DNS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Erros de input/CRC no lado que recebe apontam o caminho de chegada àquele device. Compare TX/RX, SFP e patch em direção a B. Não se começa com dual supervisor reload nem DNS. Diagnose assimétrico usa contadores por lado.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Porta de PC com cabo danificado (pares rompidos). Sintomas típicos?",
+    "alternativas": [
+      "Apenas perda de rotas BGP no ISP remoto",
+      "Link down, flapping ou CRC/erros sem mudança de config lógica",
+      "Mudança automática da VLAN nativa do core",
+      "Expiração de certificados HTTPS do data center"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Cabo com pares danificados é falha L1: down, flap ou erros de frame. Não altera VLAN nativa nem BGP remoto por si só. Teste/substituição do patch confirma a causa.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show interfaces status: Gi1/0/8 connected 30 a-full a-100. Peer está a-full a-1000 no mesmo cabo Cat6 de 5 m. Usuários lentos. Melhor interpretação?",
+    "alternativas": [
+      "Falta de OSPFv3 na VLAN 30",
+      "Speed mismatch ou negociação limitada a 100 no lado do switch de acesso — validar cabo/porta/NIC e forçar alinhamento correto",
+      "Excesso de syslog no buffer",
+      "Problema de prompt de IA generativa"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Um lado a 100 e o outro a 1000 no mesmo segmento curto indica problema de negociação/mídia/NIC/porta, não de IPv6 routing. Alinhar speed e verificar cabo/porta faz parte do Diagnose 1.1. OSPFv3 e syslog não explicam speed assimétrico.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Late collisions aumentam só após alguém configurar duplex half no switch e deixar o servidor em full. Ação correta?",
+    "alternativas": [
+      "Aumentar a largura de banda do WAN",
+      "Alinhar duplex (preferir auto/auto ou full/full nos dois) e revalidar contadores",
+      "Limpar a tabela ARP do firewall",
+      "Ativar NAT na VLAN de usuários"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O cenário descreve mismatch introduzido por hardcode half versus full. Corrigir duplex e observar se late collisions param é o procedimento. WAN, ARP de firewall e NAT não são a causa raiz desse contador.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Interface administratively down. Técnico troca o cabo três vezes sem sucesso. O que foi negligenciado?",
+    "alternativas": [
+      "Recarregar o ISP remoto",
+      "Ler o status admin (shutdown) e dar no shutdown se apropriado — cabo não levanta porta desabilitada",
+      "Remover todas as SVIs",
+      "Desativar CEF globalmente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Administratively down significa shutdown configurado. Trocar cabo não reativa a porta. Diagnose inclui ler show interfaces / status e remover o shutdown se a mudança for autorizada.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Conector de fibra com contaminação visível; RX marginal. Qual ação L1 prioritária?",
+    "alternativas": [
+      "Trocar a máscara de wildcard da ACL",
+      "Limpar/inspecionar conectores e recasar o patch antes de culpar o supervisor",
+      "Habilitar telnet sem senha",
+      "Sumarizar todas as rotas estáticas"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sujeira em face óptica é causa comum de RX ruim e erros. Limpeza e bom patch são o primeiro remédio L1. ACL, telnet e sumarização não limpam o conector.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Output: 15000 runts, 12000 CRC, reliability 200/255 em Gi1/0/20 (PC). STP está stable. Causa mais provável?",
+    "alternativas": [
+      "Root bridge incorreto no data center",
+      "Falta de banner exec",
+      "Problema L1 no segmento do host (cabo/NIC/duplex/porta)",
+      "Excesso de peers BGP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Runts e CRC altos com reliability baixa apontam frames corrompidos no link do host. STP estável reduz suspeita de loop. Foque cabo, NIC, porta e duplex antes de root bridge ou BGP.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Quando o crossover ainda pode ser relevante no raciocínio de exame/campo?",
+    "alternativas": [
+      "Sempre que houver OSPF",
+      "Apenas em links de console USB",
+      "Somente se o syslog estiver cheio",
+      "Em cenários sem auto-MDIX efetivo ou com pinagem/cabo incorreto gerando down/erros"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Auto-MDIX reduz a necessidade de crossover, mas pinagem errada ou dispositivos sem auto-MDIX ainda causam falha de link. O tópico 1.1 inclui pin out/cable types no Diagnose, não como obsessão em todo link moderno com MDIX ok.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Gi1/0/1 up/up, 0 erros; usuários da VLAN reclamam de app WAN lenta. Qual conclusão L1 local?",
+    "alternativas": [
+      "O uplink de acesso local parece saudável nos contadores; investigar caminho além (WAN/app), sem trocar o cabo local primeiro sem evidência",
+      "Sempre trocar o cabo do host antes de qualquer medida",
+      "Forçar half duplex em todas as portas",
+      "Desligar o SVI da VLAN"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Contadores limpos e up/up no acesso local enfraquecem hipótese de cabo do host. O Diagnose não inventa L1 onde a evidência está limpa; amplia o isolamento para WAN/aplicação. Evite half duplex e derrubar SVI sem causa.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show interfaces transceiver: TX power N/A, RX −40 dBm, link down. Interpretação?",
+    "alternativas": [
+      "Link óptico sem sinal útil — SFP/patch/fibra a validar",
+      "DHCP snooping bloqueando apenas IPv6",
+      "HSRP em estado Active em ambos com sucesso total",
+      "Problema exclusivo de banner motd"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Ausência de TX e RX extremamente baixo com link down é assinatura de falha óptica/SFP/fibra. Não é DHCP snooping nem HSRP. Substituir/validar transceiver e patch é o caminho.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Técnico fixa speed 1000 e duplex full em ambos os lados de um link cobre bom. Resultado esperado se a mídia suportar?",
+    "alternativas": [
+      "Sempre gera late collisions",
+      "Obriga uso de crossover T568A-B",
+      "Link up em 1G full se cabo/porta/NIC forem capazes — alinhamento hardcode consistente",
+      "Converte a porta em err-disabled por BPDU Guard automaticamente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Hardcode idêntico nos dois lados pode funcionar quando a mídia suporta. O problema clássico é hardcode de um lado e auto no outro. BPDU Guard e crossover não são consequência automática desse hardcode.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Output errors sobem em rajadas na interface do servidor; CRC no switch também sobem. Qual par de causas L1 mais razoável?",
+    "alternativas": [
+      "Apenas política de QoS no core sem olhar mídia",
+      "Somente falta de NTP",
+      "Apenas rota estática faltando",
+      "Cabo/NIC/porta com falha de mídia no segmento do servidor"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Erros nos dois sentidos do mesmo segmento reforçam falha de mídia entre switch e servidor. QoS, NTP e rota não elevam CRC em conjunto dessa forma. Teste de cabo e outra porta/NIC isolam o ponto.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cat3 antigo reaproveitado para tentar 1G full. Sintoma mais provável?",
+    "alternativas": [
+      "Negociação falha, speed menor ou erros elevados por categoria/capacidade inadequada",
+      "OSPF vira automaticamente OSPFv3",
+      "O switch vira WLC",
+      "VTY aceita apenas HTTP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Categoria e qualidade do cabo limitam a taxa confiável. Cat3 não é adequado para 1G de campus. O resultado é falha de negociação ou erros — tema cable types do 1.1.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Link flapping: logs %LINK-3-UPDOWN a cada minuto; contadores de CRC sobem a cada flap. Primeira linha de ação?",
+    "alternativas": [
+      "Redesenhar toda a política de BGP da empresa",
+      "Trocar o core chassis sem medir",
+      "Isolar L1: patch, SFP, DOM, duplex/speed e porta do peer",
+      "Desativar logging para parar o alarme"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Flap com CRC é L1 até prova em contrário. Isolar mídia e configurações de speed/duplex é prioritário. Desligar log só esconde o sintoma; trocar chassis sem dados desperdiça tempo.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show interfaces Gi1/0/3: Full-duplex, 1000Mb/s; show interfaces status no peer: half-duplex, 1000Mb/s. O que fazer?",
+    "alternativas": [
+      "Ignorar: full e half são iguais em 1G",
+      "Somente limpar MAC address table",
+      "Tratar como mismatch de duplex; corrigir config e monitorar late collisions/erros",
+      "Apagar a VLAN do host"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Full versus half no mesmo link é mismatch, mesmo a 1000 numéricos. Deve-se alinhar duplex e observar contadores. Limpar MAC ou apagar VLAN não corrige a negociação L1.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Pinagem incorreta em um patch panel (pares trocados). Ferramenta de Diagnose mais alinhada ao 1.1?",
+    "alternativas": [
+      "debug all no core",
+      "traceroute até a Internet apenas",
+      "show version | include uptime apenas",
+      "Teste de cabo/certificação + leitura de status/contadores na porta afetada"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Pinagem errada é problema de cabeamento. Teste de cabo e contadores/status na porta correlacionam a falha. debug all é perigoso e irrelevante; só traceroute/uptime não validam pin out.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SFP de 10 km monomodo em link de 80 km sem amplificação adequada. Sintoma típico?",
+    "alternativas": [
+      "RX insuficiente / link down ou erros por distância/orçamento óptico inadequado",
+      "Melhora do throughput acima de 100G automaticamente",
+      "Conversão automática para cobre Cat6a",
+      "STP desliga todas as VLANs"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Alcance do módulo e da fibra importa. 80 km com SFP de 10 km excede o orçamento típico → RX ruim ou down. Não há conversão mágica para cobre nem ganho de 100G. Validate distance e tipo de óptica.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual leitura de show interfaces mais indica colisões por half-duplex legado?",
+    "alternativas": [
+      "0 collisions, 0 late collisions, full duplex",
+      "Somente output queue drops sem collisions em full",
+      "Contadores de collisions e late collisions incrementando com duplex half",
+      "Apenas 'Last clearing of show counters never'"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Collisions/late collisions em interface half são o rastro clássico. Full limpo com zero collisions não sugere mismatch. Clearing dos contadores é só metadado, não diagnóstico sozinho.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Porta up/up com 0 erros; peer notconnect. Topologia: cabo desconectado no peer. Conclusão?",
+    "alternativas": [
+      "Configurar HSRP no lado up resolve o notconnect",
+      "O link não está completo — verificar o lado notconnect (cabo/porta) antes de reconfigurar IP no lado up/up",
+      "É impossível um lado up e o outro notconnect",
+      "O problema é necessariamente de DNS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Se o peer está notconnect, o caminho físico não está fechado do ponto de vista desse device — foque cabo e porta no lado down. HSRP e DNS não estabelecem link L1. Em alguns cenários de medições isoladas, sempre confirme o par do cabo.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Giants e CRC altos após instalação de novo patch de cobre barato em ambiente com forte EMI próximo a motores. Hipótese L1?",
+    "alternativas": [
+      "Falta de IPv6 link-local",
+      "AAA TACACS timeout",
+      "Banner login longo demais",
+      "Qualidade do cabo/EMI no run de cobre degradando frames"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "EMI e cabo de má qualidade elevam erros de frame. IPv6 link-local, TACACS e banner não geram giants/CRC. Reencaminhar o cabo, melhorar blindagem/categoria ou usar fibra são respostas de campo.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após limpar conectores e trocar o patch de fibra, CRC pararam de subir. O que isso prova no Diagnose?",
+    "alternativas": [
+      "A causa mais provável era L1 (contaminação/patch), validada por mudança controlada e contadores",
+      "Que o OSPF precisa de clear process diário",
+      "Que duplex half é obrigatório em fibra",
+      "Que o problema era ACL de VTY"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Antes/depois nos contadores após ação só de mídia confirma causa física. Não implica clear OSPF, half em fibra nem ACL de gestão. Documentar essa correlação é boa prática de NOC.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Escolha a melhor ordem de Diagnose para host lento com suspeita de cabo.",
+    "alternativas": [
+      "reload core → apagar VLAN → ver cabo",
+      "debug ip packet detail global → write erase",
+      "mudar default route → desligar STP → ver CRC",
+      "status/contadores da porta → duplex/speed → cabo/SFP/distância → só então escalar hardware de switch"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A ordem L1 usa evidência de interface antes de mudanças destrutivas ou de desenho. Reload, write erase e derrubar STP não são o primeiro passo do tópico 1.1. Contadores e mídia vêm primeiro.",
+    "part_id": "v2-1.1"
+  }
+]

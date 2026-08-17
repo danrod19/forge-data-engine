@@ -1,0 +1,126 @@
+{
+  "part_id": "v2-2.2",
+  "title": "Conectividade de dispositivos de borda (hosts, voice, AP, IoT, PoE)",
+  "blueprint_module": "2.0",
+  "blueprint_topics": ["2.2"],
+  "verb": "Configure",
+  "weight_percent": 25,
+  "topic_list": [
+    "Access port: switchport mode access e access VLAN para end hosts",
+    "Voice VLAN: switchport voice vlan — telefone IP + PC no mesmo cabo",
+    "Portas de AP: access na VLAN de AP/management (desenho simples de borda)",
+    "IoT/câmeras/impressoras: VLAN dedicada em mode access — sem trunk no endpoint",
+    "PoE: alimentar phone/AP/câmera; show power inline (delivering vs fault)",
+    "Status de borda: connected, notconnect, err-disabled",
+    "Portas não usadas: shutdown e description",
+    "spanning-tree portfast em access (edge) para subir rápido e reduzir atraso de DHCP",
+    "Verify: show interfaces status, show run interface, show vlan brief, show power inline",
+    "Erro clássico: endpoint em trunk ou access VLAN errada",
+    "Erro clássico: phone sem voice VLAN (só data) — PC ok, voz falha",
+    "Boas práticas de campus access: um endpoint, uma porta access bem documentada"
+  ],
+  "study_notes": [
+    {
+      "heading": "Borda do campus: o que o 2.2 cobre",
+      "bullets": [
+        "Configure e verify de portas de acesso para hosts de dados, voz, AP e IoT — não o desenho completo de wireless fabric.",
+        "A unidade de trabalho é a interface do access switch: mode, VLAN(s), PoE, PortFast, description e estado.",
+        "Endpoint ≠ trunk: câmera, PC, impressora e a maioria dos APs em desenho CCNA simples ficam em access."
+      ],
+      "exam_tips": [
+        "Se o dispositivo é end host, pense mode access + access vlan (e voice vlan se for phone+PC)."
+      ]
+    },
+    {
+      "heading": "Access port e VLAN de dados",
+      "bullets": [
+        "switchport mode access força a porta a não negociar trunk com o endpoint.",
+        "switchport access vlan X coloca o tráfego untagged de dados na VLAN X.",
+        "Verify: show interfaces status (Vlan column), show run interface, show vlan brief."
+      ],
+      "exam_tips": [
+        "PC na VLAN errada: quase sempre access vlan incorreta ou porta ainda em trunk/dynamic."
+      ]
+    },
+    {
+      "heading": "Voice VLAN — telefone + PC",
+      "bullets": [
+        "switchport voice vlan Y: o telefone IP usa a VLAN de voz; o PC atrás do phone usa a access (data) VLAN.",
+        "Sem voice vlan, o phone pode ficar só na data VLAN — dados do PC podem funcionar e a voz não registrar no CUCM/call control.",
+        "Não transforme a porta do usuário em trunk manual só para 'passar duas VLANs' se o desenho é voice vlan no access."
+      ],
+      "exam_tips": [
+        "Sintoma clássico: PC ok, telefone não registra → confira voice vlan e PoE."
+      ]
+    },
+    {
+      "heading": "AP e IoT na borda",
+      "bullets": [
+        "AP: tipicamente access na VLAN de management/AP; SSIDs mapeiam para VLANs no WLC (ideia simples no exame).",
+        "IoT/câmera/impressora: access VLAN dedicada para isolamento e política; evite trunk no endpoint.",
+        "Description na interface (AP-SALA-3, CAM-PORTAO) ajuda Operate/Verify no plantão."
+      ],
+      "exam_tips": [
+        "Trunk em câmera/IoT é misconfig frequente — volte para mode access + access vlan."
+      ]
+    },
+    {
+      "heading": "PoE na borda",
+      "bullets": [
+        "PoE alimenta IP phone, AP e muitas câmeras no mesmo cabo de dados.",
+        "show power inline: Admin/Oper, Power, Device, Class; estados como delivering, fault, absent.",
+        "Device não liga: confira cabo, se a porta entrega PoE, fault por curto/classe, ou se o switch tem orçamento (ideia, sem deep multi-chassis)."
+      ],
+      "exam_tips": [
+        "Phone morto + PC ok no mesmo cabo → priorize PoE/voice, não a default route do core."
+      ]
+    },
+    {
+      "heading": "PortFast, shutdown e higiene de porta",
+      "bullets": [
+        "spanning-tree portfast (edge) em access: porta sobe mais rápido para forwarding — reduz atraso de DHCP no boot do PC.",
+        "Portas sem uso: shutdown; evita link acidental e reduz superfície de ataque básica.",
+        "err-disabled na borda pode ser BPDU Guard em PortFast se alguém plugar um switch — contexto, sem aprofundar security inteiro."
+      ],
+      "exam_tips": [
+        "PC demora muito para pegar IP em access sem PortFast: candidato a edge PortFast (e ainda validar DHCP 1.7)."
+      ]
+    },
+    {
+      "heading": "Checklist Configure → Verify",
+      "bullets": [
+        "1) mode access  2) access vlan  3) voice vlan se phone  4) PortFast edge  5) description  6) no shutdown  7) PoE se device powered.",
+        "Verify: status connected + VLAN correta + power inline delivering + ping do host na subnet esperada.",
+        "Se notconnect: cabo/device; se wrong VLAN: access vlan; se voice falha: voice vlan/PoE."
+      ],
+      "exam_tips": [
+        "Mostre o show run interface e o show interfaces status na mesma resposta mental."
+      ]
+    }
+  ],
+  "key_commands": [
+    "switchport mode access",
+    "switchport access vlan <id>",
+    "switchport voice vlan <id>",
+    "spanning-tree portfast",
+    "description <texto>",
+    "shutdown  |  no shutdown",
+    "show interfaces status",
+    "show interfaces <intf> status",
+    "show running-config interface <intf>",
+    "show vlan brief",
+    "show power inline",
+    "show power inline <intf>",
+    "show interfaces <intf> switchport  (mode/access/voice)"
+  ],
+  "must_know": [
+    "End host na borda: mode access + access vlan (não trunk no endpoint típico).",
+    "Phone+PC: access (data) + voice vlan; PC ok e voz falha → voice/PoE.",
+    "AP/IoT/câmera: access em VLAN dedicada; description ajuda operate.",
+    "PoE: show power inline — delivering vs fault/absent quando o device não liga.",
+    "PortFast em access acelera forwarding e melhora experiência de DHCP no edge.",
+    "Portas ociosas: shutdown; verify com show interfaces status.",
+    "VLAN errada no PC = access vlan ou mode incorreto na porta."
+  ],
+  "reuse_from_v1": null
+}

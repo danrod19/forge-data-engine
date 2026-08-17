@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7301 — Uplink entre Access1 e Dist1 “fica lento e cai”. O júnior já reiniciou o STP e culpou o core. Contadores da porta de uplink foram anexados.",
+    "cli_output": "Access1# show interfaces GigabitEthernet1/0/48\nGigabitEthernet1/0/48 is up, line protocol is up (connected)\n  Full-duplex, 1000Mb/s, media type is 1000BaseSX SFP\n  Input queue: 0/75/0/0 (size/max/drops/flushes)\n  5 minute input rate 82000 bits/sec, 90 packets/sec\n     1844221 packets input, 0 no buffer\n     Received 12012 broadcasts (4011 multicasts)\n     0 runts, 0 giants, 0 throttles\n     18440 input errors, 17902 CRC, 0 frame, 0 overrun, 0 ignored\n     0 watchdog, 0 multicast, 0 pause input\n     12 output errors, 0 collisions, 1 interface resets\n\nAccess1# show interfaces GigabitEthernet1/0/48 status\nPort      Name        Status    Vlan  Duplex  Speed  Type\nGi1/0/48  uplink-dist connected trunk full    1000   1000BaseSX\n\nDist1# show interfaces GigabitEthernet1/0/1 | include duplex|errors|CRC|media\n  Full-duplex, 1000Mb/s, media type is 1000BaseSX SFP\n     2 input errors, 0 CRC, 0 frame\n\n# observação do campo: patch OM4 com conector sujo no lado Access1; limpeza pendente",
+    "alternativas": [
+      "STP no core é a única causa possível de CRC assimétrico",
+      "O duplex half no Access1 explica as colisões (não há full-duplex no output)",
+      "Gi1/0/48 up/up com 17902 CRC e milhares de input errors no Access1 aponta problema de meio/óptica/conector no enlace, não de rota no core",
+      "CRC alto prova que o SSID do andar está no canal 3"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O output mostra enlace up/up full 1G, porém 18440 input errors e 17902 CRC só no lado Access1 — padrão clássico de sujeira/dano em fibra/SFP/cabo. STP e core não geram esse contador local. O status exibe full-duplex, não half. SSID/canal Wi-Fi não aparece nem explica CRC Ethernet do uplink.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7302 — Dois APs novos no switch de acesso não ligam os LEDs de rádio. O cabo de dados foi testado em notebook e tem link. Outros APs antigos no mesmo switch estão OK.",
+    "cli_output": "Access2# show power inline\nModule   Available     Used     Remaining\n          (Watts)     (Watts)    (Watts)\n------   ---------   --------   ---------\n1           370.0       368.4        1.6\n\nInterface Admin  Oper       Power   Device              Class Max\n          State  State      (Watts)\n--------- ------ ---------- ------- ------------------- ----- ----\nGi1/0/1   auto   on         15.4    IP Phone 8841       3     30.0\nGi1/0/2   auto   on         15.4    IP Phone 8841       3     30.0\nGi1/0/5   auto   on         30.0    AIR-AP2802I         4     30.0\nGi1/0/6   auto   on         30.0    AIR-AP2802I         4     30.0\nGi1/0/7   auto   on         30.0    AIR-AP3802I         4     30.0\nGi1/0/10  auto   on         30.0    AIR-AP2802I         4     30.0\nGi1/0/11  auto   on         15.4    IP Phone 8851       3     30.0\nGi1/0/12  auto   on         15.4    IP Phone 8851       3     30.0\n... (várias portas on) ...\nGi1/0/23  auto   off        0.0     n/a                 n/a   30.0\nGi1/0/24  auto   off        0.0     n/a                 n/a   30.0\n\nAccess2# show interfaces status | include 23|24\nGi1/0/23  AP-novo-A   connected  40   a-full  a-1000  10/100/1000BaseTX\nGi1/0/24  AP-novo-B   connected  40   a-full  a-1000  10/100/1000BaseTX",
+    "alternativas": [
+      "Gi1/0/23-24 connected sem PoE (Oper off) e Remaining 1.6 W: power budget esgotado; link de dados sobe, mas não há watts para os APs novos",
+      "LEDs apagados porque o canal Wi-Fi 11 está proibido no Brasil",
+      "connected a-1000 prova que monomodo foi exigido nas portas de acesso",
+      "CRC infinito nas portas 23/24 é a única leitura possível do show power inline"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "show power inline deixa Used ≈ Available (368.4 de 370) e Remaining 1.6 W; portas 23/24 estão Oper off com 0 W embora o status mostre connected — dados sem alimentação PoE. Canal 11 e monomodo não explicam Oper off. O comando exibido não lista CRC; a evidência é power budget.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7303 — Porta do servidor de homologação “não sobe” após janela de mudança. O cabo e o NIC do servidor foram validados em outro switch.",
+    "cli_output": "Access3# show interfaces GigabitEthernet1/0/15\nGigabitEthernet1/0/15 is administratively down, line protocol is down (disabled)\n  Hardware is Gigabit Ethernet, address is 00a1.b2c3.d415 (bia 00a1.b2c3.d415)\n  MTU 1500 bytes, BW 1000000 Kbit/sec\n  Encapsulation ARPA, loopback not set\n  Keepalive set (10 sec)\n  Auto-duplex, Auto-speed, media type is 10/100/1000BaseTX\n\nAccess3# show running-config interface GigabitEthernet1/0/15\ninterface GigabitEthernet1/0/15\n description SRV-HML\n switchport access vlan 30\n switchport mode access\n shutdown\n spanning-tree portfast\n\nAccess3# show interfaces GigabitEthernet1/0/15 status\nPort      Name       Status       Vlan  Duplex  Speed  Type\nGi1/0/15  SRV-HML    disabled     30    auto    auto   10/100/1000BaseTX",
+    "alternativas": [
+      "CRC elevado no output obriga troca imediata do patch OM4",
+      "A interface está administratively down (shutdown / disabled); é preciso no shutdown — não é falha de cabo do servidor já testado em outro switch",
+      "Status disabled significa ESS sem SSID no AP do rack",
+      "Auto-duplex prova duplex mismatch permanente com o NIC"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O CLI mostra administratively down, line protocol down e shutdown na running-config; status disabled. A causa é admin down local. Não há contadores CRC no recorte. ESS/SSID e mismatch não se aplicam a porta desabilitada sem enlace.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7304 — Usuários no 2º andar associam no SSID CORP, sinal “bom”, mas a rede fica lenta no horário de pico. Survey rápido dos APs do andar foi colado no ticket.",
+    "cli_output": "WLC1> show ap config general AP-2A | include Channel|Power|SSID\n  AP Name                         : AP-2A\n  Country Code                    : BR\n  AP Primary SSID                 : CORP\n  2.4GHz Channel                  : 6\n  2.4GHz Tx Power                 : 8 (Highest)\n\nWLC1> show ap config general AP-2B | include Channel|Power|SSID\n  AP Name                         : AP-2B\n  AP Primary SSID                 : CORP\n  2.4GHz Channel                  : 6\n  2.4GHz Tx Power                 : 8 (Highest)\n\nWLC1> show ap config general AP-2C | include Channel|Power|SSID\n  AP Name                         : AP-2C\n  AP Primary SSID                 : CORP\n  2.4GHz Channel                  : 6\n  2.4GHz Tx Power                 : 7\n\nLaptop-user> netsh wlan show interfaces\n  SSID                   : CORP\n  State                  : connected\n  Signal                 : 82%\n  Radio type             : 802.11n\n  Channel                : 6\n\n# planta: AP-2A, AP-2B e AP-2C cobrem o mesmo open space com forte sobreposição",
+    "alternativas": [
+      "Associação e SSID CORP formam ESS, mas os três APs no canal 6 com potência alta geram interferência co-canal — planejar 1/6/11 e reduzir sobreposição",
+      "Signal 82% prova que o cliente não está associado (BSS inexistente)",
+      "Canal 6 único em todos os APs é o desenho non-overlapping ideal em 2,4 GHz",
+      "A lentidão só pode ser CRC na fibra monomodo do notebook"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Cliente connected 82% no canal 6 e três APs CORP também no canal 6 com Tx alto mostram associação OK e RF mal planejado (co-canal). Non-overlapping clássico em 2,4 GHz é 1/6/11 entre vizinhos. Sinal alto não nega BSS. Notebook não usa uplink monomodo com CRC como causa desse padrão.",
+    "part_id": "1.3"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7305 — Novo link entre prédios não sobe. A obra usou o que “sobrou no almoxarifado”. Inventário do enlace e do módulo foi anexado.",
+    "cli_output": "Dist-A# show interfaces TenGigabitEthernet1/1/1\nTenGigabitEthernet1/1/1 is down, line protocol is down (notconnect)\n  media type is 10Gbase-SR (SFP+)\n  ...\nDist-A# show inventory | include Te1/1/1|SFP\nNAME: \"Te1/1/1\", DESCR: \"1000/10000BaseSR SFP+\"\nPID: SFP-10G-SR\n\nDist-B# show interfaces TenGigabitEthernet1/1/1\nTenGigabitEthernet1/1/1 is down, line protocol is down (notconnect)\n  media type is 10Gbase-SR (SFP+)\n\nFACILITIES> plant-cable-id: BLDG-A-B-01\n  Cable type marked on jacket: OS2 Single-Mode\n  Measured length: 312 m\n  Connectors: LC-LC\n  Note: team also tried a spare UTP Cat5e run of 140 m on copper ports (link flapped, CRC)\n\nDist-A# show interfaces GigabitEthernet1/0/48 | include CRC|protocol|duplex\nGigabitEthernet1/0/48 is up, line protocol is up\n  Full-duplex, 100Mb/s\n     9021 input errors, 8804 CRC",
+    "alternativas": [
+      "LC-LC em 312 m sempre negocia 10G independentemente do tipo de fibra",
+      "notconnect com SFP-10G-SR (MMF) em planta OS2 monomodo é incompatibilidade de meio; o teste UTP 140 m ainda excede ~100 m e gerou CRC — ambos os meios estão incorretos para o desenho",
+      "CRC no cobre prova que o SFP-SR está saudável no monomodo",
+      "O link óptico está administratively down com shutdown explícito no output Te1/1/1"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "SFP-10G-SR é multimodo de curto alcance; a planta é OS2 monomodo a 312 m — meio e transceiver não combinam (notconnect). O cobre de 140 m com CRC viola o canal ~100 m. LC sozinho não valida 10G. O óptico está notconnect, não administratively down com shutdown.",
+    "part_id": "1.3"
+  }
+]

@@ -4,6 +4,13 @@ import { Flame, Heart, Crown, LogIn, User, Infinity } from "lucide-react";
 import { motion } from "framer-motion";
 import { MAX_LIVES } from "@/data/questions";
 import { useAuth } from "@/components/auth/AuthProvider";
+import {
+  TRACK_ORDER,
+  getTrackMeta,
+  useTrack,
+  type TrackId,
+} from "@/lib/track-context";
+import { cn } from "@/lib/utils";
 
 interface TopBarProps {
   streak: number;
@@ -15,6 +22,8 @@ interface TopBarProps {
   onAuthClick: () => void;
   onAccountClick: () => void;
   onLogoClick?: () => void;
+  /** Chamado após troca de track (reset de sessão) */
+  onTrackChange?: () => void;
 }
 
 export function TopBar({
@@ -26,122 +35,160 @@ export function TopBar({
   onAuthClick,
   onAccountClick,
   onLogoClick,
+  onTrackChange,
 }: TopBarProps) {
   const { user, loading } = useAuth();
+  const { track, meta, setTrack, trackReady } = useTrack();
+
+  const handleTrack = (next: TrackId) => {
+    if (next === track) return;
+    setTrack(next);
+    onTrackChange?.();
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-2xl items-center justify-between gap-2 px-3 sm:h-16 sm:px-4">
-        {/* Logo */}
-        <button
-          type="button"
-          onClick={onLogoClick}
-          className="flex min-w-0 items-center gap-2 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-neon-green/40"
-        >
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-md border border-neon-green/30 bg-neon-green/10">
-            <span className="text-xs font-bold text-neon-green">CF</span>
-          </div>
-          <div className="hidden min-w-0 sm:block">
-            <p className="truncate text-sm font-semibold tracking-tight text-slate-100">
-              CCNA <span className="text-neon-green">Forge</span>
-            </p>
-            <p className="truncate text-[10px] text-slate-500">200-301 v2.0</p>
-          </div>
-        </button>
-
-        {/* Stats + actions */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5">
-          {/* Streak */}
-          <motion.div
-            className="flex items-center gap-1 rounded-full border border-orange-500/30 bg-orange-500/10 px-2 py-1"
-            whileHover={{ scale: 1.05 }}
-          >
-            <Flame
-              className="size-3.5 text-orange-400 sm:size-4"
-              fill="currentColor"
-            />
-            <span className="text-xs font-semibold tabular-nums text-orange-300 sm:text-sm">
-              {statsReady ? streak : "—"}
-            </span>
-          </motion.div>
-
-          {/* Lives */}
-          <motion.div
-            className="flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-2 py-1"
-            whileHover={{ scale: 1.05 }}
-            key={isPro ? "pro" : lives}
-            initial={false}
-            animate={{ scale: 1 }}
-          >
-            {isPro ? (
-              <>
-                <Infinity className="size-3.5 text-rose-400 sm:size-4" />
-                <span className="text-xs font-semibold text-rose-300 sm:text-sm">
-                  ∞
-                </span>
-              </>
-            ) : (
-              <>
-                <Heart
-                  className="size-3.5 text-rose-400 sm:size-4"
-                  fill="currentColor"
-                />
-                <span className="text-xs font-semibold tabular-nums text-rose-300 sm:text-sm">
-                  {statsReady ? `${lives}/${MAX_LIVES}` : `—/${MAX_LIVES}`}
-                </span>
-              </>
-            )}
-          </motion.div>
-
-          {/* PRO badge or Upgrade */}
-          {isPro ? (
-            <span className="flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-500/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-300 sm:gap-1.5 sm:px-2.5 sm:text-xs">
-              <Crown className="size-3 sm:size-3.5" fill="currentColor" />
-              PRO
-            </span>
-          ) : (
-            <motion.button
-              type="button"
-              onClick={onUpgradeClick}
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.97 }}
-              className="relative flex items-center gap-1 overflow-hidden rounded-full px-2.5 py-1.5 text-xs font-bold text-slate-950 shadow-lg shadow-amber-500/25 sm:gap-1.5 sm:px-3 sm:text-sm"
-            >
-              <span className="gold-gradient absolute inset-0" />
-              <span className="relative flex items-center gap-1 sm:gap-1.5">
-                <Crown className="size-3.5 sm:size-4" fill="currentColor" />
-                <span className="hidden sm:inline">Upgrade PRO</span>
-                <span className="sm:hidden">PRO</span>
-              </span>
-            </motion.button>
-          )}
-
-          {/* Conta (sempre) + Entrar se deslogado */}
-          <motion.button
+      <div className="mx-auto flex max-w-2xl flex-col gap-1.5 px-3 py-2 sm:px-4">
+        <div className="flex h-10 items-center justify-between gap-2 sm:h-11">
+          {/* Logo */}
+          <button
             type="button"
-            onClick={onAccountClick}
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.97 }}
-            className="flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900/80 px-2 py-1.5 text-[10px] font-medium text-slate-300 transition-colors hover:border-neon-green/40 hover:text-neon-green sm:gap-1.5 sm:px-2.5 sm:text-xs"
-            title="Conta"
-            aria-label="Conta"
+            onClick={onLogoClick}
+            className="flex min-w-0 items-center gap-2 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-neon-green/40"
           >
-            <User className="size-3.5" />
-            <span className="hidden sm:inline">Conta</span>
-          </motion.button>
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-md border border-neon-green/30 bg-neon-green/10">
+              <span className="text-xs font-bold text-neon-green">CF</span>
+            </div>
+            <div className="hidden min-w-0 sm:block">
+              <p className="truncate text-sm font-semibold tracking-tight text-slate-100">
+                CCNA <span className="text-neon-green">Forge</span>
+              </p>
+              <p className="truncate text-[10px] text-slate-500">
+                {trackReady ? meta.examCode : "…"}
+              </p>
+            </div>
+          </button>
 
-          {!loading && !user && (
+          {/* Stats + actions */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
+            <motion.div
+              className="flex items-center gap-1 rounded-full border border-orange-500/30 bg-orange-500/10 px-2 py-1"
+              whileHover={{ scale: 1.05 }}
+            >
+              <Flame
+                className="size-3.5 text-orange-400 sm:size-4"
+                fill="currentColor"
+              />
+              <span className="text-xs font-semibold tabular-nums text-orange-300 sm:text-sm">
+                {statsReady ? streak : "—"}
+              </span>
+            </motion.div>
+
+            <motion.div
+              className="flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-2 py-1"
+              whileHover={{ scale: 1.05 }}
+              key={isPro ? "pro" : lives}
+              initial={false}
+              animate={{ scale: 1 }}
+            >
+              {isPro ? (
+                <>
+                  <Infinity className="size-3.5 text-rose-400 sm:size-4" />
+                  <span className="text-xs font-semibold text-rose-300 sm:text-sm">
+                    ∞
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Heart
+                    className="size-3.5 text-rose-400 sm:size-4"
+                    fill="currentColor"
+                  />
+                  <span className="text-xs font-semibold tabular-nums text-rose-300 sm:text-sm">
+                    {statsReady ? `${lives}/${MAX_LIVES}` : `—/${MAX_LIVES}`}
+                  </span>
+                </>
+              )}
+            </motion.div>
+
+            {isPro ? (
+              <span className="flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-500/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-300 sm:gap-1.5 sm:px-2.5 sm:text-xs">
+                <Crown className="size-3 sm:size-3.5" fill="currentColor" />
+                PRO
+              </span>
+            ) : (
+              <motion.button
+                type="button"
+                onClick={onUpgradeClick}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+                className="relative flex items-center gap-1 overflow-hidden rounded-full px-2.5 py-1.5 text-xs font-bold text-slate-950 shadow-lg shadow-amber-500/25 sm:gap-1.5 sm:px-3 sm:text-sm"
+              >
+                <span className="gold-gradient absolute inset-0" />
+                <span className="relative flex items-center gap-1 sm:gap-1.5">
+                  <Crown className="size-3.5 sm:size-4" fill="currentColor" />
+                  <span className="hidden sm:inline">Upgrade PRO</span>
+                  <span className="sm:hidden">PRO</span>
+                </span>
+              </motion.button>
+            )}
+
             <motion.button
               type="button"
-              onClick={onAuthClick}
+              onClick={onAccountClick}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-1 rounded-full border border-neon-green/35 bg-neon-green/10 px-2 py-1.5 text-[10px] font-medium text-neon-green transition-colors hover:bg-neon-green/20 sm:gap-1.5 sm:px-2.5 sm:text-xs"
+              className="flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900/80 px-2 py-1.5 text-[10px] font-medium text-slate-300 transition-colors hover:border-neon-green/40 hover:text-neon-green sm:gap-1.5 sm:px-2.5 sm:text-xs"
+              title="Conta"
+              aria-label="Conta"
             >
-              <LogIn className="size-3.5" />
-              <span className="hidden sm:inline">Entrar</span>
+              <User className="size-3.5" />
+              <span className="hidden sm:inline">Conta</span>
             </motion.button>
-          )}
+
+            {!loading && !user && (
+              <motion.button
+                type="button"
+                onClick={onAuthClick}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+                className="flex items-center gap-1 rounded-full border border-neon-green/35 bg-neon-green/10 px-2 py-1.5 text-[10px] font-medium text-neon-green transition-colors hover:bg-neon-green/20 sm:gap-1.5 sm:px-2.5 sm:text-xs"
+              >
+                <LogIn className="size-3.5" />
+                <span className="hidden sm:inline">Entrar</span>
+              </motion.button>
+            )}
+          </div>
+        </div>
+
+        {/* Track switcher */}
+        <div
+          className="flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-950/60 p-0.5"
+          role="tablist"
+          aria-label="Trilha de certificação"
+        >
+          {TRACK_ORDER.map((id) => {
+            const m = getTrackMeta(id);
+            const active = trackReady && track === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => handleTrack(id)}
+                className={cn(
+                  "flex-1 rounded-md px-2 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wide transition-colors sm:text-[11px]",
+                  active
+                    ? "bg-neon-green/15 text-neon-green ring-1 ring-neon-green/35"
+                    : "text-slate-500 hover:bg-slate-900 hover:text-slate-300"
+                )}
+              >
+                <span className="sm:hidden">{m.shortLabel}</span>
+                <span className="hidden sm:inline">{m.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </header>

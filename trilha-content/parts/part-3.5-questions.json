@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Usuário não alcança servidor em outra subnet. No host, o primeiro passo do método sistemático de troubleshooting de conectividade IP é:",
+    "alternativas": [
+      "Confirmar IP/máscara/gateway e pingar o gateway da própria VLAN antes de culpar roteamento remoto",
+      "Limpar o processo OSPF em todos os cores do campus",
+      "Desligar dual-stack forçadamente em todo o site",
+      "Alterar Administrative Distance de todas as rotas estáticas para 1"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O checklist do módulo 3.5 começa de baixo para cima: se IP/máscara/gateway estiverem errados ou o ping ao gateway da VLAN falhar, o problema é local (L2, SVI, addressing) e investigar OSPF no core é prematuro. Limpar OSPF, desligar dual-stack em massa ou reescrever AD não resolvem gateway local quebrado e desviam o diagnóstico.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Na decisão de qual rota usar para um destino, a ordem correta entre longest prefix match e Administrative Distance é:",
+    "alternativas": [
+      "Sempre compara AD primeiro; o comprimento do prefixo só importa em ECMP",
+      "Entre prefixos que casam o destino, vence o mais longo; AD só desempata o mesmo prefixo/length",
+      "Sempre faz ECMP entre todas as rotas de qualquer length",
+      "Usa apenas a ordem de linhas na running-config"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O IOS primeiro escolhe o match mais específico (longest prefix). Só quando duas fontes oferecem o mesmo prefixo e o mesmo length é que a menor AD vence. Comparar AD entre /8 e /24, assumir ECMP universal ou ordem da config são erros clássicos de troubleshooting e de prova.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Em show ip route, o código S* na linha da default e a menção a candidate default indicam tipicamente:",
+    "alternativas": [
+      "Rota OSPF inter-area aprendida por ABR",
+      "Rede connected da interface de LAN",
+      "Default route estática instalada como candidate default (gateway of last resort)",
+      "Rota local /32 do IP da interface (código L)"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "S* marca static default (0.0.0.0/0) candidata a last resort. Código O é OSPF, C é connected e L é a host route local /32. Ler S* e “Gateway of last resort” responde se o roteador tem saída genérica para destinos sem match específico — ponto central do diagnóstico de Internet e redes remotas.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Existe floating static ip route 172.16.0.0 255.255.0.0 via backup com AD 200 e rota OSPF 172.16.0.0/16 (AD 110) ainda instalada. Quem encaminha?",
+    "alternativas": [
+      "A floating fica ativa porque AD 200 “é backup” e sempre tem prioridade",
+      "Ambas compartilham carga 50/50 independentemente do AD",
+      "Uma estática AD 1 implícita sobrescreve as duas sem configuração",
+      "A OSPF permanece na tabela; a floating só assume se a rota O sair"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "No mesmo prefixo/length, menor AD vence: 110 < 200, então O fica instalada. Floating static só entra quando a primária deixa a tabela (neighbor/path cai, interface down, etc.). AD maior não “vence por ser backup”; ECMP entre ADs diferentes assim não é o comportamento padrão esperado no CCNA.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show ip route exibe “Gateway of last resort is not set”. Qual a implicação prática no troubleshooting?",
+    "alternativas": [
+      "Não há default route candidata instalada — destinos sem match específico tendem a falhar",
+      "Todas as rotas da tabela são obrigatoriamente S*",
+      "Só existem rotas L na tabela de roteamento",
+      "Administrative Distance de static passa a ser 0 automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem last resort, o roteador não tem 0.0.0.0/0 (nem outra default candidata) para destinos que não batem em rotas mais específicas. Isso não implica que só existam rotas L, que tudo seja S* ou que o AD de static vire 0. No checklist, é o sinal de “falta default” quando o destino remoto não casa com nenhum prefixo da tabela.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Destino 10.1.1.50. Tabela tem S 10.0.0.0/8 [1/0] via firewall e O 10.1.1.0/24 [110/20] via DC. Qual rota o tráfego usa e por quê?",
+    "alternativas": [
+      "A /8, porque AD 1 é sempre melhor que qualquer outra rota",
+      "A /24 OSPF, porque longest prefix match vence antes de comparar AD",
+      "Nenhuma das duas; o pacote é descartado por conflito de AD",
+      "ECMP obrigatório entre /8 e /24"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Para 10.1.1.50 ambos os prefixos casam, mas /24 é mais específico que /8 — longest match decide e a O é usada apesar do AD 110 ser pior que 1. AD só desempata o mesmo length. Culpar AD ou esperar ECMP entre lengths diferentes é o erro clássico de path “inesperado” no NOC.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Estática aponta saída por Serial0/0/0; a interface vai down. Efeito típico na tabela ativa?",
+    "alternativas": [
+      "A rota S permanece com AD 0 como connected",
+      "A rota vira S* de Internet automaticamente",
+      "A rota costuma sair da tabela ativa ou deixar de ser usável até a interface voltar",
+      "O next-hop é reescrito para 127.0.0.1 sem intervenção"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Estáticas dependentes de interface de saída (ou de next-hop só alcançável por essa interface) tendem a ser removidas da RIB ativa quando o link cai. Isso não as transforma em default S*, não as promove a connected com AD 0 e não redireciona magicamente para loopback. No diagnóstico, interface down explica “a rota some”.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Ping do host ao gateway da própria VLAN falha. Inter-VLAN e destino remoto devem ser o foco imediato?",
+    "alternativas": [
+      "Sim — comece limpando OSPF no core",
+      "Sim — só traceroute até a Internet resolve",
+      "Sim — o problema é sempre dual-stack IPv6",
+      "Não primeiro — corrija L2, addressing, SVI/subinterface e gateway local antes do caminho remoto"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Sem alcance ao gateway da VLAN, o host nem entrega o tráfego ao L3 correto da subnet. Inter-VLAN, OSPF e Internet só entram depois que ping ao gateway e status da SVI/ROAS/VLAN estiverem ok. O método sistemático evita pular do sintoma “não chega” direto para o protocolo de roteamento.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Na legenda de show ip route, os códigos C e L significam respectivamente:",
+    "alternativas": [
+      "C = rede connected da interface; L = rota local /32 do IP configurado na interface",
+      "C = candidate default; L = LACP de EtherChannel",
+      "C = static; L = OSPF link-state",
+      "C = core route; L = leaf route em fabric"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "C marca redes diretamente conectadas; L é a host route local (tipicamente /32) do endereço da interface. Candidate default usa S* e texto de last resort; LACP e topologia leaf/spine não são códigos da tabela IP. Ler C/L evita confusão com S e O ao validar se a LAN/WAN local está na tabela.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Host dual-stack: IPv4 tem 0.0.0.0/0 e navega bem; IPv6 tem GUA local mas não há ::/0. Sintoma esperado?",
+    "alternativas": [
+      "IPv6 remoto usa automaticamente a default IPv4 do host",
+      "IPv4 remoto pode funcionar enquanto destinos IPv6 remotos falham por falta de default na pilha v6",
+      "SLAAC fica proibida em toda a VLAN",
+      "O link-local FE80:: vira GUA roteável entre sites"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Cada pilha tem tabela e default próprias. 0.0.0.0/0 não encaminha pacotes IPv6; sem ::/0 (no host ou no roteador de borda) o remoto v6 falha mesmo com GUA local e IPv4 perfeito. FE80 não substitui GUA entre redes. Dual-stack exige repetir o checklist em show ipv6 route / interface brief.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip route mostra S para o destino, mas o next-hop não responde ARP e o ping falha. Conclusão correta?",
+    "alternativas": [
+      "Código S proíbe o uso de ping no IOS",
+      "AD 1 de static é inválida e deve ser 255",
+      "Rota na tabela não garante encaminhamento se o next-hop ou o L2 até ele estiver quebrado",
+      "Longest match nunca se aplica a rotas estáticas"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Instalação na RIB ≠ next-hop alcançável. Sem ARP/ND ou com return path quebrado, o ping falha mesmo com S ou O presente. AD 1 é o default legítimo de static; longest match continua válido para estáticas. O checklist 3.5 separa “há rota?” de “o caminho até o next-hop e de volta funciona?”.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Duas estáticas para 172.16.0.0/16: primária AD 1 via link A e floating AD 5 via link B. Com a primária up, o que ocorre?",
+    "alternativas": [
+      "Floating assume porque AD 5 é “número de backup mágico”",
+      "OSPF 110 vence as duas estáticas automaticamente",
+      "Ambas ficam ativas em ECMP 50/50",
+      "Comportamento esperado: AD 1 permanece instalada; floating não assume enquanto a primária estiver na tabela"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Mesmo prefixo: 1 < 5, só a primária instala. Floating com AD pior fica na running (show run | include ip route) mas fora da tabela ativa até a primária sair. Não há ECMP automático entre ADs diferentes nesse desenho, e OSPF só entraria se fosse configurado e competisse com AD próprio no mesmo length.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "PC na VLAN 10 (192.168.10.0/24) está com gateway 192.168.20.1 (SVI da VLAN 20). Sintoma típico de inter-VLAN?",
+    "alternativas": [
+      "Gateway na subnet/VLAN errada — ping ao gateway e saída local falham; inter-VLAN não sobe corretamente",
+      "Inter-VLAN fica perfeito porque o L3 switch “acha” a SVI 20 sozinho",
+      "A SVI 10 assume o IP 20.1 sem configuração",
+      "Longest match no core corrige o gateway errado do host"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O gateway default do host deve ser o IP da SVI/subinterface da VLAN do host. Gateway de outra VLAN está fora da subnet L3 local: ARP/ND e encaminhamento inicial quebram. O roteador não reescreve o default do PC por longest match. Diagnóstico inter-VLAN revisitado: gateway local primeiro, depois rotas entre SVIs.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip route 10.1.1.50 retorna “Routing entry for 10.1.1.0/24” com next-hop via Gi0/1. Isso indica principalmente:",
+    "alternativas": [
+      "Que só existe rota /8 na caixa e o /24 é ilusão",
+      "Que o match vencedor para esse destino é o prefixo /24 (mais específico que um /8 eventual na tabela)",
+      "Que o AD foi permanentemente ignorado no CEF",
+      "Que não há next-hop configurado para o destino"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O comando mostra a entry que venceu o lookup daquele destino — aqui o /24. Se houvesse só um /8 genérico, a entry seria /8. A linha com next-hop e interface de saída é exatamente o que o checklist pede após falha de ping: confirmar match, fonte (S/O/C), AD/métrica e saída. Não prova “AD morto no CEF”.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ipv6 interface brief no host/roteador mostra só FE80::; ping a 2001:db8::10 remoto falha. Eixo principal do diagnóstico?",
+    "alternativas": [
+      "Default 0.0.0.0/0 do IPv4 basta para GUA remota",
+      "Código C da tabela IPv4 resolve automaticamente IPv6",
+      "Falta GUA (estático/SLAAC) e possivelmente ::/0 — link-local não roteia entre redes",
+      "Traceroute IPv4 corrige endereçamento GUA"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Só FE80 significa ipv6 enable sem GUA útil (ou RA suppress/SLAAC falho). Destinos GUA remotos exigem endereço global no host e caminho/default IPv6. Default e rotas IPv4, código C IPv4 e traceroute v4 não preenchem a pilha v6. Use show ipv6 interface brief e show ipv6 route em paralelo ao IPv4.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Valores de AD default usados no diagnóstico mental static vs OSPF, no mesmo prefixo/length:",
+    "alternativas": [
+      "Static 110 e OSPF 1 — OSPF vence a estática",
+      "Static 120 e OSPF 90 — ambos iguais ao EIGRP",
+      "Ambos 255 até o administrador definir",
+      "Static 1 e OSPF 110 — no mesmo prefixo a estática vence a rota O"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "AD default: connected 0, static 1, eBGP 20, EIGRP 90, OSPF 110, RIP 120. No mesmo /24, S AD 1 vence O AD 110. Floating usa AD artificialmente alta (ex.: 200) para ficar de backup. Errar os números leva a interpretar mal show ip route e a floating que “não assume”.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ping falha; traceroute para o destino lista hop1 e hop2 e depois * * *. Interpretação útil no método 3.5?",
+    "alternativas": [
+      "O caminho quebra ou desvia a partir daquele hop — investigue o roteador do hop 2, rotas e return path",
+      "O problema está exclusivamente no cabo do host de origem",
+      "AD 1 está errada no hop 0 e deve ser apagada",
+      "O sintoma prova dual-stack IPv6 obrigatoriamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Traceroute localiza onde o caminho para de responder — foco no hop problemático e no retorno. Não prova sozinho que o cabo do PC é a única falha, nem que AD do hop 0 está errada, nem que é sempre IPv6. Combinado com show ip route no gateway e no hop seguinte, fecha o diagnóstico de path.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SVI Vlan20 aparece up/down e nenhum access port/trunk carrega a VLAN 20. Diagnóstico alinhado ao inter-VLAN revisitado?",
+    "alternativas": [
+      "ip routing off é a única causa possível de SVI up/down",
+      "Comum: SVI sem L2 ativo na VLAN fica com line protocol down — sem gateway L3 para a VLAN",
+      "Ausência de default route derruba o line protocol da SVI",
+      "Longest match desliga a SVI quando há overlapping"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "SVI depende de pelo menos uma porta (access ou trunk allowed) ativa na VLAN. Sem isso, up/down e hosts sem gateway. ip routing off impede encaminhamento entre SVIs mas não é a única causa de up/down. Default route e longest match não controlam o line protocol da SVI. Verifique VLAN/trunk antes de culpar OSPF.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show run | include ip route lista floating com AD 200, mas show ip route não mostra essa S. Motivo comum?",
+    "alternativas": [
+      "A running-config é ignorada pelo IOS em rotas estáticas",
+      "Códigos C proíbem qualquer estática na tabela",
+      "Floating com AD pior fica de fora da tabela ativa enquanto a primária (melhor AD) está instalada",
+      "O comando ping apaga floatings da running"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A floating está configurada (running) mas não instalada na RIB porque outra fonte do mesmo prefixo com AD melhor (S 1 ou O 110) venceu. Isso é esperado, não bug. Códigos C não proíbem estáticas; ping não remove ip route da config. Use run | include para ver backups e show ip route para ver o que realmente encaminha.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "No checklist “não chega ao destino”, show ip interface brief serve principalmente para:",
+    "alternativas": [
+      "Só listar VLANs allowed no trunk",
+      "Só exibir códigos C L S O da tabela de rotas",
+      "Só mostrar neighbor OSPF FULL/2WAY",
+      "Ver se interfaces e SVIs estão up/up e com IP — base de L1/L3 local antes de culpar rotas"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Brief resume status e endereços das interfaces: interface down explica rota que some e gateway inalcançável. Não substitui show interfaces trunk, show ip route nem show ip ospf neighbor. No método sistemático, brief é passo cedo: L1/L2 e addressing local antes de longest match e AD.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "NOC olha S 10.0.0.0/8 via firewall e espera que 10.1.1.40 saia por ele. Também existe S 10.1.1.0/24 via DC. O que acontece com o tráfego?",
+    "alternativas": [
+      "Tráfego a 10.1.1.40 usa o /24 (longest match), path “inesperado” em relação à /8 do firewall",
+      "AD da /8 sempre força o firewall independentemente do length",
+      "As duas rotas são ignoradas por conflito e o pacote dropa",
+      "O IOS converte as duas em S* de last resort"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Match mais específico manda: /24 vence /8 para hosts daquela subnet. O operador que só olha a rota “grande” acha que o firewall é o path, mas o encaminhamento real segue o /24. AD entre lengths diferentes não “força” a /8. Diagnóstico: show ip route 10.1.1.40 para ver a entry vencedora.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "L3 switch: SVIs up/up, hosts pingam o gateway da própria VLAN, inter-VLAN falha. Running sem ip routing. Diagnóstico?",
+    "alternativas": [
+      "SVIs up provam que o roteamento entre VLANs já está ativo",
+      "Comportamento esperado: sem ip routing o switch não encaminha entre SVIs, só oferece gateway local",
+      "Default ::/0 IPv6 corrige inter-VLAN IPv4",
+      "Longest match entre VLAN 10 e 20 é calculado no host"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Gateway local pode responder (SVI) sem o dispositivo rotear entre VLANs se ip routing estiver off. Inter-VLAN exige encaminhamento L3 habilitado além de SVIs up. Default IPv6 e longest match no host não substituem ip routing. No revisitado 3.5: após gateway ok, confirme se o box realmente roteia.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após a rota O 10.50.0.0/16 sair da tabela (neighbor OSPF caiu), a floating AD 210 aparece em show ip route. Isso demonstra:",
+    "alternativas": [
+      "Que floating nunca funciona em redes OSPF",
+      "Que AD maior venceu com a primária ainda instalada",
+      "Que a floating assumiu corretamente quando a primária saiu da tabela",
+      "Que longest match foi desativado no roteador"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Backup com AD pior só instala quando a fonte melhor some. O cenário confirma o desenho floating vs OSPF: com O up a S 210 fica na running; com O down a S 210 encaminha. Não prova que floating “nunca funciona”, nem que AD maior vence com primária up, nem desliga longest match para outros prefixos.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Em dual-stack, o par mínimo de verificação IPv6 no checklist unificado é:",
+    "alternativas": [
+      "Apenas show etherchannel summary",
+      "Apenas show spanning-tree vlan",
+      "Substituir permanentemente show ip route IPv4",
+      "show ipv6 interface brief e show ipv6 route — GUA/LL e defaults/rotas independentes do IPv4"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "IPv6 exige checagem própria de endereços (brief) e da tabela (route), inclusive ::/0. IPv4 ok não prova a pilha v6. STP e EtherChannel não substituem o diagnóstico de GUA e default IPv6. O content 3.5 trata dual-stack traps como repetir o método por pilha.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Há rota O e rota S para o mesmo 192.168.40.0/24 (AD 110 vs AD 1). Qual instala na tabela?",
+    "alternativas": [
+      "A estática (AD 1), porque no mesmo prefixo a menor AD vence",
+      "A OSPF, porque rotas dinâmicas sempre vencem estáticas",
+      "Nenhuma até clear ip route * forçado",
+      "Ambas em balanceamento 50/50 por padrão"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Mesmo length: desempate por AD. Static default 1 vence OSPF 110; a O fica de fora (ou como candidate em cenários avançados, fora do foco CCNA). Não há regra “dinâmica sempre vence” nem ECMP automático entre fontes com AD diferente. show ip route deve mostrar S, não O, para esse /24.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ping ao gateway da VLAN ok; traceroute para o servidor remoto morre já no primeiro hop de saída do gateway. Próximo foco?",
+    "alternativas": [
+      "Somente o cabo de acesso do PC, ignorando o gateway",
+      "Rota de saída no gateway (match, next-hop, interface) e return path do destino/remoto",
+      "Apagar a rota connected da LAN do host",
+      "Desligar IPv6 em todo o campus sem testar IPv4"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Gateway local ok isola o problema além do segmento do host: decisão de rota no gateway, next-hop unreachable, interface de WAN down ou falta de rota de volta. Cabo do PC já foi validado pelo ping ao gateway. Apagar connected da LAN piora o cenário. Checklist: após L2/local, show ip route <destino> e traceroute.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que a frase “menor AD sempre vence qualquer rota” está errada no troubleshooting?",
+    "alternativas": [
+      "Porque AD 255 sempre vence na prática",
+      "Porque rotas connected não possuem interface de saída",
+      "Porque um prefixo mais longo com AD pior pode vencer um menos específico com AD melhor (longest match primeiro)",
+      "Porque static nunca compete com OSPF no mesmo prefixo"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "AD só compara rotas do mesmo prefixo/length. Um /24 O AD 110 vence um /8 S AD 1 para destinos daquele /24. Static compete sim com O no mesmo length (e costuma vencer). A armadilha de prova e de NOC é misturar longest match com AD — o content 3.5 separa explicitamente os dois passos.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual sequência melhor resume o checklist unificado “não chega ao destino” do content 3.5?",
+    "alternativas": [
+      "Só loop em show ip ospf neighbor até FULL",
+      "Só trocar o SFP da uplink sem testar IP",
+      "Só aumentar potência do Wi-Fi do site",
+      "Host/gateway → L2 do segmento → show route do destino → longest match/AD/next-hop → traceroute/return → repetir em IPv6 se dual-stack"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O método ordena evidências: local, link, decisão de rota, path e return; dual-stack repete a lógica na pilha v6. Atalhos isolados (só OSPF, só óptica, só Wi-Fi) pulam falhas comuns de gateway, SVI e longest match. ACL/filtro só entra depois de encaminhamento e return path limpos.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ida: rota e next-hop ok no roteador de origem; ACLs limpas. Destino não tem rota de volta à origem. Sintoma típico?",
+    "alternativas": [
+      "Falha assimétrica / ping one-way — return path quebrado apesar da rota de ida",
+      "Longest match desativado globalmente no CEF",
+      "AD 1 de static torna-se inválida na origem",
+      "S* obrigatória nos dois lados para qualquer /24"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Conectividade IP é bidirecional no uso típico de ping: sem rota de volta (ou com filtro no retorno), a ida pode existir e a sessão falhar. Isso não desliga longest match, não invalida AD 1 nem exige S* em todo prefixo. No checklist, após validar a ida, confirme o return path no destino ou no hop de retorno.",
+    "part_id": "3.5"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual o melhor uso combinado de ping e show ip route <destino> no troubleshooting de conectividade?",
+    "alternativas": [
+      "Substituir qualquer verificação de VLAN e trunk",
+      "Confirmar reachability fim a fim e qual rota/next-hop o roteador usa para aquele destino",
+      "Provar apenas L1 do cabo do core sem olhar IP",
+      "Apagar automaticamente todas as floatings da running"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Ping (ou traceroute) prova se o caminho responde; show ip route <prefix> mostra a decisão de encaminhamento (match, código, AD, next-hop, interface). Juntos fecham “há path?” e “qual path?”. Não substituem L2/VLAN, não se limitam a L1 e não alteram configuração de floating. É o fechamento prático do método 3.5.",
+    "part_id": "3.5"
+  }
+]

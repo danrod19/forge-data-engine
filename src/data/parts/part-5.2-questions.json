@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Uma ACL standard no IOS filtra, de forma típica no CCNA, com base em:",
+    "alternativas": [
+      "Apenas o endereço IP de origem (source)",
+      "Source, destination, protocolo e portas obrigatoriamente",
+      "Somente o CoS do frame",
+      "Apenas o router-id OSPF"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Standard ACL examina o source IP. Extended adiciona destino, protocolo e portas. CoS e OSPF RID não definem o match clássico de standard numbered/named no 200-301. Use standard quando só a origem importa.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ACL extended diferencia-se da standard principalmente porque pode casar:",
+    "alternativas": [
+      "Somente a VLAN nativa",
+      "Source e destination, protocolo e portas (além da origem)",
+      "Apenas o hostname do device",
+      "Somente o tipo de cabo (UTP/fibra)"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Extended permite políticas finas (ex.: negar TCP/80 de A para B). Standard não enxerga porta/destino. Hostname e tipo de cabo não entram no match da ACL IP clássica do exame.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O processamento das linhas de uma ACL no IOS segue:",
+    "alternativas": [
+      "Ordem aleatória a cada pacote",
+      "Sempre a última linha primeiro",
+      "De cima para baixo, parando no first match",
+      "Apenas o implicit deny, ignorando permits"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Top-down + first match: a primeira regra que casa decide permit ou deny. Linhas abaixo não são avaliadas para aquele pacote. Implicit deny só atua se nada casar antes. Ordem errada é falha clássica de lab.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No final de toda ACL IPv4 há, mesmo sem estar escrito:",
+    "alternativas": [
+      "permit ip any any obrigatório e invisível que libera tudo",
+      "Um remark automático com o hostname",
+      "Uma rota estática 0.0.0.0/0",
+      "Implicit deny any (nega o que não casou antes)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Deny implícito fecha a lista. Por isso uma ACL só com denies (ou permits incompletos) “quebra tudo”. Se quiser permitir o resto, coloque permit explícito antes do fim — com consciência de segurança.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ip access-group FILTER in na interface G0/0 significa que a ACL FILTER age sobre:",
+    "alternativas": [
+      "Tráfego entrando em G0/0 (do cabo para o roteador)",
+      "Somente o processo SSH na VTY",
+      "Apenas rotas OSPF anunciadas",
+      "Somente o buffer de logging"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "in = inbound na interface. out filtraria o que sai por G0/0. access-group não é access-class de VTY. OSPF e syslog são eixos diferentes. Visualize o pacote entrando pela interface marcada.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ip access-group FILTER out em G0/1 filtra:",
+    "alternativas": [
+      "Apenas frames STP",
+      "Tráfego saindo por G0/1 (do roteador para o cabo)",
+      "Somente pacotes gerados pelo NTP",
+      "Apenas ARP na VLAN 1"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "out = outbound na interface. Erro comum: colocar out quando o tráfego problemático é inbound (ou o contrário). STP/NTP/ARP não redefinem o sentido de access-group IP no discurso do CCNA.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Na wildcard mask de ACL, o bit 0 indica tipicamente:",
+    "alternativas": [
+      "Que o bit correspondente deve ser ignorado",
+      "Que o endereço inteiro é any",
+      "Que o bit correspondente do endereço deve coincidir",
+      "Que a ACL está desabilitada"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "0 = “care” (deve bater); 1 = “don’t care”. Por isso 192.168.1.0 0.0.0.255 casa o terceiro octeto fixo e o último livre. Inverter com 255.255.255.0 é o erro clássico de quem cola subnet mask.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Wildcard 0.0.0.0 em um endereço host significa:",
+    "alternativas": [
+      "Qualquer host da Internet",
+      "Qualquer host da subnet /16",
+      "Match de broadcast somente",
+      "Match exato daquele host (equivalente ao atalho host)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "0.0.0.0 força todos os bits a coincidirem — um único IP. any usa 255.255.255.255 de wildcard. host 10.1.1.1 é açúcar sintático para 10.1.1.1 0.0.0.0.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "access-class 10 in sob line vty aplica a ACL 10 a:",
+    "alternativas": [
+      "Sessões de gerenciamento remoto, filtrando o IP de origem do cliente admin",
+      "Todo o NAT PAT da empresa",
+      "Somente o spanning-tree root",
+      "Apenas o pool DHCP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "access-class protege VTY (SSH/Telnet). É standard na prática de origem. Não configura NAT, STP ou DHCP. Admin bloqueado com engine SSH ok → confira access-class e implicit deny da ACL.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show access-lists serve principalmente para:",
+    "alternativas": [
+      "Listar apenas vizinhos OSPF",
+      "Configurar o clock do NTP",
+      "Gerar chaves RSA",
+      "Exibir as linhas da ACL e contadores de match (hits)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O show lista regras e hits — prova se o tráfego está casando. show ip interface confirma apply in/out. Não é OSPF, NTP nem crypto key. Hits zero na linha esperada guiam o TShoot de direção/interface.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ACL com permit tcp any host 10.1.1.10 eq 22 e nada mais. Efeito sobre HTTP para 10.1.1.10?",
+    "alternativas": [
+      "HTTP é permitido porque any cobre todas as portas",
+      "HTTP cai no implicit deny e é negado (não há permit para 80/tcp genérico)",
+      "HTTP é convertido em SSH automaticamente",
+      "Implicit deny não se aplica a extended"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Só o match SSH (22) é permitido; o restante encontra deny implícito. any na origem não libera todas as portas de destino. Extended também tem implicit deny. Inclua permits necessários ou um permit final consciente.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Linha 1: deny ip 10.0.0.0 0.0.0.255 any. Linha 2: permit ip host 10.0.0.5 any. Host 10.0.0.5 é:",
+    "alternativas": [
+      "Permitido pela linha 2 sempre, pois é mais específica",
+      "Negado pela linha 1 (first match) — a linha 2 nunca é alcançada para esse source",
+      "Ignorado porque standard não tem deny",
+      "Tratado como outside global de NAT"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "10.0.0.5 casa o deny da /24 na linha 1; first match encerra. Específico depois de genérico que já casou não salva o host. Reordene: permit do host antes do deny da rede.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Requisito: bloquear apenas TCP/80 de 192.168.1.0/24 para 10.10.10.10. Qual tipo de ACL é adequado?",
+    "alternativas": [
+      "Standard numbered 20 somente com source /24",
+      "Apenas access-class sem access-group",
+      "Extended que case source, destination, tcp e eq 80",
+      "Somente wildcard 255.255.255.0 como endereço"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Porta e destino exigem extended. Standard só source não atende “só HTTP para o host”. access-class é VTY. Wildcard 255.255.255.0 como se fosse endereço é erro conceitual.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Técnico configura ACL perfeita mas esquece ip access-group. Sintoma?",
+    "alternativas": [
+      "A ACL filtra globalmente sem apply",
+      "Implicit deny some da ACL",
+      "Standard vira extended sozinha",
+      "Nenhum efeito no tráfego — regras existem mas não estão aplicadas a uma interface/direção"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Sem access-group (ou access-class), a lista é só configuração inerte. show ip interface sem inbound/outbound ACL confirma. Crie e aplique; valide direção in/out.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Erro clássico: access-list 10 permit 192.168.1.0 255.255.255.0. Problema?",
+    "alternativas": [
+      "Standard não aceita permit",
+      "Usou subnet mask no lugar da wildcard — matching incorreto (deveria ser 0.0.0.255 para /24 típico)",
+      "192.168.1.0 é sempre any",
+      "ACL 10 é extended e exige porta"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Wildcard de /24 alinhado é 0.0.0.255, não 255.255.255.0. Com a mask invertida o match não é a subnet pretendida. ACL 10 é standard; permit é válido. Corrija a wildcard.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Pacote entra por G0/0 e sai por G0/1. Para filtrar na saída em direção à WAN em G0/1, aplica-se:",
+    "alternativas": [
+      "access-group na G0/1 in",
+      "access-group na G0/1 out",
+      "access-class na G0/1",
+      "Somente ntp server na G0/1"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Saindo pela WAN (G0/1) → out em G0/1. in em G0/1 filtraria o que chega da WAN. access-class é VTY, não interface de dados. NTP não aplica ACL.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Named extended ACL é vantajosa em relação à numbered principalmente por:",
+    "alternativas": [
+      "Eliminar o implicit deny",
+      "Permitir nomes legíveis e edição mais amigável (sequences) em plataformas modernas",
+      "Filtrar automaticamente sem apply",
+      "Funcionar só com IPv6"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "ip access-list extended NOME melhora operação e documentação. Implicit deny permanece. Ainda precisa de access-group. Serve a IPv4 no escopo CCNA clássico de ACL IPv4.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Regra prática de posicionamento: extended perto da source; standard perto do destination. Motivo?",
+    "alternativas": [
+      "Standard não funciona perto do destino nunca",
+      "Extended com dest/porta pode bloquear cedo o fluxo indesejado; standard só source, colocada cedo demais pode cortar tráfego legítimo demais",
+      "Extended só opera em VTY",
+      "O IOS ignora a posição da ACL"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Design clássico de prova: extended o mais perto possível da origem do tráfego a filtrar; standard perto do destino porque não distingue destinos. O IOS aplica onde você configurar — a “regra” é de boas práticas, não mágica de protocolo.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ip interface G0/0 mostra Inbound access list is BLOCK. Interpretação?",
+    "alternativas": [
+      "ACL BLOCK está aplicada inbound em G0/0",
+      "ACL BLOCK só existe na VTY",
+      "Não há ACL na interface",
+      "Outbound é BLOCK e inbound está livre"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O show ip interface é a prova do apply. Confirme também Outgoing access list. VTY usaria access-class, não essa linha de interface. Combine com show access-lists BLOCK para ver regras e hits.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ACL standard 15: deny 10.1.1.0 0.0.0.255 e nada mais. Tráfego de 10.2.2.2 é:",
+    "alternativas": [
+      "Permitido por match na linha deny",
+      "Convertido em 10.1.1.2",
+      "Negado pelo implicit deny (não casou o deny da 10.1.1.0/24 e não há permit)",
+      "Sempre permitido porque standard não tem implicit deny"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "10.2.2.2 não casa o deny da 10.1.1.0/24; cai no deny any implícito. Só o 10.1.1.0/24 é “explicitamente” negado, mas o resto também morre sem permit. Sintoma “ninguém passa” após ACL “só de um deny”.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Admin 172.16.5.10 bloqueado no SSH; ACL VTY permite 10.0.0.0/8. Diagnóstico access-class?",
+    "alternativas": [
+      "Origem 172.16.5.10 não casa o permit 10.0.0.0/8 e cai em deny (explícito ou implícito)",
+      "SSH ignora access-class sempre",
+      "Wildcard de /8 é irrelevante na VTY",
+      "Extended é obrigatória na VTY para qualquer SSH"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "access-class filtra source do cliente SSH. Fora do permit, nega. Ajuste a ACL ou a origem do admin. SSH não ignora access-class; standard é o uso típico na VTY.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Faixas numéricas clássicas: ACL 50 e ACL 150. Tipos?",
+    "alternativas": [
+      "50 extended; 150 standard",
+      "Ambas standard apenas",
+      "50 standard; 150 extended",
+      "Ambas named apenas"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "1–99 (e 1300–1999) standard; 100–199 (e 2000–2699) extended. 50 = standard; 150 = extended. Named é outro estilo (por nome), não o número 50/150.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Hits altos na linha deny e zero nos permits seguintes para o mesmo fluxo. Leitura?",
+    "alternativas": [
+      "First match no deny — permits abaixo não são avaliados para esse tráfego",
+      "A ACL está desaplicada",
+      "Implicit permit venceu",
+      "Wildcard any foi removida do IOS"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Contadores mostram qual linha decide. Se o deny casa primeiro, reordene ou refine o match. Hits no deny com apply ativo não indicam ACL “desligada”. Não existe implicit permit padrão.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Qual atalho representa qualquer endereço na sintaxe de ACL?",
+    "alternativas": [
+      "host 255.255.255.255 somente",
+      "0.0.0.0 0.0.0.0 somente como unique host Internet",
+      "eq any",
+      "any (equivalente a 0.0.0.0 255.255.255.255)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "any = todos os hosts. host x.x.x.x = um IP. 0.0.0.0 0.0.0.0 é o host 0.0.0.0, não “toda a Internet”. eq é operador de porta, não de endereço.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Tráfego permitido na ACL mas interface com ACL na direção oposta à do fluxo. Resultado?",
+    "alternativas": [
+      "A ACL “certa” na direction errada não filtra esse fluxo — sintoma de apply incorreto",
+      "O IOS espelha in e out automaticamente",
+      "Implicit deny é desativado",
+      "Standard vira extended"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Direção e interface definem se o pacote encontra a lista. Regras corretas no papel com out em vez de in (ou interface LAN vs WAN) = zero efeito. Corrija o access-group, não só o texto da ACL.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mínimo do content 5.2 para “ACL não funciona”:",
+    "alternativas": [
+      "Só apagar a VLAN 1",
+      "Só limpar o OSPF process",
+      "Apply (if + in/out) → path do pacote → ordem/first match → implicit deny → wildcard → standard vs extended",
+      "Só aumentar o modulus SSH"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O método evita reescrever 40 linhas antes de ver se a ACL está na interface certa. VLAN/OSPF/SSH são eixos paralelos. Valide hits e show ip interface cedo no TShoot.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Permit ip any any como última linha explícita. Efeito?",
+    "alternativas": [
+      "Remove a necessidade de access-group",
+      "Converte a ACL em standard",
+      "Nega todo o tráfego com mais força que o implícito",
+      "Torna o “resto” permitido explicitamente — o implicit deny deixa de atingir o que o permit final casa"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Permit final any any (ou similar) evita que o deny implícito mate o tráfego residual. Ainda precisa de apply. É decisão de segurança (abrir o resto) — use com critério, não por hábito cego.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Standard ACL 5 deny host 10.1.1.1 aplicada outbound na interface do servidor. Objetivo típico de design “perto do destino”?",
+    "alternativas": [
+      "Bloquear o host 10.1.1.1 de alcançar recursos além dessa interface, filtrando pela origem perto do destino",
+      "Filtrar pela porta 443 apenas",
+      "Autenticar usuários RADIUS",
+      "Marcar DSCP EF"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Standard só source: posicionar perto do destino limita o impacto colateral. Não filtra porta (precisaria extended), nem faz RADIUS/QoS marking. O exemplo ilustra a regra prática do content.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "192.168.10.0 0.0.0.255 na ACL casa quantos hosts de host bits no último octeto (bloco /24 alinhado)?",
+    "alternativas": [
+      "Exatamente 1 host",
+      "Apenas 2 hosts",
+      "256 endereços no último octeto (0–255), i.e. a subnet /24 típica",
+      "Nenhum, porque wildcard está invertida"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "0.0.0.255 ignora o último octeto → 192.168.10.0–255. É a forma correta de /24, não invertida. host único seria 0.0.0.0 de wildcard. Contar 256 endereços inclui network/broadcast na faixa de match de bits.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor uso combinado de show access-lists e show ip interface no TShoot de filtro?",
+    "alternativas": [
+      "Substituir qualquer teste de ping",
+      "Só provar o estado do EtherChannel",
+      "Apagar ACLs automaticamente",
+      "Ver regras/hits e confirmar em qual interface e direção a ACL está aplicada"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "access-lists = conteúdo e contadores; ip interface = apply in/out. Juntos fecham “a regra existe?” e “o pacote encontra a regra?”. Ainda use ping/traceroute para o path. Não medem PoC EtherChannel nem devem apagar config sem análise.",
+    "part_id": "5.2"
+  }
+]

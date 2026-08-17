@@ -1,0 +1,62 @@
+#!/usr/bin/env node
+/**
+ * Smoke checklist multi-track — imprime passos manuais de QA pós-deploy.
+ * Uso: npm run qa:tracks
+ * Não executa browser/Playwright; é um guia no terminal.
+ */
+
+const lines = [
+  "",
+  "╔══════════════════════════════════════════════════════════╗",
+  "║  CCNA Forge · QA multi-track (manual pós-deploy)        ║",
+  "╚══════════════════════════════════════════════════════════╝",
+  "",
+  "Tracks: ccna-v1 | ccna-v2 | aws",
+  "",
+  "── Viewport / shell ───────────────────────────────────────",
+  "[ ] Abre no mobile (viewport / DevTools device)",
+  "[ ] TopBar: alternar CCNA V1 / V2 / AWS",
+  "[ ] Hard refresh mantém track (localStorage)",
+  "",
+  "── Home ───────────────────────────────────────────────────",
+  "[ ] Cada track: Home mostra contagens coerentes",
+  "[ ] V2: Trilha 100% tickets · Simulado ~30% troubleshooting",
+  "[ ] AWS: labels SAA Foundations",
+  "",
+  "── Simulado ───────────────────────────────────────────────",
+  "[ ] Simulado 20 questões até o resultado + review",
+  "[ ] CCNA V2: ~6 itens com CLI/tag troubleshooting numa sessão de 20",
+  "[ ] CCNA V1: sessão traditional only (0 tickets no mix)",
+  "[ ] AWS: pool traditional inalterado (~360)",
+  "",
+  "── Trilha ─────────────────────────────────────────────────",
+  "[ ] Trilha: 3 tickets com terminal (sintoma + CLI)",
+  "[ ] V2: copy “Troubleshooting · v2.0”",
+  "",
+  "── Estudo ─────────────────────────────────────────────────",
+  "[ ] Estudo: 1 domínio/part, progresso sobe",
+  "[ ] Trocar track NÃO mistura progresso",
+  "    chaves: ccna-forge-estudo-progress:ccna-v1|:ccna-v2|:aws",
+  "",
+  "── Sobre ──────────────────────────────────────────────────",
+  "[ ] Sobre: V1 clássico · V2 posture · AWS SAA",
+  "",
+  "── Vidas / paywall visual ─────────────────────────────────",
+  "[ ] Vidas: errar reduz; zerar abre paywall visual",
+  "[ ] Vidas namespaced: ccna-forge-lives:{track}",
+  "",
+  "── localStorage ───────────────────────────────────────────",
+  "[ ] ccna-forge-active-track",
+  "[ ] ccna-forge-lives:ccna-v1 | :ccna-v2 | :aws",
+  "[ ] ccna-forge-streak:{track}",
+  "[ ] ccna-forge-estudo-progress:{track}",
+  "",
+  "── Build (local, pré-deploy) ──────────────────────────────",
+  "[ ] npx tsc --noEmit",
+  "[ ] npm run build  → pasta out/ (static export)",
+  "",
+  "Dica: DevTools → Application → Local Storage no domínio deployado.",
+  "",
+];
+
+console.log(lines.join("\n"));

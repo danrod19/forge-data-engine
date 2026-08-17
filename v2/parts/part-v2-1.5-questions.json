@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "No campus com WLC, qual o papel principal do CAPWAP entre AP e controller?",
+    "alternativas": [
+      "Túnel de controle (e, em local mode, dados) AP↔WLC para join e operação centralizada",
+      "Substituir o Spanning Tree no access",
+      "Atribuir automaticamente o root bridge",
+      "Desligar o PoE do switch"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "CAPWAP carrega o plano de controle do AP ao WLC e, em local mode, também o data plane centralizado. Sem reachability CAPWAP o AP não junta. Não é STP nem PoE.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Pré-requisito de rede para o AP fazer join no WLC?",
+    "alternativas": [
+      "Somente SSID criado, sem IP no AP",
+      "AP alcançar o WLC na VLAN de management (IP, gateway, rota/ACL permitindo CAPWAP)",
+      "Trunk nativo 999 obrigatório em todo campus",
+      "Desligar o DHCP da LAN"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Join depende de reachability ao controller. SSID sozinho não substitui management path. DHCP na VLAN de AP costuma ser necessário; desligar DHCP piora.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Desenho simples CCNA: porta do switch para o AP em management-only?",
+    "alternativas": [
+      "no switchport com /30 por rádio",
+      "Somente Port-channel sem VLAN",
+      "switchport mode access e access vlan da management do AP",
+      "ip nat inside na porta do AP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Access na VLAN de management é o desenho clássico simples. Routed /30 por rádio e NAT na porta do AP não são o padrão CCNA de edge AP.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Quando o cabo do AP costuma ser trunk?",
+    "alternativas": [
+      "Sempre, mesmo com uma única VLAN de management",
+      "Nunca; trunk é proibido para AP",
+      "Só se o WLC estiver desligado",
+      "Quando o design carrega múltiplas VLANs de usuário no AP (native = management tipicamente)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Trunk entra quando várias VLANs de usuário passam no cabo do AP. Native deve ser a management. Access basta no desenho management-only + central switching.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "WLAN/SSID no WLC precisa de quê para dados de usuário úteis?",
+    "alternativas": [
+      "Bind à interface/VLAN de usuário (além de AP joined e path L2/L3)",
+      "Apenas um nome SSID sem interface",
+      "Somente LAG sem WLAN",
+      "Desligar CAPWAP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "SSID sem bind à interface/VLAN não entrega path de dados coerente. APs joined e DHCP na VLAN correta completam o serviço. CAPWAP é necessário, não para desligar.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Modo local do AP (ideia): para onde vai tipicamente o tráfego de dados do cliente?",
+    "alternativas": [
+      "Sempre só comutado no switch do AP sem WLC",
+      "Centralizado via CAPWAP ao WLC (campus clássico)",
+      "Somente via TFTP",
+      "Somente via console do AP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Local mode centraliza o data plane no controller. FlexConnect é a ideia de local switching em branch. TFTP/console não são o data path do usuário.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "FlexConnect (ideia) em filial com WAN ao WLC instável?",
+    "alternativas": [
+      "Obriga desligar todos os SSIDs",
+      "Remove a necessidade de VLAN no switch",
+      "Pode comutar dados localmente no AP conforme design, reduzindo dependência do CAPWAP de dados",
+      "Substitui o PoE"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "FlexConnect permite local switching quando o desenho exige resiliência de branch. Ainda há requisitos de VLAN/config. Não remove PoE nem VLAN magicamente.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "LAG no WLC — ideia de prova clássica ao habilitar?",
+    "alternativas": [
+      "Nunca funciona com EtherChannel no switch",
+      "Desliga todos os APs permanentemente",
+      "Converte APs em FlexConnect automaticamente",
+      "Mudança de LAG no WLC tipicamente exige reboot do controller"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Habilitar LAG no WLC costuma requerer reboot para aplicar. O switch precisa de port-channel coerente. Não é o mesmo que mudar modo do AP automaticamente.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "AP com PoE delivering e porta connected, mas não aparece joined no WLC. Interpretação?",
+    "alternativas": [
+      "L1 ok; falha provável de CAPWAP/management reachability ou join — investigar VLAN/IP/WLC",
+      "PoE insuficiente sempre se connected",
+      "SSID inexistente impede PoE",
+      "Trunk nativo resolve sozinho sem IP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "PoE e link up são pré-requisitos L1. Join é CAPWAP até o controller. Verifique management VLAN, DHCP/IP, gateway e path ao WLC.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Verify no switch para a porta do AP?",
+    "alternativas": [
+      "Apenas show ip ospf neighbor",
+      "show interfaces status, show vlan brief / show run interface (mode e VLAN)",
+      "Apenas show ip nat translations",
+      "Apenas show standby brief"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Status, VLAN e running da interface confirmam access/trunk e management. OSPF/NAT/HSRP não verificam a porta do AP sozinhos.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Native VLAN 1 no switch e management do AP esperando VLAN 20 no trunk. Sintoma típico?",
+    "alternativas": [
+      "PoE desliga automaticamente",
+      "WLC vira root STP",
+      "Management/CAPWAP na VLAN errada — join ou path de controle falha",
+      "SSID herda VLAN 1 sempre com sucesso"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Native mismatch desloca o untagged management. Alinhe native à VLAN de management do AP. PoE/STP root não são a causa direta.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SSID criado no WLC sem interface/VLAN de usuário. Resultado comum?",
+    "alternativas": [
+      "Clientes sempre pegam IP da management",
+      "CAPWAP desliga em todos os APs",
+      "LAG forma sozinho",
+      "WLAN não operacional ou sem path de dados útil até o bind correto"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Sem bind, o SSID não tem path de dados definido. Corrija a interface dinâmica/VLAN. CAPWAP e LAG não dependem desse bind para existir.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "AP em access VLAN 40 (usuários) em vez da management 20. Efeito provável no join?",
+    "alternativas": [
+      "AP pode obter IP na VLAN errada e não alcançar o WLC / discovery falha",
+      "Join melhora sempre",
+      "FlexConnect ativa sozinho",
+      "Trunk vira access automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Management na VLAN correta é crítica para discovery/join. Access na VLAN de usuário isola o AP do path de controller. Corrija access vlan 20 (exemplo).",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cliente associa ao SSID mas fica sem IP. APs joined. Foco?",
+    "alternativas": [
+      "Somente aumentar potência RF no máximo",
+      "VLAN do WLAN, DHCP na VLAN de usuário e path L2 (trunk/access) — não só RF",
+      "Somente desligar CAPWAP",
+      "Somente mudar o hostname do switch"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Associação RF ≠ IP. Com APs joined, o problema costuma ser VLAN/DHCP do SSID. RF no máximo não cria DHCP.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem mental de Diagnose wireless campus?",
+    "alternativas": [
+      "SSID primeiro → ignorar L1",
+      "write erase no WLC",
+      "L1/PoE → join CAPWAP → WLAN/VLAN bind → cliente DHCP/IP",
+      "Só LAG reboot sem checar AP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Isole camadas: energia/link, join, configuração de WLAN/VLAN, depois cliente. write erase e LAG reboot cego não são o primeiro passo.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "WLC e APs no mesmo campus; firewall entre management do AP e WLC bloqueia CAPWAP. Sintoma?",
+    "alternativas": [
+      "STP elege dois roots",
+      "NAT overload some",
+      "HSRP perde o VIP",
+      "APs não completam join apesar de IP e PoE ok"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "CAPWAP precisa de path permitido. Firewall no meio derruba join. Não é efeito direto de STP/NAT/HSRP.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Diferença resumida local vs FlexConnect?",
+    "alternativas": [
+      "Local: dados tipicamente via WLC; FlexConnect: dados podem ser locais no AP (ideia de branch)",
+      "FlexConnect remove o WLC do design sempre",
+      "Local mode proíbe SSID",
+      "FlexConnect só existe sem switch"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O contraste de data plane é o ponto de exame. Ambos usam WLC para controle quando reachable. Não eliminam o switch de acesso.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Allowed VLANs no trunk do AP omitindo a VLAN de usuários do SSID. Efeito?",
+    "alternativas": [
+      "Join CAPWAP melhora",
+      "Clientes naquela VLAN não têm path de dados no cabo do AP",
+      "PoE aumenta de classe",
+      "LAG forma no access switch automaticamente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Trunk precisa permitir a VLAN do SSID. Omitir a VLAN isola os usuários. PoE/LAG não compensam.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ap summary (ideia WLC): AP em Not Joined. Próximo check no switch?",
+    "alternativas": [
+      "Apenas show ip ospf database",
+      "Apenas show access-lists no core de Internet",
+      "VLAN/mode da porta, IP do AP, reachability ao WLC e se a porta está connected",
+      "Apenas show flash do WLC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Do lado de switch/rede: management path. OSPF database e flash não substituem o check de porta/VLAN do AP.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo desta part?",
+    "alternativas": [
+      "CAPWAP join",
+      "Access vs trunk no AP",
+      "SSID bind VLAN",
+      "RRM lab completo, 802.11ax features e DNAC full"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O CCNA foca arquitetura AP/WLC, CAPWAP, porta e WLAN bind. RF design/RRM/ax/DNAC profundos ficam de fora.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "LAG no WLC com apenas uma porta no EtherChannel do switch. Risco?",
+    "alternativas": [
+      "Agregação inconsistente — casar número de links, mode e VLANs nos dois lados",
+      "SSID some por definição",
+      "CAPWAP usa TFTP obrigatoriamente",
+      "APs viram autonomous sem config"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "LAG exige consistência switch↔WLC. Desbalancear membros causa falha de uplink. Não é causa direta de autonomous mode.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "AP discovery: DHCP option 43 (ideia) serve para?",
+    "alternativas": [
+      "Configurar native VLAN no trunk",
+      "Informar ao AP o endereço do WLC quando o discovery local não basta",
+      "Substituir PoE",
+      "Desligar FlexConnect"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Option 43 é mecanismo clássico de apontar controllers. Não configura trunk nem PoE. Join ainda precisa de reachability IP.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Clientes caem na VLAN de management do AP. Causa configuracional típica?",
+    "alternativas": [
+      "HSRP priority 100",
+      "OSPF passive na WAN",
+      "WLAN bind/native/access colocando dados na management em vez da VLAN de usuários",
+      "ACL standard no VTY"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Dados de usuário devem mapear à VLAN do SSID. Bind/native errados misturam management e users. HSRP/OSPF/VTY não definem VLAN do WLAN.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "WLC management e AP management em subnets diferentes. Join ainda é possível se?",
+    "alternativas": [
+      "Somente se estiverem na mesma porta switch",
+      "Nunca; mesma subnet é lei absoluta sem rota",
+      "Somente com PortFast no core",
+      "Houver roteamento e permissão CAPWAP entre as subnets (e discovery correto)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Join cross-subnet é comum com rota e firewall ok. Não exige mesma porta. PortFast no core não cria reachability L3.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SSID habilitado; APs joined; interface do WLAN shutdown no WLC. Efeito?",
+    "alternativas": [
+      "SSID pode não anunciar/servir clientes até a interface/WLAN estar up e bound",
+      "CAPWAP de todos os APs cai obrigatoriamente",
+      "PoE desliga nas portas access",
+      "Trunk vira access"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "WLAN/interface down impede o serviço do SSID mesmo com APs joined. Não derruba PoE nem muda switchport mode sozinho.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Porta do AP em err-disabled por BPDU Guard. Impacto wireless?",
+    "alternativas": [
+      "WLC assume o RF do AP automaticamente",
+      "AP perde link/CAPWAP — trate L2 edge (device gerando BPDU) e recupere a porta",
+      "SSID migra para outro controller sem join",
+      "LAG no WLC corrige err-disable"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Sem link no AP não há join. Remova o switch/hub indevido e reative a porta. LAG do WLC não cura err-disable da access do AP.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Verify no WLC de que o AP está operacional (ideia)?",
+    "alternativas": [
+      "Apenas ping 127.0.0.1 no WLC",
+      "Apenas show version no access switch",
+      "AP em estado joined/registered em show ap summary (ou equivalente)",
+      "Apenas LED verde no patch panel"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Estado joined no controller confirma CAPWAP. Ping localhost e LED não bastam. Combine com checks de switch.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Trunk allowed vlan 20,30 mas SSID usa VLAN 40. Resultado?",
+    "alternativas": [
+      "VLAN 40 é criada automaticamente no allowed",
+      "Native 20 mapeia 40",
+      "CAPWAP usa VLAN 40 sem allow",
+      "Dados da VLAN 40 não passam no trunk do AP — clientes sem path"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Allowed list precisa incluir a VLAN do SSID. Sem 40, o path de usuário quebra. Native não redireciona 40 magicamente.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após habilitar LAG no WLC sem reboot, uplinks não agregam como esperado. Ação alinhada à ideia de prova?",
+    "alternativas": [
+      "Reboot do WLC (quando a plataforma exige) e validar EtherChannel no switch",
+      "Apenas aumentar priority STP",
+      "Apenas mudar SSID name",
+      "Desligar todos os APs permanentemente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "LAG no WLC classicamente aplica após reboot. Valide o port-channel no switch. STP/SSID não aplicam LAG.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo Configure/Verify wireless campus no CCNA:",
+    "alternativas": [
+      "Só RRM e 802.11ax features",
+      "CAPWAP join, porta access/trunk correta, WLAN bind VLAN, LAG ideia, e TShoot de path AP–WLC–cliente",
+      "Só mesh outdoor",
+      "Só DNAC full fabric"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O núcleo é AP/WLC/CAPWAP, switchport e SSID/VLAN. RF avançado e DNAC full ficam de fora desta part.",
+    "part_id": "v2-1.5"
+  }
+]

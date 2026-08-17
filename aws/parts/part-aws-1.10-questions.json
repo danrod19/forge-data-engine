@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Function processa uploads S3 e grava metadados em DynamoDB. O que define as permissões de S3/DynamoDB?",
+    "alternativas": [
+      "Execution role da function com least privilege s3 e dynamodb no ARN dos recursos",
+      "Somente o Security Group da subnet pública",
+      "Somente o record ALIAS do Route 53",
+      "Somente o price class do CloudFront"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Execution role da function com least privilege s3 e dynamodb no ARN dos recursos. Isso resolve o cenário: Function processa uploads S3 e grava metadados em DynamoDB. O que define as perm… O distractor «Somente o Security Group da subnet pública» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Logs mostram 'Task timed out after 3.00 seconds'; o job legítimo leva ~45s. Correção direta?",
+    "alternativas": [
+      "Aumentar o timeout da function (ex. 60–90s) ou quebrar o trabalho assíncrono",
+      "Abrir 0.0.0.0/0 no SG do RDS como único fix",
+      "Trocar o runtime para 'desligar timeout'",
+      "Remover a execution role"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Aumentar o timeout da function (ex. 60–90s) ou quebrar o trabalho assíncrono. Isso resolve o cenário: Logs mostram 'Task timed out after 3.00 seconds'; o job legítimo leva ~45s. Corr… O distractor «Abrir 0.0.0.0/0 no SG do RDS como único fix» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Picos de invoke geram 429 Too Many Requests / throttling na function crítica de pagamento. Controle típico?",
+    "alternativas": [
+      "Reserved concurrency adequada (e arquitetura de fila) para garantir/limitar capacidade",
+      "Desligar o CloudWatch Logs",
+      "Colocar a senha do DB em env plaintext",
+      "CNAME no apex para a function URL"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Reserved concurrency adequada (e arquitetura de fila) para garantir/limitar capacidade. Isso resolve o cenário: Picos de invoke geram 429 Too Many Requests / throttling na function crítica de … O distractor «Desligar o CloudWatch Logs» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Lambda em subnets privadas chama GetSecretValue e dá timeout; IAM GetSecretValue está correto. Hipótese forte?",
+    "alternativas": [
+      "Sem NAT ou VPC endpoint para secretsmanager (e kms se CMK) — path de rede ausente",
+      "Falta de s3:ListAllMyBuckets apenas",
+      "Timeout da function em 900s sempre",
+      "Alias Route 53 errado para o secret"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Sem NAT ou VPC endpoint para secretsmanager (e kms se CMK) — path de rede ausente. Isso resolve o cenário: Lambda em subnets privadas chama GetSecretValue e dá timeout; IAM GetSecretValue… O distractor «Falta de s3:ListAllMyBuckets apenas» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual diferença execution role vs resource-based policy na function?",
+    "alternativas": [
+      "Role = o que a function pode chamar; resource policy = quais principals podem invocar a function",
+      "São o mesmo documento IAM sempre",
+      "Resource policy substitui o timeout",
+      "Role define o memory size"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Role é identity da function; resource policy controla invoke (conta, serviço). Timeout/memory são config, não policy de invoke. Tip de prova: 403 ao invocar de fora → resource policy; erro dentro ao chamar S3 → execution role.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Multi-constraint: processar 10k eventos/min de S3, least privilege, sem secret em env, e evitar throttle da function de fraud. Desenho?",
+    "alternativas": [
+      "S3 event → SQS → Lambda com role mínima, secret no Secrets Manager, reserved concurrency na fraud-fn",
+      "S3 event → Lambda com AdministratorAccess e senha no env",
+      "Polling manual sem fila e timeout 1s",
+      "Uma EC2 t2.micro com SSH world open"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "SQS bufferiza, role mínima e Secrets Manager fecham segurança; reserved concurrency protege fraud-fn. Admin+senha no env violam least privilege. Tip de prova: S3 burst + segurança + anti-throttle → SQS + role mínima + Secrets + reserved concurrency.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Env var DB_PASSWORD=SuperSecret no console. Anti-pattern: por quê e alternativa?",
+    "alternativas": [
+      "Secret em plaintext no config; use Secrets Manager/SSM e GetSecretValue na role",
+      "É obrigatório pela AWS em toda Lambda",
+      "Substitui a need de CloudWatch",
+      "Aumenta o reserved concurrency automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Secret em plaintext no config; use Secrets Manager/SSM e GetSecretValue na role. Isso resolve o cenário: Env var DB_PASSWORD=SuperSecret no console. Anti-pattern: por quê e alternativa?… O distractor «É obrigatório pela AWS em toda Lambda» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Function sem permissão logs:CreateLogGroup/CreateLogStream/PutLogEvents. Sintoma?",
+    "alternativas": [
+      "Invokes podem 'funcionar' mas logs não aparecem no CloudWatch (ou falha ao criar log stream)",
+      "A VPC é apagada",
+      "O SQS vira FIFO sozinho",
+      "O ALB perde o listener 443"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A opção adequada é: Invokes podem 'funcionar' mas logs não aparecem no CloudWatch (ou falha ao criar log stream). Isso resolve o cenário: Function sem permissão logs:CreateLogGroup/CreateLogStream/PutLogEvents. Sintoma… O distractor «A VPC é apagada» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Event source mapping SQS enabled, fila com 500 msgs, mas Lambda nunca roda. Checks?",
+    "alternativas": [
+      "Somente o TTL do CloudFront",
+      "Somente o Multi-AZ do RDS sem consumers",
+      "Somente o tipo de EBS root",
+      "Permissões da role (sqs:ReceiveMessage/DeleteMessage), mapping state, batch size e se há erros de invoke"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Permissões da role (sqs:ReceiveMessage/DeleteMessage), mapping state, batch size e se há erros de invoke. Isso resolve o cenário: Event source mapping SQS enabled, fila com 500 msgs, mas Lambda nunca roda. Chec… O distractor «Somente o TTL do CloudFront» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Memory 128 MB, CPU efetiva baixa, duração alta em CPU-bound. Ajuste ideia?",
+    "alternativas": [
+      "Desligar a execution role",
+      "Colocar a function em /tmp de 0 bytes apenas",
+      "Remover o trigger e esperar",
+      "Aumentar memory size (escala CPU alocada) e medir custo/duração"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Aumentar memory size (escala CPU alocada) e medir custo/duração. Isso resolve o cenário: Memory 128 MB, CPU efetiva baixa, duração alta em CPU-bound. Ajuste ideia?… O distractor «Desligar a execution role» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Alias 'prod' aponta para version 5; deploy criou version 6. Como evitar que 100% do tráfego mude sem controle (ideia)?",
+    "alternativas": [
+      "Sempre $LATEST em produção sem alias",
+      "Apagar todas as versões antigas imediatamente",
+      "Usar só env var para versionar código",
+      "Atualizar o alias com weighted shift gradual (ou canary) entre versões"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Atualizar o alias com weighted shift gradual (ou canary) entre versões. Isso resolve o cenário: Alias 'prod' aponta para version 5; deploy criou version 6. Como evitar que 100%… O distractor «Sempre $LATEST em produção sem alias» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Reserved concurrency = 10; picos de 50 invokes simultâneos. O que ocorre com o excesso?",
+    "alternativas": [
+      "AWS ignora o limite sempre",
+      "Converte automaticamente em EC2",
+      "Aumenta o timeout para 900s sozinho",
+      "Throttling dos invokes acima do reserved (a menos que haja outra capacidade/arquitetura de fila)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Throttling dos invokes acima do reserved (a menos que haja outra capacidade/arquitetura de fila). Isso resolve o cenário: Reserved concurrency = 10; picos de 50 invokes simultâneos. O que ocorre com o e… O distractor «AWS ignora o limite sempre» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Multi-constraint: API síncrona <2s p50, trabalho de 30s de enriquecimento, e least privilege. Padrão?",
+    "alternativas": [
+      "Uma Lambda síncrona de 30s no request path do usuário com timeout 3s",
+      "Senha no env e AdministratorAccess",
+      "API Lambda só enfileira SQS (ack rápido); worker Lambda/EC2 processa 30s com role mínima",
+      "Polling em loop dentro da API até 30s com timeout 2s"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: API Lambda só enfileira SQS (ack rápido); worker Lambda/EC2 processa 30s com role mínima. Isso resolve o cenário: Multi-constraint: API síncrona <2s p50, trabalho de 30s de enriquecimento, e lea… O distractor «Uma Lambda síncrona de 30s no request path do usuário com timeout 3s» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "lambda:InvokeFunction AccessDenied de uma role de pipeline. Onde corrigir?",
+    "alternativas": [
+      "Só o Security Group da Lambda ENI para 443 world",
+      "Só o MessageRetentionPeriod da fila",
+      "Resource-based policy da function (e/ou IAM da role do pipeline) permitindo invoke",
+      "Só o price class CloudFront"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Resource-based policy da function (e/ou IAM da role do pipeline) permitindo invoke. Isso resolve o cenário: lambda:InvokeFunction AccessDenied de uma role de pipeline. Onde corrigir?… O distractor «Só o Security Group da Lambda ENI para 443 world» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cold start percebido após colocar a function em VPC. Explicação ideia?",
+    "alternativas": [
+      "O S3 versioning desliga o handler",
+      "O Route 53 remove o alias automaticamente",
+      "Criação/anexo de ENI e init em VPC aumentam latência de inicialização",
+      "O KMS apaga a role"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Criação/anexo de ENI e init em VPC aumentam latência de inicialização. Isso resolve o cenário: Cold start percebido após colocar a function em VPC. Explicação ideia?… O distractor «O S3 versioning desliga o handler» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ephemeral storage /tmp (ideia): uso correto?",
+    "alternativas": [
+      "Substitui o S3 para dados de 10 anos",
+      "É o mesmo que EFS sempre montado por default",
+      "Espaço temporário por execution environment; não é storage durável entre deploys frios indefinidos",
+      "Persiste após delete da function"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Espaço temporário por execution environment; não é storage durável entre deploys frios indefinidos. Isso resolve o cenário: Ephemeral storage /tmp (ideia): uso correto?… O distractor «Substitui o S3 para dados de 10 anos» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "S3 ObjectCreated → Lambda; a function falha e S3 redrive não é fila. Risco de retry?",
+    "alternativas": [
+      "S3 nunca retenta",
+      "Falhas apagam o objeto automaticamente",
+      "S3 pode retentar delivers; desenhe idempotência ou use SQS entre S3 e Lambda para controle de retry/DLQ",
+      "Reserved concurrency desliga retries de S3"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: S3 pode retentar delivers; desenhe idempotência ou use SQS entre S3 e Lambda para controle de retry/DLQ. Isso resolve o cenário: S3 ObjectCreated → Lambda; a function falha e S3 redrive não é fila. Risco de re… O distractor «S3 nunca retenta» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Function precisa de 2 GB de libs nativas no package. Abordagem ideia (sem lab Layers deep)?",
+    "alternativas": [
+      "Colocar as libs só em env vars base64 de 4 KB",
+      "Usar CNAME no apex como storage",
+      "Otimizar package, container image Lambda, ou layers (ideia) — respeitar limites de tamanho do modelo escolhido",
+      "Desligar a role para 'caber mais'"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: Otimizar package, container image Lambda, ou layers (ideia) — respeitar limites de tamanho do modelo escolhido. Isso resolve o cenário: Function precisa de 2 GB de libs nativas no package. Abordagem ideia (sem lab La… O distractor «Colocar as libs só em env vars base64 de 4 KB» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "API Gateway → Lambda; 5xx com log 'Status: error' e stack na function. Onde olhar primeiro?",
+    "alternativas": [
+      "Só o Multi-AZ do RDS sem logs",
+      "Só o health check Route 53 do apex",
+      "CloudWatch Logs da function e o erro da application; depois IAM e timeout",
+      "Só o sticky session do ALB de outra conta"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A opção adequada é: CloudWatch Logs da function e o erro da application; depois IAM e timeout. Isso resolve o cenário: API Gateway → Lambda; 5xx com log 'Status: error' e stack na function. Onde olha… O distractor «Só o Multi-AZ do RDS sem logs» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo profundo desta part Lambda foundations?",
+    "alternativas": [
+      "Execution role e timeout",
+      "SQS event source e concurrency",
+      "VPC endpoints/NAT para APIs AWS",
+      "Lambda@Edge full, SnapStart lab, provisioned concurrency deep tuning e Step Functions lab"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Lambda@Edge full, SnapStart lab, provisioned concurrency deep tuning e Step Functions lab. Isso resolve o cenário: Fora de escopo profundo desta part Lambda foundations?… O distractor «Execution role e timeout» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dead-letter queue / on-failure destination (ideia) para async invoke: propósito?",
+    "alternativas": [
+      "Aumentar memory automaticamente",
+      "Capturar eventos que esgotaram retries para análise (não perder silenciosamente)",
+      "Remover a need de IAM",
+      "Converter a function em EC2"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Capturar eventos que esgotaram retries para análise (não perder silenciosamente). Isso resolve o cenário: Dead-letter queue / on-failure destination (ideia) para async invoke: propósito?… O distractor «Aumentar memory automaticamente» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Batch size SQS→Lambda = 10; uma msg do batch falha no partial batch (ideia). Risco se mal configurado?",
+    "alternativas": [
+      "A fila apaga a conta AWS",
+      "Reprocessar o batch inteiro e reentregar msgs já ok (duplicatas) — use partial batch response/idempotência",
+      "O timeout vira 0",
+      "A role ganha AdministratorAccess"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Reprocessar o batch inteiro e reentregar msgs já ok (duplicatas) — use partial batch response/idempotência. Isso resolve o cenário: Batch size SQS→Lambda = 10; uma msg do batch falha no partial batch (ideia). Ris… O distractor «A fila apaga a conta AWS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Function URL ou API GW pública sem auth. Risco?",
+    "alternativas": [
+      "Melhora automática do least privilege da role",
+      "Invoke anônimo e abuso de custo/throttle — proteja com auth (IAM, JWT, etc.) e WAF quando couber",
+      "Desliga logs",
+      "Obriga VPC"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Invoke anônimo e abuso de custo/throttle — proteja com auth (IAM, JWT, etc.) e WAF quando couber. Isso resolve o cenário: Function URL ou API GW pública sem auth. Risco?… O distractor «Melhora automática do least privilege da role» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "put-function-concurrency reserved=0 (ou valor que impede execuções). Efeito?",
+    "alternativas": [
+      "Garante throughput ilimitado",
+      "Pode impedir invocações (throttle total) se reserved zera a capacidade efetiva da function",
+      "Apaga o código da function",
+      "Muda o runtime para provided.al2 sozinho"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Pode impedir invocações (throttle total) se reserved zera a capacidade efetiva da function. Isso resolve o cenário: put-function-concurrency reserved=0 (ou valor que impede execuções). Efeito?… O distractor «Garante throughput ilimitado» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cross-account S3 trigger para Lambda (ideia): o que além da role?",
+    "alternativas": [
+      "Somente abrir 22 na ENI",
+      "Permissões de invoke na resource policy da Lambda e config de notificação S3 na conta origem",
+      "Somente ALIAS no apex",
+      "Somente desligar BPA e nada de policy"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Permissões de invoke na resource policy da Lambda e config de notificação S3 na conta origem. Isso resolve o cenário: Cross-account S3 trigger para Lambda (ideia): o que além da role?… O distractor «Somente abrir 22 na ENI» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Memory 1024 MB, timeout 60s, job I/O bound a API externa lenta. Melhor eixo primeiro?",
+    "alternativas": [
+      "Memory 10 GB obrigatório",
+      "Timeout adequado + retries/backoff assíncrono; memory extra ajuda pouco se o gargalo é espera de rede",
+      "Remover todos os logs",
+      "Reserved concurrency 1 sempre"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Timeout adequado + retries/backoff assíncrono; memory extra ajuda pouco se o gargalo é espera de rede. Isso resolve o cenário: Memory 1024 MB, timeout 60s, job I/O bound a API externa lenta. Melhor eixo prim… O distractor «Memory 10 GB obrigatório» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Handler não encontrado / Runtime.ImportModuleError após deploy. Causa típica?",
+    "alternativas": [
+      "Falta de Multi-AZ no tópico SNS",
+      "Handler string ou package path incorreto no deploy (module.function) ou dependência ausente no package",
+      "TTL DNS 300",
+      "gp3 IOPS 3000 no EBS de outra conta"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Handler string ou package path incorreto no deploy (module.function) ou dependência ausente no package. Isso resolve o cenário: Handler não encontrado / Runtime.ImportModuleError após deploy. Causa típica?… O distractor «Falta de Multi-AZ no tópico SNS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "X-Ray / tracing (menção): para que serve no TShoot de latência?",
+    "alternativas": [
+      "Substituir a execution role",
+      "Mapear subsegments de calls a S3/HTTP e achar gargalo de duração",
+      "Desligar o timeout",
+      "Criar a VPC automaticamente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A opção adequada é: Mapear subsegments de calls a S3/HTTP e achar gargalo de duração. Isso resolve o cenário: X-Ray / tracing (menção): para que serve no TShoot de latência?… O distractor «Substituir a execution role» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Checklist mental TShoot Lambda nesta part?",
+    "alternativas": [
+      "Só recriar a conta AWS",
+      "Só aumentar o ASG de um serviço não relacionado",
+      "Só desligar o versioning S3 global",
+      "Logs/erro → timeout/memory → execution role → concurrency/throttle → event source → VPC path (endpoint/NAT) → secrets"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A opção adequada é: Logs/erro → timeout/memory → execution role → concurrency/throttle → event source → VPC path (endpoint/NAT) → secrets. Isso resolve o cenário: Checklist mental TShoot Lambda nesta part?… O distractor «Só recriar a conta AWS» falha porque não endereça a causa evidenciada no enunciado. Tip de prova: foque no sintoma e no serviço citados (part aws-1.10), não em controles de outro domínio.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo Lambda foundations no SAA-C03:",
+    "alternativas": [
+      "Admin role + secret no env + timeout 1s + VPC sem NAT para jobs longos",
+      "Sem logs, sem fila, invoke público sem auth",
+      "Reserved 0 e culpar o runtime sempre",
+      "Role mínima, timeout/memory/concurrency alinhados, triggers com permissão, Secrets gerenciados, VPC com path AWS, logs no CloudWatch"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Bom desenho une least privilege, limites corretos, triggers, secrets e rede. Admin+timeout 1s+VPC sem path são anti-patterns. Tip de prova: se a opção equilibra role, timeout, concurrency, trigger e VPC path, costuma ser a correta.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  }
+]

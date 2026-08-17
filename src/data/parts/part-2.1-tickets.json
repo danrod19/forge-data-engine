@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8201 — Servidor de arquivos foi movido da sala A para a sala B. Usuários reclamam de lentidão e “tráfego estranho” no uplink. O júnior diz que a VLAN sumiu.",
+    "cli_output": "Access1# show mac address-table dynamic | include 0050.56aa.f001\n  (empty — no entry for 0050.56aa.f001)\n\nAccess1# show mac address-table dynamic interface Gi1/0/8\n  (empty)\n\nAccess1# show interfaces status | include Gi1/0/8|Gi1/0/22\nGi1/0/8   SRV-OLD-PATCH   notconnect   1    auto   auto   10/100/1000BaseTX\nGi1/0/22  SRV-NEW-LOC     connected    1    a-full a-1000  10/100/1000BaseTX\n\nAccess1# show mac address-table dynamic interface Gi1/0/22\n  (empty — capture during idle)\n\n# após ping forçado do notebook do técnico para o IP do servidor:\nAccess1# show mac address-table dynamic | include 0050.56aa.f001\n    1    0050.56aa.f001    DYNAMIC     Gi1/0/22\n\nTech-PC# (debug textual) first frames to SRV showed high unknown-unicast rate on uplink until MAC relearned",
+    "alternativas": [
+      "Gi1/0/8 notconnect e MAC ausente na porta antiga; após tráfego o MAC 0050.56aa.f001 aparece em Gi1/0/22 — unknown unicast/flood até reaprendizado na porta nova, não “VLAN sumida”",
+      "MAC vazio em Gi1/0/22 idle prova que o switch roteia por IP na CAM",
+      "notconnect em Gi1/0/8 significa aging zero no chassis inteiro",
+      "Flood de unknown unicast só ocorre com destino FFFF.FFFF.FFFF"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O CLI mostra a porta antiga notconnect, MAC ausente e, após ping, aprendizado em Gi1/0/22. Enquanto o destino era desconhecido, unicast era flooded. Não há evidência de VLAN removida. CAM não é tabela de rotas IP. Broadcast não é o único caso de flood.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8202 — Syslog do switch “piscando” MAC move. Impressora some e reaparece na rede a cada poucos segundos.",
+    "cli_output": "Access2# show logging | include FLAP|flap|0050.56bb.print\n%SW_MATM-4-MACFLAP_NOTIF: Host 0050.56bb.print in vlan 1 is flapping between port Gi1/0/14 and port Gi1/0/15\n%SW_MATM-4-MACFLAP_NOTIF: Host 0050.56bb.print in vlan 1 is flapping between port Gi1/0/15 and port Gi1/0/14\n\nAccess2# show mac address-table dynamic address 0050.56bb.print\n   Mac Address Table\n-------------------------------------------\nVlan    Mac Address       Type        Ports\n----    -----------       --------    -----\n   1    0050.56bb.print   DYNAMIC     Gi1/0/15\n\nAccess2# show interfaces status | include Gi1/0/14|Gi1/0/15\nGi1/0/14  PRINT-DROP1   connected  1  a-full  a-1000  10/100/1000BaseTX\nGi1/0/15  PRINT-DROP2   connected  1  a-full  a-1000  10/100/1000BaseTX\n\n# campo: cabo Y / dois patchs no mesmo switch ligados ao mini-switch da impressora",
+    "alternativas": [
+      "Aging de 300s explica flaps a cada 2–3 segundos entre portas",
+      "Forward seletivo de known unicast gera log MACFLAP_NOTIF por padrão",
+      "MAC flapping: 0050.56bb.print alterna Gi1/0/14↔Gi1/0/15 nos logs com ambas connected — loop/cabo duplo no segmento da impressora",
+      "notconnect em ambas as portas no status prova L1 down"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "MACFLAP_NOTIF e a mesma MAC vista em duas portas connected indicam flapping, não aging normal. Known unicast forward não gera esse log. Status mostra connected, não notconnect.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8203 — “O switch esqueceu o PC do RH”. Usuário jura que o cabo está “bem encaixado”.",
+    "cli_output": "Access3# show interfaces status | include Gi1/0/6\nGi1/0/6   PC-RH   notconnect   1   auto   auto   10/100/1000BaseTX\n\nAccess3# show interfaces Gi1/0/6\nGigabitEthernet1/0/6 is down, line protocol is down (notconnect)\n  0 input packets, 0 output packets\n  0 CRC, 0 input errors\n\nAccess3# show mac address-table dynamic interface Gi1/0/6\n  Mac Address Table\n-------------------------------------------\nVlan    Mac Address       Type        Ports\n----    -----------       --------    -----\n\nAccess3# show mac address-table dynamic | include 00a1.b2c3.rh01\n  (no matches)\n\n# patch panel label diz Gi1/0/6 → mesa RH; cabo no wall jack frouxo ao retestar",
+    "alternativas": [
+      "Tabela vazia com 0 packets e Gi1/0/6 up/up prova flood excessivo de broadcast",
+      "clear mac address-table dynamic é a única correção sem olhar o cabo",
+      "MAC 00a1.b2c3.rh01 está em aging mas a porta está full-duplex no status",
+      "Gi1/0/6 notconnect, line protocol down, 0 packets e MAC ausente: L1 impede aprendizado — não é “esquecimento” por aging sozinho"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "notconnect + 0 packets explicam ausência de MAC: sem enlace não há frames de origem. Não há up/up. clear sem cabo não resolve. Status não mostra full-duplex connected com aging do host.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8204 — Em lab, o analista rodou clear mac address-table dynamic “para limpar o switch” e o uplink disparou alarme de broadcast/unknown por alguns segundos.",
+    "cli_output": "LabSW# show mac address-table dynamic count\n  Total dynamic entries before clear: 184\n\nLabSW# clear mac address-table dynamic\nLabSW# show mac address-table dynamic count\n  Total dynamic entries: 0\n\nLabSW# show interfaces GigabitEthernet1/0/48 | include rate|packets|broadcast\n  30 second input rate 820000 bits/sec, 940 packets/sec\n     12044 broadcasts received in last interval (elevated)\n  30 second output rate 790000 bits/sec, 910 packets/sec\n\n# captura resumida no analisador (texto):\n# many unknown unicast frames flooded until hosts spoke again\nLabSW# show mac address-table dynamic count\n  Total dynamic entries: 37   (rebuilding after traffic)\nLabSW# show mac address-table dynamic | include 0050.56aa.pc01\n    1    0050.56aa.pc01    DYNAMIC     Gi1/0/3",
+    "alternativas": [
+      "clear não altera a tabela; o count 0 é cosmético",
+      "Após clear (0 entradas), tráfego sobe com flood de unknown unicast até reaprendizado — esperado, não falha permanente de VLAN",
+      "Broadcast elevado prova que known unicast nunca faz forward de novo",
+      "Gi1/0/3 com PC01 após rebuild indica MAC flapping 14↔15"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Count 184→0 após clear e rebuild com taxa alta batem com flood até reaprender. A tabela voltou a popular (ex.: PC01 em Gi1/0/3). Não é cosmético nem flapping entre 14/15. Known unicast volta a forward quando o MAC está na tabela.",
+    "part_id": "2.1"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8205 — NOC esperava ver “flood em todas as portas” em todo unicast do servidor de vídeo. SPAN mostrou o contrário após o fluxo estabilizar.",
+    "cli_output": "CoreAccess# show mac address-table dynamic address 00aa.bbcc.srv1\nVlan    Mac Address       Type        Ports\n----    -----------       --------    -----\n   1    00aa.bbcc.srv1    DYNAMIC     Gi1/0/20\n\nCoreAccess# show mac address-table dynamic address 00aa.bbcc.cam1\nVlan    Mac Address       Type        Ports\n----    -----------       --------    -----\n   1    00aa.bbcc.cam1    DYNAMIC     Gi1/0/5\n\n# SPAN note (texto do analisador):\n# Unicast cam1 -> srv1 observed ONLY on path toward Gi1/0/20 after learning\n# NOT replicated to Gi1/0/6..Gi1/0/19 idle access ports\n\nCoreAccess# show interfaces status | include Gi1/0/5|Gi1/0/20\nGi1/0/5   CAM-RECEP    connected  1  a-full  a-1000  10/100/1000BaseTX\nGi1/0/20  SRV-VIDEO    connected  1  a-full  a-1000  10/100/1000BaseTX",
+    "alternativas": [
+      "Sem entrada MAC o switch faria filter na porta de origem do servidor",
+      "Broadcast FFFF.FFFF.FFFF é o único frame que usa a tabela MAC",
+      "Aging remove known unicast da CAM a cada frame forward",
+      "MACs de cam1 e srv1 aprendidos em Gi1/0/5 e Gi1/0/20: unicast conhecido faz forward seletivo, não flood em todas as portas idle"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Tabela com ambos os MACs em portas distintas e SPAN só no caminho do destino mostram forward seletivo de known unicast. Filter na origem do servidor não é o caso. Broadcast não é o único uso da CAM. Aging não apaga a cada frame encaminhado.",
+    "part_id": "2.1"
+  }
+]

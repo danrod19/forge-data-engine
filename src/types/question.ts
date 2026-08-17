@@ -16,6 +16,19 @@ export interface Question {
   resposta_correta: number;
   /** Vazio ou omitido no modo traditional limpo */
   explicacao_profunda?: string;
+  /** Parte da trilha (ex.: "1.1", "1.4-drill") */
+  part_id?: string;
+  /** Origem do item quando há merge de bancos */
+  source?:
+    | "v2"
+    | "aws"
+    | "module1"
+    | "module2"
+    | "module3"
+    | "module4"
+    | "module5"
+    | "module6"
+    | "legacy";
 }
 
 export type NavTab =
@@ -47,4 +60,9 @@ export function isTraditionalQuestion(q: Question): boolean {
 
 export function hasDeepExplanation(q: Question): boolean {
   return Boolean(q.explicacao_profunda?.trim());
+}
+
+/** Drill de subnetting (cálculo IPv4) — fora do simulado cronometrado padrão */
+export function isDrillQuestion(q: Question): boolean {
+  return q.part_id === "1.4-drill";
 }

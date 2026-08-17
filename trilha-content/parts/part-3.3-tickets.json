@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9301 — Link novo entre R1 e R2 “não forma OSPF”. Cabo e IPs ok; NOC já reiniciou as interfaces.",
+    "cli_output": "R1# show ip ospf interface GigabitEthernet0/0\nGigabitEthernet0/0 is up, line protocol is up\n  Internet Address 10.0.0.1/30, Area 0\n  Process ID 1, Router ID 1.1.1.1, Network Type BROADCAST, Cost: 1\n  Timer intervals configured, Hello 10, Dead 40, WaitUp 40, Retransmit 5\n  Neighbor Count is 0\n\nR2# show ip ospf interface GigabitEthernet0/0\nGigabitEthernet0/0 is up, line protocol is up\n  Internet Address 10.0.0.2/30, Area 0\n  Process ID 1, Router ID 2.2.2.2, Network Type BROADCAST, Cost: 1\n  Timer intervals configured, Hello 5, Dead 20, WaitUp 40, Retransmit 5\n  Neighbor Count is 0\n\nR1# show ip ospf neighbor\nR2# show ip ospf neighbor\n\nR1# show ip interface brief | include GigabitEthernet0/0\nGigabitEthernet0/0   10.0.0.1   YES manual up  up",
+    "alternativas": [
+      "Area mismatch 0 vs 1 no output",
+      "Hello/Dead 10/40 em R1 vs 5/20 em R2 — timers mismatch; Neighbor Count 0 em ambos",
+      "RID duplicado 1.1.1.1 nos dois",
+      "Interfaces down/down no brief"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show ip ospf interface mostra Hello/Dead diferentes e 0 vizinhos; mesma area 0 e RIDs distintos; interface up/up. Timers são a causa.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9302 — OSPF sobe em outros links, mas o link 10.10.10.0/30 entre Dist e Core “não entra no processo”.",
+    "cli_output": "Core# show running-config | section router ospf\nrouter ospf 1\n router-id 3.3.3.3\n network 10.1.0.0 0.0.255.255 area 0\n network 192.168.0.0 0.0.0.255 area 0\n\nCore# show ip interface brief | include GigabitEthernet0/1\nGigabitEthernet0/1   10.10.10.1   YES manual up  up\n\nCore# show ip ospf interface brief\nInterface    PID   Area   IP Address/Mask    Cost  State Nbrs F/C\nGi0/0        1     0      10.1.1.1/24        1     DR    1/1\nLo0          1     0      3.3.3.3/32         1     LOOP  0/0\n\nCore# show ip ospf neighbor\nNeighbor ID  Pri  State      Dead Time  Address    Interface\n1.1.1.1        1  FULL/BDR   00:00:35   10.1.1.2   GigabitEthernet0/0\n\n# Gi0/1 10.10.10.1/30 NÃO aparece em ospf interface brief",
+    "alternativas": [
+      "Gi0/1 está down no brief",
+      "RID ausente no processo",
+      "network 10.1.0.0 0.0.255.255 não cobre 10.10.10.1/30 — interface fora do OSPF (não está no brief OSPF; só Gi0/0 e Lo0)",
+      "Area 1 na interface Gi0/0 impede qualquer neighbor"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "network casa 10.1.0.0–10.1.255.255, não 10.10.10.1. Gi0/1 up/up mas ausente do ospf interface brief. Neighbor existe em outro link. RID está configurado.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9303 — Após clonar config de lab, adjacências OSPF “enlouquecem” e logs citam router-id.",
+    "cli_output": "R1# show ip ospf\n Routing Process \"ospf 1\" with ID 10.0.0.1\n\nR2# show ip ospf\n Routing Process \"ospf 1\" with ID 10.0.0.1\n\nR1# show ip ospf neighbor\nNeighbor ID  Pri  State        Dead Time  Address     Interface\n10.0.0.1       1  FULL/DR      00:00:08   10.1.1.2    GigabitEthernet0/0\n\nR2# show run | include router-id\nrouter-id 10.0.0.1\n\nR1# show run | include router-id\nrouter-id 10.0.0.1\n\n# ambos foram provisionados do mesmo template de lab",
+    "alternativas": [
+      "Hello 10 vs 40 no output de show ip ospf",
+      "Area 0 vs area 1 no neighbor table",
+      "Passive-interface default em ambos",
+      "RID duplicado 10.0.0.1 em R1 e R2 (show ip ospf ID idêntico e router-id iguais na running)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Ambos com Routing Process ID 10.0.0.1 e router-id 10.0.0.1 na running — RID duplicado. Neighbor FULL/DR com mesmo Neighbor ID reforça o problema. Sem evidência de timers/area/passive no recorte.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9304 — NOC queria o core como DR do segmento de usuários; o access virou DR e o core ficou DROTHER.",
+    "cli_output": "Access# show ip ospf interface Vlan10\nVlan10 is up, line protocol is up\n  Internet Address 10.10.10.2/24, Area 0\n  Router ID 9.9.9.9, Network Type BROADCAST, Cost: 1\n  Transmit Delay is 1 sec, State DR, Priority 1\n  Designated Router (ID) 9.9.9.9, Interface address 10.10.10.2\n  Backup Designated Router (ID) 1.1.1.1, Interface address 10.10.10.1\n\nCore# show ip ospf interface Vlan10\nVlan10 is up, line protocol is up\n  Internet Address 10.10.10.1/24, Area 0\n  Router ID 1.1.1.1, Network Type BROADCAST, Cost: 1\n  Transmit Delay is 1 sec, State BDR, Priority 0\n  Designated Router (ID) 9.9.9.9, Interface address 10.10.10.2\n  Backup Designated Router (ID) 1.1.1.1, Interface address 10.10.10.1\n\nCore# show run interface Vlan10 | include priority\n ip ospf priority 0",
+    "alternativas": [
+      "Core com priority 0 (inelegível a DR) e Access State DR com RID 9.9.9.9 — DR inesperado por priority 0 no core; Access vira DR",
+      "Core está State DR no output",
+      "Network Type POINT_TO_POINT elimina DR no recorte",
+      "Timers Hello diferentes entre Access e Core no trecho exibido"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Core priority 0 → BDR/não DR; Access é DR. Network BROADCAST. Sem timers no recorte. Core não está State DR.",
+    "part_id": "3.3"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9305 — Neighbor Full com o WAN peer, mas a LAN 192.168.50.0/24 do site remoto não entra na tabela. “OSPF está up!”",
+    "cli_output": "HQ# show ip ospf neighbor\nNeighbor ID  Pri  State      Dead Time  Address       Interface\n5.5.5.5        0  FULL/ -    00:00:38   10.0.0.2      GigabitEthernet0/0/0\n\nHQ# show ip route ospf\n\nHQ# show ip route 192.168.50.0\n% Network not in table\n\nBR# show running-config | section router ospf\nrouter ospf 1\n router-id 5.5.5.5\n passive-interface Vlan50\n network 10.0.0.0 0.0.0.3 area 0\n\nBR# show ip interface brief | include Vlan50|GigabitEthernet0/0/0\nVlan50                 192.168.50.1   YES manual up  up\nGigabitEthernet0/0/0   10.0.0.2       YES manual up  up\n\nBR# show ip ospf interface brief\nInterface    PID  Area  IP Address/Mask   Cost  State Nbrs F/C\nGi0/0/0      1    0     10.0.0.2/30       1     P2P   1/1\n\n# Vlan50 NÃO está no ospf interface brief — network statement não cobre 192.168.50.0",
+    "alternativas": [
+      "Neighbor não está Full no HQ",
+      "Vlan50 aparece em ospf interface brief no BR",
+      "Full no WAN ok, mas network só 10.0.0.0/30: LAN 192.168.50.0/24 fora do OSPF (passive sozinho não anuncia se a if não está no processo) — rota O ausente",
+      "Cost 65535 na Gi0/0/0 impede Full"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Neighbor Full só no /30; network não inclui Vlan50; brief OSPF sem Vlan50; HQ sem rota O. Passivelan50 up não basta. Full existe; cost não aparece 65535 nem impede Full no output.",
+    "part_id": "3.3"
+  }
+]

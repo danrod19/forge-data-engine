@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5201 — Após “bloquear só a subnet 10.10.10.0/24”, ninguém da empresa navega. Outras subnets também morreram.",
+    "cli_output": "R1# show access-lists 10\nStandard IP access list 10\n    10 deny   10.10.10.0, wildcard bits 0.0.0.255 (512 matches)\n\nR1# show ip interface GigabitEthernet0/1 | include access list\n  Outgoing access list is 10\n  Inbound  access list is not set\n\nR1# show run | section access-list 10|interface GigabitEthernet0/1\ninterface GigabitEthernet0/1\n ip address 203.0.113.2 255.255.255.252\n ip access-group 10 out\n!\naccess-list 10 deny 10.10.10.0 0.0.0.255\n\nR1# show access-lists 10\nStandard IP access list 10\n    10 deny   10.10.10.0, wildcard bits 0.0.0.255\n! (sem permit; implicit deny any no final)\n\n! Hosts 10.20.20.50 e 10.10.10.50: ambos falham para Internet via G0/1",
+    "alternativas": [
+      "ACL 10 tem permit ip any any explícito no show",
+      "Inbound access list is 10 no show ip interface",
+      "Só 10.10.10.0/24 é afetada; 10.20.20.0 passa por permit implícito",
+      "Só existe deny da /24 e implicit deny any — todo source sem permit é negado na out G0/1"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "ACL 10 tem apenas deny 10.10.10.0/24; o resto cai no implicit deny. Aplicada out em G0/1 (WAN). 10.20.20.x também morre. Falta permit para o tráfego legítimo (ex.: permit any) após o deny específico, ou redesenho da política.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5202 — Querem bloquear tráfego vindo da LAN G0/0. ACL “BLOCK-LAN” está na WAN com out; hosts LAN ainda alcançam o servidor DMZ.",
+    "cli_output": "R1# show run | section access-list|interface GigabitEthernet0/0|interface GigabitEthernet0/1\ninterface GigabitEthernet0/0\n description LAN\n ip address 192.168.1.1 255.255.255.0\n! sem access-group\ninterface GigabitEthernet0/1\n description WAN\n ip address 203.0.113.2 255.255.255.252\n ip access-group BLOCK-LAN out\n!\nip access-list extended BLOCK-LAN\n deny   ip 192.168.1.0 0.0.0.255 host 10.50.50.50\n permit ip any any\n\nR1# show ip interface GigabitEthernet0/0 | include access list\n  Outgoing access list is not set\n  Inbound  access list is not set\n\nR1# show ip interface GigabitEthernet0/1 | include access list\n  Outgoing access list is BLOCK-LAN\n  Inbound  access list is not set\n\nR1# show access-lists BLOCK-LAN\nExtended IP access list BLOCK-LAN\n    10 deny ip 192.168.1.0 0.0.0.255 host 10.50.50.50 (0 matches)\n    20 permit ip any any (8900 matches)\n\n! Topologia: servidor 10.50.50.50 alcançado saindo por G0/0 (DMZ), não por G0/1",
+    "alternativas": [
+      "0 matches no deny e apply só out na WAN — tráfego LAN→DMZ não passa por G0/1 out; interface/direção erradas",
+      "deny tem milhares de matches no output",
+      "G0/0 tem Inbound access list BLOCK-LAN",
+      "permit ip any any está ausente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Hits: deny 0, permit 8900. ACL na G0/1 out (WAN), mas o fluxo ao 10.50.50.50 não sai por essa interface. G0/0 sem ACL. Corrija apply para a interface/direção do path real (ex.: G0/0 in ou interface DMZ out).",
+    "part_id": "5.2"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5203 — “Liberei a VLAN 30 inteira” com ACL 30, mas quase ninguém casa o permit. Wildcard suspeita.",
+    "cli_output": "R1# show run | section access-list 30|interface Vlan30\ninterface Vlan30\n ip address 10.30.30.1 255.255.255.0\n ip access-group 30 in\naccess-list 30 permit 10.30.30.0 255.255.255.0\naccess-list 30 deny any\n\nR1# show access-lists 30\nStandard IP access list 30\n    10 permit 10.30.30.0, wildcard bits 255.255.255.0 (2 matches)\n    20 deny   any (4400 matches)\n\nR1# show ip interface Vlan30 | include access list\n  Outgoing access list is not set\n  Inbound  access list is 30\n\n! Intenção do NOC: permitir 10.30.30.0/24 (wildcard 0.0.0.255)\n! Hosts 10.30.30.50 falham; poucos matches estranhos no permit",
+    "alternativas": [
+      "Wildcard 0.0.0.255 está configurada no show run",
+      "ACL não está aplicada (inbound not set)",
+      "Wildcard 255.255.255.0 (subnet mask invertida) — match incorreto; deny any leva a maior parte dos hits",
+      "Standard ACL 30 não pode usar deny any"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Config mostra 10.30.30.0 255.255.255.0 — wildcard errada (deveria 0.0.0.255). Hits: permit 2 vs deny any 4400. Apply in em Vlan30 ok. Corrija a wildcard; deny any explícito reforça o fechamento.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5204 — Pedido: bloquear só HTTP (tcp/80) de 192.168.5.0/24 ao servidor 10.1.1.80; resto ok. Usaram ACL standard.",
+    "cli_output": "R1# show run | section access-list|interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n ip address 192.168.5.1 255.255.255.0\n ip access-group 50 in\naccess-list 50 deny 192.168.5.0 0.0.0.255\naccess-list 50 permit any\n\nR1# show access-lists 50\nStandard IP access list 50\n    10 deny   192.168.5.0, wildcard bits 0.0.0.255 (2100 matches)\n    20 permit any (50 matches)\n\nR1# show ip interface GigabitEthernet0/0 | include access list\n  Outgoing access list is not set\n  Inbound  access list is 50\n\n! Sintoma: SSH, HTTPS, ping e HTTP da /24 para 10.1.1.80 falham todos\n! Requisito era negar somente tcp/80 para o host 10.1.1.80",
+    "alternativas": [
+      "Extended com tcp eq 80 e dest 10.1.1.80 já está no access-list 50",
+      "Standard 50 só filtra source — deny da /24 bloqueia todo IP da LAN, não só HTTP ao servidor",
+      "permit any está ausente e explica hits 50",
+      "ACL 50 é extended numbered na faixa 50"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "ACL 50 (standard) deny 192.168.5.0/24 derruba todo o tráfego da origem, não só TCP/80 ao 10.1.1.80. Precisa extended: deny tcp 192.168.5.0 0.0.0.255 host 10.1.1.80 eq 80 + permits. Faixa 50 é standard, não 100–199.",
+    "part_id": "5.2"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5205 — Admin 10.255.1.20 não abre SSH; colega 10.0.0.15 entra. Engine SSH ok.",
+    "cli_output": "R1# show run | section line vty|access-list 10\nline vty 0 4\n access-class 10 in\n login local\n transport input ssh\naccess-list 10 permit 10.0.0.0 0.0.0.255\naccess-list 10 deny any\n\nR1# show access-lists 10\nStandard IP access list 10\n    10 permit 10.0.0.0, wildcard bits 0.0.0.255 (88 matches)\n    20 deny   any (14 matches)\n\nR1# show run | include username|ip ssh\nusername netops secret 9 $9$xxxx\nip ssh version 2\n\nR1# show ip interface GigabitEthernet0/0 | include access list\n  Outgoing access list is not set\n  Inbound  access list is not set\n\n! 10.255.1.20 tenta SSH → connection closed / refused by ACL\n! 10.0.0.15 sessão VTY ativa",
+    "alternativas": [
+      "SSH disabled por falta de username",
+      "Inbound ACL de dados em G0/0 bloqueia conforme show ip interface",
+      "access-class 10 permite só 10.0.0.0/24 — 10.255.1.20 casa deny any (first match após falha do permit)",
+      "transport input telnet only no section vty"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "VTY com access-class 10: permit 10.0.0.0/24, deny any. 10.255.1.20 fora do permit → deny. username e SSH ok; interface de dados sem ACL. 10.0.0.15 gera hits no permit. Ajuste a ACL de gerência ou a origem do admin.",
+    "part_id": "5.2"
+  }
+]

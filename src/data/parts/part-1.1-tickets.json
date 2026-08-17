@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7101 — Usuário não abre o portal HTTPS do servidor 10.10.10.50. Diz que “a rede está fora”. O analista júnior já confirmou cabo e link no notebook.",
+    "cli_output": "PC-Cliente> ping 10.10.10.50\nResposta de 10.10.10.50: bytes=32 tempo=1ms TTL=64\n\nPC-Cliente> netstat -an | findstr 10.10.10.50\n  TCP    192.168.1.20:51244    10.10.10.50:443    SYN_SENT\n  TCP    192.168.1.20:51245    10.10.10.50:443    SYN_SENT\n\nSRV-WEB> netstat -an | findstr :443\n  TCP    0.0.0.0:80            0.0.0.0:0            LISTENING\n  TCP    0.0.0.0:8080          0.0.0.0:0            LISTENING",
+    "alternativas": [
+      "Falha de camada 1: o cabo do cliente está com CRC alto e por isso o TCP não completa o handshake",
+      "O host alcança o servidor em L3 (ping OK), mas nada escuta TCP 443 no destino; o serviço HTTPS não está em escuta na porta esperada",
+      "Problema exclusivo de MAC: o switch não aprendeu o MAC do cliente, logo o IP 10.10.10.50 é inalcançável",
+      "O cliente deveria usar UDP 443; TCP 443 nunca é usado para HTTPS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Ping com resposta prova conectividade L3 até 10.10.10.50; logo cabo/link (L1) e rota básica não são a causa principal. No cliente, conexões ficam em SYN_SENT para 443, ou seja, o TCP tenta abrir e não recebe SYN-ACK. No servidor, netstat mostra LISTENING em 80 e 8080, não em 443 — o processo HTTPS não escuta a porta de destino. MAC inalcançável contradiz o ping; HTTPS usa TCP 443, não UDP.",
+    "part_id": "1.1"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7102 — Time de VoIP reclama de atraso e “eco robótico” após um “ajuste de segurança” que forçou todo tráfego de mídia a usar o mesmo perfil do portal web (retransmissão e sessão confiável).",
+    "cli_output": "ANALISTA> # captura resumida no fone IP 192.168.20.15\nFrame 1: RTP over UDP 192.168.20.15:40000 -> 192.168.20.1:16384  (payload audio)\n\n# após a mudança de política (mesmo fluxo de voz)\nFrame 40: TCP 192.168.20.15:51210 -> 192.168.20.1:16384  [PSH, ACK]  Seq=1200 Ack=800\nFrame 41: TCP 192.168.20.1:16384 -> 192.168.20.15:51210  [ACK]  Seq=800 Ack=1800\nFrame 55: TCP Retransmission  Seq=1200  (RTT elevado, jitter sobe)\n\nANALISTA> # política atual (trecho)\nmatch media-voip  -> force transport tcp retransmit enable",
+    "alternativas": [
+      "A mídia RTP deveria permanecer em UDP (best-effort); forçar TCP com retransmissão aumenta latência e piora a qualidade de voz",
+      "VoIP exige sempre TCP com handshake de três vias; a captura em UDP inicial estava errada por definição",
+      "O problema é só L1: retransmissão TCP prova cabo rompido entre fones",
+      "Portas dinâmicas 40000/16384 são inválidas; VoIP só usa well-known 0–1023"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "RTP/VoIP prefere UDP por baixa latência e ausência de retransmissão. A política forçou TCP e a captura mostra ACK e retransmissões com RTT/jitter piores — causa alinhada a TCP vs UDP, não a cabo. Portas altas (dinâmicas/efêmeras) são normais em mídia; restringir voz a well-known 0–1023 está incorreto. Retransmissão TCP não implica automaticamente falha física.",
+    "part_id": "1.1"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7103 — Firewall liberou “SSH para o jump-host”, mas o script de automação ainda falha. O operador insiste que “a porta 22 está aberta na rede”.",
+    "cli_output": "PC-OPS> netstat -an | findstr 10.0.5.10\n  TCP    10.0.1.40:53112     10.0.5.10:22     SYN_SENT\n\nJUMP> netstat -an | findstr LISTEN\n  TCP    0.0.0.0:2222        0.0.0.0:0        LISTENING\n  TCP    127.0.0.1:22        0.0.0.0:0        LISTENING\n\nJUMP> # trecho sshd_config\nPort 2222\n# Porta 22 bound only on loopback for local admin",
+    "alternativas": [
+      "O cliente usa porta de origem 22 e por isso o firewall bloqueia a volta",
+      "O serviço SSH escuta em 2222 na interface de rede; a porta 22 só escuta em 127.0.0.1, então conexões remotas à 22 não completam",
+      "SSH nunca usa TCP; o correto é UDP 22 e o netstat do cliente está no protocolo errado",
+      "Falha de encapsulamento L2: falta trailer Ethernet no SYN, por isso SYN_SENT eterno"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O cliente tenta 10.0.5.10:22 e fica em SYN_SENT. No jump-host, LISTENING externo é 2222; a 22 está só em 127.0.0.1 (loopback), inacessível remotamente. A porta de origem 53112 é efêmera normal do cliente, não o serviço. SSH usa TCP, não UDP. SYN_SENT com serviço na porta/interface errada é problema L4 de escuta, não de trailer Ethernet.",
+    "part_id": "1.1"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7104 — Hosts na mesma VLAN 20 conversam; ao acessar servidor em outra subnet o tráfego “some”. O técnico de LAN só olhou a tabela MAC do switch de acesso e concluiu que “MAC do servidor não está no switch, então o servidor está offline”.",
+    "cli_output": "SwitchA# show vlan brief | include 20\n20   USERS    active    Gi0/1, Gi0/2, Gi0/3\n\nSwitchA# show mac address-table dynamic vlan 20\n  20    0050.56aa.1001    DYNAMIC   Gi0/1   (PC-A)\n  20    0050.56aa.1002    DYNAMIC   Gi0/2   (PC-B)\n  20    0050.56aa.00fe    DYNAMIC   Gi0/24  (Router-GW SVI/trunk access)\n\nPC-A> ipconfig\n   IPv4: 192.168.20.10  Mask: 255.255.255.0  Gateway: 192.168.20.1\n\nPC-A> ping 192.168.20.1\nResposta de 192.168.20.1: tempo=1ms\n\nPC-A> ping 10.10.30.50\nEsgotado o tempo limite do pedido.\n\nRouter-GW# show ip route 10.10.30.50\n% Network not in table\nRouter-GW# show ip interface brief | include 192.168.20.1\nVlan20   192.168.20.1   YES manual up   up",
+    "alternativas": [
+      "O servidor deveria aparecer na tabela MAC da VLAN 20; se não aparece, está definitivamente desligado",
+      "Tráfego para outra subnet é decisão L3 no gateway; ausência do MAC do servidor no switch de acesso é esperada. A causa apontada no output é falta de rota no Router-GW para 10.10.30.50",
+      "Ping ao gateway prova que o problema é só L4 (portas TCP), não L3",
+      "Switch L2 reescreve o IP de destino em cada hop; por isso o MAC do servidor precisa estar em todos os switches do campus"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Hosts na mesma VLAN usam MAC local; destino em outra rede vai ao default gateway (MAC do GW na tabela). O servidor remoto não precisa (nem deve) aparecer na MAC table da VLAN 20. Ping ao GW OK e falha a 10.10.30.50 + “Network not in table” indicam problema de roteamento L3 no gateway, não “servidor offline por MAC ausente”. Switch L2 não reescreve IP; reescrita de quadro L2 ocorre em cada hop do roteador.",
+    "part_id": "1.1"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7105 — App de inventário reporta “falha de aplicação ao contactar API”. NOC viu contadores de erro na interface do switch e abriu troca de cabo. O host ainda resolve DNS e faz TCP handshake; o payload HTTP parece “sumir” no caminho de volta segundo o analista de app.",
+    "cli_output": "SwitchA# show interfaces Gi0/5\nGi0/5 is up, line protocol is up\n  input errors: 0, CRC: 0, frame: 0, overrun: 0\n  output errors: 0\n  Last clearing of \"show interface\" counters 00:40:12\n\nPC-APP> ping api.empresa.local\nResposta de 10.50.1.8: bytes=32 tempo=2ms TTL=61\n\nPC-APP> curl -v https://api.empresa.local/health\n* Trying 10.50.1.8:443...\n* Connected to api.empresa.local (10.50.1.8) port 443\n* SSL connection using TLSv1.2\n> GET /health HTTP/1.1\n< HTTP/1.1 401 Unauthorized\n{\"error\":\"missing API token\"}\n\n# observação do NOC (ticket antigo)\n# “erros de input” vistos ontem em Gi0/8 de OUTRO host, não neste link",
+    "alternativas": [
+      "Há falha de encapsulamento L1 no Gi0/5: CRC zero ainda assim impede a montagem do quadro de retorno",
+      "Sintoma relatado como “aplicação”, mas a causa é ausência de rota L3 — o TCP 443 nunca chegaria a completar",
+      "L1/L2 do link estão saudáveis e L3/L4 sobem até HTTPS; a falha é de aplicação (401 sem token), não de cabo nem de porta fechada",
+      "MAC e IP estão invertidos no encapsulamento: o host colocou o IP no cabeçalho Ethernet e o switch descartou o frame"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Gi0/5 up/up sem CRC/input errors elimina a hipótese atual de cabo no link do PC-APP. Ping OK, connect TCP 443 e resposta HTTP 401 com JSON de token faltando provam encapsulamento e caminho L3/L4 funcionando até a aplicação. O erro é de credencial/autorização na API, não de L1 nem de rota. “IP no cabeçalho Ethernet” não é o modelo de encapsulamento (MAC em L2, IP em L3).",
+    "part_id": "1.1"
+  }
+]

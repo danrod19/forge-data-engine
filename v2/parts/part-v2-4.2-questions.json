@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Qual conjunto habilita a base do servidor SSH no IOS?",
+    "alternativas": [
+      "hostname, ip domain-name e crypto key generate rsa",
+      "Somente switchport mode access",
+      "Somente ip dhcp snooping trust",
+      "Somente spanning-tree portfast"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "SSH no IOS depende de identidade (hostname + domain-name) e do par de chaves RSA. Sem a chave, o serviço tipicamente não sobe. Portas L2 e PortFast não geram o servidor SSH.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Por que Telnet é inadequado em produção na gestão do device?",
+    "alternativas": [
+      "Porque usa apenas IPv6",
+      "Porque trafega credenciais e sessão em cleartext (sniffable)",
+      "Porque exige sempre modulus 4096",
+      "Porque não tem linha VTY"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Telnet envia usuário, senha e comandos sem cifra. Em redes compartilhadas isso expõe a gestão. SSH cifra o canal. Telnet usa VTY normalmente; o problema é a falta de confidencialidade.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Comando na VTY para aceitar apenas SSH?",
+    "alternativas": [
+      "transport input telnet",
+      "transport input all",
+      "transport input ssh",
+      "transport output ssh"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "transport input ssh restringe o ingresso nas linhas VTY ao SSH. telnet ou all reabrem cleartext. output não controla quem conecta no device.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Protocolo de transferência cifrado baseado em SSH para copiar arquivos?",
+    "alternativas": [
+      "TFTP",
+      "FTP clássico",
+      "HTTP sem TLS",
+      "SCP (ou SFTP)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "SCP e SFTP usam o canal SSH e cifram a transferência. TFTP e FTP clássico não oferecem a mesma proteção. Em produção sensível, prefira SCP/SFTP.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "TFTP no CCNA: característica correta?",
+    "alternativas": [
+      "UDP 69, sem autenticação forte — comum em lab/legacy, não ideal em rede exposta",
+      "Sempre cifrado com AES-256 por padrão",
+      "Substitui SSH nas VTYs",
+      "Exige AAA TACACS obrigatório"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "TFTP é simples e sem auth/cifra robusta; serve a lab e bootstrap. Não gerencia sessão VTY nem impõe TACACS. Para configs sensíveis em produção, use SCP/SFTP.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show ip ssh serve para quê?",
+    "alternativas": [
+      "Listar VLANs de acesso",
+      "Verificar status/versão do servidor SSH no device",
+      "Mostrar tabela MAC",
+      "Exibir power inline"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show ip ssh confirma se o SSH está enabled e a versão (ex. 2). É o Verify básico após gerar chaves e configurar VTY. Não lista VLAN nem PoE.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "login local nas VTY significa?",
+    "alternativas": [
+      "Usa usuários locais (username) para autenticar a sessão remota",
+      "Desliga autenticação",
+      "Força Telnet only",
+      "Gera chave RSA automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "login local aponta a autenticação VTY para a base username do device. Ainda é preciso transport e, para SSH, chaves. Não gera RSA sozinho nem desliga auth.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "FTP clássico vs SCP para backup de running-config em rede corporativa?",
+    "alternativas": [
+      "FTP é sempre mais seguro que SCP",
+      "Ambos são idênticos em cifra",
+      "TFTP é o único permitido em produção",
+      "SCP cifra via SSH; FTP envia credenciais/dados em claro — prefira SCP"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "FTP cleartext expõe senhas e o conteúdo do arquivo. SCP reutiliza SSH e protege o canal. TFTP também é inseguro para produção exposta.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "SSH falha; show ip ssh indica que não está habilitado; não há chave. Ação?",
+    "alternativas": [
+      "Gerar crypto key rsa (com hostname/domain-name ok) e revalidar show ip ssh",
+      "Só configurar spanning-tree mode rapid-pvst",
+      "Só aumentar o MTU do uplink",
+      "Só criar VLAN 999"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem chave RSA o servidor SSH não opera. Gere a chave após hostname/domain-name e confira show ip ssh. STP, MTU e VLAN não habilitam SSH.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ip ssh version 2 recomenda-se porque?",
+    "alternativas": [
+      "Desativa todas as VTY",
+      "Força uso de Telnet",
+      "Preferência por SSHv2 (mais seguro/moderno que v1 legado)",
+      "Converte TFTP em SFTP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "SSHv2 é o padrão desejado em operações modernas. Não remove VTY nem transforma TFTP. Evite SSHv1 quando a plataforma permitir v2 only.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "VTY com transport input telnet ssh. Risco residual?",
+    "alternativas": [
+      "Telnet continua permitido — sessão cleartext ainda possível; restrinja a ssh only se a política exigir",
+      "SSH fica desabilitado automaticamente",
+      "Chaves RSA são apagadas",
+      "access-class vira obrigatório 0.0.0.0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Listar telnet e ssh mantém Telnet aberto. Para endurecer, use apenas ssh. A presença de SSH não cancela o risco do Telnet na mesma VTY.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SFTP no contexto CCNA de file transfer:",
+    "alternativas": [
+      "É o mesmo que TFTP na porta 69",
+      "File transfer seguro baseado em SSH (cifrado)",
+      "Protocolo de eleição de DR no OSPF",
+      "Modo de PortFast"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "SFTP roda sobre SSH e protege a transferência. Não é TFTP nem feature de OSPF/STP. Use quando precisar de cópia segura de arquivos.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "access-class 10 in na VTY; ACL 10 permite só 10.255.0.0/16. Admin em 10.40.0.5 falha SSH. Causa?",
+    "alternativas": [
+      "Falta de crypto key sempre (não se pode afirmar sem show ip ssh)",
+      "Provável bloqueio por access-class — origem não está na ACL permitida",
+      "TFTP desabilitado no PC",
+      "Voice vlan ausente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "access-class filtra o IP de origem do admin. 10.40.0.5 fora de 10.255.0.0/16 é negado. Ajuste a ACL ou a estação de jump. Voice e TFTP não explicam o bloqueio VTY.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Melhor escolha para backup noturno de running-config com senhas em rede corporativa?",
+    "alternativas": [
+      "copy running-config tftp: para servidor aberto na Internet",
+      "Telnet e paste manual no chat",
+      "FTP anônimo sem TLS",
+      "copy via SCP ou SFTP para repositório interno controlado"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Config contém segredos; canal cifrado e destino controlado são obrigatórios em produção. TFTP/FTP/Telnet expõem dados. SCP/SFTP alinham ao 4.2 seguro.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem típica de Configure SSH local?",
+    "alternativas": [
+      "Só access-class antes de hostname",
+      "Só TFTP server no PC",
+      "hostname → domain-name → crypto key → username → line vty login local + transport input ssh → show ip ssh",
+      "Só transport input telnet"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A sequência monta identidade, chave, usuário e VTY segura, depois Verify. Telnet only e TFTP não constroem SSH. access-class é opcional de endurecimento, não o primeiro passo isolado.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Cliente recebe Connection refused em SSH; Telnet conecta. Interpretação comum?",
+    "alternativas": [
+      "transport input telnet (SSH não aceito) ou serviço SSH down/sem chave",
+      "Sempre cabo rompido (Telnet não conectaria)",
+      "Sempre MTU 9000",
+      "Sempre falta de VLAN 1"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Telnet ok prova path L3 básico até o device; SSH refused aponta transporte/serviço SSH. Ajuste transport e chaves. Cabo rompido derrubaria ambos.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "username admin privilege 15 secret Cisco123 — papel no modelo local?",
+    "alternativas": [
+      "Gera automaticamente a chave RSA",
+      "Define usuário local para login local nas VTYs (e console se configurado)",
+      "Abre TFTP na porta 69",
+      "Configura access-class 15"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "username secret alimenta a autenticação local. Não cria chave SSH nem TFTP. privilege 15 dá nível de privilégio após login bem-sucedido.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Quando TFTP ainda pode ser aceitável?",
+    "alternativas": [
+      "Backup diário de todos os cores pela Internet",
+      "Transferência de segredos em Wi-Fi de convidados",
+      "Lab isolado / bootstrap controlado sem exposição de dados sensíveis",
+      "Sempre, em qualquer produção"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "TFTP é prático em lab e redes fechadas. Em produção exposta com configs sensíveis, prefira SCP/SFTP. Internet e guest Wi-Fi são péssimos para TFTP de secrets.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "copy running-config scp: exige tipicamente?",
+    "alternativas": [
+      "Somente Telnet ativo",
+      "SSH operacional e credenciais válidas no destino/origem conforme o fluxo",
+      "Apenas UDP 69 aberto",
+      "Desligar ip ssh version 2"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "SCP depende de SSH. Sem serviço/credenciais, a cópia falha. TFTP (UDP 69) é outro protocolo. Manter SSHv2 é desejável, não desligar.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Diferença prática SCP vs SFTP no nível CCNA?",
+    "alternativas": [
+      "SCP é sempre UDP; SFTP é OSPF",
+      "SFTP é cleartext; SCP não",
+      "Ambos inseguros como Telnet",
+      "Ambos usam SSH para cifrar; SFTP é file transfer SSH; SCP é cópia segura via SSH — escolha segura em produção"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Os dois são opções cifradas sobre SSH. Detalhes de implementação diferem, mas no exame ambos contrastam com FTP/TFTP. Não são cleartext nem OSPF.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Authentication failed no SSH com path ok e show ip ssh enabled. Foco?",
+    "alternativas": [
+      "Usuário/senha/privilege ou método de login (local/AAA) — não a geração de chave de novo por padrão",
+      "Sempre MTU mismatch de OSPF",
+      "Sempre duplex half",
+      "Sempre falta de PoE"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Serviço up e auth fail apontam credencial ou login method. Chave do servidor já permitiu o handshake. PoE e duplex não autenticam SSH.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Por que ip domain-name importa antes do crypto key?",
+    "alternativas": [
+      "Define a VLAN de dados",
+      "O FQDN lógico (hostname.domain) entra na geração/identidade da chave do servidor SSH",
+      "Substitui username",
+      "Abre porta 23 automaticamente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "IOS usa hostname + domain-name na criação da chave RSA do SSH. Não configura VLAN nem Telnet sozinho. Sem domain-name a geração pode falhar ou ser inadequada.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Admin faz copy tftp: running-config em switch de produção com secrets na config. Risco principal?",
+    "alternativas": [
+      "TFTP cifra por padrão com SSHv2",
+      "Arquivo e caminho sem cifra — exposição de secrets se a rede for hostil",
+      "TFTP remove todas as senhas ao copiar",
+      "TFTP exige access-class deny any"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "TFTP não protege o conteúdo em trânsito. Em produção, prefira SCP/SFTP. TFTP não remove senhas nem cifra via SSH.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "line vty 0 4 com login local e transport input ssh, mas sem username. Efeito?",
+    "alternativas": [
+      "SSH usa Telnet por baixo",
+      "Qualquer senha funciona",
+      "Autenticação local falha — é preciso criar username secret",
+      "crypto key é apagada"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "login local exige base de usuários. Sem username, o login remoto falha mesmo com SSH e chave ok. Crie o usuário privilegiado.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Teste rápido do PC: telnet 10.10.10.1 conecta; política proíbe Telnet. Correção no device?",
+    "alternativas": [
+      "transport input ssh nas VTY (remover telnet) e validar que só SSH entra",
+      "Desligar todas as interfaces de dados",
+      "Apagar ip domain-name e manter Telnet",
+      "Habilitar TFTP server público"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma mostra Telnet aceito. Endureça com transport input ssh. Desligar dados e TFTP público não cumprem a política de gestão segura.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Tabela mental correta?",
+    "alternativas": [
+      "Telnet e FTP cifrados; SCP cleartext",
+      "TFTP com autenticação AAA nativa forte",
+      "SSH/SCP/SFTP cifrados; Telnet/FTP/TFTP inseguros para produção exposta",
+      "Todos os protocolos de file transfer são iguais"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Memorize o contraste cifrado vs cleartext. Produção exposta → SSH e SCP/SFTP. Lab pode usar TFTP com consciência do risco.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "SSH timeout; ping ao management IP ok; access-class permite só 192.0.2.0/24; admin em 10.50.1.10. Diagnóstico?",
+    "alternativas": [
+      "Path L3 quebrado (contradiz ping)",
+      "Sempre chave RSA corrompida",
+      "Sempre falta de hostname",
+      "ACL/access-class bloqueando a origem do admin apesar do ping"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Ping prova reachability; filtro de VTY age na sessão de gestão. 10.50.1.10 fora do permit explica timeout/refuse de SSH. Ajuste ACL ou jump host.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Fora de escopo do 4.2 nesta part?",
+    "alternativas": [
+      "SSH e transport input",
+      "SCP/SFTP vs TFTP",
+      "show ip ssh",
+      "AnyConnect full tunnel lab e NETCONF profundo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O tópico cobre gestão CLI remota e cópia de arquivos. VPN client completa e NETCONF avançado ficam fora. Foque SSH/VTY e protocolos de copy.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Após gerar nova chave RSA, sessões SSH antigas de clientes podem precisar de quê?",
+    "alternativas": [
+      "Desligar o switching L2",
+      "Remover todas as VLANs",
+      "Aceitar novo host key / limpar known_hosts no cliente — identidade do server mudou",
+      "Converter o device em hub"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Trocar a chave do servidor altera a impressão vista pelo cliente SSH. O admin confirma o novo host key. Não exige redesenhar L2/VLANs.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Resumo Configure/Verify 4.2:",
+    "alternativas": [
+      "Só Telnet + TFTP em toda produção",
+      "Só FTP anônimo para secrets",
+      "Só access-class deny any log",
+      "SSH v2 com chave e VTY endurecida; copiar arquivos com SCP/SFTP; Verify com show ip ssh e testes reais"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O pacote mental é gestão remota cifrada e file transfer seguro, com verificação operacional. Telnet/TFTP/FTP anônimo para produção sensível contradiz o tópico.",
+    "part_id": "v2-4.2"
+  }
+]

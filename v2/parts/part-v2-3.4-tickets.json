@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3401: design pedia R1 como Active do VIP 10.40.0.1; na prática R2 encaminha e R1 está Standby.",
+    "cli_output": "R1# show standby brief\n                     P indicates configured to preempt.\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nVl40        40   90    Standby 10.40.0.3       local           10.40.0.1\n\nR2# show standby brief\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nVl40        40  100    Active  local           10.40.0.2       10.40.0.1\n\nR1# show run interface Vlan40 | include standby\n standby 40 ip 10.40.0.1\n standby 40 priority 90\n standby 40 preempt\n\nR2# show run interface Vlan40 | include standby\n standby 40 ip 10.40.0.1\n standby 40 priority 100\n\nDesign: R1 should be preferred Active",
+    "alternativas": [
+      "Grupo mismatch",
+      "Priority de R1 (90) menor que R2 (100) — Active no router ‘errado’; subir priority em R1",
+      "VIP diferente",
+      "Falta de PortFast no SVI"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show standby brief: R2 Active com Pri 100 e R1 Standby com 90. Preempt em R1 não vence priority menor. Ajuste R1 para priority 110+ (e preempt). Grupo e VIP já batem.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3402: após manutenção, R1 (preferido) voltou up mas o tráfego continua no R2; operadores querem R1 Active de novo.",
+    "cli_output": "R1# show standby brief\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nVl40        40  120    Standby 10.40.0.3       local           10.40.0.1\n\nR2# show standby brief\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nVl40        40  100    Active  local           10.40.0.2       10.40.0.1\n\nR1# show run interface Vlan40 | include standby\n standby 40 ip 10.40.0.1\n standby 40 priority 120\n (no preempt)\n\nR2# show run interface Vlan40 | include standby\n standby 40 ip 10.40.0.1\n standby 40 priority 100\n\nTimeline: R1 was reloaded; R2 became Active; R1 is back with higher priority",
+    "alternativas": [
+      "VIP precisa mudar para .2",
+      "Priority 120 é inválida",
+      "Trocar o grupo para 0",
+      "Falta standby preempt em R1 — sem preempt o Active atual (R2) permanece apesar da priority maior em R1"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "R1 tem Pri 120 mas sem P/preempt e fica Standby; R2 Active com 100. Habilite standby 40 preempt no R1 para reconquistar Active. VIP/grupo ok.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3403: hosts perdem gateway intermitente; dois routers ‘Active’ reportados na mesma VLAN.",
+    "cli_output": "R1# show standby Vlan40\nVlan40 - Group 40\n  State is Active\n  Virtual IP address is 10.40.0.1\n  Active router is local\n  Standby router is unknown\n\nR2# show standby Vlan40\nVlan40 - Group 41\n  State is Active\n  Virtual IP address is 10.40.0.1\n  Active router is local\n  Standby router is unknown\n\nR1# show run interface Vlan40 | include standby\n standby 40 ip 10.40.0.1\n standby 40 priority 110\n standby 40 preempt\n\nR2# show run interface Vlan40 | include standby\n standby 41 ip 10.40.0.1\n standby 41 priority 100\n standby 41 preempt\n\nBoth SVIs up/up; L2 between cores OK per ops",
+    "alternativas": [
+      "Alinhar o número do grupo (ex. ambos 40) e o VIP — mismatch de grupo impede par Active/Standby",
+      "Desligar preempt nos dois",
+      "Baixar priority de ambos para 50",
+      "Remover IPs reais dos SVIs"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Grupo 40 vs 41 com Standby unknown = peers não se veem no mesmo grupo. Corrija standby 40 (ou 41) nos dois com o mesmo VIP. Priority/preempt secundários até o grupo casar.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3404: um router de borda caiu e toda a VLAN perdeu Internet; só havia um gateway físico no DHCP.",
+    "cli_output": "PC> ipconfig\n   IPv4 Address. . . . . . . . . . . : 10.40.0.55\n   Default Gateway . . . . . . . . . : 10.40.0.2\n\nR1# show run interface Vlan40\ninterface Vlan40\n ip address 10.40.0.2 255.255.255.0\n (no standby commands)\n\nR2# show run interface Vlan40\ninterface Vlan40\n ip address 10.40.0.3 255.255.255.0\n (no standby commands)\n\nR1# show standby brief\n% No Hot Standby groups configured\n\nR1 down during incident → PC gateway 10.40.0.2 unreachable\nR2 was up but hosts do not use 10.40.0.3",
+    "alternativas": [
+      "HSRP já está Active em ambos",
+      "Basta PortFast no R2",
+      "Sem FHRP: gateway único 10.40.0.2 = SPOF — configurar HSRP VIP (ex. .1) nos dois e DHCP default-router = VIP",
+      "VRRP está implícito sem config"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Sem standby e com DHCP apontando ao IP físico do R1, a queda do R1 isola os hosts apesar do R2 up. Configure HSRP e mude o gateway dos hosts para o VIP.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3405: HSRP não estabiliza; show standby fica em Speak/Init; VIP não responde ping.",
+    "cli_output": "R1# show standby Vlan40\nVlan40 - Group 40\n  State is Speak\n  Virtual IP address is 10.40.0.1\n  Active router is unknown\n  Standby router is unknown\n  Priority 100 (default)\n\nR1# show ip interface brief | include Vlan40\nVlan40   10.40.0.2   YES NVRAM  up   down\n\nR1# show run interface Vlan40 | include standby|ip address\n ip address 10.40.0.2 255.255.255.0\n standby 40 ip 10.40.0.1\n\nR2# show standby brief\nVl40  40  100  Active  local  unknown  10.40.0.1\n\nR2 Vlan40 is up/up; R1 Vlan40 line protocol down (L2/VLAN issue on R1 side)\nLog R1: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan40, changed state to down",
+    "alternativas": [
+      "Priority default proíbe Active",
+      "VIP .1 é inválido em /24",
+      "Grupo 40 só funciona com preempt",
+      "SVI R1 up/down (line protocol down) — HSRP não completa; corrigir L2/VLAN no R1 para o grupo estabilizar"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Speak com Active unknown e Vlan40 up/down no R1 mostram falha de interface/L2, não só priority. R2 pode ficar Active sozinho; R1 não forma Standby saudável até o SVI ficar up/up. Corrija VLAN/trunk no lado R1.",
+    "part_id": "v2-3.4"
+  }
+]

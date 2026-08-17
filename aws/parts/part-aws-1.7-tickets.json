@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1701: Failover DNS primary→secondary não ocorre; primary está down na aplicação.",
+    "cli_output": "$ aws route53 get-health-check --health-check-id abcdef\nHealthCheckConfig:\n  FullyQualifiedDomainName: primary.exemplo.com\n  Port: 443\n  Type: HTTPS\n  ResourcePath: /health\n  RequestInterval: 30\n  FailureThreshold: 3\n\n$ aws route53 get-health-check-status --health-check-id abcdef\nStatus: Success: HTTP Status Code: 200   # still Success!\n\n# primary.exemplo.com ALIAS → ALB that is actually returning 503 to users on /\n# /health on primary still returns 200 from a static OK page\n\n$ aws route53 list-resource-record-sets --hosted-zone-id Z123\nprimary.exemplo.com  Failover PRIMARY  ALIAS dualstack.app-alb-...  HealthCheckId: abcdef  EvaluateTargetHealth: false\nsecondary.exemplo.com Failover SECONDARY ALIAS dualstack.static-alb-...  (no health check)\n\n# dig primary.exemplo.com → still ALB primary",
+    "alternativas": [
+      "Ajustar health check para path que reflita falha real (ou Evaluate Target Health no alias ALB) — /health 200 esconde o 503 da app",
+      "Apagar o secondary record",
+      "Trocar TTL para 86400",
+      "Abrir 0.0.0.0/0 no SG do secondary apenas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Status Success no health em /health 200 impede failover mesmo com 503 na home. Secondary só entra com primary unhealthy. Tip de prova: failover não arma → health path deve falhar quando o serviço está ruim (ou use ETH no ALB).",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1702: CloudFront d111.cloudfront.net retorna 403; origin é S3 privado corp-web.",
+    "cli_output": "$ aws cloudfront get-distribution --id E123\nOrigins:\n  DomainName: corp-web.s3.us-east-1.amazonaws.com\n  S3OriginConfig: null\n  OriginAccessControlId: (empty)\n  OriginAccessIdentity: (empty)\n\n$ aws s3api get-bucket-policy --bucket corp-web\n{\n  \"Statement\": [{\n    \"Effect\": \"Deny\",\n    \"Principal\": \"*\",\n    \"Action\": \"s3:*\",\n    \"Resource\": [\"arn:aws:s3:::corp-web\",\"arn:aws:s3:::corp-web/*\"],\n    \"Condition\": {\"Bool\": {\"aws:SecureTransport\": \"false\"}}\n  }]\n}\n# No Allow for CloudFront service principal / OAC\n\n$ aws s3api get-public-access-block --bucket corp-web\nBlockPublicAcls=true RestrictPublicBuckets=true\n\ncurl -I https://d111.cloudfront.net/index.html\nHTTP/2 403\n\n# Object exists:\naws s3api head-object --bucket corp-web --key index.html → 200 with admin creds",
+    "alternativas": [
+      "Configurar OAC (ou OAI) na origin e Allow GetObject na bucket policy para o CloudFront — hoje não há origin access nem allow",
+      "Só criar invalidation /* sem policy",
+      "Mudar o record MX do domínio",
+      "Habilitar Multi-AZ no Route 53 hosted zone"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem OAI/OAC e sem Allow ao CloudFront, a edge toma 403 no GetObject mesmo com objeto existente. Invalidation não concede IAM. Tip de prova: CloudFront 403 S3 privado → OAC + bucket policy Allow ao serviço.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1703: Apex exemplo.com não resolve após migração para ALB; www funciona.",
+    "cli_output": "$ aws route53 list-resource-record-sets --hosted-zone-id Z999\nexemplo.com.     CNAME  app-alb-123.us-east-1.elb.amazonaws.com.   # INVALID pattern for apex\nwww.exemplo.com. A ALIAS dualstack.app-alb-123.us-east-1.elb.amazonaws.com.\n\n$ dig exemplo.com CNAME +short\napp-alb-123.us-east-1.elb.amazonaws.com.\n# many resolvers / DNS standards: CNAME at apex coexists badly / not allowed with other data\n\n$ dig www.exemplo.com +short\n# returns ALB IPs via alias\n\n# Registrador NS → Route 53 OK\n# App healthy behind ALB",
+    "alternativas": [
+      "Manter CNAME no apex e adicionar TXT only",
+      "Trocar o apex para A/AAAA ALIAS para o ALB (como o www) — CNAME no apex é o erro",
+      "Criar health check na porta 22 do ALB",
+      "Mover o certificado ACM para eu-west-1 apenas"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1703: Apex exemplo.com não resolve após migração para ALB; www funciona.…), a ação correta é: Trocar o apex para A/AAAA ALIAS para o ALB (como o www) — CNAME no apex é o erro. «Manter CNAME no apex e adicionar TXT only» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.7.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1704: Deploy de logo.png há 40 min; CloudFront ainda serve logo antiga.",
+    "cli_output": "$ aws cloudfront get-distribution-config --id E456\nDefaultCacheBehavior:\n  MinTTL: 0\n  DefaultTTL: 86400\n  MaxTTL: 31536000\n  ViewerProtocolPolicy: redirect-to-https\nOrigins: S3 corp-cdn with OAC ok\n\n$ aws s3api head-object --bucket corp-cdn --key assets/logo.png\nLastModified: 40 minutes ago  ETag: \"newetag\"\n\n$ curl -sI https://d456.cloudfront.net/assets/logo.png | egrep -i 'x-cache|age|etag'\nx-cache: Hit from cloudfront\nage: 28000\netag: \"oldetag\"\n\n$ aws cloudfront list-invalidations --distribution-id E456\nItems: []   # none recent",
+    "alternativas": [
+      "Create-invalidation para /assets/logo.png (ou /*) — Hit/age alto e ETag velha com DefaultTTL 86400",
+      "Desligar OAC",
+      "Remover o record ALIAS",
+      "Abrir 3306 no SG do RDS de origem"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "x-cache Hit + age alto + ETag antiga com TTL 86400 e zero invalidations explicam stale. OAC e DNS não limpam objeto em cache. Tip de prova: Hit from cloudfront + arquivo novo no S3 → invalidation ou versioned filename.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1705: Health check R53 do endpoint público do ALB fica unhealthy; app ok via VPN interna.",
+    "cli_output": "$ aws route53 get-health-check --health-check-id hc-9\nType: HTTPS  Port: 443  ResourcePath: /ready  FQDN: app.exemplo.com\n\n$ aws route53 get-health-check-status --health-check-id hc-9\nFailure: Timeout / Connection failed (from checker)\n\n$ aws elbv2 describe-load-balancers --names app-alb\nScheme: internet-facing\nState: active\nSecurityGroups: [sg-alb]\n\n$ aws ec2 describe-security-groups --group-ids sg-alb\nInbound:\n  TCP 443  Source 10.0.0.0/8\n  (no 0.0.0.0/0 or AWS health checker ranges)\nOutbound: all\n\n$ curl -sk https://app.exemplo.com/ready   # from corporate VPN 10.x → 200 OK\n# from public Internet / online checker → timeout",
+    "alternativas": [
+      "Permitir HTTPS 443 no sg-alb a partir da Internet (ou ranges necessários aos health checkers R53) — check é externo, 10.0.0.0/8 não basta",
+      "Trocar o health path para / no S3 website only",
+      "Desligar o ALB multi-AZ",
+      "Converter hosted zone em privada para o check passar"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1705: Health check R53 do endpoint público do ALB fica unhealthy; app ok via VPN interna.…), a ação correta é: Permitir HTTPS 443 no sg-alb a partir da Internet (ou ranges necessários aos health checkers R53) — check é externo, 10.0.0.0/8 não basta. «Trocar o health path para / no S3 website only» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.7.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  }
+]

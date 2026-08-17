@@ -1,0 +1,452 @@
+[
+  {
+    "id": 1,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "O prefixo FE80::/10 identifica endereços:",
+    "alternativas": [
+      "Link-local IPv6",
+      "GUA pública obrigatória",
+      "Multicast all-nodes apenas",
+      "Default route ::/0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "FE80::/10 é link-local. GUA é outra faixa; all-nodes é FF02::1; ::/0 é default.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 2,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "GUA (Global Unicast) serve principalmente para:",
+    "alternativas": [
+      "Apenas comunicação no mesmo cabo sem roteador",
+      "Endereçamento roteável globalmente (ou fim a fim entre redes)",
+      "Substituir o MAC na camada 2",
+      "Identificar apenas multicast de roteadores"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "GUA é o endereço unicast roteável. Link-local é local ao enlace. Não substitui MAC nem é só multicast.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 3,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "FF02::1 no escopo link-local é:",
+    "alternativas": [
+      "Unique local fd00::/8",
+      "Loopback ::1",
+      "Multicast all-nodes no enlace",
+      "Default ::/0"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "FF02::1 = all-nodes. ULA, loopback e default são outros tipos.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 4,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "ipv6 enable em uma interface tipicamente:",
+    "alternativas": [
+      "Cria default ::/0",
+      "Desliga o IPv4",
+      "Configura OSPFv3 area 1",
+      "Ativa IPv6 e gera/usa link-local sem exigir GUA estática"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "ipv6 enable liga a pilha e link-local. Não define default, não remove IPv4 nem seta OSPFv3 sozinho.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 5,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "EUI-64 clássico a partir do MAC:",
+    "alternativas": [
+      "Insere FFFE no meio do MAC e inverte o bit U/L para formar o Interface ID de 64 bits",
+      "Usa apenas os 32 bits baixos do MAC",
+      "Copia o MAC sem alteração para os 128 bits",
+      "Gera obrigatoriamente FE80::1"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "EUI-64 = FFFE + flip U/L. Não é cópia crua de 128 bits nem FE80::1 fixo.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 6,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "SLAAC depende principalmente de:",
+    "alternativas": [
+      "Somente DHCPv4",
+      "Router Advertisement com prefixo (tipicamente /64) para o host montar a GUA",
+      "NAT overload IPv4",
+      "EtherChannel LACP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "SLAAC usa RA/prefixo. Não depende de DHCPv4/NAT/LACP.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 7,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Default route IPv6 é:",
+    "alternativas": [
+      "0.0.0.0/0 apenas",
+      "::/0",
+      "FE80::/10",
+      "FF02::2"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "::/0 é a default IPv6. 0/0 é IPv4; FE80 link-local; FF02::2 all-routers.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 8,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Unique Local Address (ULA) é melhor descrito como:",
+    "alternativas": [
+      "Sempre 2001:db8::/32 público",
+      "Sinônimo de ::/0",
+      "Apenas multicast FF02::1",
+      "fc00::/7 (prático fd00::/8), privado de site — distinto de FE80 link-local"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "ULA é privado de site. 2001:db8 é documentação GUA; ::/0 default; FF02::1 multicast.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 9,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "Flag M no RA indica tipicamente:",
+    "alternativas": [
+      "DHCPv6 stateful para obter endereço (managed)",
+      "Somente compressão “::”",
+      "Proibir link-local",
+      "Obrigar OSPFv3 em todos os hosts"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "M = managed/DHCPv6 endereço. Não é notação, nem remove FE80, nem força OSPFv3 em hosts.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 10,
+    "question_type": "traditional",
+    "isPremium": false,
+    "enunciado": "show ipv6 interface brief serve para:",
+    "alternativas": [
+      "Só listar rotas OSPFv2",
+      "Ver endereços IPv6 e estado das interfaces de forma resumida",
+      "Configurar eui-64 remotamente",
+      "Apagar o neighbor ND"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Resumo de IPv6 por interface. Não configura eui-64, nem é tabela OSPFv2, nem clear ND.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 11,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Host mostra apenas fe80::…/10 e não alcança 2001:db8:10::50. Diagnóstico coerente:",
+    "alternativas": [
+      "Falta GUA (estático/SLAAC) e/ou rota; link-local sozinho não roteia entre redes",
+      "FE80 já é GUA global",
+      "Multicast FF02::1 substitui a GUA",
+      "Default IPv4 0.0.0.0/0 serve para IPv6 automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem GUA/rota, destino global falha. FE80 não é GUA; default IPv4 não encaminha IPv6.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 12,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ipv6 nd ra suppress na SVI do gateway. Efeito nos hosts da VLAN:",
+    "alternativas": [
+      "Hosts recebem mais RAs",
+      "SLAAC deixa de receber prefixo via RA — podem ficar só com link-local",
+      "OSPFv3 vira obrigatório",
+      "ULA vira GUA automaticamente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "RA suppress impede anúncios; SLAAC sofre. Não aumenta RA nem converte ULA em GUA.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 13,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ipv6 route ::/0 2001:db8:0:1::1 configura:",
+    "alternativas": [
+      "Rota host /128 para todos os destinos",
+      "Null route de descarte IPv4",
+      "ACL deny ipv6 any",
+      "Default route IPv6 via next-hop 2001:db8:0:1::1"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "::/0 com next-hop é default IPv6. Não é ACL nem null IPv4.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 14,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Flag O no RA (com A=1, M=0) sugere:",
+    "alternativas": [
+      "Somente IPv4 DHCP",
+      "Proibir SLAAC",
+      "SLAAC para endereço e DHCPv6 para outras opções (ex.: DNS)",
+      "RID OSPF 0.0.0.0"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O = other config via DHCPv6; A permite SLAAC; M=0 sem endereço stateful obrigatório.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 15,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Dual-stack significa:",
+    "alternativas": [
+      "Apenas IPv6 com NAT64 obrigatório",
+      "Desligar IPv4 em todos os hosts",
+      "Operar IPv4 e IPv6 simultaneamente, cada um com endereços/rotas próprios",
+      "Usar só FE80 em ambas as pilhas"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Dual-stack = duas pilhas ativas. Não exige desligar IPv4 nem só link-local.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 16,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "OSPFv3 na interface (visão leve):",
+    "alternativas": [
+      "ipv6 ospf <pid> area <area> na interface (com IPv6 ativo/link-local)",
+      "Apenas network 0.0.0.0 sob router ospf IPv4",
+      "channel-group 1 mode active",
+      "switchport access vlan 6"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "OSPFv3 habilita-se no contexto IPv6 da interface. Network IPv4 clássico, LACP e access vlan não são a ativação v3.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 17,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "FF02::2 representa:",
+    "alternativas": [
+      "All-nodes",
+      "GUA de documentação",
+      "All-routers multicast no link-local scope",
+      "Default ::/0"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "FF02::2 = all-routers. All-nodes é FF02::1. GUA e default são outros.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 18,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ipv6 neighbors é análogo conceitual a:",
+    "alternativas": [
+      "show vlan brief",
+      "show ip ospf database apenas",
+      "show spanning-tree root",
+      "show arp / resolução de vizinhos no enlace (ND)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "ND cache ≈ ARP do IPv4. Não é VLAN/STP/LSDB isolado.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 19,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Prefixo de LAN típico para SLAAC no CCNA:",
+    "alternativas": [
+      "/128 apenas",
+      "/24 classful",
+      "/64",
+      "/8 privado IPv4"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "/64 é o padrão de sub-rede para SLAAC. /128 é host; /24 é IPv4.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 20,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "ipv6 unicast-routing no roteador:",
+    "alternativas": [
+      "Só cria link-local em hosts Windows",
+      "Desabilita RA para sempre",
+      "Substitui a necessidade de GUA",
+      "Habilita o encaminhamento de pacotes IPv6 no roteador"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Unicast-routing = router encaminha IPv6. Hosts não usam esse comando para ter FE80; não remove GUA.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 21,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Host tem GUA e ping local ok, mas destinos da Internet IPv6 falham. show ipv6 route sem ::/0. Causa:",
+    "alternativas": [
+      "Falta default IPv6 (::/0) ou rota adequada — default IPv4 não cobre a pilha v6",
+      "Link-local inválido por definição se há GUA",
+      "EUI-64 proíbe Internet",
+      "FF02::1 bloqueia unicast"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Sem ::/0 o remoto falha. GUA e FE80 coexistem; EUI-64 e all-nodes não explicam ausência de default.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 22,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Notação 2001:db8:0:0:0:0:0:1 comprimida corretamente:",
+    "alternativas": [
+      "2001::db8::1",
+      "2001:db8::1",
+      "2001:db8:0:0::1::",
+      "db8:2001::1::0"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Um único “::” comprime o bloco de zeros → 2001:db8::1. Dois “::” são inválidos.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 23,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Next-hop FE80::1 em ipv6 route sem interface de saída em multiacesso. Problema:",
+    "alternativas": [
+      "FE80 nunca pode ser next-hop",
+      "GUA é proibida como next-hop",
+      "Link-local como next-hop costuma exigir a interface de saída — FE80 se repete em cada link",
+      "Default ::/0 não existe em IPv6"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "FE80 é válido como next-hop com interface. Ambíguo sem if. ::/0 existe; GUA também pode ser next-hop.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 24,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "DHCPv6 stateful vs SLAAC (conceito):",
+    "alternativas": [
+      "Stateful entrega endereço via DHCP; SLAAC monta GUA a partir do RA",
+      "SLAAC só funciona com NAT IPv4",
+      "Stateful proíbe link-local",
+      "Ambos exigem 0.0.0.0/0"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Diferença clássica de obtenção de endereço. Link-local permanece; NAT IPv4 e default IPv4 não definem os dois.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 25,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Interface com ipv6 enable, sem ipv6 address e sem RA no link. show brief tende a mostrar:",
+    "alternativas": [
+      "Várias GUAs 2001:db8",
+      "Apenas IPv4",
+      "Default ::/0 na interface",
+      "Link-local FE80 sem GUA"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "enable → FE80; sem address/SLAAC → sem GUA. Não cria default na if.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 26,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "OSPFv3 Hellos usam, no essencial:",
+    "alternativas": [
+      "Apenas broadcast 255.255.255.255",
+      "Link-local IPv6 na interface (IPv6 precisa estar ativo)",
+      "Somente GUA 2001:db8::1 fixa",
+      "TCP 179"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "OSPFv3 opera com IPv6/link-local no link. Não é broadcast IPv4 nem BGP TCP 179.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 27,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "show ipv6 route static ajuda a ver:",
+    "alternativas": [
+      "Apenas rotas OSPFv2 IPv4",
+      "VLANs access",
+      "Estáticas IPv6 configuradas/instaladas (incl. candidatos default)",
+      "Tabela MAC L2"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Filtro de estáticas IPv6. Não é OSPFv2, VLAN nem MAC.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 28,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "2001:db8::/32 em material de estudo costuma ser:",
+    "alternativas": [
+      "Link-local FE80",
+      "Multicast all-routers",
+      "Prefixo de documentação GUA (não roteável na Internet real como produção genérica)",
+      "ULA fd00::/8"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "2001:db8::/32 é documentação. FE80/FF02/ULA são outros tipos.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 29,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "Ordem mental de troubleshooting IPv6 na interface:",
+    "alternativas": [
+      "Só limpar ARP IPv4 em loop",
+      "IPv6 enable/address → GUA/LL → ND/roteador → rota/default → (OSPFv3 se usado)",
+      "Desligar unicast-routing em hosts",
+      "Forçar todos os destinos via FF02::1"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Fluxo do content: endereço → vizinho → rota. ARP IPv4, desligar routing em hosts e all-nodes como unicast estão errados.",
+    "part_id": "3.4"
+  },
+  {
+    "id": 30,
+    "question_type": "traditional",
+    "isPremium": true,
+    "enunciado": "IPv4 com default e IPv6 sem ::/0 em dual-stack. Comportamento típico:",
+    "alternativas": [
+      "IPv6 remoto usa automaticamente 0.0.0.0/0",
+      "SLAAC proibida se IPv4 existir",
+      "Link-local vira GUA",
+      "Tráfego IPv4 remoto pode funcionar e IPv6 remoto falhar por falta de default v6"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Cada pilha tem sua tabela. Default IPv4 não encaminha IPv6. SLAAC e FE80 não se convertem em GUA por dual-stack sozinho.",
+    "part_id": "3.4"
+  }
+]

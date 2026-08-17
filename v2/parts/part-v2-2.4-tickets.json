@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2401: gateway não alcança o servidor 10.40.0.50. Capture e ARP abaixo.",
+    "cli_output": "GW# show ip arp 10.40.0.50\nProtocol  Address          Age (min)  Hardware Addr   Type   Interface\nInternet  10.40.0.50              -   Incomplete      ARPA   Vlan40\n\nWireshark snippet (SPAN on VLAN 40):\nFrame 1: ARP  Who has 10.40.0.50? Tell 10.40.0.1\nFrame 2: ARP  Who has 10.40.0.50? Tell 10.40.0.1\nFrame 3: ARP  Who has 10.40.0.50? Tell 10.40.0.1\n(no ARP is-at from 10.40.0.50)\n\nSW-ACC# show mac address-table | include 0050.56\n(no entry for server expected MAC)\n\nSW-ACC# show interfaces status | include Gi1/0/12\nGi1/0/12  SRV-APP   notconnect   40   auto auto",
+    "alternativas": [
+      "clear ip ospf process no ABR",
+      "Problema L2/host: ARP sem reply, MAC ausente, porta notconnect — não é rota de Internet",
+      "Falta de registro MX",
+      "Duplex half forçado no core resolve is-at"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Incomplete + who-has sem is-at + notconnect na porta do server isolam L2/host. Capture confirma ausência de reply. Levante link/VLAN/host; OSPF e MX não geram is-at.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2402: ping 10.50.0.20 falha. ARP do próximo hop ok. Capture no path:",
+    "cli_output": "PC> ping 10.50.0.20\nRequest timed out.\n\nPC> tracert -d 10.50.0.20\n  1  10.40.0.1\n  2  10.0.0.2\n  3  * * *\n\nWireshark (client SPAN):\nFrame 10: ICMP Echo (ping) request  id=0x0001, seq=1  10.40.0.88 -> 10.50.0.20\nFrame 11: ICMP Echo (ping) request  id=0x0001, seq=2  10.40.0.88 -> 10.50.0.20\n(no Echo reply frames)\n\nR-EDGE# show ip route 10.50.0.0\nO  10.50.0.0/24 [110/2] via 10.0.0.5\n\nR-EDGE# show run | include access-list|10.50\nip access-list extended BLOCK-ICMP\n deny icmp any 10.50.0.0 0.0.0.255 echo\n permit ip any any\ninterface Gi0/0/1\n ip access-group BLOCK-ICMP out",
+    "alternativas": [
+      "VLAN access do PC está errada (ARP local ok e echo sai)",
+      "Sem default route no PC (tracert passou do GW)",
+      "ICMP requests saem e não há reply — ACL/filtro ou destino; evidência de ACL deny echo no edge",
+      "SPAN destination down impede o ping real"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Requests no PCAP e rota presente com ACL deny icmp echo explicam a falta de reply. Não é membership VLAN local nem falta de default no PC. SPAN só observa; não causa o timeout sozinho.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2403: browser em https://app.empresa.local falha. DNS resolve. Capture:",
+    "cli_output": "PC> nslookup app.empresa.local\nAddress: 10.20.5.40\n\nWireshark filter tcp.port==443 && ip.addr==10.20.5.40:\nFrame 1: 10.40.0.88 → 10.20.5.40 TCP 51722→443 [SYN] Seq=0\nFrame 2: 10.40.0.88 → 10.20.5.40 TCP 51722→443 [SYN] Seq=0 Retransmission\nFrame 3: 10.40.0.88 → 10.20.5.40 TCP 51722→443 [SYN] Seq=0 Retransmission\n(no SYN-ACK from 10.20.5.40)\n\nFW# show run | include 10.20.5.40|443\naccess-list OUT deny tcp any host 10.20.5.40 eq 443\naccess-list OUT permit ip any any\n\nSRV-APP: service https stopped for maintenance (ops note)",
+    "alternativas": [
+      "Problema de ARP Incomplete no gateway do PC (não há evidência ARP)",
+      "Falha de resolução DNS (nslookup ok)",
+      "DHCP Discover sem Offer",
+      "TCP SYN retransmit sem SYN-ACK — serviço/filtro no path (ACL e/ou https parado)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "DNS ok; SYN retransmit sem SYN-ACK é o padrão de porta filtrada ou serviço morto. ACL deny 443 e nota de maintenance fecham. Não é DHCP nem ARP local.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2404: técnico diz que 'Wireshark não captura nada' enquanto o PC gera pings. SPAN config:",
+    "cli_output": "SW# show monitor session 1\nSession 1\n---------\nType                   : Local Session\nSource Ports           :\n    Both               : Gi1/0/2\nDestination Ports      : Gi1/0/48\n    Encapsulation      : Native\n          Ingress      : Disabled\n\nSW# show interfaces Gi1/0/10 status\nGi1/0/10  PC-USER   connected  40  a-full a-1000\n\nSW# show interfaces Gi1/0/2 status\nGi1/0/2   SPARE     notconnect 1   auto auto\n\nSW# show interfaces Gi1/0/48 status\nGi1/0/48  SNIFFER   connected  1   a-full a-1000\n\nPC on Gi1/0/10: continuous ping to 10.40.0.1\nAnalyzer on Gi1/0/48: 0 packets related to PC",
+    "alternativas": [
+      "Source SPAN em Gi1/0/2 (spare) — corrigir source para Gi1/0/10 (ou VLAN 40); destination já é o sniffer",
+      "Wireshark não suporta ICMP",
+      "Destination deve ser Gi1/0/10 (porta do usuário)",
+      "É necessário ERSPAN multi-hop para ver ping local"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "show monitor prova source na porta spare notconnect, não na do PC. Capture vazia é misconfig de SPAN. Aponte source para Gi1/0/10 ou VLAN 40. Destination no sniffer está correto; ERSPAN não é obrigatório.",
+    "part_id": "v2-2.4"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2405: notebook em APIPA. Capture no access da VLAN 40:",
+    "cli_output": "Wireshark (bootp/dhcp):\nFrame 1: DHCP Discover  src MAC aa:bb:cc:dd:ee:01  chaddr=aa:bb:cc:dd:ee:01\nFrame 2: DHCP Discover  (retransmission)\nFrame 3: DHCP Discover  (retransmission)\n(no DHCP Offer / Boot Reply)\n\nSW# show run interface Vlan40 | include helper|ip address\n ip address 10.40.0.1 255.255.255.0\n (no ip helper-address)\n\nDHCP server 10.10.10.53 lives in VLAN 10\nPC> ipconfig → 169.254.10.20\n\nSW# show mac address-table interface Gi1/0/22\n   40    aabb.ccdd.ee01    DYNAMIC     Gi1/0/22",
+    "alternativas": [
+      "DORA completo com Offer oculto (não há Offer no PCAP)",
+      "TCP SYN sem SYN-ACK na porta 443",
+      "Discover no fio sem Offer + server remoto sem helper — capture amarra o Diagnose DHCP (1.7)",
+      "SPAN destination errada porque o MAC foi aprendido"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Discover retransmitido sem Offer e APIPA, com server em outra subnet e SVI sem helper, é o padrão de relay ausente. A captura prova o Discover no segmento. MAC aprendido só mostra o cliente na porta; não invalida a leitura DHCP.",
+    "part_id": "v2-2.4"
+  }
+]

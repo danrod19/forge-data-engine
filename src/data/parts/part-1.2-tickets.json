@@ -3,7 +3,7 @@
     "id": 1,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "Chamado #7201 — Usuários da VLAN 10 não abrem o file server na VLAN 20. O analista júnior diz que “o switch de acesso não tem o MAC do servidor, então o servidor está offline”. Ping entre PCs da mesma VLAN 10 funciona.",
+    "sintoma": "Chamado #7201 — usuários da VLAN 10 não abrem o file server na VLAN 20. O júnior diz que “o access não tem o MAC do servidor, então o servidor está offline”. Ping entre PCs da VLAN 10 funciona.",
     "cli_output": "Access1# show vlan brief | include 10|20\n10   USERS     active    Gi1/0/1-24\n20   SERVERS   active    (nenhuma porta de acesso neste switch)\n\nAccess1# show mac address-table dynamic vlan 10\n  10  0050.56aa.1001  DYNAMIC  Gi1/0/3   (PC-A)\n  10  0050.56aa.1002  DYNAMIC  Gi1/0/4   (PC-B)\n  10  0050.56aa.00fe  DYNAMIC  Gi1/0/48  (uplink Dist1)\n\nAccess1# show ip interface brief\nVlan1   unassigned   YES unset  up  up\n(nenhuma SVI 10/20 neste access)\n\nPC-A> ipconfig\n   IPv4: 192.168.10.25  Mask: 255.255.255.0  Gateway: 192.168.10.1\n\nPC-A> ping 192.168.10.26\nResposta de 192.168.10.26: tempo<1ms\n\nPC-A> ping 192.168.20.10\nEsgotado o tempo limite do pedido.\n\nDist1# show ip interface brief | include Vlan\nVlan10  192.168.10.1  YES manual up  up\nVlan20  192.168.20.1  YES manual up  up\n\nDist1# show ip route 192.168.20.0\nC    192.168.20.0/24 is directly connected, Vlan20\n\nDist1# show ip interface Vlan20\nVlan20 is up, line protocol is up\n  Internet address is 192.168.20.1/24\n\nDist1# ping 192.168.20.10\n.....  Success rate is 0 percent (0/5)\n\nServer-FS> ipconfig\n   IPv4: 192.168.20.10  Mask: 255.255.255.0  Gateway: 192.168.20.1\nServer-FS> ping 192.168.20.1\nEsgotado o tempo limite do pedido.",
     "alternativas": [
       "O access switch deveria aprender o MAC do servidor na VLAN 10; a ausência prova que o cabo do PC-A está ruim",
@@ -12,14 +12,14 @@
       "O correto é desabilitar as SVIs e forçar todo tráfego VLAN 10↔20 só por tabela MAC"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Ping intra-VLAN 10 OK e MACs de PCs + uplink no Access1 mostram L2 de usuários saudável. O servidor não precisa aparecer na MAC table da VLAN 10 do access. Dist1 tem SVIs 10/20 e rota conectada para 20, mas o próprio Dist1 e o server não pingam 192.168.20.1↔.10 — a falha está no segmento L2/L3 da VLAN 20 (cabo, porta, SVI/host), típico de inter-VLAN, não de “MAC ausente no access”. Desligar SVIs ou exigir MAC do server no access são erros de técnico júnior.",
+    "explicacao_profunda": "O sintoma aponta para inter-VLAN com problema no segmento da VLAN 20, não para “MAC ausente no access”. No CLI, L2 da VLAN 10 está saudável; Dist1 tem SVIs 10/20, mas Dist1 e o server não se pingam em 192.168.20.1↔.10. Insight: o MAC do server não precisa aparecer na VLAN 10 do access — o tráfego sobe ao gateway L3. Culpar o cabo do PC-A contradiz o ping local. Falta de VLAN 20 no Access1 (sem portas de server) não derruba o campus. Desligar SVIs e forçar só MAC entre VLANs é o oposto do modelo inter-VLAN.",
     "part_id": "1.2"
   },
   {
     "id": 2,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "Chamado #7202 — Notebook associa no Wi-Fi “CORP-WIFI”, obtém IP, mas não alcança a Intranet em outra subnet. Voz de corredor: “coloca um AP autônomo novo que resolve”.",
+    "sintoma": "Chamado #7202 — notebook associa no Wi-Fi CORP-WIFI, pega IP, mas não alcança a Intranet em outra subnet. No corredor já ouvem: “coloca um AP autônomo novo que resolve”.",
     "cli_output": "Laptop> netsh wlan show interfaces\n    SSID                   : CORP-WIFI\n    State                  : connected\n    Radio type             : 802.11ac\n    Receive rate           : 400 Mbps\n    Signal                 : 88%\n\nLaptop> ipconfig\n   IPv4 Address. . . . . . : 10.50.40.88\n   Subnet Mask . . . . . . : 255.255.255.0\n   Default Gateway . . . . : 10.50.40.1\n\nLaptop> ping 10.50.40.1\nEsgotado o tempo limite do pedido.\n\nLaptop> ping 10.50.10.20\nEsgotado o tempo limite do pedido.\n\nWLC1> show ap summary\nAP Name      AP Model   Ethernet MAC   Location   Country  IP Address     State\nAP-Andar3    2802I      00a1.b2c3.d4e5  Floor3     BR       10.50.2.33     Registered\n\nWLC1> show wlan summary\nWLAN ID  WLAN Profile Name / SSID   Status  Interface Name\n1        CORP-WIFI / CORP-WIFI      Enabled  wifi-users\n\nCore-L3# show ip interface brief | include 10.50.40\nVlan40   10.50.40.1   YES manual  up   down\n\nCore-L3# show vlan brief | include 40\n40   WIFI-USERS   active\n\nCore-L3# show interfaces status | include 40\nGi1/0/24  trunk-to-wlc-path   connected  trunk  a-1000\n(observação: SVI Vlan40 line protocol down)",
     "alternativas": [
       "Associação e RF estão OK (AP Registered + cliente connected); o gateway 10.50.40.1 está com SVI Vlan40 up/down — falha L3 da subnet Wi-Fi, não se resolve trocando por AP autônomo",
@@ -28,14 +28,14 @@
       "Basta criar SSID novo no AP sem WLC; SVIs não se aplicam a clientes wireless"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Cliente connected, bom sinal e AP Registered na WLC mostram associação wireless funcional. O default gateway 10.50.40.1 não responde e a SVI Vlan40 está up/down — causa no L3/VLAN de usuários Wi-Fi. Migrar para AP autônomo não corrige SVI caída. IP do cliente não precisa ser o da WLC management. Sinal alto não diagnostica o servidor remoto; wireless também usa gateway L3 para outras subnets.",
+    "explicacao_profunda": "O sintoma aponta para gateway/SVI da subnet Wi-Fi, não para RF. No CLI, cliente connected com bom sinal e AP Registered na WLC; o default 10.50.40.1 não responde e a SVI Vlan40 está up/down. Insight: associação wireless OK + falha off-subnet = olhe L3 da VLAN de usuários antes de trocar AP. Migrar para AP autônomo não levanta SVI caída. O notebook não precisa de IP da faixa de management da WLC. Sinal alto não diagnostica o servidor remoto; cliente wireless também usa gateway L3.",
     "part_id": "1.2"
   },
   {
     "id": 3,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "Chamado #7203 — Portal da DMZ na TCP 443 “passa no firewall”, mas o SOC viu exploit conhecido e o ataque não foi bloqueado. Time de rede quer só “abrir mais portas”.",
+    "sintoma": "Chamado #7203 — portal da DMZ na TCP 443 “passa no firewall”, mas o SOC viu exploit conhecido e o ataque não foi bloqueado. O time de rede quer só “abrir mais portas”.",
     "cli_output": "FW-EDGE# show running-config | section policy-map|class-map|zone\nzone security LAN\nzone security DMZ\nzone security WAN\nzone-pair security LAN-to-DMZ source LAN destination DMZ\n  service-policy type inspect POLICY-LAN-DMZ\n\nclass-map type inspect match-any CM-WEB\n match protocol https\npolicy-map type inspect POLICY-LAN-DMZ\n class type inspect CM-WEB\n  inspect\n class class-default\n  drop\n\nFW-EDGE# show policy-firewall sessions | include 10.20.30.50\nSession 1022: 10.10.5.40:52011 => 10.20.30.50:443  prot tcp  (INSPECT)  ALLOW\n\nFW-EDGE# show running-config | include ips|ngfw|utd|threat\n(no matching inspection / IPS policy bound to zone-pair)\n\nSOC-ALERT> signature id 29455 \"Known web exploit pattern\" action would-be-drop\n           status: NOT ENFORCED on path LAN->DMZ (firewall allow only)\n\nPC-TEST> curl -vk https://10.20.30.50/login\n* Connected to 10.20.30.50 port 443\n* SSL handshake OK\n< HTTP/1.1 200 OK",
     "alternativas": [
       "A sessão ALLOW na 443 prova que o cabo da DMZ está rompido e por isso o IPS não age",
@@ -44,14 +44,14 @@
       "O zone-pair permite HTTPS com inspect (porta OK), mas não há política IPS/NGFW de ameaça aplicada no caminho — abrir mais portas não bloqueia o exploit visto pelo SOC"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "O output mostra zone-pair LAN→DMZ com inspect HTTPS e sessão ALLOW 443; conectividade de aplicação existe. Não há policy IPS/UTD/threat bound. O alerta do SOC diz NOT ENFORCED. Logo o gap é prevenção de ameaça, não falta de porta. Cabo rompido contradiz sessão e HTTP 200. Desligar zona LAN ou exigir MAC de servidor no firewall são equívocos de operação.",
+    "explicacao_profunda": "O sintoma aponta para gap de prevenção de ameaça, não para porta fechada. No CLI, zone-pair LAN→DMZ faz inspect HTTPS com sessão ALLOW 443 e a app responde; não há policy IPS/UTD/threat bound e o alerta do SOC diz NOT ENFORCED. Insight: permitir a porta ≠ inspecionar payload malicioso — abrir mais portas só aumenta superfície. Cabo rompido contradiz sessão ALLOW e HTTP 200. Desligar a zone LAN não é mitigação de exploit. MAC do file server no firewall não é requisito para HTTPS funcionar.",
     "part_id": "1.2"
   },
   {
     "id": 4,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "Chamado #7204 — Projeto de “modernização” propôs spine-leaf com dois spines no escritório de 8 pessoas. Inventário real do site foi colado no ticket para validar o design.",
+    "sintoma": "Chamado #7204 — projeto de “modernização” propôs spine-leaf com dois spines no escritório de 8 pessoas. O inventário real do site foi colado no ticket para validar o design.",
     "cli_output": "INVENTARIO-SITE-FILIAL08\nDispositivos gerenciados:\n  1x ISR-4331  (WAN/Internet, NAT, VPN)     hostname: BR-SOHO-R1\n  1x CBS250-24T (switch acesso 24p)         hostname: BR-SOHO-SW1\n  1x AP1800 (autônomo, SSID unico)          hostname: BR-SOHO-AP1\n  8x endpoints (PC/impressora)\n\nBR-SOHO-R1# show ip interface brief\nGigabitEthernet0/0/0  203.0.113.10  YES DHCP   up  up   (WAN)\nGigabitEthernet0/0/1  192.168.0.1   YES manual up  up   (LAN)\n\nBR-SOHO-SW1# show cdp neighbors\nDevice ID        Local Intrfce    Holdtme  Capability  Platform  Port ID\nBR-SOHO-R1       Gig 0/1          150         R S I     ISR4331   Gig 0/0/1\nBR-SOHO-AP1      Gig 0/8          140         T         AP1800    Gig 0\n\nBR-SOHO-R1# show ip route | include Gateway|0.0.0.0\nGateway of last resort is 203.0.113.1 to network 0.0.0.0\nS*  0.0.0.0/0 [1/0] via 203.0.113.1\n\nPROPOSTA-ARQUITETO (trecho):\n  \"Implantar 2x Spine + 4x Leaf, MLAG, e Core three-tier dedicado\"",
     "alternativas": [
       "O inventário mostra topologia SOHO (roteador borda + switch acesso + AP); spine-leaf/three-tier dedicado é oversized e não se sustenta nos dispositivos existentes",
@@ -60,14 +60,14 @@
       "CDP só lista o AP; por isso o switch não existe e o design correto é apenas dois spines sem leaf"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Inventário e CDP mostram um roteador WAN/LAN, um switch de acesso e um AP — padrão SOHO de pequeno porte. Proposta de 2 spines + leafs + core three-tier não encontra base no site. Default route é borda Internet, não fabric DC. CDP lista router e AP no switch; negar o switch contradiz o output.",
+    "explicacao_profunda": "O sintoma aponta para oversizing: inventário e CDP mostram SOHO (roteador WAN/LAN + switch de acesso + AP). No CLI, default na WAN é borda Internet, não fabric de DC; CDP lista o ISR e o AP no switch. Insight: desenhe pelo porte e pelos dispositivos existentes, não pelo buzzword. Three-tier completo não é obrigatório com 8 PCs. Default route na WAN não prova spine-leaf. Negar a existência do switch contradiz o próprio CDP.",
     "part_id": "1.2"
   },
   {
     "id": 5,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "Chamado #7205 — LAN da matriz acessa servidores locais e SaaS pela Internet, mas a subnet da filial 10.60.0.0/16 ficou inacessível após “ajuste de cloud”. Usuários locais não reclamam da Intranet on-prem.",
+    "sintoma": "Chamado #7205 — a LAN da matriz acessa servidores locais e SaaS pela Internet, mas a subnet da filial 10.60.0.0/16 ficou inacessível após um “ajuste de cloud”. Usuários locais não reclamam da Intranet on-prem.",
     "cli_output": "PC-MATRIZ> ping 10.10.10.50\nResposta de 10.10.10.50: tempo=1ms   (servidor on-prem OK)\n\nPC-MATRIZ> ping 10.60.5.10\nEsgotado o tempo limite do pedido.   (host da filial)\n\nEdge-MATRIZ# show ip route 10.60.0.0\n% Network not in table\n\nEdge-MATRIZ# show ip route 0.0.0.0\nS*  0.0.0.0/0 [1/0] via 198.51.100.1, GigabitEthernet0/0   (Internet)\n\nEdge-MATRIZ# show crypto session\nCrypto session current status\n  Interface: Tunnel0\n  Session status: DOWN\n  Peer: 203.0.113.50 (filial)  Idle time: 02:14:11\n\nEdge-MATRIZ# show ip interface brief | include Tunnel0|10.255\nTunnel0   10.255.0.1   YES manual  up   down\n\nEdge-FILIAL# show ip interface brief | include Tunnel0\nTunnel0   10.255.0.2   YES manual  up   down\n\nEdge-MATRIZ# show running-config | include ip route 10.60\n(no static route to 10.60.0.0/16)\n(observação: rota da filial era aprendida via Tunnel0 quando UP)",
     "alternativas": [
       "Como o ping ao servidor on-prem falha, o problema é spine-leaf no access da matriz",
@@ -76,7 +76,7 @@
       "SaaS na nuvem exige remover o Tunnel0 permanentemente para a filial voltar"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Ping 10.10.10.50 confirma LAN/on-prem. Default route via Internet existe, mas 10.60.0.0 não está na tabela, Tunnel0 está up/down e crypto session DOWN com o peer da filial. A causa visível é a borda WAN/VPN (túnel) que deveria carregar o prefixo da filial no modelo híbrido. Não há evidência de falha spine-leaf nem de trocar switch por WLC. Derrubar o túnel “por causa de SaaS” piora o acesso à filial.",
+    "explicacao_profunda": "O sintoma aponta para a borda WAN/VPN híbrida, não para a LAN on-prem. No CLI, ping a 10.10.10.50 OK e há default para Internet, mas Tunnel0 está up/down, crypto session DOWN e 10.60.0.0/16 fora da tabela. Insight: LAN local saudável + prefixo de filial ausente = olhe túnel/crypto antes de redesenhar o access. Não há evidência de falha spine-leaf; trocar switch por WLC não restaura rota WAN. Remover o Tunnel0 “por causa de SaaS” só piora o acesso à filial.",
     "part_id": "1.2"
   }
 ]

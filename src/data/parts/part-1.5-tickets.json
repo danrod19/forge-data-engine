@@ -3,7 +3,7 @@
     "id": 1,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "Chamado #7501 — Servidor de aplicação “tem IPv6 ligado” mas não alcança o backend com GUA 2001:db8:10::50 em outra VLAN. Ping local no enlace às vezes responde em FE80.",
+    "sintoma": "Chamado #7501 — servidor de aplicação “tem IPv6 ligado”, mas não alcança o backend com GUA 2001:db8:10::50 em outra VLAN. Ping local no enlace às vezes responde em FE80.",
     "cli_output": "SRV-APP> ipconfig\n   Ethernet adapter Ethernet0:\n   IPv6 Address. . . . . . . . . . . :\n   Link-local IPv6 Address . . . . . : fe80::a1b2:c3d4:e5f6:7788%12\n   IPv4 Address. . . . . . . . . . . : 10.10.10.20\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.10.10.1\n\nSRV-APP> ping 2001:db8:10::50\nPinging 2001:db8:10::50 with 32 bytes of data:\nDestination host unreachable.\n\nR1# show ipv6 interface brief GigabitEthernet0/1\nGi0/1    [up/up]\n    FE80::1\n    2001:DB8:20::1\n\nR1# show ipv6 interface GigabitEthernet0/1 | include advert|Joined|FE80|2001\n  No global unicast address advertised via RA to this segment check:\n  (RA suppressed / ipv6 nd ra suppress configured on access VLAN of SRV)\n  Joined group address(es):\n    FF02::1\n    FF02::2\n\nAccess-SVI# show running-config interface Vlan20\ninterface Vlan20\n ipv6 address 2001:DB8:20::1/64\n ipv6 nd ra suppress",
     "alternativas": [
       "O IPv4 10.10.10.20 prova que o GUA IPv6 2001:db8:10::50 está na mesma subnet do servidor",
@@ -12,14 +12,14 @@
       "FF02::1 no roteador substitui a necessidade de prefixo /64 no host"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "O ipconfig do servidor lista só link-local IPv6 (fe80::…), sem GUA. A SVI tem ipv6 nd ra suppress, então não há RA/SLAAC no segmento. Ping a 2001:db8:10::50 falha com unreachable. IPv4 OK não cria GUA. FE80 não é GUA. Multicast FF02::1 não atribui unicast /64 ao host.",
+    "explicacao_profunda": "O sintoma aponta para host só com link-local, sem GUA. No CLI, ipconfig lista fe80::…, a SVI tem ipv6 nd ra suppress (sem RA/SLAAC) e o ping ao GUA remoto falha com unreachable. Insight: FE80 não roteia off-link; sem RA ou config manual não nasce GUA. IPv4 OK não cria GUA IPv6. FE80 na interface não é GUA global válido. Multicast FF02::1 no roteador não atribui unicast /64 ao host.",
     "part_id": "1.5"
   },
   {
     "id": 2,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "Chamado #7502 — Notebook dual-stack acessa sistemas legados IPv4, mas falha em portais internos publicados só em IPv6. Time de app culpou o certificado TLS.",
+    "sintoma": "Chamado #7502 — notebook dual-stack acessa sistemas legados IPv4, mas falha em portais internos publicados só em IPv6. O time de app já culpou o certificado TLS.",
     "cli_output": "PC-ENG> ipconfig\n   IPv4 Address. . . . . . . . . . . : 192.168.40.55\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 192.168.40.1\n   IPv6 Address. . . . . . . . . . . : 2001:db8:40:0:a1b2:c3d4:e5f6:99aa\n   Link-local IPv6 Address . . . . . : fe80::a1b2:c3d4:e5f6:99aa%8\n   Default Gateway . . . . . . . . . : fe80::1%8\n\nPC-ENG> ping 192.168.40.1\nResposta de 192.168.40.1: tempo=1ms\n\nPC-ENG> ping 2001:db8:90::10\nPinging 2001:db8:90::10 with 32 bytes of data:\nDestination net unreachable.\n\nPC-ENG> route print -6 | findstr /i \"::/0 2001\"\n  None listed for ::/0\n  2001:db8:40::/64  on-link\n\nCore# show ipv6 route ::/0\n% Route not found\nCore# show ip route 0.0.0.0\nS*  0.0.0.0/0 [1/0] via 203.0.113.1",
     "alternativas": [
       "Há GUA 2001:db8:40:… e on-link /64, mas não existe ::/0 no host nem no Core — dual-stack com default só IPv4; destinos IPv6 remotos ficam unreachable",
@@ -28,14 +28,14 @@
       "Certificado TLS é a única leitura possível de “net unreachable” no ping IPv6"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "route print -6 sem ::/0 e Core sem rota ::/0, enquanto 0.0.0.0/0 IPv4 existe, explicam IPv4 OK e IPv6 remoto unreachable. GUA local sozinha não cria default. fe80::1 no PC não prova ::/0 no core. Ping IPv4 funciona. Net unreachable é L3, não diagnóstico de certificado TLS.",
+    "explicacao_profunda": "O sintoma aponta para falta de default IPv6. No CLI, route print -6 sem ::/0 e Core sem ::/0, enquanto 0.0.0.0/0 IPv4 existe — daí IPv4 OK e IPv6 remoto unreachable. Insight: dual-stack com GUA on-link mas sem ::/0 quebra só o caminho IPv6 remoto; TLS não é a primeira leitura de “net unreachable”. fe80::1%8 no PC não prova ::/0 instalada no Core. Ping IPv4 ok não manda o IPv6 para 169.254. Certificado não explica unreachable de L3.",
     "part_id": "1.5"
   },
   {
     "id": 3,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "Chamado #7503 — Estagiário afirmou que o PC “já recebeu IP válido” e encerrou o chamado de Internet. Usuário ainda sem acesso a nada da empresa.",
+    "sintoma": "Chamado #7503 — estagiário afirmou que o PC “já recebeu IP válido” e encerrou o chamado de Internet. O usuário ainda não acessa nada da empresa.",
     "cli_output": "PC-RECEP> ipconfig /all\n   DHCP Enabled. . . . . . . . . . . : Yes\n   Autoconfiguration Enabled . . . . : Yes\n   IPv4 Address. . . . . . . . . . . : 169.254.14.200(Preferred)\n   Subnet Mask . . . . . . . . . . . : 255.255.0.0\n   Default Gateway . . . . . . . . . :\n   DHCP Server . . . . . . . . . . . :\n   DNS Servers . . . . . . . . . . . :\n   Autoconfiguration IPv4 Address. . : 169.254.14.200\n\nPC-RECEP> ping 192.168.5.1\nEsgotado o tempo limite do pedido.\n\nAccess5# show interfaces Gi1/0/8 status\nPort      Name        Status     Vlan  Duplex  Speed  Type\nGi1/0/8   RECEP-PC    connected  50    a-full  a-1000 10/100/1000BaseTX\n\nAccess5# show mac address-table dynamic interface Gi1/0/8\n  50   0050.56aa.recp   DYNAMIC  Gi1/0/8",
     "alternativas": [
       "169.254.14.200 é GUA IPv6 comprimida incorretamente no Windows",
@@ -44,14 +44,14 @@
       "MAC na VLAN 50 garante que o default gateway 192.168.5.1 já foi instalado via RA"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Campos Autoconfiguration, 169.254.14.200, DHCP Server/gateway/DNS vazios mostram APIPA por falha de DHCP. Não é IPv6 GUA. Lease completo teria servidor DHCP e opções. MAC na porta só confirma L2, não instala gateway nem via RA IPv6.",
+    "explicacao_profunda": "O sintoma aponta para APIPA disfarçado de “IP válido”. No CLI, Autoconfiguration 169.254.14.200, DHCP Server/gateway/DNS vazios — típico de falha de DHCP. Insight: se não há DHCP Server nem gateway no ipconfig, o lease não aconteceu. 169.254 não é GUA IPv6 comprimida. Gateway/DNS preenchidos com DHCP Server vazio não seria o cenário deste output. MAC na VLAN 50 só confirma L2; não instala 192.168.5.1 via RA.",
     "part_id": "1.5"
   },
   {
     "id": 4,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "Chamado #7504 — “A Internet caiu” no setor financeiro. O analista viu que ping 1.1.1.1 funciona e culpou o firewall de borda.",
+    "sintoma": "Chamado #7504 — “a Internet caiu” no setor financeiro. O analista viu ping 1.1.1.1 funcionando e culpou o firewall de borda.",
     "cli_output": "PC-FIN> ipconfig /all\n   IPv4 Address. . . . . . . . . . . : 10.60.2.44\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.60.2.1\n   DNS Servers . . . . . . . . . . . : 10.255.255.255\n                                       10.255.255.254\n\nPC-FIN> ping 1.1.1.1\nResposta de 1.1.1.1: tempo=12ms\n\nPC-FIN> ping www.empresa.local\nPing request could not find host www.empresa.local.\n\nPC-FIN> nslookup www.empresa.local\nDNS request timed out.\n    timeout was 2 seconds.\nServer:  UnKnown\nAddress:  10.255.255.255\n\n# observação NOC: 10.255.255.255/254 não são os resolvers oficiais (oficiais = 10.60.0.10 e 10.60.0.11)",
     "alternativas": [
       "Ping 1.1.1.1 OK com nslookup timeout em 10.255.255.255: gateway/rota de saída funcionam; o problema visível é DNS inválido no cliente, não queda total de Internet L3",
@@ -60,14 +60,14 @@
       "10.255.255.255 no campo DNS é o loopback IPv6 ::1"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "1.1.1.1 responde → IP, máscara e gateway permitem saída. nslookup para 10.255.255.255 dá timeout e o nome não resolve — DNS errado. Gateway 10.60.2.1 é coerente com 10.60.2.44/24. NAT não é a leitura do nslookup. 10.255.255.255 não é ::1.",
+    "explicacao_profunda": "O sintoma aponta para DNS inválido, não para queda total de L3. No CLI, ping 1.1.1.1 OK (IP/máscara/gateway permitem saída) e nslookup para 10.255.255.255 dá timeout — nome não resolve. Insight: ping a IP público + falha de nome = confira DNS do cliente antes de culpar firewall/NAT. Gateway 10.60.2.1 é coerente com 10.60.2.44/24. Falha de nome com ping IP OK não prova ausência de PAT. 10.255.255.255 no campo DNS não é ::1.",
     "part_id": "1.5"
   },
   {
     "id": 5,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "Chamado #7505 — Impressora nova pinga outros hosts da VLAN 30, mas não imprime em filas na VLAN 40 nem “sai para a rede”. Configuração estática foi digitada no painel web.",
+    "sintoma": "Chamado #7505 — impressora nova pinga outros hosts da VLAN 30, mas não imprime em filas na VLAN 40 nem “sai para a rede”. A config estática foi digitada no painel web.",
     "cli_output": "PRN-30> (menu de rede — dump técnico)\n  IP Address      : 192.168.30.80\n  Subnet Mask     : 255.255.255.0\n  Default Gateway : 0.0.0.0\n  DNS Primary     : 192.168.30.10\n\nTech-PC> ping 192.168.30.80\nResposta de 192.168.30.80: tempo<1ms\n\nTech-PC> tracert 192.168.40.20\n  1  192.168.30.1  1 ms\n  2  192.168.40.20  2 ms\n\nDist# show ip interface brief | include Vlan30\nVlan30   192.168.30.1   YES manual   up   up\n\nPRN-30> ping 192.168.30.1\nEsgotado o tempo limite do pedido.   # gateway em branco/0.0.0.0 no device\nPRN-30> ping 192.168.40.20\nEsgotado o tempo limite do pedido.",
     "alternativas": [
       "DNS 192.168.30.10 na mesma VLAN obriga gateway 0.0.0.0",
@@ -76,7 +76,7 @@
       "Default Gateway 0.0.0.0 no dump da impressora: tráfego local na /24 funciona, mas sem gateway válido (deveria ser 192.168.30.1) não há saída para a VLAN 40"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "A impressora tem gateway 0.0.0.0; pings a 192.168.30.1 e 192.168.40.20 falham nela, enquanto hosts da mesma VLAN a alcançam e o Tech-PC faz tracert via 192.168.30.1. DNS local não substitui gateway. Ping ao .80 é só L2/L3 local. SVI está up/up no Dist.",
+    "explicacao_profunda": "O sintoma aponta para default gateway 0.0.0.0 na impressora. No CLI, pings a 192.168.30.1 e 192.168.40.20 falham nela, enquanto hosts locais a alcançam e o Tech-PC faz tracert via .1; SVI Vlan30 está up/up. Insight: ping local na /24 não prova rota off-subnet — corrija o gateway para 192.168.30.1. DNS na mesma VLAN não obriga gateway 0.0.0.0. Ping ao .80 é só alcance local. SVI down não explicaria o tracert bem-sucedido do Tech-PC.",
     "part_id": "1.5"
   }
 ]

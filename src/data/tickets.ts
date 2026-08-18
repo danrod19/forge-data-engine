@@ -242,14 +242,14 @@ export function trilhaSessionCopy(track: TrackId): {
   if (track === "aws") {
     return {
       title: "Trilha · AWS SAA",
-      subtitle: `Foundations · ${bankSize} tickets (CLI / policy / TShoot)`,
+      subtitle: `${bankSize} tickets de diagnóstico (policy, logs, CLI)`,
       bankSize,
     };
   }
   if (track === "ccna-v1") {
     return {
       title: "Trilha · CCNA V1",
-      subtitle: `Módulos 1–6 · ${bankSize} tickets no banco`,
+      subtitle: `${bankSize} tickets com sintoma + CLI (módulos 1–6)`,
       bankSize,
     };
   }

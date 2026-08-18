@@ -33,6 +33,7 @@ import {
   countTicketsInSession,
   V2_SIMULADO_TICKET_RATIO,
   TOTAL_SIMULADO_V2,
+  // counts used in config UI
   TOTAL_SIMULADO_AWS,
   TOTAL_SIMULADO_MODULE1,
   TOTAL_SIMULADO_MODULE2,
@@ -50,6 +51,7 @@ import { SimuladoReview } from "@/components/simulado/SimuladoReview";
 import { Explicacao } from "@/components/ticket/Explicacao";
 import { TerminalCLI } from "@/components/ticket/TerminalCLI";
 import { useTrack } from "@/lib/track-context";
+import { simuladoConfigCopy } from "@/data/copy";
 
 type Phase = "config" | "quiz" | "result" | "review";
 
@@ -81,7 +83,7 @@ export function SimuladoMode({
   disabled,
   onUpgrade,
 }: SimuladoModeProps) {
-  const { track, meta } = useTrack();
+  const { track } = useTrack();
   const [phase, setPhase] = useState<Phase>("config");
   const [countOption, setCountOption] = useState<SimuladoCountOption>(20);
   const [source, setSource] = useState<SimuladoSource>(() =>
@@ -268,6 +270,7 @@ export function SimuladoMode({
         ? poolTotal
         : Math.min(countOption, poolTotal);
     const timerMins = getSimuladoTimerMinutes(previewCount, poolTotal);
+    const cfg = simuladoConfigCopy(track);
 
     return (
       <motion.div
@@ -282,15 +285,12 @@ export function SimuladoMode({
             </div>
             <div>
               <h1 className="text-lg font-bold text-slate-50">
-                Modo <span className="text-neon-green">Simulado</span>
+                Modo <span className="text-neon-green">{cfg.title}</span>
               </h1>
-              <p className="text-xs text-slate-500">
-                {meta.label} · {poolTotal} questões traditional · {meta.examCode}
-              </p>
-              {track === "ccna-v2" && (
+              <p className="text-xs text-slate-500">{cfg.subtitle}</p>
+              {cfg.mixLine && (
                 <p className="mt-0.5 text-[10px] text-neon-green/80">
-                  Mix v2.0 · ~{Math.round(V2_SIMULADO_TICKET_RATIO * 100)}%
-                  troubleshooting (tickets)
+                  {cfg.mixLine}
                 </p>
               )}
             </div>
@@ -299,20 +299,21 @@ export function SimuladoMode({
           {/* Source selector — only ccna-v1; AWS and V2 use fixed pools */}
           {track === "aws" ? (
             <div className="mb-5 rounded-xl border border-amber-500/25 bg-amber-500/5 px-3 py-3">
-              <p className="text-sm font-bold text-amber-200">AWS SAA-C03 Foundations</p>
+              <p className="text-sm font-bold text-amber-200">
+                AWS SAA-C03 Foundations
+              </p>
               <p className="mt-0.5 text-[10px] text-amber-200/70">
-                {TOTAL_SIMULADO_AWS} questões · parts 1.1–1.12 · banco piloto
+                {TOTAL_SIMULADO_AWS} questões · parts 1.1–1.12 · piloto
               </p>
             </div>
           ) : track === "ccna-v2" ? (
             <div className="mb-5 rounded-xl border border-neon-green/25 bg-neon-green/5 px-3 py-3">
               <p className="text-sm font-bold text-neon-green">
-                CCNA 200-301 v2.0 · mix diagnóstico
+                Sessão com mix de diagnóstico
               </p>
               <p className="mt-0.5 text-[10px] text-neon-green/70">
-                {TOTAL_SIMULADO_V2} traditional + tickets · ~
+                {TOTAL_SIMULADO_V2} traditional + tickets · cerca de{" "}
                 {Math.round(V2_SIMULADO_TICKET_RATIO * 100)}% troubleshooting
-                na sessão
               </p>
             </div>
           ) : (
@@ -545,18 +546,7 @@ export function SimuladoMode({
         </div>
 
         <div className="rounded-xl border border-dashed border-slate-800 bg-slate-900/30 px-4 py-3 text-center text-[11px] text-slate-500">
-          {track === "ccna-v2" ? (
-            <>
-              Banco: {poolTotal} traditional · sessão com mix ~
-              {Math.round(V2_SIMULADO_TICKET_RATIO * 100)}% tickets (diagnóstico)
-              · embaralhada a cada simulado
-            </>
-          ) : (
-            <>
-              Banco: {poolTotal} questões · embaralhadas a cada simulado · drill
-              de subnetting fica só no Estudo (parte 1.4)
-            </>
-          )}
+          {cfg.footer}
         </div>
       </motion.div>
     );

@@ -61,7 +61,15 @@ export function TopBar({
             </div>
             <div className="hidden min-w-0 sm:block">
               <p className="truncate text-sm font-semibold tracking-tight text-slate-100">
-                CCNA <span className="text-neon-green">Forge</span>
+                {track === "aws" ? (
+                  <>
+                    AWS <span className="text-amber-300">Forge</span>
+                  </>
+                ) : (
+                  <>
+                    CCNA <span className="text-neon-green">Forge</span>
+                  </>
+                )}
               </p>
               <p className="truncate text-[10px] text-slate-500">
                 {trackReady ? meta.examCode : "…"}

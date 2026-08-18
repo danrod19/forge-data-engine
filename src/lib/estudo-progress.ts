@@ -36,6 +36,10 @@ export interface DomainProgressEntry {
    * IDs únicos acertados (interno — garante completed sem double-count).
    */
   masteredIds?: number[];
+  /** Conteúdo didático marcado como lido */
+  contentRead?: boolean;
+  /** ISO 8601 da última leitura / marcar como lido */
+  lastReadAt?: string;
 }
 
 export type EstudoProgressMap = Partial<
@@ -52,6 +56,8 @@ function emptyEntry(total = 0): DomainProgressEntry {
     total,
     lastPracticed: "",
     masteredIds: [],
+    contentRead: false,
+    lastReadAt: "",
   };
 }
 
@@ -71,6 +77,8 @@ function normalizeEntry(
     typeof o.total === "number" && o.total >= 0 ? o.total : fallbackTotal;
   const lastPracticed =
     typeof o.lastPracticed === "string" ? o.lastPracticed : "";
+  const lastReadAt = typeof o.lastReadAt === "string" ? o.lastReadAt : "";
+  const contentRead = o.contentRead === true || Boolean(lastReadAt);
 
   const completed =
     masteredIds.length > 0
@@ -82,6 +90,8 @@ function normalizeEntry(
     total,
     lastPracticed,
     masteredIds,
+    contentRead,
+    lastReadAt,
   };
 }
 
@@ -302,4 +312,29 @@ export function formatLastPracticed(iso: string): string | null {
     month: "short",
     year: "numeric",
   });
+}
+
+/**
+ * Marca conteúdo didático como lido (namespaced por track).
+ */
+export function recordContentRead(
+  map: EstudoProgressMap,
+  input: {
+    domainId: string;
+    track: EstudoTrackId;
+    poolTotal?: number;
+  }
+): EstudoProgressMap {
+  const prev = getDomainProgress(map, input.domainId, input.poolTotal);
+  const next: DomainProgressEntry = {
+    ...prev,
+    contentRead: true,
+    lastReadAt: new Date().toISOString(),
+  };
+  const updated: EstudoProgressMap = {
+    ...map,
+    [input.domainId]: next,
+  };
+  saveEstudoProgressForTrack(input.track, updated);
+  return updated;
 }

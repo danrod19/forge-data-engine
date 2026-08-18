@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ProPlans, TrialButton } from "@/components/pro/ProPlans";
+import { paywallCopy } from "@/data/copy";
 
 interface PaywallModalProps {
   open: boolean;
@@ -22,9 +23,9 @@ interface PaywallModalProps {
 }
 
 const features = [
-  { icon: Infinity, label: "Vidas infinitas — sem cooldown de 4h" },
-  { icon: Zap, label: "Explicações profundas e labs premium" },
-  { icon: Clock, label: "Diagnósticos CLI ilimitados" },
+  { icon: Infinity, label: paywallCopy.features[0] },
+  { icon: Zap, label: paywallCopy.features[1] },
+  { icon: Clock, label: paywallCopy.features[2] },
 ];
 
 export function PaywallModal({
@@ -95,14 +96,12 @@ export function PaywallModal({
                 {isLives ? "$ life_check --status" : "$ upgrade --tier pro"}
               </p>
               <DialogTitle className="text-lg font-bold tracking-tight text-slate-50 sm:text-xl">
-                {isLives ? "Suas vidas acabaram!" : "Desbloqueie o PRO"}
+                {isLives ? paywallCopy.livesTitle : paywallCopy.upgradeTitle}
               </DialogTitle>
             </div>
 
             <DialogDescription className="text-sm leading-relaxed text-slate-400">
-              {isLives
-                ? "Ative o PRO (trial ou plano) para vidas infinitas, ou aguarde para recuperar."
-                : "Trial de 24h ou planos por período — explicações sem blur e vidas infinitas."}
+              {isLives ? paywallCopy.livesBody : paywallCopy.upgradeBody}
             </DialogDescription>
           </DialogHeader>
 

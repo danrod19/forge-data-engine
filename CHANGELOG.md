@@ -4,6 +4,13 @@
 
 ## Entradas Recentes
 
+- **2026-08-17** — Estudo com leitura + copy multi-track
+  - Fluxo Estudo: Conteúdo (`study_notes`) → Marcar como lido → Praticar até 30
+  - `estudo-content.ts` + bank (V1 31 · V2 17 · AWS 12); progresso `contentRead`/`lastReadAt` por track
+  - Catálogo V1 vs V2 separado (`getStudyPartsForTrack`)
+  - `src/data/copy.ts`: heroes Home por track (AWS sem Cisco), Simulado/Paywall/Estudo
+  - JSON de questões (alternativas/respostas) intocados
+
 - **2026-08-15** — Deploy prep multi-track (Vercel Hobby, sem Stripe)
   - README: Tracks, scripts, Deploy Vercel, checklist QA pós-deploy
   - `.env.example` (Supabase opcional; Stripe comentado) · `.gitignore` permite example

@@ -10,10 +10,19 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CCNA Forge — Estude CCNA 200-301 de forma gamificada",
+  title: "CCNA Forge — CCNA 200-301 e AWS SAA",
   description:
-    "Plataforma de estudos gamificada para a certificação Cisco CCNA 200-301 v2.0. Modo Ticket de Suporte, lives, streak e labs interativos.",
-  keywords: ["CCNA", "Cisco", "200-301", "networking", "gamificação", "estudos"],
+    "Estudo gamificado multi-track: CCNA 200-301 (V1/V2) e AWS SAA-C03 Foundations. Trilha com tickets, Simulado e Estudo com conteúdo + prática.",
+  keywords: [
+    "CCNA",
+    "Cisco",
+    "200-301",
+    "AWS",
+    "SAA-C03",
+    "networking",
+    "gamificação",
+    "estudos",
+  ],
 };
 
 export const viewport: Viewport = {

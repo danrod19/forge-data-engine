@@ -22,6 +22,11 @@ import { getSimuladoPoolByTrack } from "@/data/simulado-questions";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ProPlans, TrialButton } from "@/components/pro/ProPlans";
 import { useTrack } from "@/lib/track-context";
+import {
+  freeVsProCopy,
+  homeHeroCopy,
+  homeHowToCopy,
+} from "@/data/copy";
 
 interface HomeScreenProps {
   isPro: boolean;
@@ -30,6 +35,15 @@ interface HomeScreenProps {
   onAuthClick?: () => void;
 }
 
+const HOW_ICONS = [Map, ClipboardList, BookOpen, GraduationCap] as const;
+const HOW_ACCENTS = [
+  "border-neon-green/30 bg-neon-green/5 text-neon-green",
+  "border-neon-cyan/30 bg-neon-cyan/5 text-neon-cyan",
+  "border-violet-500/30 bg-violet-500/5 text-violet-300",
+  "border-amber-500/30 bg-amber-500/5 text-amber-300",
+] as const;
+const HOW_IDS: NavTab[] = ["trilha", "simulado", "estudo", "sobre"];
+
 export function HomeScreen({
   isPro,
   onNavigate,
@@ -37,69 +51,19 @@ export function HomeScreen({
   onAuthClick,
 }: HomeScreenProps) {
   const { user, trialAvailable, startTrial } = useAuth();
-  const { track, meta } = useTrack();
+  const { track } = useTrack();
   const ticketCount = getTicketsPool(track).length;
   const simuladoCount = getSimuladoPoolByTrack(track).length;
-
-  const howToCards: {
-    id: NavTab;
-    step: string;
-    title: string;
-    desc: string;
-    icon: typeof Map;
-    accent: string;
-  }[] = [
-    {
-      id: "trilha",
-      step: "01",
-      title: "Trilha",
-      desc:
-        track === "aws"
-          ? `Tickets AWS (CLI / policy / TShoot) — ${ticketCount} tickets no banco SAA.`
-          : track === "ccna-v2"
-            ? `Trilha 100% tickets · Troubleshooting · v2.0 — ${ticketCount} no banco.`
-            : `Tickets com sintoma + CLI — ${ticketCount} tickets no banco.`,
-      icon: Map,
-      accent: "border-neon-green/30 bg-neon-green/5 text-neon-green",
-    },
-    {
-      id: "simulado",
-      step: "02",
-      title: "Simulado",
-      desc:
-        track === "ccna-v2"
-          ? `${meta.label} · ${simuladoCount} traditional · mix ~30% troubleshooting (tickets).`
-          : `${meta.label} · ${simuladoCount} questões traditional · ${meta.examCode}.`,
-      icon: ClipboardList,
-      accent: "border-neon-cyan/30 bg-neon-cyan/5 text-neon-cyan",
-    },
-    {
-      id: "estudo",
-      step: "03",
-      title: "Estudo",
-      desc:
-        track === "aws"
-          ? "8 domínios SAA Foundations (IAM → CloudWatch) · progresso em :aws."
-          : track === "ccna-v2"
-            ? "Parts CCNA v2.0 · progresso namespaced · prática por part_id."
-            : "Pratique por part/domínio do blueprint CCNA e acompanhe o progresso.",
-      icon: BookOpen,
-      accent: "border-violet-500/30 bg-violet-500/5 text-violet-300",
-    },
-    {
-      id: "sobre",
-      step: "04",
-      title: "Sobre a Prova",
-      desc:
-        track === "aws"
-          ? "SAA-C03 Foundations — 12 parts piloto (IAM → CloudWatch)."
-          : track === "ccna-v2"
-            ? "CCNA 200-301 v2.0 · ênfase troubleshooting e parts consolidadas."
-            : "Formato do exame e pesos por domínio do blueprint CCNA.",
-      icon: GraduationCap,
-      accent: "border-amber-500/30 bg-amber-500/5 text-amber-300",
-    },
-  ];
+  const hero = homeHeroCopy(track);
+  const howToCards = homeHowToCopy(track, {
+    tickets: ticketCount,
+    simulado: simuladoCount,
+  }).map((card, i) => ({
+    ...card,
+    id: HOW_IDS[i],
+    icon: HOW_ICONS[i],
+    accent: HOW_ACCENTS[i],
+  }));
   const [trialLoading, setTrialLoading] = useState(false);
   const [trialError, setTrialError] = useState<string | null>(null);
 
@@ -132,18 +96,23 @@ export function HomeScreen({
           className="pointer-events-none absolute -bottom-8 -left-8 size-28 rounded-full bg-neon-cyan/10 blur-2xl"
         />
         <p className="relative mb-2 font-mono text-[10px] uppercase tracking-[0.22em] text-neon-cyan">
-          $ ./ccna-forge --boot
+          {hero.prompt}
         </p>
         <h1 className="relative text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
-          CCNA <span className="text-neon-green">Forge</span>
+          {hero.titleLead}{" "}
+          <span
+            className={
+              track === "aws" ? "text-amber-300" : "text-neon-green"
+            }
+          >
+            {hero.titleAccent}
+          </span>
         </h1>
         <p className="relative mt-1.5 text-sm font-medium text-slate-300 sm:text-base">
-          preparação prática para Cisco CCNA 200-301
+          {hero.subtitle}
         </p>
         <p className="relative mt-3 max-w-md text-[13px] leading-relaxed text-slate-400 sm:text-sm">
-          Treine como a prova cobra: troubleshooting com sintoma e CLI, mais
-          simulados no estilo do exame — feedback imediato, progresso e foco no
-          raciocínio de rede.
+          {hero.body}
         </p>
 
         <div className="relative mt-5 flex flex-col gap-2 sm:flex-row">
@@ -153,7 +122,7 @@ export function HomeScreen({
             className="h-11 flex-1 gap-2 border border-neon-green/40 bg-neon-green/15 font-semibold text-neon-green hover:bg-neon-green/25"
           >
             <Map className="size-4" />
-            Começar Trilha
+            {hero.ctaPrimary}
             <ChevronRight className="size-4" />
           </Button>
           <Button
@@ -162,7 +131,7 @@ export function HomeScreen({
             className="h-11 flex-1 gap-2 border border-neon-cyan/35 bg-neon-cyan/10 font-semibold text-neon-cyan hover:bg-neon-cyan/20"
           >
             <ClipboardList className="size-4" />
-            Fazer Simulado
+            {hero.ctaSecondary}
           </Button>
         </div>
       </section>
@@ -218,18 +187,22 @@ export function HomeScreen({
         <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
           <div className="mb-2 flex items-center gap-2">
             <Heart className="size-4 text-rose-400" fill="currentColor" />
-            <h3 className="text-sm font-semibold text-slate-100">Free</h3>
+            <h3 className="text-sm font-semibold text-slate-100">
+              {freeVsProCopy.freeTitle}
+            </h3>
           </div>
           <ul className="space-y-1.5 font-mono text-[11px] leading-relaxed text-slate-400">
-            <li>› Trilha, Simulado e Estudo</li>
-            <li>› Vidas limitadas</li>
-            <li>› Explicações profundas com blur</li>
+            {freeVsProCopy.freeBullets.map((b) => (
+              <li key={b}>› {b}</li>
+            ))}
           </ul>
         </div>
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
           <div className="mb-2 flex items-center gap-2">
             <Crown className="size-4 text-amber-400" fill="currentColor" />
-            <h3 className="text-sm font-semibold text-amber-200">PRO</h3>
+            <h3 className="text-sm font-semibold text-amber-200">
+              {freeVsProCopy.proTitle}
+            </h3>
             {isPro && (
               <span className="rounded-full border border-amber-400/40 bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-300">
                 ativo
@@ -238,12 +211,14 @@ export function HomeScreen({
           </div>
           <ul className="space-y-1.5 font-mono text-[11px] leading-relaxed text-slate-300">
             <li className="flex items-center gap-1.5">
-              <Infinity className="size-3 text-amber-400" /> Vidas infinitas
+              <Infinity className="size-3 text-amber-400" />{" "}
+              {freeVsProCopy.proBullets[0]}
             </li>
             <li className="flex items-center gap-1.5">
-              <Zap className="size-3 text-amber-400" /> Explicações sem blur
+              <Zap className="size-3 text-amber-400" />{" "}
+              {freeVsProCopy.proBullets[1]}
             </li>
-            <li>› Trial 24h (1x por conta)</li>
+            <li>› {freeVsProCopy.proBullets[2]}</li>
           </ul>
           {!isPro && (
             <Button
@@ -252,7 +227,7 @@ export function HomeScreen({
               className="relative mt-3 h-9 w-full overflow-hidden border-0 text-xs font-bold text-slate-950"
             >
               <span className="gold-gradient absolute inset-0" />
-              <span className="relative">Ver planos PRO</span>
+              <span className="relative">{freeVsProCopy.proCta}</span>
             </Button>
           )}
         </div>

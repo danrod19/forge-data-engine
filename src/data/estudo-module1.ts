@@ -224,7 +224,7 @@ export function getPartTickets(partId: string): Question[] {
 
 export function pickPartPracticeQuestions(
   partId: string,
-  count = 15
+  count = 30
 ): Question[] {
   const pool = getPartQuestions(partId);
   return shuffleQuestions(pool).slice(0, Math.min(count, pool.length));
@@ -251,18 +251,31 @@ export const MODULE5_STUDY_TOTAL = module5TraditionalQuestions.length;
 export const MODULE6_STUDY_TOTAL = module6TraditionalQuestions.length;
 export const MODULE1_DRILL_TOTAL = module1DrillQuestions.length;
 
+/** Catálogo CCNA V1 (módulos 1–6). */
+export const V1_STUDY_PARTS: StudyPartManifest[] = [
+  ...MODULE_1_PARTS,
+  ...MODULE_2_PARTS,
+  ...MODULE_3_PARTS,
+  ...MODULE_4_PARTS,
+  ...MODULE_5_PARTS,
+  ...MODULE_6_PARTS,
+];
+
 /**
  * Todas as partes de estudo — primary v2 (parts_index).
  * Fallback: módulos v1 se v2 vazio.
+ * Preferir `getStudyPartsForTrack(track)` no Estudo multi-track.
  */
 export const ALL_STUDY_PARTS: StudyPartManifest[] =
-  V2_STUDY_PARTS.length > 0
-    ? V2_STUDY_PARTS
-    : [
-        ...MODULE_1_PARTS,
-        ...MODULE_2_PARTS,
-        ...MODULE_3_PARTS,
-        ...MODULE_4_PARTS,
-        ...MODULE_5_PARTS,
-        ...MODULE_6_PARTS,
-      ];
+  V2_STUDY_PARTS.length > 0 ? V2_STUDY_PARTS : V1_STUDY_PARTS;
+
+/** Parts de estudo conforme o track ativo. */
+export function getStudyPartsForTrack(
+  track: "ccna-v1" | "ccna-v2" | "aws"
+): StudyPartManifest[] {
+  if (track === "ccna-v1") return V1_STUDY_PARTS;
+  if (track === "ccna-v2") {
+    return V2_STUDY_PARTS.length > 0 ? V2_STUDY_PARTS : V1_STUDY_PARTS;
+  }
+  return [];
+}

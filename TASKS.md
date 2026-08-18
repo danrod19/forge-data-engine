@@ -16,6 +16,8 @@
 - [x] Fase 3: SobreProvaAws + Sobre CCNA V1/V2 + polish labels V2
 - [x] Bias fino Simulado V2: mix ~30% tickets (sessão; JSON intocado)
 - [x] Deploy prep: README, .env.example, vercel.json headers, npm run qa:tracks
+- [x] Estudo: fluxo Conteúdo → marcar lido → Praticar (até 30) + content bank
+- [x] Copy audit multi-track (Home/TopBar/Simulado/Paywall/Trilha/Estudo)
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção

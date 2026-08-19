@@ -1,0 +1,107 @@
+{
+  "part_id": "aws-1.8",
+  "title": "SQS + SNS + desacoplamento (filas, fan-out, DLQ)",
+  "blueprint_module": "2.0",
+  "blueprint_topics": [
+    "2.1",
+    "2.2",
+    "3.2"
+  ],
+  "verb": "Design",
+  "weight_percent": 26,
+  "topic_list": [
+    "Desacoplar produtor e consumidor com filas (buffer de picos)",
+    "SQS standard: throughput alto, best-effort ordering, at-least-once",
+    "SQS FIFO: ordem por message group, deduplicação, throughput limitado (ideia)",
+    "Visibility timeout e long polling",
+    "Dead-letter queue: maxReceiveCount e redrive",
+    "SNS pub/sub e fan-out para SQS, Lambda, HTTP, email (ideia)",
+    "Padrão clássico SNS → múltiplas filas SQS",
+    "IAM: sqs:SendMessage/ReceiveMessage/DeleteMessage; sns:Publish/Subscribe",
+    "SSE-SQS / KMS ideia de criptografia em repouso",
+    "TShoot: mensagem reaparece, DLQ enchendo, AccessDenied, FIFO no cenário errado",
+    "NÃO: EventBridge pipes deep, MQ/Kafka full, Step Functions lab, Kinesis deep, SNS filtering lab completo"
+  ],
+  "study_notes": [
+    {
+      "heading": "Por que desacoplar com SQS/SNS",
+      "bullets": [
+        "Fila absorve picos: o produtor não bloqueia no consumidor lento.",
+        "SNS faz fan-out: um evento, vários subscribers em paralelo.",
+        "Retry com visibility + DLQ isola mensagens venenosas (poison)."
+      ],
+      "exam_tips": [
+        "Picos + resiliência entre tiers → SQS; um evento para N destinos → SNS (+ SQS)."
+      ]
+    },
+    {
+      "heading": "Standard vs FIFO",
+      "bullets": [
+        "Standard: escala massiva, ordem best-effort, possíveis duplicatas (desenhe idempotência).",
+        "FIFO: ordem por MessageGroupId, dedup (content-based ou DeduplicationId), menor throughput nominal.",
+        "Não use FIFO só por 'parecer mais seguro' se o workload não precisa de ordem estrita."
+      ],
+      "exam_tips": [
+        "Ordem estrita de pedidos por cliente → FIFO + group id; telemetria em alto volume → standard."
+      ]
+    },
+    {
+      "heading": "Visibility timeout e DLQ",
+      "bullets": [
+        "Após ReceiveMessage, a msg some para outros até o timeout; se não DeleteMessage, reaparece.",
+        "Processamento > visibility → outro consumer pega a mesma msg (duplicata aparente).",
+        "maxReceiveCount esgotado envia à DLQ; analise poison messages e redrive com cuidado."
+      ],
+      "exam_tips": [
+        "Msg reaparece com worker lento → suba visibility ou estenda com ChangeMessageVisibility."
+      ]
+    },
+    {
+      "heading": "SNS fan-out e IAM",
+      "bullets": [
+        "Topic recebe Publish; subscriptions entregam a SQS/Lambda/HTTP/email.",
+        "Fila SQS subscriber precisa de policy permitindo sns.amazonaws.com enviar à fila.",
+        "Roles de producer/consumer: least privilege em ARN da fila/tópico."
+      ],
+      "exam_tips": [
+        "SNS→SQS sem mensagens → subscription confirmada + queue policy do SNS."
+      ]
+    },
+    {
+      "heading": "Anti-patterns de prova (SQS/SNS)",
+      "bullets": [
+        "Visibility timeout de 5s com batch de 2 minutos de processamento.",
+        "Sem DLQ e loops infinitos de poison message.",
+        "FIFO para telemetria de alto volume sem necessidade de ordem.",
+        "Access key no consumer em vez de role com sqs:ReceiveMessage.",
+        "Assumir que SNS garante ordem global entre todos os subscribers."
+      ],
+      "exam_tips": [
+        "Separe: tipo de fila · visibility/DLQ · fan-out SNS · IAM de send/receive."
+      ]
+    }
+  ],
+  "key_commands": [
+    "aws sqs send-message --queue-url <url> --message-body ...",
+    "aws sqs receive-message --queue-url <url> --wait-time-seconds 20",
+    "aws sqs delete-message --queue-url <url> --receipt-handle ...",
+    "aws sqs get-queue-attributes --queue-url <url> --attribute-names All",
+    "aws sqs set-queue-attributes (VisibilityTimeout, RedrivePolicy)",
+    "aws sqs start-message-move-task / redrive (ideia)",
+    "aws sns create-topic / publish",
+    "aws sns subscribe --topic-arn ... --protocol sqs --notification-endpoint <queue-arn>",
+    "aws sns list-subscriptions-by-topic",
+    "aws iam simulate / get-role-policy (AccessDenied send/receive)"
+  ],
+  "must_know": [
+    "SQS desacopla e bufferiza; SNS fan-out pub/sub.",
+    "Standard = escala/at-least-once; FIFO = ordem por group + dedup.",
+    "Visibility curta demais → mensagem reaparece durante o processamento.",
+    "DLQ com maxReceiveCount isola poison messages.",
+    "SNS→SQS exige subscription e queue policy permitindo SNS.",
+    "IAM least privilege no ARN da fila/tópico para producer e consumer.",
+    "DeleteMessage após sucesso evita reentrega; idempotência no consumer.",
+    "Fora: EventBridge pipes deep, Kinesis/MSK full, Step Functions lab, filtering SNS deep."
+  ],
+  "reuse_from_v1": null
+}

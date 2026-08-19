@@ -8,113 +8,117 @@
   "verb": "Design",
   "weight_percent": 30,
   "topic_list": [
-    "VPC: rede isolada na conta; CIDR e escopo de design",
-    "Subnets públicas vs privadas; multi-AZ (uma subnet por AZ ideia)",
+    "VPC: rede isolada na conta/Região; CIDR e escopo de design",
+    "Subnets públicas vs privadas; multi-AZ (uma subnet por AZ)",
     "Route tables: associação de subnet; rota local vs 0.0.0.0/0",
-    "Internet Gateway (IGW): entrada/saída da VPC para a Internet (subnet pública)",
+    "Internet Gateway (IGW): path internet da subnet pública",
     "NAT Gateway: saída da subnet privada sem IP público na instância",
     "Security Groups: stateful, allow-only, anexados a ENI/instância",
     "Network ACLs: stateless, allow/deny, nível de subnet",
-    "Segmentação segura: apps/dados em privadas; ALB/bastion em públicas",
-    "TShoot: sem rota 0.0.0.0/0, SG deny implícito, NACL deny, subnet errada",
-    "IP público / Elastic IP só onde o design exige exposição",
+    "Segmentação segura: ALB/bastion em públicas; app/dados em privadas",
+    "TShoot: rota 0.0.0.0/0, SG deny implícito, NACL deny, subnet/AZ errada",
     "NÃO: Transit Gateway deep, PrivateLink lab completo, IPv6 avançado, Client VPN detalhado"
   ],
   "study_notes": [
     {
-      "heading": "VPC e subnets no SAA-C03",
+      "heading": "O que é VPC (e subnets)",
       "bullets": [
-        "A VPC é o contêiner de rede da conta em uma Região; subnets segmentam o CIDR e vivem em uma AZ cada.",
-        "Desenho multi-AZ: repetir o padrão de subnets (ex. public-a/private-a e public-b/private-b) para HA.",
-        "Pública ≠ 'qualquer coisa': é subnet cujo tráfego de saída/entrada internet passa por IGW via route table."
+        "A VPC é o contêiner de rede lógica da sua conta em uma Região AWS: você define CIDR e segmenta com subnets.",
+        "Cada subnet vive em exatamente uma Availability Zone. Multi-AZ = repetir o padrão (public-a/private-a e public-b/private-b).",
+        "Subnet 'pública' no SAA não significa 'qualquer coisa aberta': significa que a route table envia 0.0.0.0/0 para um Internet Gateway.",
+        "Subnet 'privada' típica: sem rota direta para IGW; saída para internet (updates, APIs) passa por NAT Gateway em subnet pública."
       ],
       "exam_tips": [
-        "Requisito multi-AZ + recurso em uma só AZ → risco de SPOF; redesenhe subnets em ≥2 AZ."
+        "Requisito multi-AZ com recurso em uma só AZ = SPOF de design. Conte subnets (e recursos) por AZ antes de marcar a resposta."
+      ]
+    },
+    {
+      "heading": "Quando usar / quando NÃO usar",
+      "bullets": [
+        "Use subnet pública + IGW para pontos de entrada controlados: ALB, NAT Gateway, bastion (com SG restrito).",
+        "Use subnet privada para app tiers e bancos: sem EIP, SG só do tier de cima, sem rota 0.0.0.0/0→IGW.",
+        "Use NAT Gateway quando a privada precisa de saída (patches, chamar APIs públicas) sem expor IP público na instância.",
+        "NÃO coloque banco RDS/dados sensíveis com EIP e SG 0.0.0.0/0 na porta do engine — superfície demais.",
+        "NÃO chame de 'privada' uma subnet cuja rota default aponta para IGW; na prática ela é pública.",
+        "NÃO abra SSH/RDP 0.0.0.0/0 no bastion: restrinja CIDR corporativo ou prefira SSM Session Manager (ideia)."
+      ],
+      "exam_tips": [
+        "Enunciado 'sem acesso da Internet ao banco' → private subnet + SG origem = tier app + sem EIP/IGW."
+      ]
+    },
+    {
+      "heading": "Exemplo concreto de arquitetura",
+      "bullets": [
+        "VPC 10.0.0.0/16 em 2 AZs: public-a/public-b (ALB + NAT) e private-a/private-b (ASG de app + RDS).",
+        "Usuários → Internet → IGW → ALB nas públicas → SG do ALB permite 443 do mundo; SG do app permite só a porta do ALB.",
+        "App nas privadas chama APIs externas via NAT (rota 0.0.0.0/0→nat-...); RDS só aceita SG do app, sem rota IGW.",
+        "HA: ALB e ASG cobrem as duas AZs; RDS Multi-AZ (ideia) alinha rede com resiliência do domínio 2.",
+        "Se a private-a perder a rota para o NAT, o app nessa AZ falha updates/APIs mesmo com SG aberto — problema de path, não de IAM."
+      ],
+      "exam_tips": [
+        "Desenhe o path completo (cliente → IGW → ALB → SG → app → SG → DB) e o path de saída (app → NAT → IGW). Questões de timeout vivem nesses elos."
       ]
     },
     {
       "heading": "Route tables, IGW e NAT",
       "bullets": [
-        "Toda subnet tem route table (explícita ou main). Rota local cobre o CIDR da VPC.",
-        "Subnet pública típica: 0.0.0.0/0 → Internet Gateway. Instâncias costumam ter IP público ou EIP.",
-        "Subnet privada típica: 0.0.0.0/0 → NAT Gateway (em subnet pública) para updates/APIs de saída; sem rota para IGW direto.",
-        "Sem rota 0.0.0.0/0 correta: timeouts na Internet mesmo com SG aberto."
+        "Toda subnet usa uma route table (associada ou main). A rota local cobre o CIDR da VPC automaticamente.",
+        "Pública típica: 0.0.0.0/0 → igw-.... Instâncias costumam ter IP público ou Elastic IP quando precisam ser alcançáveis.",
+        "Privada típica: 0.0.0.0/0 → nat-... (NAT em subnet pública, com EIP). Instâncias ficam só com IP privado.",
+        "Sem rota 0.0.0.0/0 correta ou sem IGW anexado à VPC: timeout na internet mesmo com Security Group liberado.",
+        "NAT resolve saída; não cria entrada espontânea da Internet para a instância privada."
       ],
       "exam_tips": [
-        "Privada 'sem internet de saída' → confira NAT + rota da private RT, não só Security Group."
+        "Privada 'sem internet de saída' → confira NAT available + rota da private RT. Não fique só mexendo no SG."
       ]
     },
     {
       "heading": "Security Groups vs Network ACLs",
       "bullets": [
-        "Security Group (SG): stateful; se outbound allow, a resposta de retorno é permitida; só regras Allow (deny implícito).",
-        "NACL: stateless; precisa allow de ida e volta; pode Deny explícito; aplica-se à subnet inteira.",
-        "Ordem mental de TShoot: SG da instância → NACL da subnet → rotas → IGW/NAT.",
-        "SG é o controle principal no dia a dia; NACL é camada extra / deny de sub-rede."
+        "Security Group: stateful, só regras Allow (deny implícito no fim), anexa a ENI/instância/ALB. Retorno de conexão permitida é automático.",
+        "NACL: stateless, Allow e Deny explícitos, aplica-se à subnet inteira. Ida e volta precisam de allow; Deny pode bloquear um CIDR/porta.",
+        "No dia a dia SAA, SG é o controle principal de microsegmentação; NACL é camada extra ou ferramenta de deny na borda da subnet.",
+        "Ordem mental de TShoot de conectividade: SG do recurso → NACL da subnet → rotas → IGW/NAT anexados e healthy."
       ],
       "exam_tips": [
-        "SG allow na porta e ainda falha → olhe NACL deny ou rota/NAT, não só o SG de novo."
-      ]
-    },
-    {
-      "heading": "Segmentação para cargas seguros (tarefa 1.2)",
-      "bullets": [
-        "Padrão: frontend/ALB em subnets públicas; app e banco em privadas (sem IP público).",
-        "Banco e dados sensíveis não precisam de rota IGW; saída administrativa via NAT se necessário.",
-        "Menos superfície: não abra 0.0.0.0/0 em SG de app/DB; restrinja CIDR ou SG de origem.",
-        "Multi-AZ no app/DB alinha segurança operacional com resiliência (domínio 2 se cruza)."
-      ],
-      "exam_tips": [
-        "Pergunta 'sem acesso da Internet ao banco' → private subnet + SG só do tier app + sem EIP."
-      ]
-    },
-    {
-      "heading": "Fluxos de internet (ideia de prova)",
-      "bullets": [
-        "Entrada de usuários → IGW → subnet pública (ALB/EC2 pública) → SG allow.",
-        "Saída de privada → NAT Gateway → IGW → Internet (instância sem IP público).",
-        "Entrada direta da Internet em instância privada com IP privado apenas: não funciona sem design especial (não é o caso padrão).",
-        "Timeout assimétrico: NACL faltando allow de retorno (stateless)."
-      ],
-      "exam_tips": [
-        "EC2 'pública' sem internet: route table sem 0.0.0.0/0→IGW ou IGW não anexado à VPC."
+        "SG allow na porta e ainda timeout → olhe NACL deny, rota ausente ou NAT/IGW — não só 'abra mais o SG'."
       ]
     },
     {
       "heading": "TShoot VPC no Associate",
       "bullets": [
-        "CLI ideia: describe-route-tables, describe-security-groups, describe-network-acls, describe-subnets, describe-nat-gateways.",
-        "Sintoma timeout: quase sempre path (rota/NACL/SG) — não IAM de S3.",
-        "Sintoma connection refused: serviço down ou porta errada; timeout: filtragem de rede.",
-        "Recurso em AZ única quando o requisito pedia multi-AZ: falha de design, não só 'rede'."
+        "Timeout quase sempre é path (rota / SG / NACL / IGW / NAT). Connection refused costuma ser processo down ou porta errada no host.",
+        "CLI ideia: describe-route-tables, describe-security-groups, describe-network-acls, describe-subnets, describe-nat-gateways, describe-internet-gateways.",
+        "Checklist rápido: (1) subnet/AZ correta, (2) rota 0.0.0.0/0, (3) SG allow origem/destino, (4) NACL allow ida+volta, (5) IGW anexado / NAT available.",
+        "Produção em AZ única quando o requisito pedia multi-AZ é falha de design — não 'só um problema de firewall'."
       ],
       "exam_tips": [
-        "Isole: (1) subnet/AZ, (2) rotas, (3) SG, (4) NACL, (5) IGW/NAT anexados e available."
+        "Isole uma camada por vez. Mudar SG, NACL e rotas ao mesmo tempo esconde a causa e é exatamente o que o distractor espera."
       ]
     },
     {
-      "heading": "Fora de escopo deste piloto de rede",
+      "heading": "Armadilhas comuns da prova",
       "bullets": [
-        "Transit Gateway e designs multi-VPC complexos.",
-        "PrivateLink / VPC endpoints lab completo (ideia leve em outras parts).",
-        "IPv6 dual-stack avançado e Client VPN detalhado.",
-        "Firewall de rede gerenciado deep (use SG/NACL como base aqui)."
+        "Subnet rotulada 'privada' com 0.0.0.0/0 → IGW (vira pública de fato).",
+        "Banco ou app de dados com EIP + SG 0.0.0.0/0 na porta do engine.",
+        "Culpar só o Security Group quando a NACL tem Deny ou falta rota 0.0.0.0/0.",
+        "Arquitetura inteira em uma AZ com requisito explícito de multi-AZ / HA.",
+        "Abrir SSH 0.0.0.0/0 no bastion em vez de CIDR restrito ou SSM."
       ],
       "exam_tips": [
-        "Se a pergunta for TGW/PrivateLink deep, não force resposta só com IGW/NAT deste piloto."
+        "Timeout de rede: rota → SG → NACL → IGW/NAT. Multi-AZ: conte subnets e recursos por AZ."
       ]
     },
     {
-      "heading": "Anti-patterns de prova (VPC)",
+      "heading": "Ligação com Simulado e Trilha de cenários",
       "bullets": [
-        "Subnet 'privada' com 0.0.0.0/0 → IGW (vira pública de fato).",
-        "Banco ou app de dados com EIP e SG 0.0.0.0/0 na porta do engine.",
-        "Produção inteira em uma única AZ quando o requisito pede multi-AZ.",
-        "Culpar só o Security Group quando a NACL tem Deny ou a rota 0.0.0.0/0 falta.",
-        "Abrir SSH 0.0.0.0/0 no bastion em vez de CIDR corporativo ou SSM."
+        "Estas notas fecham o vocabulário da tarefa 1.2 (workloads seguros): pública/privada, IGW/NAT, SG/NACL, multi-AZ.",
+        "No Simulado, stems misturam conectividade com HA — 'app sem internet', 'ALB ok mas targets unhealthy por SG', 'DB exposto'.",
+        "Na Trilha AWS (cenários de arquitetura), você escolhe o desenho de rede certo a partir do requisito (exposição, saída, segmentação), sem terminal Cisco.",
+        "Depois de marcar a part como lida, pratique eliminar distractors que 'abrem tudo' ou que colocam dados na pública."
       ],
       "exam_tips": [
-        "Timeout de rede: rota → SG → NACL → IGW/NAT; multi-AZ: conte subnets por AZ."
+        "Ao estudar: uma passada nestas notas → questões da part → Simulado misturando IAM (1.1) com VPC (1.2) — os dois se cruzam em quase todo design seguro."
       ]
     }
   ],
@@ -130,12 +134,13 @@
     "Route idea: Destination 0.0.0.0/0 Target igw-... | nat-..."
   ],
   "must_know": [
-    "Subnet pública: rota 0.0.0.0/0 → IGW; privada típica: 0.0.0.0/0 → NAT (sem IP público na instância).",
+    "Subnet pública: 0.0.0.0/0 → IGW; privada típica: 0.0.0.0/0 → NAT (sem IP público na instância).",
     "SG é stateful (allow-only); NACL é stateless e pode Deny na subnet.",
-    "Multi-AZ: subnets em ≥2 AZ para HA de app/dados.",
-    "Sem internet na pública: IGW anexado + rota na route table da subnet.",
-    "Privada sem updates: falta NAT ou rota para o NAT.",
+    "Multi-AZ: subnets (e recursos críticos) em ≥2 AZ para HA.",
+    "Sem internet na pública: IGW anexado à VPC + rota na route table da subnet.",
+    "Privada sem updates/APIs: falta NAT Gateway ou rota para o NAT.",
     "Segmentação segura: dados/app em privada; exposição controlada (ALB) em pública.",
+    "Timeout = path (rota/SG/NACL/IGW/NAT); refused = serviço/porta no host.",
     "Fora deste part: TGW deep, PrivateLink full, IPv6 avançado, Client VPN detalhado."
   ],
   "reuse_from_v1": null

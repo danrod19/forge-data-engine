@@ -16,7 +16,7 @@
     "ALB em subnets públicas ≥2 AZ; targets em privadas multi-AZ",
     "SG: ALB inbound 443; targets inbound só do SG do ALB",
     "ASG: min/desired/max; launch template (AMI, tipo, SG, instance profile)",
-    "Scaling policies: CPU, request count, custom (ideia); cooldown ideia",
+    "Scaling policies: CPU, request count, custom (ideia); cooldown",
     "Integração ALB+ASG: attach target group; replace de unhealthy",
     "Deregistration delay / connection draining (ideia)",
     "TShoot: 503, unhealthy, health path 404, SG, ASG capacity 0, single-AZ SPOF",
@@ -24,71 +24,88 @@
   ],
   "study_notes": [
     {
-      "heading": "ALB no desenho multi-tier",
+      "heading": "O que é ALB e Auto Scaling",
       "bullets": [
-        "Application Load Balancer opera em L7 (HTTP/HTTPS): listeners encaminham a target groups.",
-        "Internet-facing: nodes em subnets públicas multi-AZ; internal: só dentro da VPC/rede privada.",
-        "Targets (EC2) ficam em privadas; o ALB alcança pela rota local da VPC e SG corretos."
+        "Application Load Balancer (ALB) opera em L7 (HTTP/HTTPS): listener recebe a conexão e encaminha a um target group (TG) com protocol/porta definidos.",
+        "Internet-facing: nodes do ALB em subnets públicas em ≥2 AZ. Internal: só tráfego de dentro da VPC/rede privada.",
+        "Auto Scaling Group (ASG) mantém a capacity entre min, desired e max usando launch template (AMI, tipo, SG, instance profile, user data).",
+        "Juntos, ALB+ASG entregam elasticidade e HA de camada de app: tráfego distribuído, targets unhealthy fora do balanceamento, scale-out/in por métrica."
       ],
       "exam_tips": [
-        "Usuários na Internet → ALB internet-facing em ≥2 AZ públicas; app em privada."
+        "Usuários na Internet → ALB internet-facing em ≥2 AZ públicas; app tier em privadas multi-AZ."
       ]
     },
     {
-      "heading": "Health checks e 503",
+      "heading": "Quando usar / quando NÃO usar",
       "bullets": [
-        "O TG marca target unhealthy se o health path falhar (timeout, 5xx, ou 404 se não aceito).",
-        "Unhealthy remove o target do balanceamento; se todos unhealthy ou capacity 0 → 503 ao cliente.",
-        "Path e porta do health check devem existir na app; SG do target deve permitir a porta do health a partir do ALB."
+        "Use ALB para HTTP/HTTPS com path/host routing (ideia), TLS no edge do VPC e health checks de aplicação.",
+        "Use ASG quando a capacity precisa acompanhar carga (CPU, request count) ou substituir instances unhealthy automaticamente.",
+        "Padrão SAA multi-tier: ALB público → EC2/ASG em privadas → DB privado (RDS). SG do target só aceita o SG do ALB.",
+        "NÃO use ALB/ASG em uma única AZ se o requisito pede alta disponibilidade de AZ. NÃO abra 0.0.0.0/0 no SG do app 'para o health passar'.",
+        "Fora desta part: NLB/GLB deep, lab completo de path routing, Blue/Green CodeDeploy, predictive scaling, Warm pools e ECS capacity providers."
       ],
       "exam_tips": [
-        "503 no ALB + zero healthy targets → capacity/ASG ou health/SG, não 'só DNS'."
+        "Requisito multi-AZ + HTTP → ALB+ASG em ≥2 AZ; não resolva HA só com uma instance maior."
       ]
     },
     {
-      "heading": "Security Groups ALB → target",
+      "heading": "Exemplo concreto de arquitetura",
       "bullets": [
-        "Padrão: sg-alb permite 443 (ou 80) de 0.0.0.0/0 ou prefix list; sg-app permite a porta do TG só de sg-alb.",
-        "Allow 0.0.0.0/0 na app quebra least privilege e confunde TShoot.",
-        "Health check usa o mesmo path de rede: sem inbound do ALB, target fica unhealthy."
+        "ALB internet-facing em duas subnets públicas (AZ-a, AZ-b); listener 443; TG HTTP:8080 com health em /health retornando 200.",
+        "ASG com launch template (AMI, t3/m5 ideia, sg-app, instance profile) e subnets privadas nas mesmas duas AZs; min=2, desired=2, max=8.",
+        "sg-alb: inbound 443 de 0.0.0.0/0 (ou prefix list). sg-app: inbound 8080 somente de sg-alb — health e tráfego usam o mesmo caminho de rede.",
+        "Target tracking: RequestCountPerTarget ou CPU ~50–70%. Deregistration delay adequado para drenar conexões no scale-in. ASG attached ao TG para register/deregister automático."
       ],
       "exam_tips": [
-        "Timeout no target com process up → Source do SG deve ser o SG do ALB."
+        "No papel: listener/TG · health path · SG ALB→app · subnets/AZ do ASG · min/desired/max."
       ]
     },
     {
-      "heading": "Auto Scaling Group",
+      "heading": "Health checks, 503 e Security Groups",
       "bullets": [
-        "ASG mantém desired entre min e max; launch template define AMI, instance type, key, SG, profile.",
-        "Subnets do ASG em ≥2 AZ para HA; uma AZ só = SPOF de disponibilidade.",
-        "Com TG attached, instances entram/saem do target group; unhealthy pode ser substituída conforme health check do ASG/ELB."
+        "O TG marca unhealthy se o health falhar (timeout, 5xx, ou 404 se o código não for aceito). Unhealthy sai do balanceamento.",
+        "Se todos os targets estão unhealthy ou a capacity é zero → cliente vê 503. Não é 'DNS do Route 53 quebrado' por padrão.",
+        "Path e porta do health devem existir na app; o SG do target precisa permitir a porta do TG a partir do SG do ALB.",
+        "Allow 0.0.0.0/0 no sg-app quebra least privilege e mascara o diagnóstico: o sintoma clássico é timeout/unhealthy com processo up."
       ],
       "exam_tips": [
-        "desired=0 ou max=0 → nenhuma instance → 503 se o ALB não tiver targets healthy."
+        "503 no ALB + zero healthy → capacity/ASG ou health/SG; não comece pelo certificado TLS."
       ]
     },
     {
-      "heading": "Scaling e draining",
+      "heading": "ASG, scaling e draining",
       "bullets": [
-        "Target tracking (CPU %, ALB request count por target) é o padrão ideia de prova.",
-        "Cooldown-out evita flapping de scale-out/in consecutivos.",
-        "Deregistration delay: tempo para conexões drenarem antes de terminar a instance no scale-in."
+        "Desired fica entre min e max; desired=0 ou max=0 com ALB de produção = nenhuma instance = 503.",
+        "Subnets do ASG em ≥2 AZ; uma AZ só = SPOF mesmo que o ALB esteja multi-AZ.",
+        "Com TG attached, instances entram/saem do grupo; unhealthy pode ser substituída conforme health do ELB/ASG.",
+        "Target tracking (CPU %, ALB request count) é o padrão ideia de prova. Cooldown evita flapping. Deregistration delay dá tempo de drenar conexões no scale-in."
       ],
       "exam_tips": [
-        "Jobs cortados no scale-in → aumente deregistration delay ou arquitetura stateless/checkpoint."
+        "Jobs cortados no scale-in → aumente deregistration delay ou torne a carga stateless/com checkpoint."
       ]
     },
     {
-      "heading": "Anti-patterns de prova (ALB/ASG)",
+      "heading": "Armadilhas comuns da prova",
       "bullets": [
-        "ALB ou ASG em uma única AZ quando o requisito pede multi-AZ.",
-        "Health path em /admin que retorna 401/404 e derruba todos os targets.",
-        "sg-app sem allow do sg-alb; abrir 0.0.0.0/0 'para testar' em produção.",
-        "desired/min/max incoerentes (desired 0 com ALB de produção).",
-        "Scale-in agressivo sem draining em workloads com conexão longa."
+        "ALB ou ASG em uma única AZ quando o enunciado exige multi-AZ / HA de disponibilidade.",
+        "Health path em /admin (401/404) ou porta errada — todos os targets caem unhealthy.",
+        "sg-app sem allow do sg-alb; ou abrir 0.0.0.0/0 na app em vez de source = SG do ALB.",
+        "desired/min/max incoerentes (desired 0) ou scale-in agressivo sem draining em conexão longa."
       ],
       "exam_tips": [
-        "Sempre separe: listener/TG · health · SG · subnets/AZ · capacity ASG."
+        "Checklist mental: listener/TG · health · SG · subnets/AZ · capacity ASG."
+      ]
+    },
+    {
+      "heading": "Ligação com Simulado e Trilha de cenários",
+      "bullets": [
+        "No Simulado, 503, unhealthy e 'app não escala' quase sempre pedem separar health/SG/capacity de 'trocar o ALB por NLB'.",
+        "Na Trilha de cenários, desenhe o multi-tier completo: ALB público, ASG privado multi-AZ, SG em cascata e métrica de scale — sem spoil de alternativas.",
+        "Use esta part como ponte: EC2/EBS (1.4) vira frota gerenciada; RDS (1.6) fecha o backend. O exame ama a coerência entre as camadas.",
+        "Fluxo sugerido: ler → marcar lido → praticar questões do part → cenários na Trilha focando HA + least privilege de SG."
+      ],
+      "exam_tips": [
+        "Se o cenário cita 503 ou 'nenhuma instance saudável', olhe target health e desired antes de mexer em DNS."
       ]
     }
   ],
@@ -105,7 +122,7 @@
     "aws ec2 describe-subnets"
   ],
   "must_know": [
-    "ALB multi-AZ em públicas; targets app em privadas multi-AZ.",
+    "ALB multi-AZ em públicas; targets de app em privadas multi-AZ.",
     "Health check falho → unhealthy → sem tráfego; todos unhealthy ou capacity 0 → 503.",
     "SG do target deve permitir a porta do TG a partir do SG do ALB.",
     "ASG min/desired/max + launch template definem capacity e config de launch.",

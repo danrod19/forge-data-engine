@@ -10,75 +10,101 @@
   "verb": "Design",
   "weight_percent": 24,
   "topic_list": [
-    "Table, partition key (PK) e sort key (SK) como access pattern",
-    "Item e atributos; single-table ideia leve",
-    "Provisioned RCU/WCU vs on-demand capacity mode",
-    "Throttling ProvisionedThroughputExceeded e hot partition ideia",
+    "O que é DynamoDB: NoSQL gerenciado, multi-AZ, item/atributos",
+    "Quando usar vs RDS/Aurora (access pattern, joins, tráfego spiky)",
+    "PK/SK como access pattern; single-table ideia leve",
     "Query vs Scan (eficiência e custo)",
-    "GSI e LSI para access patterns adicionais (ideia)",
+    "Provisioned RCU/WCU vs on-demand; throttle e hot partition",
+    "GSI e LSI para padrões adicionais (ideia)",
     "Leituras eventually vs strongly consistent (ideia)",
-    "TTL e Streams ideia (trigger Lambda)",
-    "Encryption at rest (AWS owned / CMK)",
-    "IAM least privilege: GetItem/PutItem/Query/Scan no ARN da tabela/índice",
-    "TShoot: throttle, AccessDenied, Scan abusivo, GSI ausente",
+    "TTL e Streams → Lambda (ideia de integração)",
+    "Encryption at rest (AWS owned / CMK) e IAM GetItem/PutItem/Query",
+    "TShoot: ProvisionedThroughputExceeded, AccessDenied, Scan abusivo, GSI ausente",
     "NÃO: DAX lab, PartiQL deep, transactions lab full, Global Tables multi-Region lab full"
   ],
   "study_notes": [
     {
-      "heading": "DynamoDB no SAA-C03",
+      "heading": "O que é Amazon DynamoDB",
       "bullets": [
-        "NoSQL gerenciado, multi-AZ por design; escolha de chaves define Query eficiente.",
-        "Cruza performance (RCU/WCU, índices), custo (on-demand vs provisioned) e IAM.",
-        "Modele pela query: PK (e SK) para o padrão principal; GSI para secundários."
+        "DynamoDB é banco NoSQL gerenciado, key-value/document, com replicação multi-AZ por design e modelo de capacidade (provisioned ou on-demand).",
+        "Você modela por access pattern: partition key (PK) e, opcionalmente, sort key (SK) determinam Query eficiente. Itens são documentos com atributos.",
+        "No SAA, o foco é escolher DynamoDB quando o padrão de leitura/escrita é conhecido e horizontal, e operar RCU/WCU, índices e throttle — não lab de SQL relacional.",
+        "Cruza performance (capacidade, hot key), custo (on-demand vs provisioned) e segurança (IAM no ARN da tabela/índice, encryption)."
       ],
       "exam_tips": [
-        "Access pattern novo sem chave → GSI (ou redesenho), não Scan full table em produção."
+        "Se o cenário exige Query por chave conhecida em escala com HA gerenciada e schema flexível, DynamoDB entra no shortlist — ainda valide chaves e capacidade."
       ]
     },
     {
-      "heading": "PK, SK, Query e Scan",
+      "heading": "Quando usar / quando NÃO usar",
       "bullets": [
-        "PK distribui partições; SK ordena itens na partição e permite Query com range.",
-        "Query usa chave; Scan lê a tabela inteira (caro e lento em escala).",
-        "Hot partition: muitos requests na mesma PK geram throttle local."
+        "USE para sessões, perfis, leaderboards, metadados de objeto, carrinho, IoT/telemetry com PK bem distribuída e queries previsíveis.",
+        "USE on-demand quando o tráfego é spiky/imprevisível; use provisioned (+ auto scaling ideia) quando o baseline é estável e você quer controle fino de custo.",
+        "NÃO USE como substituto de RDS quando o app depende de joins complexos, transações multi-tabela profundas, ad-hoc SQL de BI ou relatórios analíticos pesados — prefira RDS/Aurora (+ analytics à parte).",
+        "NÃO USE Scan full table como path principal de API em produção; se surgiu um access pattern novo, modele GSI (ou redesenhe a chave), não 'Scan com filtro'."
       ],
       "exam_tips": [
-        "Filtro só por atributo não-chave em escala → Scan ou GSI, não Query mágica."
+        "Enunciado com 'consultas ad-hoc por vários atributos sem chave' + relatório → desconfie de DynamoDB puro; pode ser RDS ou pipeline analítico."
       ]
     },
     {
-      "heading": "Capacidade e custo",
+      "heading": "PK, SK, Query, Scan e índices",
       "bullets": [
-        "Provisioned: define RCU/WCU; exceder → ProvisionedThroughputExceeded.",
-        "On-demand: paga por request; bom para tráfego imprevisível.",
-        "Burst e adaptive capacity ajudam, mas hot keys e under-provision ainda throttlam."
+        "PK distribui partições; SK ordena na partição e permite Query com condições de range (begins_with, between — ideia).",
+        "Query usa a chave; Scan lê a tabela (ou índice) inteira — caro, lento e comum em distractors de prova.",
+        "Hot partition: muitos requests na mesma PK (ex. status=ACTIVE com poucos valores) → throttle local mesmo com WCU 'total' alto.",
+        "GSI: outra PK (e SK opcional) para access pattern alternativo; eventual consistency típica no GSI. LSI: mesma PK, outra SK — definida na criação da tabela (ideia)."
       ],
       "exam_tips": [
-        "Tráfego spiky imprevisível → on-demand; steady previsível → provisioned + auto scaling ideia."
+        "Precisa Query por email e por orderId → GSI; LSI não troca a PK. Filtro só por atributo não-chave em escala ≠ Query mágica."
       ]
     },
     {
-      "heading": "GSI/LSI, consistência, streams",
+      "heading": "Capacidade, consistência e Streams",
       "bullets": [
-        "GSI: outra PK (e SK opcional) para access pattern alternativo; eventual consistency típica no GSI.",
-        "LSI: mesma PK, outra SK; criado na criação da tabela (ideia).",
-        "Streams capturam mudanças de item para Lambda (ideia de integração)."
+        "Provisioned: define RCU/WCU; exceder → ProvisionedThroughputExceededException. On-demand: paga por request, absorve picos melhor.",
+        "Leituras strongly consistent (ideia) na tabela base custam mais RCU; GSI em geral é eventually consistent.",
+        "TTL expira itens automaticamente (ideia de retenção). Streams capturam mudanças de item para Lambda processar (desacoplamento).",
+        "IAM least privilege: GetItem/PutItem/Query/UpdateItem/Scan só no ARN da tabela e dos índices necessários — sem dynamodb:* em Resource *."
       ],
       "exam_tips": [
-        "Precisa Query por email e por orderId → modele GSI; LSI não troca a PK."
+        "Throttle com tráfego uneven → hot key ou under-provision; spiky imprevisível → on-demand costuma ser a resposta de modo."
       ]
     },
     {
-      "heading": "Anti-patterns de prova (DynamoDB)",
+      "heading": "Exemplo concreto de arquitetura",
       "bullets": [
-        "Scan em tabela grande como path principal de API.",
-        "PK = status com poucos valores (hot partition).",
-        "Provisioned baixíssimo com tráfego alto e sem on-demand.",
-        "AdministratorAccess na role da Lambda só para PutItem.",
-        "Esquecer GSI e forçar Scan para novo access pattern."
+        "Cenário: API de pedidos. PK=CUSTOMER#<id>, SK=ORDER#<ts> para listar pedidos do cliente; GSI com PK=ORDER#<id> para lookup direto pelo orderId.",
+        "Peças: API Gateway → Lambda (role: dynamodb:Query/GetItem/PutItem na tabela e no GSI) → DynamoDB on-demand (tráfego de campanha imprevisível) → DynamoDB Stream → Lambda de fulfillment que publica em SQS.",
+        "Observabilidade: alarmes CloudWatch em UserErrors/ThrottledRequests e ConsumedReadCapacityUnits; logs da Lambda com correlation id do pedido.",
+        "Segurança: encryption at rest com CMK se a política exigir customer managed; sem Scan na API pública."
       ],
       "exam_tips": [
-        "Separe: chave/access pattern · capacidade · índice · IAM · encryption."
+        "No desenho, declare o access pattern antes da tabela — a prova pune quem escolhe DynamoDB e depois resolve com Scan."
+      ]
+    },
+    {
+      "heading": "Armadilhas comuns da prova",
+      "bullets": [
+        "Scan em tabela grande como caminho feliz da API.",
+        "PK com baixa cardinalidade (status, país, boolean) gerando hot partition.",
+        "Provisioned baixíssimo sob pico (ou insistir em provisioned quando o enunciado grita tráfego imprevisível).",
+        "Esquecer GSI para novo padrão de Query e 'resolver' com Scan + filter."
+      ],
+      "exam_tips": [
+        "Separe: chave/access pattern · modo de capacidade · índice · IAM · encryption — o distractor troca o eixo."
+      ]
+    },
+    {
+      "heading": "Ligação com Simulado / Trilha de cenários",
+      "bullets": [
+        "Simulado e Trilha AWS cobram escolha DynamoDB vs RDS, causa de throttle e remodelagem com GSI — quase sempre com restrição de custo ou latência no mesmo enunciado.",
+        "Ao errar, pergunte: a Query usa a chave? a capacidade é o modo certo? existe índice para o padrão pedido? a role tem ação no ARN certo?",
+        "Pratique cenários de 'ProvisionedThroughputExceeded' e de 'novo access pattern' sem abrir o gabarito antes de fechar o diagnóstico.",
+        "Cruze com Lambda (Streams), IAM e CloudWatch: throttle aparece em métrica e em erro de API; AccessDenied é outro eixo."
+      ],
+      "exam_tips": [
+        "Na Trilha, se o sintoma é lentidão/custo alto com Scan, a correção de arquitetura é access pattern — não 'só subir RCU'."
       ]
     }
   ],
@@ -90,18 +116,18 @@
     "aws dynamodb update-table --billing-mode / --provisioned-throughput",
     "aws dynamodb describe-table --query Table.GlobalSecondaryIndexes",
     "aws dynamodb list-tables",
-    "aws cloudwatch get-metric-statistics (ConsumedReadCapacityUnits, UserErrors, ThrottledRequests)",
-    "aws iam get-role-policy (dynamodb:*)",
-    "aws dynamodb describe-time-to-live / update-time-to-live"
+    "aws dynamodb describe-time-to-live / update-time-to-live",
+    "aws cloudwatch get-metric-statistics (ConsumedReadCapacityUnits, ThrottledRequests)",
+    "aws iam get-role-policy (dynamodb:GetItem|Query|PutItem no ARN)"
   ],
   "must_know": [
     "Modele PK/SK pelo access pattern; Query > Scan em produção.",
     "Provisioned RCU/WCU vs on-demand: previsível vs spiky.",
-    "Throttle: capacidade insuficiente ou hot partition.",
-    "GSI para novos padrões de Query; LSI mesma PK.",
-    "Strongly consistent reads só na tabela base (ideia) e custam mais RCU.",
-    "IAM least privilege no ARN da tabela e índices.",
-    "Streams → Lambda para reação a mudanças (ideia).",
+    "Throttle: capacidade insuficiente ou hot partition (PK quente).",
+    "GSI para novos padrões de Query; LSI mantém a mesma PK.",
+    "Strongly consistent reads (ideia) na base custam mais RCU; GSI tipicamente eventual.",
+    "IAM least privilege no ARN da tabela e dos índices.",
+    "Streams → Lambda para reagir a mudanças de item (ideia).",
     "Fora: DAX, transactions deep, Global Tables lab full, PartiQL deep."
   ],
   "reuse_from_v1": null

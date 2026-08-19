@@ -10,75 +10,101 @@
   "verb": "Design",
   "weight_percent": 26,
   "topic_list": [
+    "O que é CloudWatch: metrics, alarms, logs, dashboards (ideia)",
+    "Quando usar alarm+SNS/ASG vs só dashboard; quando NÃO confiar em INSUFFICIENT_DATA",
     "Metrics: namespace, dimensions, statistics (Average, Sum, Maximum, SampleCount)",
     "Alarms: threshold, period, evaluation periods, datapoints to alarm",
-    "Estados ALARM / OK / INSUFFICIENT_DATA",
-    "Alarm actions: SNS, Auto Scaling, EC2 actions (ideia)",
-    "Composite alarms (ideia leve)",
-    "Log groups, log streams e retention de logs",
-    "Metric filters: erro em log → custom metric → alarm",
-    "Dashboards (ideia operacional)",
+    "Estados ALARM / OK / INSUFFICIENT_DATA e missing data treatment (ideia)",
+    "Alarm actions: SNS, Auto Scaling, EC2 actions; composite alarms (ideia)",
+    "Log groups, streams, retention e custo de ingestão",
+    "Metric filters: texto de log → custom metric → alarm",
     "EC2: métricas hypervisor vs agent (memória custom ideia)",
-    "Custo: ingestão/armazenamento de logs e alta cardinalidade de métricas",
-    "TShoot: alarm silencioso, INSUFFICIENT_DATA, PutMetricData denied, ASG sem scale",
+    "TShoot: alarm silencioso, dimensão errada, PutMetricData denied, ASG sem scale",
     "NÃO: Contributor Insights deep, Logs Insights lab full, OpenSearch/Firehose lab, AMP/Prometheus deep, X-Ray full map"
   ],
   "study_notes": [
     {
-      "heading": "CloudWatch no SAA-C03",
+      "heading": "O que é Amazon CloudWatch",
       "bullets": [
-        "Observabilidade: métricas + alarmes + logs unem saúde e ação (SNS, scaling).",
-        "Cruza todos os serviços já vistos (EC2, ALB, ASG, RDS, Lambda, DynamoDB).",
-        "INSUFFICIENT_DATA ≠ OK: falta de pontos não significa sistema saudável."
+        "CloudWatch é o hub de observabilidade da conta: métricas (séries temporais), alarmes (limiar → ação), logs (log groups/streams) e dashboards operacionais.",
+        "No SAA, você desenha o que medir, como alarmar e o que fazer (SNS, Auto Scaling, ação EC2) — não o lab completo de analytics de log.",
+        "Quase todo serviço já visto emite métricas (EC2, ALB, ASG, RDS, Lambda, DynamoDB). Custom metrics via PutMetricData quando a app/agent publica.",
+        "INSUFFICIENT_DATA não significa 'saudável': indica falta de pontos (recurso parado, dimensão errada, métrica inexistente)."
       ],
       "exam_tips": [
-        "Alarme não dispara → confira métrica/dimensão, period, datapoints e missing data treatment."
+        "Pergunta de 'notificar / escalar quando CPU ou 5xx sobe' → CloudWatch Alarm + action; confira estatística e dimensão antes de inventar outro serviço."
       ]
     },
     {
-      "heading": "Métricas e estatísticas",
+      "heading": "Quando usar / quando NÃO usar",
       "bullets": [
-        "Namespace + metric name + dimensions identificam a série (ex. InstanceId, FunctionName, TableName).",
-        "Statistic errada (Avg vs Sum) distorce o threshold (ex. contagem de erros).",
-        "Custom metrics via PutMetricData (app/agent); permissões IAM necessárias."
+        "USE alarmes com action (SNS → e-mail/SQS/Lambda, policy de ASG, reboot/recover EC2) para sintomas acionáveis: CPU sustentada, Lambda Errors/Throttles, ALB 5xx, DynamoDB throttle.",
+        "USE metric filter quando o sinal está no texto do log ('ERROR', código de falha) e você precisa de métrica + alarme sem pipeline pesado.",
+        "NÃO USE 'só dashboard' como resposta de incidente crítico sem notificação — dashboard não acorda ninguém às 3h.",
+        "NÃO USE retention Never expire em todos os log groups de não-produção; NÃO trate INSUFFICIENT_DATA como OK; NÃO escolha OpenSearch/Firehose quando o enunciado pede só alarme a partir de log (metric filter costuma bastar no Associate)."
       ],
       "exam_tips": [
-        "CPU ASG scale: Average CPUUtilization com período coerente, não Sum de CPU% sem sentido."
+        "Custo alto de Logs → retention + menos verbosidade/filtro; 'aumentar disco EBS' não resolve fatura de CloudWatch Logs."
       ]
     },
     {
-      "heading": "Alarmes e actions",
+      "heading": "Métricas, estatísticas e alarmes",
       "bullets": [
-        "Datapoints to alarm / evaluation periods evitam flapping ou atraso.",
-        "Actions: publish SNS, change ASG desired, stop/reboot EC2 (ideia).",
-        "Composite alarm agrega vários alarmes (ideia de redução de ruído)."
+        "Identidade da série: namespace + metric name + dimensions (InstanceId, FunctionName, TableName, LoadBalancer…). Dimensão errada = série vazia.",
+        "Statistic importa: contagem de erros costuma ser Sum; CPU de scale-out costuma ser Average. Avg em contagem pode mascarar pico.",
+        "Alarm: threshold + period + evaluation periods + datapoints to alarm. Poucos datapoints → flapping; muitos → atraso para entrar em ALARM.",
+        "Actions só disparam se o alarme realmente vai a ALARM (e a action está configurada). Composite alarm (ideia) agrega vários alarmes para reduzir ruído."
       ],
       "exam_tips": [
-        "ASG não escala com CPU alta → alarme em ALARM? action correta? metric do ASG/EC2?"
+        "ASG não escala com CPU alta → alarme em ALARM? metric/dimension do ASG ou da instância? action ligada à policy de scaling?"
       ]
     },
     {
       "heading": "Logs, retention e metric filters",
       "bullets": [
-        "Log group sem retention = retenção indefinida → custo crescente.",
-        "Metric filter extrai contagem de 'ERROR' para métrica custom e alarme.",
-        "Lambda/EC2 apps dependem de permissões de log e do agent/config."
+        "Log group agrupa streams (ex. por instância/function). Sem retention explícita, retenção indefinida → custo crescente.",
+        "Metric filter extrai padrão do log → custom metric → alarm (ex. contar 'ERROR' ou 'Timeout').",
+        "Lambda e apps em EC2 precisam de permissão/config para escrever logs; PutMetricData também exige IAM.",
+        "Métricas de memória em EC2 clássicas exigem agent/custom (ideia): CPU hypervisor vem 'de graça'; RAM detalhada não é o mesmo caso."
       ],
       "exam_tips": [
-        "Custo CloudWatch Logs alto → retention + filtrar/exportar, não só 'mais disco EBS'."
+        "Alarme silencioso com instância terminada e dimension InstanceId antigo → INSUFFICIENT_DATA eterno; atualize dimensão/grupo."
       ]
     },
     {
-      "heading": "Anti-patterns de prova (CloudWatch)",
+      "heading": "Exemplo concreto de arquitetura",
       "bullets": [
-        "Alarme crítico sem action (ninguém é notificado).",
-        "Dimensão InstanceId de instance terminada → INSUFFICIENT_DATA eterno.",
-        "Retention Never expire em todos os log groups de dev.",
-        "Threshold em Avg de contagem de erros que deveria ser Sum.",
-        "Confiar que INSUFFICIENT_DATA significa 'tudo bem'."
+        "Cenário: API atrás de ALB + ASG. Objetivo: acordar on-call em 5xx e escalar em CPU sustentada, controlando custo de logs.",
+        "Peças: ALB metric HTTPCode_Target_5XX_Count (Sum) → Alarm → SNS → subscription on-call; ASG CPUUtilization (Average) → Alarm → scaling policy; log group da app com retention 14 dias.",
+        "Sinal de negócio no log: metric filter em 'PAYMENT_FAILED' → custom metric → Alarm → SNS (sem OpenSearch neste desenho Associate).",
+        "TShoot: se SNS não recebe, verifique estado ALARM, action, topic policy/subscription; se scale não ocorre, verifique alarm + policy do ASG, não só o threshold 'no papel'."
       ],
       "exam_tips": [
-        "Separe: métrica certa · estatística · period/datapoints · estado · action · retention/custo."
+        "Desenho completo = métrica certa + estatística + alarme + action + (para logs) retention — omitir action é armadilha clássica."
+      ]
+    },
+    {
+      "heading": "Armadilhas comuns da prova",
+      "bullets": [
+        "Alarme crítico sem action (ninguém notificado / ASG sem scale).",
+        "Statistic errada (Average em contagem de erros) ou dimensão de recurso já destruído.",
+        "Tratar INSUFFICIENT_DATA como 'tudo bem'.",
+        "Retention Never expire em massa ou culpar EBS pelo custo de CloudWatch Logs."
+      ],
+      "exam_tips": [
+        "Checklist: métrica · dimensão · estatística · period/datapoints · estado · action · retention/custo."
+      ]
+    },
+    {
+      "heading": "Ligação com Simulado / Trilha de cenários",
+      "bullets": [
+        "No Simulado/Trilha AWS, CloudWatch aparece como cola: sintoma de ALB/ASG/Lambda/DynamoDB + 'como detectar e reagir' com alarm/SNS/scale.",
+        "Treine diagnósticos de alarme silencioso e de scale que não dispara — quase sempre falta action, dimensão ou estado ALARM, não 'outro serviço mágico'.",
+        "Revise must_know e refaça cenários de observabilidade cruzando com as parts de ALB/ASG, Lambda e DynamoDB, sem memorizar gabarito.",
+        "Na jornada AWS (Estudo → Simulado → Trilha de cenários), use esta part para fechar o ciclo: depois de escolher o serviço, pergunte como você saberia que quebrou."
+      ],
+      "exam_tips": [
+        "Se o enunciado pede notificação + auto scale, CloudWatch Alarm é o mecanismo; SNS/ASG são as actions — não troque a ordem mental."
       ]
     }
   ],
@@ -95,12 +121,12 @@
     "aws sns list-subscriptions-by-topic (action do alarm)"
   ],
   "must_know": [
-    "Métrica = namespace + nome + dimensions; statistic importa no threshold.",
-    "Alarme: period, evaluation, datapoints to alarm; estados ALARM/OK/INSUFFICIENT_DATA.",
-    "Actions (SNS/ASG/EC2) só ajudam se o alarme realmente entra em ALARM.",
+    "Métrica = namespace + nome + dimensions; a statistic define o sentido do threshold.",
+    "Alarme: period, evaluation, datapoints to alarm; estados ALARM / OK / INSUFFICIENT_DATA.",
+    "Actions (SNS / ASG / EC2) só ajudam se o alarme entra em ALARM de fato.",
     "Log retention controla custo; Never expire em tudo é anti-pattern.",
-    "Metric filter liga texto de log a métrica e alarme.",
-    "INSUFFICIENT_DATA: métrica sem pontos (recurso parado, dimensão errada).",
+    "Metric filter liga padrão de log a custom metric e alarme.",
+    "INSUFFICIENT_DATA: sem pontos (recurso parado, dimensão errada) — não é OK.",
     "Cruza ALB 5xx, ASG CPU, RDS connections, Lambda Errors/Throttles, DynamoDB throttle.",
     "Fora: Insights lab full, OpenSearch/Firehose, AMP, X-Ray full map."
   ],

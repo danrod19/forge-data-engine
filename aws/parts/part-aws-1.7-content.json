@@ -11,73 +11,102 @@
   "weight_percent": 26,
   "topic_list": [
     "Route 53 hosted zone e records (A/AAAA/CNAME/ALIAS)",
-    "ALIAS vs CNAME: apex/zone apex e targets AWS (ALB, CloudFront, S3 website)",
-    "Routing policies: simple, weighted, latency, failover, geolocation (ideia)",
+    "ALIAS vs CNAME: apex e targets AWS (ALB, CloudFront, S3 website)",
+    "Routing policies: simple, weighted, latency, failover, geolocation",
     "Health checks Route 53 + failover DNS (primary/secondary)",
     "CloudFront distribution, edge locations e origin (S3, ALB, custom)",
-    "Cache behaviors e TTL (ideia); invalidation após deploy",
+    "Cache behaviors, TTL e invalidation após deploy",
     "HTTPS no CloudFront com certificado ACM (us-east-1)",
     "OAI/OAC: S3 privado como origem (cruzar aws-1.3)",
-    "Price class ideia leve (custo de edge)",
-    "TShoot: DNS não resolve, health unhealthy, origem 403, cache stale",
-    "NÃO: Traffic Flow deep, Resolver hybrid lab, Lambda@Edge full, signed cookies lab completo"
+    "Price class (ideia leve de custo de edge)",
+    "TShoot: DNS, health unhealthy, origem 403, cache stale",
+    "NÃO: Traffic Flow deep, Resolver hybrid, Lambda@Edge full, signed cookies lab"
   ],
   "study_notes": [
     {
-      "heading": "Route 53 no SAA-C03",
+      "heading": "O que é (Route 53 + CloudFront)",
       "bullets": [
-        "Hosted zone pública responde DNS autoritativo do domínio; records apontam a IPs, nomes ou aliases AWS.",
-        "ALIAS (Route 53) aponta a ALB, CloudFront, S3 website, etc., inclusive no apex (exemplo.com).",
-        "CNAME clássico não pode no apex de zona em DNS padrão — use ALIAS para ALB/CloudFront no root."
+        "Route 53 é o DNS autoritativo da AWS: hosted zone pública guarda records (A/AAAA/CNAME/ALIAS) que traduzem o nome do app para ALB, CloudFront, IP ou outro alvo.",
+        "ALIAS é recurso Route 53 (não é CNAME DNS clássico): aponta o apex (exemplo.com) e subdomínios para ALB, CloudFront, S3 website endpoint e outros targets AWS, sem custo extra de query no mesmo registro 'flat'.",
+        "CloudFront é CDN: terminais (edge locations) cacheiam conteúdo perto do usuário; a origin pode ser S3, ALB ou domínio custom. Behaviors definem path, TTL, métodos e política HTTPS.",
+        "Juntos cobrem entrega global + resolução de nome: DNS decide para onde o cliente vai; a edge reduz latência e carga na origin."
       ],
       "exam_tips": [
-        "Apex → ALB/CloudFront = ALIAS (A/AAAA alias), não CNAME."
+        "Apex → ALB/CloudFront = record ALIAS (A/AAAA alias). CNAME clássico no apex é resposta errada clássica."
       ]
     },
     {
-      "heading": "Routing e health checks",
+      "heading": "Quando usar / quando NÃO usar",
       "bullets": [
-        "Simple: um valor; Weighted: percentuais; Latency: menor latência de região; Failover: primary/secondary; Geolocation: por localização do resolver.",
-        "Health check HTTP/HTTPS/TCP avalia endpoint; failover só promove secondary se primary unhealthy (e secondary healthy).",
-        "DNS failover não substitui Multi-AZ de app sozinho — complementa multi-Region/DR."
+        "Use Route 53 quando precisa de DNS autoritativo na AWS, health checks, failover DNS, weighted/latency/geo ou ALIAS para serviços AWS.",
+        "Use CloudFront para estático (SPA, imagens) em S3, APIs/HTML atrás de ALB com cache seletivo, TLS na borda e redução de origem/egress.",
+        "Prefira OAI/OAC + S3 privado quando o bucket não deve ser público — CloudFront é a única porta de leitura.",
+        "NÃO use CloudFront como substituto de Multi-AZ/RDS HA: CDN não 'cura' banco single-AZ.",
+        "NÃO escolha CNAME no apex; NÃO espere TTL alto invalidar sozinho em segundos após deploy crítico — use invalidation ou versionamento de objeto.",
+        "NÃO abra o bucket com Principal * só para 'fazer o CloudFront funcionar' se o requisito é privado."
       ],
       "exam_tips": [
-        "Primary unhealthy e secondary não recebe tráfego → confira health check e Evaluate Target Health / association."
+        "Cenário 'site estático global + bucket fechado' → CloudFront + OAC/OAI + ACM us-east-1, não S3 website público."
       ]
     },
     {
-      "heading": "CloudFront e origem",
+      "heading": "Routing policies e health checks",
       "bullets": [
-        "CloudFront cacheia na edge; origin pode ser S3, ALB ou custom domain.",
-        "Comportamentos definem path patterns, TTL, métodos e HTTPS.",
-        "Após deploy de estático, invalidation ou versionar objetos evita cache stale."
+        "Simple: um alvo. Weighted: fatias percentuais (canary/blue-green DNS). Latency: menor latência medida por região. Failover: primary/secondary. Geolocation: por localização do resolver DNS.",
+        "Health check HTTP/HTTPS/TCP marca o endpoint; no failover, o secondary só recebe tráfego se o primary estiver unhealthy (e o secondary healthy, conforme desenho).",
+        "Evaluate Target Health em ALIAS para ALB/CloudFront combina saúde do alvo AWS com a lógica do record.",
+        "Failover DNS complementa DR multi-Region; não substitui sozinho Multi-AZ da aplicação dentro da região."
       ],
       "exam_tips": [
-        "Conteúdo velho na edge → invalidation (ou object versioning), não 'só flush do RDS'."
+        "Primary unhealthy e secondary sem tráfego → health check (path/código), associação do check ao record e Evaluate Target Health."
       ]
     },
     {
-      "heading": "S3 privado + CloudFront (OAI/OAC)",
+      "heading": "Cache, TLS e origem S3 privada",
       "bullets": [
-        "OAI/OAC permite que só o CloudFront leia o bucket; bucket policy nega GetObject público.",
-        "403 na origem costuma ser bucket policy sem allow ao OAI/OAC ou BPA/conflito de policy.",
-        "ACM para CloudFront: certificado na região us-east-1."
+        "TTL alto = menos hits na origin e risco de conteúdo stale; após publish de estático, invalidation (paths) ou nomes versionados (app.js?v=…).",
+        "Certificado ACM para viewers do CloudFront deve estar em us-east-1 (N. Virginia), mesmo que a origin esteja em outra região.",
+        "OAI (legado) / OAC (recomendado): identidade do CloudFront; bucket policy Allow só a essa identidade no GetObject; Block Public Access permanece ligado.",
+        "403 na origin S3 quase sempre é policy/OAC/OAI ou BPA — não 'DNS errado' nem 'falta de Multi-AZ'."
       ],
       "exam_tips": [
-        "CloudFront 403 S3 → OAI/OAC + bucket policy; não abra Principal * sem necessidade."
+        "CloudFront + custom domain HTTPS → ACM us-east-1; 403 S3 → OAC/OAI + bucket policy antes de culpar o record DNS."
       ]
     },
     {
-      "heading": "Anti-patterns de prova (R53/CloudFront)",
+      "heading": "Exemplo concreto de arquitetura",
       "bullets": [
-        "CNAME no apex quando o alvo é ALB/CloudFront (use ALIAS).",
-        "Failover DNS sem health check no primary.",
-        "S3 público Principal * só para 'funcionar o CloudFront' em vez de OAI/OAC.",
-        "Esperar que TTL alto invalide sozinho em segundos após deploy crítico.",
-        "Health check R53 no path que retorna 401/404 e achar que é 'falha de CloudFront'."
+        "Site marketing global: usuários → Route 53 ALIAS apex → CloudFront → origin S3 (privado) com OAC; assets /images/* com TTL longo; index.html com TTL curto ou invalidation no deploy.",
+        "API com front estático: Route 53 api.exemplo.com → CloudFront behavior /api* → origin ALB (sem cache ou TTL mínimo); /* → S3.",
+        "DR ativo-passivo: Route 53 failover — primary ALIAS para CloudFront/ALB da região A + health check; secondary para stack da região B.",
+        "Canary DNS: weighted 90/10 entre duas distributions ou dois ALBs enquanto valida release."
       ],
       "exam_tips": [
-        "Separe: DNS record · health · origin access · cache TTL/invalidation · TLS/ACM."
+        "Desenhe sempre a cadeia: resolver DNS → edge (se houver) → origin → policy de acesso na origin."
+      ]
+    },
+    {
+      "heading": "Armadilhas comuns da prova",
+      "bullets": [
+        "CNAME no apex quando o alvo é ALB/CloudFront/S3 website — a prova espera ALIAS.",
+        "Failover DNS sem health check no primary (secondary nunca promove de forma confiável).",
+        "Tornar o bucket público com Principal * em vez de OAI/OAC quando o enunciado pede origem privada.",
+        "Achar que invalidation é automática só porque o objeto foi sobrescrito com o mesmo key e TTL ainda válido na edge."
+      ],
+      "exam_tips": [
+        "Checklist rápido: tipo de record · health · OAC/policy · TTL/invalidation · região do ACM."
+      ]
+    },
+    {
+      "heading": "Ligação com Simulado / Trilha de cenários",
+      "bullets": [
+        "No Simulado, stems de 'usuários veem HTML antigo' ou '403 no site via CDN' testam invalidation/TTL e OAC — não banco nem SG do RDS.",
+        "Cenários de apex e 'root domain no load balancer' discriminam ALIAS vs CNAME.",
+        "Na Trilha (cenários de arquitetura), espere trade-offs: custo de edge (price class), failover multi-Region vs Multi-AZ, e quando CloudFront na frente do ALB faz sentido.",
+        "Pratique o vocabulário: hosted zone, health check, distribution, origin, behavior, invalidation, OAC — sem memorizar wizard de Traffic Flow."
+      ],
+      "exam_tips": [
+        "Antes de marcar a alternativa, nomeie a camada falha: DNS, TLS/ACM, cache ou acesso à origin."
       ]
     }
   ],
@@ -90,18 +119,18 @@
     "aws cloudfront create-invalidation --distribution-id <ID> --paths '/*'",
     "aws s3api get-bucket-policy --bucket <b>",
     "aws acm list-certificates --region us-east-1",
-    "aws elbv2 describe-load-balancers (origem dinâmica)",
+    "aws elbv2 describe-load-balancers",
     "dig / nslookup (validação DNS local)"
   ],
   "must_know": [
-    "ALIAS no apex para ALB/CloudFront/S3 website; CNAME não no apex clássico.",
-    "Failover DNS + health check: secondary só entra se primary unhealthy.",
-    "CloudFront na edge; origem S3/ALB; cache TTL e invalidation após deploy.",
-    "S3 privado como origin: OAI/OAC + bucket policy (não Principal * desnecessário).",
-    "Certificado CloudFront no ACM us-east-1.",
-    "403 origem S3 → policy/OAI; unhealthy R53 → path/SG/health config.",
-    "Weighted/latency/geo = políticas de roteamento; simple = um target.",
-    "Fora: Traffic Flow deep, Resolver hybrid, Lambda@Edge full, signed URLs lab completo."
+    "ALIAS no apex para ALB/CloudFront/S3 website; CNAME clássico não no apex.",
+    "Failover DNS exige health check; secondary entra com primary unhealthy.",
+    "CloudFront na edge; origin S3/ALB; TTL + invalidation (ou versioning) após deploy.",
+    "S3 privado como origin: OAC/OAI + bucket policy (sem Principal * desnecessário).",
+    "Certificado de viewer CloudFront no ACM us-east-1.",
+    "403 na origin S3 → policy/OAC; unhealthy Route 53 → path/SG/código do health check.",
+    "Weighted/latency/geo/failover = políticas; simple = um target.",
+    "Fora: Traffic Flow deep, Resolver hybrid, Lambda@Edge full, signed URLs/cookies lab."
   ],
   "reuse_from_v1": null
 }

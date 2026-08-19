@@ -4,6 +4,17 @@
 
 ## Entradas Recentes
 
+- **2026-08-18** — Estudo AWS study_notes polish — 18/08/2026
+  - Polidos os 12 `aws/parts/part-aws-1.1…1.12-content.json` (O que é · Quando usar/NÃO · exemplo arquitetura · armadilhas · ligação Simulado/Trilha)
+  - Regen: `node scripts/gen-estudo-content.mjs` → `src/data/estudo-content-bank/aws-*.json` + `estudo-content.ts`
+  - Backup pré-polish: `scripts/output/estudo_aws_content_before_polish/`
+  - part_id estáveis; questions/tickets/traditional e Trilha AWS intocados
+
+- **2026-08-18** — Estudo AWS: polish didático parts 1.7–1.9
+  - `aws/parts/part-aws-1.7|1.8|1.9-content.json`: study_notes PT-BR (O que é · Quando usar/NÃO · exemplo · armadilhas · ligação Simulado/Trilha)
+  - Bank UI sincronizado: `src/data/estudo-content-bank/aws-1.7|1.8|1.9.json`
+  - part_id / blueprint / verb / weight estáveis; questions/tickets intocados
+
 - **2026-08-18** — Decisão B + bloco curadoria de texto fechado (DECISIONS.md)
   - Opção A (explicações PT / enunciados EN) e Opção B (Trilha AWS = cenários) gravadas como lei
   - Tabela de escopo: tickets V1/V2/AWS + traditional V1/V2/AWS OK; próximo foco ≠ reescrita em massa

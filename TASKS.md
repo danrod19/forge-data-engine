@@ -27,6 +27,7 @@
 - [x] 3B.3 Traditional V1 UI pool: 949 explicacao_profunda em PT (bad=0)
 - [x] AWS Trilha = cenários traditional (sem CLI); tickets_aws.json preservado
 - [x] DECISIONS.md: Opção A + Opção B (Trilha AWS) + pools UI + escopo curadoria fechado 18/08/2026
+- [x] Estudo AWS study_notes polish — 18/08/2026 (aws-1.1–1.12 + regen bank)
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção
@@ -42,6 +43,11 @@
 - [x] Integrar Módulo 6.0 (Automação): traditional + tickets + domains + Estudo/Simulado/Trilha
 - [x] AWS SAA Foundations 1.1–1.12 (quality-pass FINAL → app)
 - [x] Estudo AWS jogável + Sobre SAA
+- [x] Estudo AWS study_notes polish — 18/08/2026 (todas as parts aws-1.1–1.12)
+  - Fonte canônica: `aws/parts/part-aws-*-content.json` → `node scripts/gen-estudo-content.mjs` → `estudo-content-bank` + `estudo-content.ts`
+  - Estrutura: O que é · Quando usar/NÃO · Exemplo de arquitetura · Armadilhas · Ligação Simulado/Trilha
+  - Backup: `scripts/output/estudo_aws_content_before_polish/`
+  - Questions/tickets/traditional/Trilha wiring intocados
 
 ### Bloqueios / Pendências
 - Env Stripe em produção já falhou uma vez (“link não configurado”)

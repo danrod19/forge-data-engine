@@ -10,74 +10,101 @@
   "verb": "Design",
   "weight_percent": 24,
   "topic_list": [
-    "Function, handler, package/container (ideia de deploy)",
+    "O que é Lambda: compute event-driven, handler, package/container (ideia)",
+    "Quando usar vs EC2/containers/Step Functions (limites de tempo e estado)",
     "Execution role least privilege vs resource-based policy de invoke",
-    "Timeout, memory e ephemeral storage (/tmp) ideia",
-    "Concurrency: account unreserved, reserved concurrency, throttling",
-    "Triggers: SQS, SNS, EventBridge, API Gateway, S3 event (ideia)",
-    "Lambda em VPC: ENI, cold start, endpoints/NAT para APIs AWS",
+    "Timeout, memory (/tmp) e cold start (ideia)",
+    "Concurrency: unreserved, reserved, throttling 429",
+    "Triggers: SQS, SNS, EventBridge, API Gateway, S3 event",
+    "Lambda em VPC: ENI, NAT/VPC endpoints para APIs AWS",
     "Env vars vs Secrets Manager (sem secret em plaintext)",
-    "CloudWatch Logs: log group e logs:CreateLogStream/PutLogEvents na role",
-    "Versions e aliases (ideia de tráfego estável)",
-    "TShoot: timeout, AccessDenied na role, throttle 429, VPC sem rota",
+    "CloudWatch Logs na role (CreateLogStream/PutLogEvents)",
+    "Versions/aliases (ideia) e TShoot: timeout, AccessDenied, throttle, VPC sem rota",
     "NÃO: Lambda@Edge full, SnapStart lab, provisioned concurrency deep, Step Functions lab, Layers deep"
   ],
   "study_notes": [
     {
-      "heading": "Lambda no SAA-C03",
+      "heading": "O que é AWS Lambda",
       "bullets": [
-        "Compute event-driven: escala com invocações, paga por duração/request (modelo serverless).",
-        "Execution role define o que a function pode chamar (S3, SQS, Secrets, logs).",
-        "Quem invoca (SQS, API GW, outra conta) pode precisar de resource policy de invoke além da role."
+        "Lambda é compute serverless: você publica uma function (handler + código) e a AWS escala as invocações; cobrança típica por request e duração (GB·s).",
+        "No SAA, o desenho gira em torno de: quem invoca, o que a function pode chamar (execution role), limites (timeout/memory/concurrency) e path de rede se estiver em VPC.",
+        "Package zip ou imagem de container; storage efêmero em /tmp (ideia). Não é um servidor que você liga/desliga — é execução sob demanda com isolamento por invoke.",
+        "Versions e aliases permitem apontar tráfego estável para uma revisão (ideia de promoção), sem mudar o ARN 'lógico' do consumidor."
       ],
       "exam_tips": [
-        "AccessDenied dentro da function → execution role; 403 de invoke externo → resource policy/permissions do trigger."
+        "Se o enunciado fala em 'rodar código em resposta a evento sem gerenciar servers', Lambda está no centro — ainda assim valide timeout, role e trigger."
       ]
     },
     {
-      "heading": "Timeout, memory e concurrency",
+      "heading": "Quando usar / quando NÃO usar",
       "bullets": [
-        "Timeout máximo da function deve ser ≥ tempo real do job (com margem); senão Task timed out.",
-        "Memory aloca CPU proporcional (ideia); mais memória pode reduzir duração.",
-        "Reserved concurrency limita/garante capacidade; sem headroom → throttling."
+        "USE quando o trabalho é event-driven, curto/médio, stateless e escala com pico de eventos: API leve (API Gateway), processamento de objeto S3, fan-in de SQS, cron via EventBridge, reação a SNS.",
+        "USE para glue de integração (ler fila → escrever DynamoDB/S3) com least privilege na execution role e secrets fora do código.",
+        "NÃO USE como substituto de processo longo (>15 min), job batch pesado contínuo, app com estado local persistente ou servidor que precisa de sessão TCP longa — prefira ECS/EKS, EC2, Batch ou Step Functions orquestrando pedaços.",
+        "NÃO USE Lambda em VPC 'por padrão': só anexe VPC se precisar alcançar recursos privados (RDS em subnet privada, ElastiCache). VPC sem NAT/endpoints vira timeout misterioso em GetSecretValue/S3/SQS."
       ],
       "exam_tips": [
-        "Logs 'Task timed out after N seconds' → suba timeout ou quebre o trabalho; não é só 'falta de SG'."
+        "Job de horas ou monolito com socket permanente → não force Lambda; quebre com Step Functions/filas ou mude o compute."
       ]
     },
     {
-      "heading": "VPC e path a serviços AWS",
+      "heading": "Role, timeout, memory e concurrency",
       "bullets": [
-        "Lambda em subnet privada precisa de NAT ou VPC endpoints (Secrets, KMS, S3, SQS…) para APIs AWS.",
-        "ENI/cold start: anexar a VPC aumenta latência de init (ideia).",
-        "Sem path de rede, o sintoma parece timeout, não AccessDenied de IAM."
+        "Execution role = o que a function faz (s3:GetObject, sqs:ReceiveMessage, secretsmanager:GetSecretValue, logs:*). Resource-based policy / permissão do trigger = quem pode invocar.",
+        "Timeout deve cobrir a duração real do trabalho com margem; 'Task timed out after N seconds' é configuração/arquitetura, não 'falta de CPU genérica'.",
+        "Memory maior aloca mais CPU proporcional (ideia) e pode reduzir duração — trade-off de custo vs latência.",
+        "Reserved concurrency garante ou limita capacidade da function; conta sem headroom → throttling (429). Concurrency 0 efetivo bloqueia invokes."
       ],
       "exam_tips": [
-        "VPC Lambda + timeout em GetSecretValue com IAM ok → endpoint/NAT, não só amplie a policy."
+        "AccessDenied dentro da function → execution role; 403 de invoke externo → resource policy/permissões do trigger; throttle → concurrency, não 'só aumente timeout'."
       ]
     },
     {
-      "heading": "Triggers e observabilidade",
+      "heading": "Triggers, VPC e segredos",
       "bullets": [
-        "SQS event source mapping: role precisa receive/delete; batch e concurrency importam.",
-        "S3/SNS/EventBridge/API GW disparam invoke conforme config e permissões.",
-        "Logs vão ao CloudWatch; role precisa de permissões de log se não usar managed policy básica."
+        "Event source mapping (SQS): role precisa receive/delete; mapping enabled e fila com mensagens. SNS/S3/EventBridge/API Gateway disparam invoke com config + permissões corretas.",
+        "Lambda em subnet privada precisa de NAT Gateway ou VPC interface/gateway endpoints (Secrets Manager, KMS, S3, SQS, etc.) para falar com APIs AWS.",
+        "Sem path de rede, o sintoma parece timeout — IAM pode estar perfeito. Cold start + ENI aumenta latência de init (ideia).",
+        "Segredos: Secrets Manager/SSM SecureString + kms se CMK; nunca password em variável de ambiente plaintext no console 'porque é fácil'."
       ],
       "exam_tips": [
-        "SQS não invoca → event source mapping enabled + permissões SQS na role + fila com msgs."
+        "VPC Lambda + timeout em GetSecretValue com IAM ok → endpoint/NAT; SQS 'não invoca' → mapping + permissões SQS + msgs na fila."
       ]
     },
     {
-      "heading": "Anti-patterns de prova (Lambda)",
+      "heading": "Exemplo concreto de arquitetura",
       "bullets": [
-        "Secrets em variáveis de ambiente plaintext.",
-        "Timeout 3s para job de 2 minutos.",
-        "AdministratorAccess na execution role.",
-        "Lambda em VPC sem NAT/endpoints e culpar só o código.",
-        "Reserved concurrency = 0 efetivo / sem conta para picos (throttle)."
+        "Cenário: upload de imagem em bucket S3 dispara Lambda que valida o objeto, grava metadados em DynamoDB e publica evento em SNS para notificar o time.",
+        "Peças: S3 event notification → Lambda (execution role: s3:GetObject no prefixo, dynamodb:PutItem, sns:Publish, logs) → DynamoDB table → SNS topic → e-mail/SQS subscriber.",
+        "Segurança: sem access key no código; secret de API de terceiros (se houver) via Secrets Manager; bucket com BPA e least privilege no prefixo.",
+        "Operação: timeout coerente com download+processamento; reserved concurrency se a function crítica não pode ser esmagada por pico de outro workload na mesma conta; alarmes em Errors e Throttles (liga com CloudWatch)."
       ],
       "exam_tips": [
-        "Separe: role · timeout/memory · concurrency · trigger · rede VPC · logs."
+        "No desenho S3→Lambda, confira permissão de invoke do bucket + actions S3 na role + tratamento de erro/retry — não só o código do handler."
+      ]
+    },
+    {
+      "heading": "Armadilhas comuns da prova",
+      "bullets": [
+        "Colocar secret em env var plaintext ou user-data 'temporário'.",
+        "Timeout de poucos segundos para job que demora minutos (ou o inverso: timeout enorme mas concurrency esgotada).",
+        "AdministratorAccess na execution role 'para não falhar na demo'.",
+        "Lambda em VPC sem NAT/VPC endpoints e culpar só o código ou 'falta de SG de saída 443' sem path real à API AWS."
+      ],
+      "exam_tips": [
+        "Checklist mental: role · timeout/memory · concurrency · trigger · rede VPC · logs/secrets — um eixo por vez."
+      ]
+    },
+    {
+      "heading": "Ligação com Simulado / Trilha de cenários",
+      "bullets": [
+        "No Simulado e na Trilha AWS (cenários de arquitetura), espere enunciados que misturam sintoma (timeout, throttle, AccessDenied) com trade-off de serviço (Lambda vs EC2 vs fila).",
+        "Treine separar causa de rede VPC, causa de IAM (role vs invoke) e causa de capacidade (concurrency) — a alternativa 'aumentar memória' nem sempre resolve timeout por falta de NAT.",
+        "Ao revisar erros, releia must_know desta part e refaça só os cenários de compute event-driven / permissões de function, sem decorar gabarito.",
+        "Cruze com parts de SQS/SNS, IAM, VPC e CloudWatch: o mesmo incidente costuma ter evidência em logs + métrica Throttles + policy."
+      ],
+      "exam_tips": [
+        "Na Trilha, leia o requisito (tempo, VPC, quem invoca) antes de escolher o serviço — o distractor clássico troca o eixo certo."
       ]
     }
   ],
@@ -88,20 +115,20 @@
     "aws lambda list-event-source-mappings --function-name <name>",
     "aws lambda create-event-source-mapping --event-source-arn <sqs-arn> ...",
     "aws lambda invoke --function-name <name> out.json",
+    "aws lambda put-function-concurrency --reserved-concurrent-executions <n>",
     "aws logs describe-log-groups / filter-log-events",
     "aws iam get-role --role-name <exec-role>",
-    "aws ec2 describe-vpc-endpoints / describe-nat-gateways",
-    "aws lambda put-function-concurrency --reserved-concurrent-executions <n>"
+    "aws ec2 describe-vpc-endpoints / describe-nat-gateways"
   ],
   "must_know": [
-    "Execution role = o que a function faz; resource policy = quem invoca.",
-    "Timeout < duração real → Task timed out; ajuste timeout ou arquitetura.",
-    "Concurrency esgotada → throttle; reserved concurrency isola critical functions.",
-    "VPC Lambda precisa de path (endpoint/NAT) para Secrets/KMS/S3 APIs.",
-    "Triggers SQS/SNS/S3/API/EventBridge com permissões corretas.",
-    "Secrets via Secrets Manager/SSM, não plaintext em env.",
-    "Logs: CloudWatch + permissões de log na role.",
-    "Fora: Lambda@Edge full, SnapStart/provisioned deep, Step Functions lab."
+    "Execution role = o que a function faz; resource policy / trigger = quem invoca.",
+    "Timeout < duração real → Task timed out; ajuste timeout ou quebre o trabalho.",
+    "Concurrency esgotada → throttle (429); reserved concurrency isola functions críticas.",
+    "VPC Lambda precisa de NAT ou VPC endpoints para Secrets/KMS/S3/SQS APIs.",
+    "Triggers SQS/SNS/S3/API Gateway/EventBridge exigem permissões e config corretas.",
+    "Secrets via Secrets Manager/SSM — nunca plaintext em env de produção.",
+    "Logs no CloudWatch: role precisa CreateLogStream/PutLogEvents (ou managed básica).",
+    "Fora: Lambda@Edge full, SnapStart/provisioned deep, Step Functions lab, Layers deep."
   ],
   "reuse_from_v1": null
 }

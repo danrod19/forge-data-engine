@@ -11,73 +11,102 @@
   "weight_percent": 26,
   "topic_list": [
     "Desacoplar produtor e consumidor com filas (buffer de picos)",
-    "SQS standard: throughput alto, best-effort ordering, at-least-once",
-    "SQS FIFO: ordem por message group, deduplicação, throughput limitado (ideia)",
+    "SQS standard: alto throughput, ordem best-effort, at-least-once",
+    "SQS FIFO: ordem por MessageGroupId, deduplicação, throughput limitado",
     "Visibility timeout e long polling",
     "Dead-letter queue: maxReceiveCount e redrive",
-    "SNS pub/sub e fan-out para SQS, Lambda, HTTP, email (ideia)",
+    "SNS pub/sub e fan-out (SQS, Lambda, HTTP, email)",
     "Padrão clássico SNS → múltiplas filas SQS",
     "IAM: sqs:SendMessage/ReceiveMessage/DeleteMessage; sns:Publish/Subscribe",
-    "SSE-SQS / KMS ideia de criptografia em repouso",
-    "TShoot: mensagem reaparece, DLQ enchendo, AccessDenied, FIFO no cenário errado",
-    "NÃO: EventBridge pipes deep, MQ/Kafka full, Step Functions lab, Kinesis deep, SNS filtering lab completo"
+    "SSE-SQS / SSE-KMS (ideia de criptografia em repouso)",
+    "TShoot: mensagem reaparece, DLQ enchendo, AccessDenied, FIFO indevido",
+    "NÃO: EventBridge Pipes deep, MQ/Kafka full, Step Functions lab, Kinesis deep, SNS filtering lab"
   ],
   "study_notes": [
     {
-      "heading": "Por que desacoplar com SQS/SNS",
+      "heading": "O que é (SQS + SNS)",
       "bullets": [
-        "Fila absorve picos: o produtor não bloqueia no consumidor lento.",
-        "SNS faz fan-out: um evento, vários subscribers em paralelo.",
-        "Retry com visibility + DLQ isola mensagens venenosas (poison)."
+        "SQS é fila gerenciada: o produtor envia mensagens; o consumidor faz ReceiveMessage, processa e DeleteMessage. Absorve picos e desacopla tiers (API ↔ workers).",
+        "Entrega at-least-once: desenhe o consumer idempotente (o mesmo pedido pode aparecer mais de uma vez em standard).",
+        "SNS é pub/sub: um Publish no topic pode fan-out para vários subscribers (SQS, Lambda, HTTP, e-mail) em paralelo.",
+        "O padrão clássico de resiliência: SNS fan-out → N filas SQS (cada time/serviço consome no seu ritmo) + DLQ para poison messages."
       ],
       "exam_tips": [
-        "Picos + resiliência entre tiers → SQS; um evento para N destinos → SNS (+ SQS)."
+        "Picos entre tiers → SQS; um evento para N destinos → SNS (muitas vezes SNS + SQS)."
       ]
     },
     {
-      "heading": "Standard vs FIFO",
+      "heading": "Quando usar / quando NÃO usar",
       "bullets": [
-        "Standard: escala massiva, ordem best-effort, possíveis duplicatas (desenhe idempotência).",
-        "FIFO: ordem por MessageGroupId, dedup (content-based ou DeduplicationId), menor throughput nominal.",
-        "Não use FIFO só por 'parecer mais seguro' se o workload não precisa de ordem estrita."
+        "Use SQS standard para telemetria, jobs assíncronos e alto volume quando ordem estrita global não é requisito.",
+        "Use SQS FIFO quando a ordem por entidade importa (ex.: eventos do mesmo pedido/cliente via MessageGroupId) e aceita throughput menor.",
+        "Use SNS quando vários sistemas devem reagir ao mesmo evento sem o produtor conhecer cada um.",
+        "NÃO use FIFO 'por segurança' se o workload não precisa de ordem — custo/limites sem benefício.",
+        "NÃO use só SNS se precisa de buffer durável e retry controlado por worker: combine SNS → SQS.",
+        "NÃO confunda SQS com orquestração de workflow longo (isso é território de Step Functions — fora do foco desta part)."
       ],
       "exam_tips": [
-        "Ordem estrita de pedidos por cliente → FIFO + group id; telemetria em alto volume → standard."
+        "Enunciado fala 'ordem estrita por cliente' → FIFO + group id; 'milhões de eventos de sensor' → standard."
       ]
     },
     {
-      "heading": "Visibility timeout e DLQ",
+      "heading": "Visibility timeout, long polling e DLQ",
       "bullets": [
-        "Após ReceiveMessage, a msg some para outros até o timeout; se não DeleteMessage, reaparece.",
-        "Processamento > visibility → outro consumer pega a mesma msg (duplicata aparente).",
-        "maxReceiveCount esgotado envia à DLQ; analise poison messages e redrive com cuidado."
+        "Após ReceiveMessage, a mensagem fica invisível até o visibility timeout; se o worker não DeleteMessage a tempo, ela reaparece (parece duplicata).",
+        "Processamento mais longo que o timeout → suba VisibilityTimeout ou use ChangeMessageVisibility; alinhe ao pior caso do batch.",
+        "Long polling (WaitTimeSeconds até 20) reduz ReceiveMessage vazios e custo/ruído de short polling.",
+        "RedrivePolicy: após maxReceiveCount falhas, a mensagem vai à DLQ. Investigue poison (schema inválido, bug) antes de redrive em massa."
       ],
       "exam_tips": [
-        "Msg reaparece com worker lento → suba visibility ou estenda com ChangeMessageVisibility."
+        "Mensagem 'volta' com worker lento → visibility curta demais, não 'SNS quebrado'."
       ]
     },
     {
-      "heading": "SNS fan-out e IAM",
+      "heading": "Fan-out SNS→SQS e IAM",
       "bullets": [
-        "Topic recebe Publish; subscriptions entregam a SQS/Lambda/HTTP/email.",
-        "Fila SQS subscriber precisa de policy permitindo sns.amazonaws.com enviar à fila.",
-        "Roles de producer/consumer: least privilege em ARN da fila/tópico."
+        "Subscription SNS→SQS precisa estar confirmada; a queue policy deve Allow sqs:SendMessage do serviço sns.amazonaws.com (com SourceArn do topic).",
+        "Producer: sns:Publish no topic ARN (ou sqs:SendMessage se fala direto na fila). Consumer: ReceiveMessage + DeleteMessage (+ GetQueueAttributes conforme o SDK).",
+        "Least privilege no ARN da fila/tópico; role da Lambda/EC2, não access key de user no código.",
+        "SSE-SQS ou SSE-KMS: em repouso; se CMK customer, a role precisa de kms além de sqs (cruzar aws-1.9)."
       ],
       "exam_tips": [
-        "SNS→SQS sem mensagens → subscription confirmada + queue policy do SNS."
+        "SNS publica e a fila fica vazia → subscription + queue policy do SNS antes de culpar o consumer."
       ]
     },
     {
-      "heading": "Anti-patterns de prova (SQS/SNS)",
+      "heading": "Exemplo concreto de arquitetura",
       "bullets": [
-        "Visibility timeout de 5s com batch de 2 minutos de processamento.",
-        "Sem DLQ e loops infinitos de poison message.",
-        "FIFO para telemetria de alto volume sem necessidade de ordem.",
-        "Access key no consumer em vez de role com sqs:ReceiveMessage.",
-        "Assumir que SNS garante ordem global entre todos os subscribers."
+        "Checkout: API recebe pedido → Publish SNS OrderPlaced → fila Inventory SQS + fila Email SQS + fila Analytics SQS; cada worker escala independente.",
+        "Pico de upload: API só valida e envia job para SQS; fleet de workers processa thumbnails; DLQ guarda falhas após 5 receives.",
+        "Pedidos por cliente: FIFO com MessageGroupId = customerId para serializar eventos daquele cliente sem serializar o mundo inteiro.",
+        "Retry resiliente: visibility 60–120s alinhado ao job; alarmes em ApproximateNumberOfMessagesVisible da DLQ."
       ],
       "exam_tips": [
-        "Separe: tipo de fila · visibility/DLQ · fan-out SNS · IAM de send/receive."
+        "No desenho SAA, mostre buffer (SQS), fan-out (SNS) e isolamento de falha (DLQ) como três decisões distintas."
+      ]
+    },
+    {
+      "heading": "Armadilhas comuns da prova",
+      "bullets": [
+        "VisibilityTimeout de poucos segundos com processamento de minutos → 'duplicatas' e DLQ enchendo sem bug de negócio.",
+        "Fila sem DLQ e poison message em loop infinito consumindo worker/custo.",
+        "Escolher FIFO para telemetria de alto volume sem requisito de ordem.",
+        "Assumir que SNS garante ordem global idêntica em todos os subscribers."
+      ],
+      "exam_tips": [
+        "Separe no enunciado: tipo de fila · visibility/DLQ · fan-out · IAM send/receive."
+      ]
+    },
+    {
+      "heading": "Ligação com Simulado / Trilha de cenários",
+      "bullets": [
+        "No Simulado, 'mensagens reaparecem' e 'fila de mortos crescendo' apontam visibility e maxReceiveCount — não Exchange/Kafka.",
+        "Stems de 'notificar billing e shipping ao mesmo tempo' pedem SNS fan-out (com ou sem SQS), não uma única fila compartilhada sem desenho.",
+        "Na Trilha de cenários, compare SQS vs chamar o downstream de forma síncrona sob pico, e standard vs FIFO sob constraint de ordem.",
+        "AccessDenied em SendMessage/Publish é IAM/resource policy — mesmo reflexo de outras parts de identidade."
+      ],
+      "exam_tips": [
+        "Traduza o sintoma: reaparece = visibility/delete; ninguém consome do SNS = subscription/policy; ordem quebrada = standard vs FIFO/group."
       ]
     }
   ],
@@ -85,23 +114,23 @@
     "aws sqs send-message --queue-url <url> --message-body ...",
     "aws sqs receive-message --queue-url <url> --wait-time-seconds 20",
     "aws sqs delete-message --queue-url <url> --receipt-handle ...",
+    "aws sqs change-message-visibility --queue-url <url> --receipt-handle ... --visibility-timeout <sec>",
     "aws sqs get-queue-attributes --queue-url <url> --attribute-names All",
     "aws sqs set-queue-attributes (VisibilityTimeout, RedrivePolicy)",
-    "aws sqs start-message-move-task / redrive (ideia)",
-    "aws sns create-topic / publish",
+    "aws sns create-topic / publish --topic-arn ... --message ...",
     "aws sns subscribe --topic-arn ... --protocol sqs --notification-endpoint <queue-arn>",
-    "aws sns list-subscriptions-by-topic",
-    "aws iam simulate / get-role-policy (AccessDenied send/receive)"
+    "aws sns list-subscriptions-by-topic --topic-arn ...",
+    "aws sts get-caller-identity (TShoot AccessDenied)"
   ],
   "must_know": [
-    "SQS desacopla e bufferiza; SNS fan-out pub/sub.",
-    "Standard = escala/at-least-once; FIFO = ordem por group + dedup.",
+    "SQS desacopla e bufferiza; SNS faz fan-out pub/sub.",
+    "Standard = escala + at-least-once; FIFO = ordem por MessageGroupId + dedup.",
     "Visibility curta demais → mensagem reaparece durante o processamento.",
-    "DLQ com maxReceiveCount isola poison messages.",
-    "SNS→SQS exige subscription e queue policy permitindo SNS.",
-    "IAM least privilege no ARN da fila/tópico para producer e consumer.",
-    "DeleteMessage após sucesso evita reentrega; idempotência no consumer.",
-    "Fora: EventBridge pipes deep, Kinesis/MSK full, Step Functions lab, filtering SNS deep."
+    "DLQ + maxReceiveCount isola poison messages; monitore e redrive com cuidado.",
+    "SNS→SQS exige subscription confirmada e queue policy permitindo SNS.",
+    "IAM least privilege nos ARNs de fila/tópico; DeleteMessage após sucesso.",
+    "Consumer idempotente: at-least-once não é bug do SQS standard.",
+    "Fora: EventBridge Pipes deep, Kinesis/MSK full, Step Functions lab, filtering SNS deep."
   ],
   "reuse_from_v1": null
 }

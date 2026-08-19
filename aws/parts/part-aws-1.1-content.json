@@ -8,113 +8,117 @@
   "verb": "Design",
   "weight_percent": 30,
   "topic_list": [
-    "IAM: identities (user, group, role) e políticas identity-based (ideia)",
-    "Least privilege: Allow mínimo necessário; Deny explícito tem precedência",
-    "User vs Role: credenciais humanas vs assumir papel (EC2/Lambda instance role)",
-    "Trust policy (role) vs permissions policy (o que a role pode fazer)",
-    "STS AssumeRole (ideia): temporário, não access key de longo prazo em EC2",
+    "IAM: identities (user, group, role) e políticas identity-based",
+    "Least privilege: Allow mínimo; Deny explícito tem precedência",
+    "User vs Role: humano/legado vs workload (EC2, Lambda, ECS)",
+    "Trust policy (quem assume) vs permissions policy (o que pode fazer)",
+    "STS AssumeRole: credenciais temporárias; evitar access key de longo prazo",
     "Attach de policy: user, group ou role — group errada = sem permissão",
-    "AccessDenied: ler Action, Resource e se há Deny explícito",
-    "Access keys de user: quando evitar (app em EC2/container → preferir role)",
-    "Policy JSON: Effect, Action, Resource, Condition (ideia)",
-    "TShoot: simular avaliação (who can call what) e CloudTrail (ideia)",
-    "NÃO: SCPs de Organizations profundos, IAM Identity Center lab full, permission boundaries enterprise"
+    "AccessDenied: Action, Resource, Deny explícito, Condition e trust",
+    "Policy JSON: Effect, Action, Resource, Condition (ideia SAA)",
+    "TShoot: who can call what + CloudTrail (ideia)",
+    "NÃO: SCPs profundos, IAM Identity Center lab full, permission boundaries enterprise"
   ],
   "study_notes": [
     {
-      "heading": "Modelo mental IAM no SAA",
+      "heading": "O que é IAM",
       "bullets": [
-        "IAM controla autenticação/autorização de principals (users, roles, serviços) na conta AWS.",
-        "No Associate, o foco é desenhar quem pode chamar o quê com least privilege — não o lab enterprise de Identity Center.",
-        "Três peças: identity (user/group/role), permissions policy, e (para roles) trust policy."
+        "IAM (Identity and Access Management) controla quem (principal) pode chamar quais Actions em quais Resources na conta AWS.",
+        "No SAA-C03 (domínio 1 · tarefa 1.1), o foco é desenhar acesso seguro com least privilege — não montar lab enterprise de Identity Center.",
+        "Três peças que você sempre separa na cabeça: identity (user / group / role), permissions policy (o que pode fazer) e, para roles, trust policy (quem pode assumir).",
+        "User = identidade humana (ou legado de app). Group = coleção de users para anexar policies por função. Role = identidade assumível, sem senha permanente, ideal para serviços."
       ],
       "exam_tips": [
-        "Pergunta de EC2 acessando S3 → pense em instance profile / role, não access key embutida."
+        "Cenário de workload em AWS (EC2, Lambda, ECS) pedindo acesso a S3/DynamoDB → a identidade padrão é IAM role, não access key de user."
       ]
     },
     {
-      "heading": "Users, groups e roles",
+      "heading": "Quando usar / quando NÃO usar",
       "bullets": [
-        "User: identidade humana (ou legada de app); pode ter access keys — preferir MFA e policies via groups.",
-        "Group: coleção de users; anexa policies ao grupo para facilitar least privilege por função (Devs, Ops).",
-        "Role: identidade assumível; sem senha permanente; usada por serviços (EC2, Lambda) ou por humanos via federation/AssumeRole.",
-        "Role ≠ user: a role não 'faz login' com password; o principal assume e recebe credenciais temporárias."
+        "Use IAM user + groups para humanos no console/CLI; anexe policies aos groups (Devs, Ops) e ative MFA.",
+        "Use IAM role + instance profile / execution role para qualquer app rodando na AWS — STS entrega credenciais temporárias.",
+        "Use AssumeRole (mesma conta ou cross-account) quando precisa de sessão curta e auditoria clara de quem assumiu o quê.",
+        "NÃO use access key de IAM user em AMI, user-data, código-fonte, Lambda zip ou container — anti-pattern clássico de prova e de produção.",
+        "NÃO use AdministratorAccess ou Action/Resource * 'só por enquanto' para júnior/CI: least privilege é o critério do exame.",
+        "NÃO trate root da conta como usuário do dia a dia: reserve para break-glass; operações rotineiras vão com users/roles."
       ],
       "exam_tips": [
-        "Se o cenário é workload em AWS (EC2/ECS/Lambda), a resposta padrão de identidade é role."
+        "Se o enunciado contraste 'embutir access key na EC2' vs 'anexar role', a opção segura quase sempre é a role."
       ]
     },
     {
-      "heading": "Policies e least privilege",
+      "heading": "Exemplo concreto de arquitetura",
       "bullets": [
-        "Identity-based policies anexadas a user/group/role definem Effect Allow/Deny sobre Actions e Resources.",
-        "Least privilege: conceder só as actions e resources necessários ao job; evitar * em produção sem necessidade.",
-        "Deny explícito vence Allow (ideia clássica de avaliação IAM).",
-        "Resource-based (ex. bucket policy) existe no ecossistema, mas o piloto foca identity-based + AccessDenied."
+        "App web em EC2 (ou Auto Scaling) precisa ler objetos em um bucket S3 privado e gravar logs em outro prefixo.",
+        "Crie uma IAM role com trust em ec2.amazonaws.com; permissions policy Allow só s3:GetObject/PutObject nos ARNs necessários (sem s3:* em *).",
+        "Associe a role via instance profile às instâncias; a aplicação usa o SDK/CLI sem access key local — o metadata service + STS resolvem a sessão.",
+        "Humano Ops: user no group Ops com policy de Describe/Start/Stop nas instâncias do ambiente; sem permissão de DeleteBucket.",
+        "Falha típica no desenho: policy S3 rica na role, mas trust não permite EC2 (ou instance profile não anexado) → AssumeRole/metadata falha antes do GetObject."
       ],
       "exam_tips": [
-        "AccessDenied com Deny na policy → não 'falta attach' se a evidência mostra Deny explícito."
+        "Na prova, desenhe o caminho completo: trust → instance profile → permissions → Resource ARN. Falta em qualquer elo = AccessDenied ou falha de assume."
       ]
     },
     {
       "heading": "Trust policy vs permissions policy",
       "bullets": [
-        "Permissions policy: o que a role (ou user) pode fazer depois de autenticada (s3:GetObject, ec2:Describe…).",
-        "Trust policy (AssumeRolePolicyDocument): quem pode assumir a role (ex. serviço EC2, outra conta, usuário).",
-        "Sem trust adequado, AssumeRole falha mesmo com permissions ricas na role.",
-        "EC2 instance profile associa a role à instância; a trust costuma permitir o serviço ec2.amazonaws.com."
+        "Permissions policy: o que a role (ou user) pode fazer depois de autenticada (ex.: s3:GetObject, ec2:DescribeInstances).",
+        "Trust policy (AssumeRolePolicyDocument): quem pode assumir a role — serviço (ec2.amazonaws.com), outra conta, ou usuário federado (ideia).",
+        "Sem trust adequado, sts:AssumeRole falha mesmo com permissions ricas. Sem permissions, assume até funciona, mas as Actions de negócio falham.",
+        "EC2 instance profile é o 'gancho' que associa a role à instância; confunda instance profile ausente com 'policy S3 errada' e você perde a questão de TShoot."
       ],
       "exam_tips": [
-        "Falha 'not authorized to perform sts:AssumeRole' → confira trust, não só a policy S3 da role."
+        "Mensagem 'not authorized to perform sts:AssumeRole' → olhe trust (e quem está chamando), não só a policy S3 da role."
+      ]
+    },
+    {
+      "heading": "Least privilege, Allow/Deny e AccessDenied",
+      "bullets": [
+        "Identity-based policies usam Effect Allow/Deny sobre Action + Resource (+ Condition opcional).",
+        "Least privilege: conceda só as Actions e Resources do job; evite * em produção sem necessidade clara do cenário.",
+        "Deny explícito vence Allow — empilhar mais Allow não 'vence' um Deny na mesma avaliação.",
+        "Checklist de AccessDenied: principal certo? policy attached (user/group/role)? Allow existe para Action/Resource? há Deny? Condition bloqueando? trust/instance profile ok?",
+        "CLI útil: get-caller-identity, list-attached-*-policies, get-policy-version, get-role (trust). CloudTrail mostra a API call que falhou (ideia)."
+      ],
+      "exam_tips": [
+        "Evidência com explicit deny → não marque 'falta attach de Allow' como causa raiz; o Deny precisa ser removido ou o principal mudado."
       ]
     },
     {
       "heading": "STS e credenciais temporárias",
       "bullets": [
-        "STS AssumeRole devolve access key + secret + session token de curta duração.",
-        "Evita access keys de longo prazo em AMIs, user-data e código.",
-        "Cross-account (ideia): conta A confia em principal da conta B via trust; B assume role em A.",
-        "Não cobrir federation OIDC/SAML lab completo neste piloto."
+        "STS AssumeRole devolve access key + secret + session token de curta duração — isso é o modelo seguro de sessão.",
+        "Evita keys de longo prazo em disco/imagem e reduz janela de comprometimento.",
+        "Cross-account (ideia SAA): conta A confia em principal da conta B via trust; B assume role em A com permissions limitadas.",
+        "Federation OIDC/SAML lab completo fica fora deste piloto; basta saber que humanos federados também assumem roles."
       ],
       "exam_tips": [
-        "Design seguro de app → roles + STS; access key de IAM user em EC2 é anti-pattern clássico de exame."
+        "Design 'app precisa falar com AWS API' → role + STS; access key de user fixa no host é o distractor que o exame adora."
       ]
     },
     {
-      "heading": "TShoot AccessDenied",
+      "heading": "Armadilhas comuns da prova",
       "bullets": [
-        "Leia a mensagem: Action, Resource, e se possível o principal.",
-        "Checklist: policy attached? group certo? Allow existe? Deny explícito? Resource ARN correto? Condição (Condition) bloqueando?",
-        "CLI: aws iam list-attached-*-policies, get-policy-version, get-role (trust).",
-        "CloudTrail ajuda a ver a API call que falhou (ideia)."
+        "Colocar access key de IAM user em EC2/Lambda/user-data/repositório em vez de role + STS.",
+        "Corrigir só a permissions policy S3 e ignorar trust policy ou instance profile ausente.",
+        "Responder 'adicione Allow' quando a evidência mostra explicit deny.",
+        "Usar AdministratorAccess / s3:* em Resource * como atalho 'temporário' em cenário que pede least privilege.",
+        "Confundir group errada (user sem policy efetiva) com 'bug do serviço S3'."
       ],
       "exam_tips": [
-        "Separe: (1) identidade errada, (2) falta de Allow, (3) Deny, (4) trust, (5) resource policy — um de cada vez."
+        "Antes de marcar gabarito: principal → Allow → Deny → trust/instance profile → Resource ARN. Um passo por vez."
       ]
     },
     {
-      "heading": "Fora de escopo deste piloto",
+      "heading": "Ligação com Simulado e Trilha de cenários",
       "bullets": [
-        "Organizations SCPs em profundidade.",
-        "IAM Identity Center (SSO) lab completo e permission sets enterprise.",
-        "Permission boundaries e session policies avançadas.",
-        "Desenho completo de ABAC com tags (só ideia se surgir)."
+        "No Estudo desta part, fixe o modelo mental user/group/role + trust vs permissions; isso destrava dezenas de stems do domínio 1.",
+        "No Simulado SAA, espere cenários do tipo 'EC2 precisa ler S3', 'AccessDenied ao chamar API', 'qual identidade usar' — aplique least privilege e role para workload.",
+        "Na Trilha AWS (cenários de arquitetura, sem CLI Cisco), o enunciado descreve um design ou incidente de permissão; você escolhe o serviço/controle certo sem precisar de gabarito decorado.",
+        "Pratique verbalizar a causa em uma frase: 'falta trust', 'Deny explícito', 'policy no group vizinho', 'access key no host' — isso acelera a eliminação de distractors."
       ],
       "exam_tips": [
-        "No SAA, se a pergunta for SCP de Organizations, costuma ser outra part — aqui foque IAM clássico da conta."
-      ]
-    },
-    {
-      "heading": "Anti-patterns de prova (IAM)",
-      "bullets": [
-        "Access key de IAM user em EC2/Lambda/user-data ou repositório de código.",
-        "AdministratorAccess ou s3:* em Resource * para humanos júnior 'só por enquanto'.",
-        "Confiar só em Allow extra quando a mensagem mostra explicit deny.",
-        "Corrigir permissions S3 da role e ignorar trust policy / instance profile na EC2.",
-        "Usar root da conta no dia a dia de operações e pipelines."
-      ],
-      "exam_tips": [
-        "Workload AWS → role + STS; humano console → user/group; AccessDenied → principal, Allow, Deny, trust."
+        "Ordem sugerida: ler estas notas → marcar lido → praticar questões da part → só então misturar Simulado/Trilha com outros domínios."
       ]
     }
   ],
@@ -131,13 +135,14 @@
     "Policy JSON: Effect / Action / Resource / Condition"
   ],
   "must_know": [
-    "Least privilege: Allow mínimo; Deny explícito tem precedência sobre Allow.",
-    "Workload em EC2/Lambda: preferir IAM role + instance profile, não access key de user no host.",
-    "Trust policy define quem assume a role; permissions policy define o que a role pode fazer.",
-    "AccessDenied: verificar attach, group, Action/Resource e Deny explícito.",
-    "STS AssumeRole fornece credenciais temporárias (ideia de segurança).",
+    "Least privilege: Allow mínimo necessário; Deny explícito tem precedência sobre Allow.",
+    "Workload em EC2/Lambda/ECS: IAM role + instance/execution profile — não access key de user no host.",
+    "Trust policy = quem assume a role; permissions policy = o que a role pode fazer.",
+    "AccessDenied: verificar principal, attach, Action/Resource, Deny, Condition e trust.",
+    "STS AssumeRole entrega credenciais temporárias (modelo seguro de sessão).",
     "Group errada ou policy só no grupo vizinho = user sem permissão efetiva.",
-    "Fora deste piloto: SCPs profundos, Identity Center full, permission boundaries enterprise."
+    "Root não é usuário operacional do dia a dia; MFA e break-glass apenas.",
+    "Fora deste piloto: SCPs profundos, IAM Identity Center full, permission boundaries enterprise."
   ],
   "reuse_from_v1": null
 }

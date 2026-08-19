@@ -29,6 +29,7 @@
 - [x] DECISIONS.md: Opção A + Opção B (Trilha AWS) + pools UI + escopo curadoria fechado 18/08/2026
 - [x] Estudo AWS study_notes polish — 18/08/2026 (aws-1.1–1.12 + regen bank)
 - [x] Estudo V2 study_notes polish — 18/08/2026 (todas as 17 parts v2-1.1…5.2 + regen bank)
+- [x] Estudo V1 study_notes polish — 18/08/2026 (todas as 31 parts 1.1–6.5 + regen bank)
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção
@@ -54,18 +55,12 @@
   - Estrutura: O que é · Quando usar/NÃO ou prova/TShoot · Exemplo · tech · Armadilhas · Ligação Simulado+Trilha CLI
   - Backup: `scripts/output/estudo_v2_content_before_polish/` (17 arquivos)
   - part_id estáveis; questions_v2_traditional / tickets_v2 / Trilha wiring intocados
-
-  - part_id estáveis; questions/tickets intocados
-  - Restante V2 parts: polish sob demanda / próximo lote
-- [x] Estudo V2 study_notes polish — lote 3.3/3.4/4.2/4.3 (18/08/2026)
-  - Fonte: `v2/parts/part-v2-3.3|3.4|4.2|4.3-content.json`
-  - Bank UI: `src/data/estudo-content-bank/v2-3.3|3.4|4.2|4.3.json`
-- [x] Estudo V2 study_notes polish — lote 1.1/1.5/1.6/1.7 (18/08/2026)
-  - Fonte: `v2/parts/part-v2-1.1|1.5|1.6|1.7-content.json`
-  - Bank UI: `src/data/estudo-content-bank/v2-1.1|1.5|1.6|1.7.json`
-  - Backup: `scripts/output/estudo_v2_content_before_polish/`
-  - Helper opcional: `node scripts/_sync_v2_estudo_bank_slice.mjs` (ou `gen-estudo-content.mjs` full)
-  - Backup: `scripts/output/estudo_v2_content_before_polish/`
+- [x] Estudo V1 study_notes polish — 18/08/2026 (todas as 31 parts)
+  - Fonte: `src/data/parts/part-*-content.json` → `node scripts/gen-estudo-content.mjs` → `estudo-content-bank/{1..6}.*.json`
+  - Estrutura: O que é · Quando usar/NÃO ou prova/TShoot · Exemplo · tech · Armadilhas · Ligação Simulado+Trilha CLI
+  - Backup: `scripts/output/estudo_v1_content_before_polish/` (31 arquivos)
+  - `1.4-drill` = prática só (sem content próprio); content didático = part `1.4`
+  - part_id estáveis; traditional/tickets curated / Trilha wiring intocados
 
 ### Bloqueios / Pendências
 - Env Stripe em produção já falhou uma vez (“link não configurado”)

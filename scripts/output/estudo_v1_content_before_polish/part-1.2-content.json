@@ -1,0 +1,131 @@
+{
+  "part_id": "1.2",
+  "title": "Dispositivos e topologias de rede",
+  "blueprint_module": "1.0",
+  "weight_percent": 20,
+  "topic_list": [
+    "Endpoints e hosts na borda da rede",
+    "Switch de camada 2: comutação por MAC e VLANs",
+    "Switch de camada 3: roteamento entre VLANs e SVIs",
+    "Access Point e infraestrutura wireless",
+    "Roteador: encaminhamento entre redes e WAN",
+    "Firewall, NGFW e IPS no caminho de segurança",
+    "Controllers (WLC e SDN) e gerenciamento centralizado",
+    "Topologia SOHO e rede de pequeno porte",
+    "Arquiteturas two-tier (collapsed core) e three-tier",
+    "Topologias WAN e conexão entre sites",
+    "Spine-leaf em data center",
+    "Modelos on-premises, cloud e híbridos"
+  ],
+  "study_notes": [
+    {
+      "heading": "Endpoints e papel na borda",
+      "bullets": [
+        "Endpoints (PCs, impressoras, câmeras, telefones IP, servidores, IoT) originam e consomem o tráfego da rede.",
+        "Em geral operam nas camadas superiores e usam IP/MAC fornecidos pela infraestrutura; não encaminham tráfego de terceiros como um switch ou roteador.",
+        "Na borda de acesso, conectam-se a switches (cabeado) ou a APs (sem fio).",
+        "Inventário e segmentação de endpoints (VLAN, ACL, 802.1X) são base de segurança e de design no CCNA."
+      ],
+      "exam_tips": [
+        "Se a questão fala em ‘origem/destino do fluxo do usuário’, pense em endpoint; se fala em ‘encaminhar entre portas/redes’, pense em switch/roteador."
+      ]
+    },
+    {
+      "heading": "Switches L2 e L3",
+      "bullets": [
+        "Switch L2 aprende endereços MAC, monta a tabela de endereços e encaminha quadros dentro da mesma VLAN/domínio de broadcast.",
+        "Segmenta colisões por porta e, com VLANs, cria domínios de broadcast lógicos separados.",
+        "Switch L3 (multilayer) mantém comutação L2 e adiciona roteamento: SVIs, rotas estáticas/dinâmicas e encaminhamento entre VLANs (inter-VLAN routing).",
+        "Inter-VLAN no L3 switch costuma ser mais eficiente que hairpin em roteador externo (router-on-a-stick) em redes médias/grandes.",
+        "Critério prático: mesmo IP network → comutação L2; redes diferentes → decisão de roteamento L3."
+      ],
+      "exam_tips": [
+        "‘Encaminha por MAC’ = L2. ‘Roteia entre VLANs / tem SVI e tabela de rotas’ = L3."
+      ]
+    },
+    {
+      "heading": "Access Point, WLC e rede sem fio",
+      "bullets": [
+        "O Access Point (AP) fornece o meio wireless (RF) e associa clientes Wi-Fi à infraestrutura cabeada.",
+        "Em modo autônomo o AP se gerencia sozinho; em modo lightweight/centralizado, a política e o controle ficam na Wireless LAN Controller (WLC).",
+        "A WLC centraliza SSIDs, autenticação, RF e roaming; os APs tratam o tráfego de rádio sob essa orquestração.",
+        "Do ponto de vista do cliente, o AP é o ponto de entrada L2 na WLAN; a saída para outras subnets ainda passa por gateway L3."
+      ],
+      "exam_tips": [
+        "Associe AP à borda de acesso wireless e WLC a controle centralizado — não confunda WLC com roteador de Internet."
+      ]
+    },
+    {
+      "heading": "Roteadores e borda WAN",
+      "bullets": [
+        "Roteadores encaminham pacotes entre redes IP distintas usando tabela de roteamento (rotas conectadas, estáticas ou dinâmicas).",
+        "Típicos em borda de LAN, entre VLANs (quando não há L3 switch), e na conexão com WAN/Internet/provedor.",
+        "Em cada hop o roteador reescreve o quadro L2 do próximo enlace e mantém o IP de L3 como referência de encaminhamento ponta a ponta (salvo NAT).",
+        "Recursos comuns na borda: NAT, ACLs, VPN, QoS e terminação de links WAN."
+      ],
+      "exam_tips": [
+        "Roteador = redes diferentes / próximo salto. Switch L2 = mesmo broadcast domain / MAC."
+      ]
+    },
+    {
+      "heading": "Firewall, NGFW e IPS",
+      "bullets": [
+        "Firewall tradicional filtra tráfego entre zonas (ex.: LAN, DMZ, WAN) com base em IP, porta e estado da conexão.",
+        "NGFW (Next-Generation Firewall) agrega inspeção de aplicação, identidade de usuário e, com frequência, funções de prevenção de ameaças.",
+        "IPS (Intrusion Prevention System) analisa o tráfego em busca de assinaturas/comportamentos maliciosos e pode bloquear em linha.",
+        "No design, firewall/NGFW costumam ficar no caminho entre redes de confiança diferentes; IPS pode ser integrado ao NGFW ou appliance dedicado.",
+        "Não substituem switch/roteador: complementam o encaminhamento com política de segurança."
+      ],
+      "exam_tips": [
+        "Filtragem por zona/política → firewall. Detecção/bloqueio de ataques em profundidade → IPS/NGFW."
+      ]
+    },
+    {
+      "heading": "Controllers e gerenciamento centralizado",
+      "bullets": [
+        "Controllers (WLC, controladores SDN/DNA Center em visão moderna) centralizam política, inventário e automação.",
+        "Separação comum: plano de controle/políticas no controller; plano de dados nos dispositivos de encaminhamento (switch, AP, roteador).",
+        "Benefícios: configuração consistente, visibilidade, templates e menor erro manual em escala.",
+        "No CCNA, o exemplo mais cobrado de controller de acesso é a WLC com APs lightweight."
+      ],
+      "exam_tips": [
+        "Se a pergunta cita ‘SSID único, roaming e RF centralizados’, a resposta aponta para WLC + APs, não para um único switch L2 isolado."
+      ]
+    },
+    {
+      "heading": "Topologias SOHO, two-tier e three-tier",
+      "bullets": [
+        "SOHO (Small Office/Home Office): poucos hosts, em geral um roteador/firewall all-in-one, switch de acesso e, opcionalmente, AP — simplicidade e baixo custo.",
+        "Two-tier (collapsed core): camadas de Access + Distribution/Core colapsadas; comum em campus médio, menos saltos e menor custo que three-tier.",
+        "Three-tier clássico de campus: Access (hosts/APs) → Distribution (agregação, políticas, L3) → Core (transporte de alta velocidade entre blocos).",
+        "Access conecta endpoints; Distribution agrega e aplica política; Core prioriza velocidade e disponibilidade entre módulos.",
+        "Escolha two-tier vs three-tier depende de escala, crescimento e necessidade de separar core de distribuição."
+      ],
+      "exam_tips": [
+        "Memorize a função de cada tier: Access = borda; Distribution = agregação/política; Core = backbone."
+      ]
+    },
+    {
+      "heading": "WAN, spine-leaf e on-prem/cloud",
+      "bullets": [
+        "WAN interliga sites geograficamente separados (filiais, DC, nuvem) via provedor, MPLS, Internet+VPN, links dedicados etc.",
+        "Na WAN, a borda costuma usar roteadores/firewalls; a LAN interna continua com switches/APs.",
+        "Spine-leaf (data center): leafs conectam servidores e sobem para todos os spines; spines não conectam servers entre si — fabric com paths previsíveis e leste-oeste eficiente.",
+        "On-premises: infraestrutura na empresa; cloud: recursos no provedor; híbrido: combinação com conectividade segura entre ambos.",
+        "Do ponto de vista de design CCNA, reconheça onde cada topologia se aplica (campus vs DC vs WAN vs nuvem) e quais dispositivos dominam cada papel."
+      ],
+      "exam_tips": [
+        "Spine-leaf = DC/east-west. Three-tier = campus. SOHO = pequeno porte. Cloud/híbrido = onde rodam as cargas, não ‘substitui’ o conceito de switch de acesso local."
+      ]
+    }
+  ],
+  "key_commands": [],
+  "must_know": [
+    "Switch L2 encaminha por MAC na mesma VLAN; roteador e switch L3 encaminham entre redes IP diferentes.",
+    "AP oferece acesso wireless; WLC centraliza controle de APs lightweight (SSID, RF, políticas).",
+    "Firewall/NGFW aplicam política entre zonas; IPS previne/bloqueia ameaças no tráfego.",
+    "Three-tier: Access → Distribution → Core; two-tier colapsa Core+Distribution.",
+    "Spine-leaf é topologia típica de data center com leafs conectados a todos os spines.",
+    "SOHO usa design simples all-in-one; WAN interliga sites remotos; cloud/híbrido descreve onde a carga e a infraestrutura residem."
+  ]
+}

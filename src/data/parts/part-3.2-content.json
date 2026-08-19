@@ -19,98 +19,80 @@
   ],
   "study_notes": [
     {
-      "heading": "Inter-VLAN: o problema e a solução L3",
+      "heading": "O que é inter-VLAN (ROAS e SVI)",
       "bullets": [
-        "Hosts na mesma VLAN comunicam por switching L2; VLANs diferentes são broadcast domains separados.",
-        "Para IP entre VLANs é obrigatório um gateway L3 (roteador ou switch multilayer) com interface em cada VLAN.",
-        "O default gateway do host deve ser o IP da interface L3 da sua VLAN (SVI ou subinterface ROAS).",
-        "Sem rota entre as redes das VLANs (connected nas interfaces L3 ou rotas adicionais), o tráfego inter-VLAN não completa.",
-        "Dois desenhos clássicos CCNA: router-on-a-stick (ROAS) e inter-VLAN em L3 switch (SVI)."
+        "Hosts na mesma VLAN falam em L2; VLANs diferentes são broadcast domains separados — IP entre elas exige gateway L3.",
+        "ROAS (router-on-a-stick): um trunk físico até o roteador + subinterfaces com encapsulation dot1Q <vlan> e IP da subnet.",
+        "SVI: interface Vlan <id> no switch multilayer com IP — gateway virtual daquela VLAN; exige ip routing para encaminhar entre SVIs.",
+        "Gateway do host = IP da SVI ou da subinterface da SUA VLAN — nunca o IP de outra VLAN."
       ],
       "exam_tips": [
-        "Mesma VLAN → L2. VLANs diferentes → precisa de L3 (ROAS ou SVI)."
+        "Mesma VLAN → L2. VLANs diferentes → ROAS ou SVI (L3)."
       ]
     },
     {
-      "heading": "Router-on-a-stick (ROAS)",
+      "heading": "Quando usar / quando NÃO (prova e TShoot)",
       "bullets": [
-        "Um link físico trunk do switch ao roteador carrega várias VLANs; no roteador usam-se subinterfaces lógicas.",
-        "Cada subinterface representa uma VLAN: encapsulation dot1Q <vlan-id> e ip address da subnet dessa VLAN.",
-        "A interface física costuma ficar sem IP (no ip address) e no shutdown removido; o trabalho é nas subinterfaces.",
-        "Native VLAN no ROAS: encapsulation dot1Q <id> native na subinterface correspondente (ou tráfego untagged na física, conforme design).",
-        "O switch deve ter a porta para o roteador em trunk, com as VLANs no allowed e native alinhada à do roteador.",
-        "Falhas clássicas: esquecer encapsulation (subinterface “não roteia” a VLAN), VLAN fora do allowed, native mismatch, subinterface administratively down."
+        "Use ROAS com poucas VLANs e um roteador único (lab/filial simples); gargalo = um link e CPU do roteador.",
+        "Use SVI + ip routing em campus/distribution multilayer quando o inter-VLAN deve rodar no hardware do L3 switch.",
+        "Use routed port (no switchport + IP) em uplink L3 p2p entre cores — não como “gateway de muitos PCs”.",
+        "NÃO omita encapsulation dot1Q na subinterface — sem ela o ROAS não associa a VLAN.",
+        "NÃO espere SVI up/up sem VLAN existente, no shutdown e porta/trunk ativo transportando a VLAN.",
+        "NÃO deixe ip routing off no L3 switch se a prova pede encaminhamento entre SVIs."
       ],
       "exam_tips": [
-        "ROAS = 1 cabo trunk + N subinterfaces dot1Q. Sem encapsulation, a subinterface não associa a VLAN."
+        "Ping gateway local falha → L2/SVI/subif/trunk antes de culpar rota remota."
       ]
     },
     {
-      "heading": "SVI no switch L3 (multilayer)",
+      "heading": "Exemplo concreto (lab Configure)",
       "bullets": [
-        "SVI (Switched Virtual Interface): interface Vlan <id> com endereço IP — gateway daquela VLAN no switch.",
-        "Passos típicos: criar VLAN, colocar portas access, interface Vlan X → ip address → no shutdown, e ip routing global.",
-        "A SVI fica up/up quando: a VLAN existe, a interface Vlan não está shutdown, e há pelo menos uma porta up naquela VLAN (ou trunk que transporte a VLAN, conforme plataforma/regras).",
-        "Sem porta ativa na VLAN, a SVI frequentemente fica up/down (line protocol down) — sintoma clássico de prova.",
-        "ip routing desabilitado: o switch comuta L2, mas não encaminha entre SVIs como roteador.",
-        "show ip route deve listar as redes connected das SVIs quando o roteamento está ativo e as SVIs up."
+        "VLANs 10 (10.10.10.0/24) e 20 (10.10.20.0/24); hosts com gateway .1 da própria VLAN.",
+        "ROAS: Gi0/0 no roteador sobe; Gi0/0.10 encapsulation dot1Q 10 + 10.10.10.1/24; Gi0/0.20 dot1Q 20 + 10.10.20.1/24; switch: trunk allowed 10,20.",
+        "SVI: vlan 10/20; interface Vlan10/Vlan20 com os .1; ip routing; portas access nas VLANs corretas.",
+        "Verify: show ip interface brief (subif/SVI up/up), show interfaces trunk, show vlan brief, show ip route (C das subnets), ping gateway → ping outra VLAN."
       ],
       "exam_tips": [
-        "SVI down? VLAN existe? no shutdown? Há porta up na VLAN / trunk carregando a VLAN?"
+        "Ordem: VLAN/trunk → interface L3 up → ip routing (L3 SW) → C na tabela → ping."
       ]
     },
     {
-      "heading": "Routed port vs SVI",
+      "heading": "ROAS, SVI, trunk e routed port",
       "bullets": [
-        "Routed port: no switchport na interface física + ip address — porta vira L3 pura (sem VLAN membership de access).",
-        "Útil em links ponto a ponto entre L3 switches ou para uplink L3 sem trunk de várias VLANs naquela porta.",
-        "SVI serve redes de acesso (muitas portas L2 na mesma VLAN compartilham o mesmo gateway virtual).",
-        "Não confunda: porta access com IP não é o modelo; ou é SVI (Vlan X) ou routed (no switchport).",
-        "ROAS usa subinterfaces no roteador; no L3 switch o equivalente multi-VLAN de acesso é SVI + trunk entre switches, não “subinterface” em access ports."
+        "ROAS: física sem IP; trabalho nas subinterfaces; native com encapsulation … native alinhada ao switch; allowed deve incluir as VLANs.",
+        "SVI up/down clássico: VLAN sem porta ativa (ou trunk que a carregue) — line protocol down.",
+        "ip routing desabilitado: switch comuta L2; SVIs podem ter IP, mas não roteiam entre VLANs.",
+        "Routed port = no switchport + ip address (L3 puro). SVI = muitos access ports compartilhando o mesmo gateway virtual.",
+        "Native mismatch e VLAN fora do allowed quebram ROAS mesmo com IPs “certos” no papel."
       ],
       "exam_tips": [
-        "Muitos PCs na VLAN 10 → SVI Vlan10. Link L3 dedicado entre cores → often no switchport."
+        "show interfaces trunk + show ip interface brief resolvem a maioria dos inter-VLAN “mortos”."
       ]
     },
     {
-      "heading": "Trunk, allowed e native no caminho do ROAS/SVI",
+      "heading": "Armadilhas comuns da prova",
       "bullets": [
-        "ROAS exige trunk no switch em direção ao roteador; VLANs das subinterfaces devem estar no allowed.",
-        "Native VLAN deve ser a mesma nos dois lados; mismatch quebra untagged e confunde o ROAS nativo.",
-        "Entre L3 switches, trunks transportam VLANs de usuário; o gateway pode ser SVI local (distribuição) em cada VLAN.",
-        "show interfaces trunk e show vlan brief validam se a VLAN “existe” e se o uplink a carrega.",
-        "VLAN inexistente no switch: porta access não associa corretamente e SVI/ROAS daquela tag não tem L2 saudável."
+        "Subinterface sem encapsulation dot1Q.",
+        "Host com gateway da VLAN vizinha.",
+        "SVI up/down por falta de porta na VLAN e culpar “IP errado”.",
+        "L3 switch sem ip routing.",
+        "Trunk allowed sem a VLAN do ROAS; native desalinhada.",
+        "Confundir porta access com IP e routed port/SVI — modelos diferentes."
       ],
       "exam_tips": [
-        "Inter-VLAN “morto” com IPs certos: cheque trunk allowed + native + status da SVI/subinterface."
+        "Antes do gabarito: encapsulation? SVI up/up? ip routing? allowed/native? gateway = SVI/subif da VLAN do host?"
       ]
     },
     {
-      "heading": "ROAS vs SVI: escolha de design",
+      "heading": "Ligação com Simulado e Trilha CLI",
       "bullets": [
-        "ROAS: barato e simples com um roteador e poucas VLANs; gargalo = um único link físico e CPU do roteador.",
-        "SVI em L3 switch: escala melhor no campus (inter-VLAN no hardware do switch), típico em distribution multilayer.",
-        "Routed ports: topologia L3 entre blocos sem precisar de VLAN de usuário naquele enlace.",
-        "Prova gosta de: “qual interface é o gateway?” → IP da SVI ou da subinterface da VLAN do host.",
-        "Migrar de ROAS para SVI: hosts mantêm gateway conceitualmente, mas o next-hop passa a ser a SVI do L3 switch."
+        "No Estudo, fixe: ROAS = trunk + dot1Q; SVI = Vlan X + ip routing; gateway = interface L3 da VLAN do host.",
+        "No Simulado V1, espere outputs de show vlan / trunk / ip interface brief e stems de inter-VLAN falho.",
+        "Na Trilha CLI, o sintoma (PC não fala com outra VLAN) + CLI deve apontar encapsulation, SVI down, allowed ou routing off — correção mínima.",
+        "Comandos âncora: encapsulation dot1Q, interface Vlan, ip routing, no switchport, show interfaces trunk, show vlan brief."
       ],
       "exam_tips": [
-        "Poucas VLANs + roteador único → ROAS. Campus com multilayer → SVI + ip routing."
-      ]
-    },
-    {
-      "heading": "Verificação e troubleshooting",
-      "bullets": [
-        "show ip interface brief: subinterfaces e SVIs up/up?",
-        "show run | section interface: encapsulation, ip address, no switchport, shutdown.",
-        "show interfaces trunk: allowed e native do link ROAS ou entre switches.",
-        "show vlan brief: VLAN criada e portas access corretas.",
-        "show ip route: redes das VLANs como connected (C) quando L3 está ok.",
-        "Host: mesmo IP/máscara/gateway da VLAN; ping ao gateway antes do inter-VLAN.",
-        "Ordem mental: L2 (VLAN/trunk) → interface L3 up → ip routing → rotas connected → ping gateway → ping outra VLAN."
-      ],
-      "exam_tips": [
-        "SVI up/down sem porta na VLAN. Subinterface sem dot1Q. L3 switch sem ip routing. Allowed sem a VLAN do ROAS."
+        "Ordem: notas → marcar lido → praticar → tickets inter-VLAN na Trilha → Simulado."
       ]
     }
   ],

@@ -19,100 +19,77 @@
   ],
   "study_notes": [
     {
-      "heading": "O que é uma API no CCNA",
+      "heading": "O que é API REST no CCNA",
       "bullets": [
-        "API (Application Programming Interface) é um contrato: o cliente pede operações e o servidor responde de forma previsível.",
-        "Em redes programáveis, orquestradores, scripts e portais usam APIs em vez de apenas CLI humana.",
-        "A API esconde detalhes internos e expõe recursos (devices, interfaces, clientes, policies).",
-        "Northbound no modelo SDN: aplicações falam com o controller via API (muito frequentemente REST/HTTP).",
-        "Southbound: o controller fala com os devices (APIs de device ou protocolos) — revisão breve da 6.1."
+        "API é contrato máquina–máquina: cliente pede, servidor responde de forma previsível.",
+        "REST no exame = HTTP + recursos (URI) + verbos + status (+ JSON no body, detalhe em 6.3).",
+        "Northbound típico: apps/orquestração → controller via REST; southbound: controller → devices (revisão 6.1)."
       ],
       "exam_tips": [
-        "API = contrato máquina–máquina. REST no exame = HTTP + recursos + verbos + status."
+        "Ver verbo + URI + status antes de culpar a rede do usuário."
       ]
     },
     {
-      "heading": "REST em uma frase de prova",
+      "heading": "Quando usar / o que a prova espera vs lab profundo",
       "bullets": [
-        "REST (Representational State Transfer) é um estilo de API que usa HTTP para operar sobre recursos identificados por URI/URL.",
-        "Cliente envia método HTTP + caminho do recurso (+ headers/body); servidor responde com status e representação (muitas vezes JSON).",
-        "Stateless (ideia): cada request carrega o necessário (ex.: token de auth); o servidor não depende de sessão CLI.",
-        "Não é obrigatório decorar todas as constraints acadêmicas de REST — foque HTTP, recursos e CRUD.",
-        "Northbound de controllers Cisco/DNA no discurso CCNA é o exemplo clássico de REST API."
+        "Espera: mapear CRUD ↔ GET/POST/PUT/PATCH/DELETE; reconhecer 200/201/400/401/403/404/500; Basic vs token.",
+        "Espera: distinguir 401 (auth) de 403 (authz) de 404 (recurso) de timeout/503 (API/controller).",
+        "NÃO exige escrever cliente completo, OAuth avançado nem OpenAPI spec.",
+        "NÃO confunda REST northbound do controller com “cabo do access down”.",
+        "NÃO use GET mentalmente para criar recurso se o stem pede Create → POST."
       ],
       "exam_tips": [
-        "Ver verbo + URI + status code antes de culpar “a rede do usuário”."
+        "Listar inventário → GET; criar policy → POST; apagar → DELETE."
       ]
     },
     {
-      "heading": "Recursos, URI e representação",
+      "heading": "Exemplo concreto",
       "bullets": [
-        "Recurso: entidade da API (ex.: /network-device, /interface, /wlan).",
-        "URI/URL: endereço do recurso (https://controller.lab/api/v1/network-device/1).",
-        "Representação: como o recurso é serializado no body — JSON é o mais cobrado no módulo 6.",
-        "Path errado → 404; host/porta errados → timeout ou conexão recusada.",
-        "Versionamento (/v1/, /dna/intent/api/v1/) aparece em exemplos reais de controller."
+        "GET https://controller/api/v1/network-device → 200 + lista JSON (Read).",
+        "POST com body de policy → 201 Created; JSON inválido → 400; sem token → 401; token sem role → 403.",
+        "URI /network-device/999 inexistente → 404; controller overloaded → 503/timeout.",
+        "curl -i mostra status line + headers — essencial para classificar o eixo da falha."
       ],
       "exam_tips": [
-        "404 = recurso/caminho não encontrado; não é o mesmo que senha errada (401)."
+        "401 = quem é você?; 403 = você não pode; 404 = isso não existe; 5xx = servidor."
       ]
     },
     {
-      "heading": "Verbos HTTP e CRUD",
+      "heading": "Recursos, verbos, status e auth",
       "bullets": [
-        "GET: ler/listar recurso (Read) — não deve alterar estado por design.",
-        "POST: criar recurso ou disparar ação (Create / operação).",
-        "PUT: substituir/atualizar recurso de forma completa (Update full — ideia).",
-        "PATCH: atualização parcial (Update parcial — ideia).",
-        "DELETE: remover recurso (Delete).",
-        "Erro clássico: usar GET onde a API exige POST (ou o inverso) → 405 Method Not Allowed ou efeito colateral inesperado se mal implementado; no exame, foque o mapeamento CRUD correto."
+        "Recurso identificado por URI; representação típica = JSON.",
+        "GET=Read; POST≈Create; PUT≈Update full; PATCH≈Update parcial; DELETE=Delete.",
+        "2xx sucesso; 4xx erro do cliente; 5xx erro do servidor.",
+        "Basic (user/pass, use HTTPS) e Bearer token; token expirado → 401.",
+        "Path/host/porta errados: 404 ou timeout — não misture com data plane do user."
       ],
       "exam_tips": [
-        "Listar inventário → GET. Criar policy → POST. Apagar device do inventário → DELETE."
+        "Ordem de TShoot API: reachability → auth → método/URI → payload → lógica do body."
       ]
     },
     {
-      "heading": "Códigos de status que a prova reconhece",
+      "heading": "Armadilhas comuns",
       "bullets": [
-        "200 OK: sucesso genérico (ex.: GET com body).",
-        "201 Created: recurso criado com sucesso (tipicamente POST).",
-        "400 Bad Request: pedido malformado (JSON inválido, campos faltando).",
-        "401 Unauthorized: falha de autenticação (sem credencial/token inválido).",
-        "403 Forbidden: autenticado, mas sem permissão (autorização).",
-        "404 Not Found: URI/recurso inexistente.",
-        "500 Internal Server Error: falha no servidor da API.",
-        "Timeout / 503: serviço indisponível ou sobrecarregado — eixo de disponibilidade do controller/API gateway."
+        "Tratar 404 como “senha errada” (401) ou “sem permissão” (403).",
+        "Culpar southbound device offline por 401 no portal de orquestração.",
+        "Ignorar o body quando status é 200 (sucesso HTTP, lógica de app errada).",
+        "Decorar constraints acadêmicas de REST em vez de HTTP+CRUD+status.",
+        "Achar que JSON “é assunto só de 6.3” e não ler o preview de payload aqui."
       ],
       "exam_tips": [
-        "401 = quem é você?; 403 = você não pode; 404 = isso não existe; 5xx = lado servidor."
+        "Timeout/503 = disponibilidade da API; 404 = URI/recurso — eixos diferentes."
       ]
     },
     {
-      "heading": "Autenticação de API e JSON (preview)",
+      "heading": "Ligação com Simulado e Trilha",
       "bullets": [
-        "Basic Auth: usuário/senha (muitas vezes Base64 no header Authorization) — conceito; use HTTPS.",
-        "Token/Bearer: cliente autentica uma vez e reutiliza token nas requests seguintes.",
-        "Token expirado ou ausente → 401; token válido sem role → 403.",
-        "JSON: pares chave–valor e listas; payload típico de REST no CCNA (detalhe de sintaxe em 6.4).",
-        "200 com body vazio ou campos inesperados pode ser sucesso técnico com lógica de app errada — leia o body, não só o status."
+        "No Estudo, fixe: northbound REST, CRUD↔verbos, status 401/403/404/5xx, token/Basic.",
+        "No Simulado, espere stems “qual verbo/status” e isolamento northbound vs data plane — conceitual, sem lab Postman profundo.",
+        "Na Trilha (ticket + CLI), ping/curl ao controller e leitura de status line reforçam o mesmo raciocínio; shows de device confirmam underlay.",
+        "Segue em 6.3 para ler o JSON do body com o status que você já classifica aqui."
       ],
       "exam_tips": [
-        "curl -i mostra status line + headers; essencial para tickets de API."
-      ]
-    },
-    {
-      "heading": "Checklist de falha northbound REST",
-      "bullets": [
-        "1) URL/host/porta corretos? TLS?",
-        "2) Método HTTP correto para a operação (GET vs POST…)?",
-        "3) Header Authorization presente e válido?",
-        "4) Status: 401/403/404/4xx/5xx/timeout — classifique o eixo.",
-        "5) Body JSON válido e campos exigidos pela API?",
-        "6) Controller/API up (503) vs recurso inexistente (404) vs rede do usuário (data plane).",
-        "7) Não misture southbound device offline com 401 no portal de orquestração."
-      ],
-      "exam_tips": [
-        "Ordem: reachability da API → auth → método/URI → payload → lógica do body."
+        "Jornada: 6.1 (north/south) → 6.2 (HTTP) → 6.3 (JSON)."
       ]
     }
   ],
@@ -134,7 +111,7 @@
     "CRUD: Create≈POST, Read≈GET, Update≈PUT/PATCH, Delete≈DELETE.",
     "200/201 = sucesso; 401 auth; 403 authz; 404 recurso; 400 pedido inválido; 500 erro servidor.",
     "Token/Basic autenticam a API; ausência/expiração → 401; sem permissão → 403.",
-    "JSON é o formato de payload mais citado no módulo 6 (preview antes de 6.4).",
+    "JSON é o formato de payload mais citado no módulo 6 (detalhe de sintaxe em 6.3).",
     "Timeout/503 = disponibilidade da API/controller; não confunda com 404 de URI errada."
   ]
 }

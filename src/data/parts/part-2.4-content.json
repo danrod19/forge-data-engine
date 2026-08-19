@@ -21,101 +21,94 @@
     {
       "heading": "O que é EtherChannel / Port-Channel",
       "bullets": [
-        "EtherChannel agrega múltiplos links físicos Ethernet em um único link lógico (Port-Channel / Po).",
-        "Do ponto de vista de STP e da maioria das decisões de encaminhamento, o bundle conta como uma interface lógica.",
-        "Benefícios: mais throughput agregado, redundância se um membro cair, e menos topologia STP “emaranhada” entre os mesmos switches.",
-        "Membros continuam sendo cabos/portas reais; o Po é a interface lógica onde se aplica config comum (ex.: trunk).",
-        "Sem alinhamento de parâmetros nos membros, o bundle não sobe ou sobe incompleto."
+        "EtherChannel agrega vários links físicos Ethernet em um único link lógico (Port-Channel / Po).",
+        "No CCNA (módulo 2), STP e o encaminhamento “enxergam” o Po — não N caminhos paralelos soltos entre os mesmos switches.",
+        "Benefícios: mais throughput agregado, redundância se um membro cair, topologia STP mais limpa.",
+        "Membros = portas/cabos reais; o Po recebe a config lógica compartilhada (ex.: trunk). Sem alinhamento L2, o bundle não sobe ou sobe incompleto."
       ],
       "exam_tips": [
-        "Pense: N links físicos → 1 Port-Channel lógico. STP vê o Po, não N caminhos paralelos “soltos”."
+        "N físicos → 1 Port-Channel lógico. STP conta o Po, não cada membro como path separado saudável."
       ]
     },
     {
-      "heading": "LACP vs PAgP vs on",
+      "heading": "Quando usar / quando NÃO (prova e TShoot)",
       "bullets": [
-        "LACP (IEEE 802.3ad/802.1AX): padrão multivendor. Modes: active (inicia negociação) e passive (responde).",
-        "PAgP: proprietário Cisco. Modes: desirable (inicia) e auto (espera).",
-        "Modo on: força o bundle sem protocolo de negociação — os dois lados precisam estar on e compatíveis.",
-        "LACP forma canal com active-active ou active-passive; passive-passive não inicia.",
-        "PAgP forma com desirable-desirable ou desirable-auto; auto-auto não inicia.",
-        "on de um lado e LACP/PAgP do outro costuma falhar: um espera frames de protocolo, o outro não negocia da mesma forma.",
-        "Em redes mistas (Cisco + outro vendor), prefira LACP — não PAgP."
-      ],
-      "exam_tips": [
-        "Memorize pares que funcionam: LACP active+active/passive; PAgP desirable+desirable/auto; on+on. Evite on+active."
-      ]
-    },
-    {
-      "heading": "Requisitos para o bundle formar",
-      "bullets": [
-        "Mesma velocidade e duplex em todos os membros (e coerente com o remoto).",
-        "Mesmo modo de switchport: todos access na mesma VLAN ou todos trunk.",
-        "Em trunk: native VLAN, allowed list e encapsulamento alinhados entre membros e entre peers.",
-        "Mesmas configs “sensíveis”: MTU, (em muitos casos) mesma allowed, sem misturar access com trunk no mesmo channel-group.",
-        "channel-group <n> mode <modo> em cada membro; a interface Port-channel <n> recebe a config lógica compartilhada.",
-        "Ordem prática: alinhe L2 dos membros → depois channel-group → confira show etherchannel summary."
-      ],
-      "exam_tips": [
-        "Bundle down? Checklist: mode, speed/duplex, access/trunk, native/allowed, e se o channel-group é o mesmo ID nos membros."
-      ]
-    },
-    {
-      "heading": "Load-balancing (hash) — visão CCNA",
-      "bullets": [
-        "O tráfego é distribuído entre membros por um algoritmo de hash (não é round-robin perfeito por pacote em todos os casos de fluxo).",
-        "Critérios comuns: src-mac, dst-mac, src-dst-mac, src-ip, dst-ip, src-dst-ip (e variações por plataforma).",
-        "Fluxos com o mesmo hash caem no mesmo membro físico — por isso um único “elephant flow” pode saturar um link enquanto outros membros ociosos.",
-        "show etherchannel load-balance mostra o método global (ou por contexto da plataforma).",
-        "Ajustar o método pode melhorar distribuição (ex.: IP em L3-heavy, MAC em L2-heavy), mas não “cura” modes errados.",
-        "Assimetria de carga ≠ bundle quebrado: primeiro confirme se todos os membros estão no Po (P para bundled)."
-      ],
-      "exam_tips": [
-        "Um fluxo TCP grande pode parecer “load-balance ruim” e ainda assim o EtherChannel estar saudável."
-      ]
-    },
-    {
-      "heading": "Comandos e leitura de status",
-      "bullets": [
-        "interface Port-channel <n> — interface lógica do bundle.",
-        "channel-group <n> mode active|passive|desirable|auto|on — nos físicos.",
-        "show etherchannel summary — visão rápida: Po up/down, flags dos membros (P=in port-channel, I=stand-alone, etc. conforme plataforma).",
-        "show etherchannel port-channel / show interfaces port-channel <n> — detalhe do lógico e membros.",
-        "show etherchannel load-balance — método de hash.",
-        "show interfaces trunk nos membros — detecta mismatch de trunk/allowed/native entre links do mesmo grupo.",
-        "Protocolo na summary (LACP/PAgP/- ) ajuda a ver se a negociação é a esperada."
-      ],
-      "exam_tips": [
-        "summary primeiro: Po existe? quantos ports em P? protocol LACP ou PAgP ou none?"
-      ]
-    },
-    {
-      "heading": "Troubleshooting clássico",
-      "bullets": [
-        "Bundle não sobe: modes incompatíveis (auto+auto, passive+passive, on+active).",
-        "Só um membro no Po: outro link com mismatch de speed/duplex/VLAN/trunk ou cabo; o parceiro rejeita o membro.",
-        "Po up com 1 de 4 links: capacidade e HA reduzidas — trate como falha parcial, não “ok total”.",
-        "Config divergente: um membro access e outro trunk no mesmo channel-group.",
-        "Allowed/native diferentes entre membros do mesmo lado ou entre peers — LACP/PAgP podem suspender o membro.",
-        "Após corrigir mode, confira se a config do Port-channel (trunk) está no Po e herdada/consistente nos membros.",
-        "STP: com bundle saudável, um único custo lógico; se membros ficam standalone, STP pode ver múltiplos paths de novo."
-      ],
-      "exam_tips": [
-        "Sintoma “ EtherChannel flapping / suspended ” → compare show etherchannel summary + switchport/trunk de CADA membro."
-      ]
-    },
-    {
-      "heading": "Design e armadilhas de prova",
-      "bullets": [
-        "Prefira LACP active em ambos os lados em ambientes modernos e multi-vendor.",
-        "on+on funciona, mas sem detecção inteligente de falha de “negociação”; use com disciplina de config idêntica.",
-        "Não misture PAgP com equipamento não-Cisco esperando interoperabilidade.",
-        "Número do channel-group deve ser o mesmo nos membros locais; o peer usa o mesmo conceito de grupo no seu lado.",
-        "Load-balance assimétrico com todos em P ainda pode ser normal para poucos fluxos grandes.",
-        "EtherChannel não substitui o alinhamento de VLAN/trunk — ele depende dele."
+        "Use EtherChannel quando quiser agregar uplinks switch–switch (ou WLC↔switch) com mais banda e HA sem multiplicar paths STP.",
+        "Prefira LACP (active) em ambientes modernos e multi-vendor; PAgP só no ecossistema Cisco compatível.",
+        "Use mode on+on só com disciplina de config idêntica — não há negociação inteligente de protocolo.",
+        "NÃO misture on de um lado com LACP/PAgP do outro esperando bundle estável.",
+        "NÃO misture access com trunk (nem native/allowed divergentes) nos membros do mesmo channel-group.",
+        "NÃO trate load-balance assimétrico com todos em P como “bundle quebrado” sem antes ver a summary."
       ],
       "exam_tips": [
         "Pergunta “por que não formou?”: 80% mode ou mismatch L2; 20% cabo/speed."
+      ]
+    },
+    {
+      "heading": "Exemplo concreto",
+      "bullets": [
+        "SW1↔SW2: Gi1/0/1 e Gi1/0/2 no channel-group 1 mode active (LACP) dos dois lados; interface Port-channel1 em trunk (native 99, allowed 10,20,99).",
+        "Resultado: Po1 up com 2 membros em P; STP vê um path lógico; se Gi1/0/2 cair, o Po continua com 1 membro.",
+        "Falha de lab: SW1 active e SW2 on → bundle não forma como esperado; ou SW2 Gi1/0/2 ainda access VLAN 10 enquanto o outro é trunk → membro suspenso/standalone.",
+        "Verify: show etherchannel summary (Po, flags P, protocol LACP); show interfaces trunk / switchport em cada membro e no Po."
+      ],
+      "exam_tips": [
+        "summary primeiro: Po existe? quantos ports em P? protocol LACP, PAgP ou none?"
+      ]
+    },
+    {
+      "heading": "LACP vs PAgP vs on + requisitos",
+      "bullets": [
+        "LACP (IEEE): active inicia, passive responde — forma com active+active ou active+passive; passive+passive não inicia.",
+        "PAgP (Cisco): desirable inicia, auto espera — forma com desirable+desirable ou desirable+auto; auto+auto não inicia.",
+        "on: estático, sem negociação — on+on; on+LACP/PAgP em geral falha.",
+        "Requisitos: mesma speed/duplex; todos access na mesma VLAN ou todos trunk; native/allowed/MTU alinhados; mesmo channel-group ID nos membros locais.",
+        "Ordem prática: alinhe L2 dos membros → channel-group → confira show etherchannel summary.",
+        "Config lógica (trunk etc.) no Port-channel; mantenha membros consistentes."
+      ],
+      "exam_tips": [
+        "Pares OK: LACP active+active/passive; PAgP desirable+desirable/auto; on+on. Evite on+active e passive+passive."
+      ]
+    },
+    {
+      "heading": "Load-balance, status e TShoot",
+      "bullets": [
+        "Distribuição por hash de fluxo (src/dst MAC/IP…): mesmo hash → mesmo membro; um elephant flow pode saturar um link com outros ociosos.",
+        "show etherchannel load-balance mostra o método; assimetria ≠ Po down se todos estão em P.",
+        "show etherchannel summary / port-channel / show interfaces port-channel <n>: Po up/down, membros, protocolo.",
+        "Bundle parcial (1 de 4 em P): HA e capacidade reduzidas — trate como falha parcial.",
+        "Membro rejected/suspended: mismatch speed/duplex/VLAN/trunk/allowed/native ou cabo; compare CADA membro.",
+        "Se membros viram standalone, STP pode voltar a ver múltiplos paths — o bundle deixou de “unificar” a topologia."
+      ],
+      "exam_tips": [
+        "Um fluxo TCP grande pode parecer “LB ruim” com EtherChannel saudável."
+      ]
+    },
+    {
+      "heading": "Armadilhas comuns",
+      "bullets": [
+        "auto+auto ou passive+passive e achar que “LACP/PAgP está ligado”.",
+        "on de um lado e active do outro.",
+        "PAgP contra equipamento não-Cisco esperando interoperabilidade — use LACP.",
+        "channel-group OK mas native/allowed diferentes entre membros.",
+        "Po up com 1 membro e dar como “redundância ok”.",
+        "Achar que EtherChannel substitui alinhar VLAN/trunk — ele depende disso.",
+        "Culpar hash sem confirmar flags P na summary."
+      ],
+      "exam_tips": [
+        "Sintoma suspended/flapping → summary + switchport/trunk de cada membro, um a um."
+      ]
+    },
+    {
+      "heading": "Ligação com Simulado e Trilha (CLI)",
+      "bullets": [
+        "No Estudo, memorize pares de mode que formam/falham e o checklist L2 dos membros.",
+        "No Simulado V1, espere show etherchannel summary com Po down, 1 membro em P, ou protocol inesperado.",
+        "Na Trilha (tickets CLI), isole mode e mismatch de trunk/VLAN antes de culpar STP “por bloquear demais” ou cabo em todos os links.",
+        "Comandos âncora: channel-group <n> mode …, show etherchannel summary, show etherchannel load-balance, show interfaces trunk."
+      ],
+      "exam_tips": [
+        "Ordem: notas → marcar lido → praticar → cruzar com 2.2 (trunk) e 2.3 (STP vê o Po) na Trilha."
       ]
     }
   ],

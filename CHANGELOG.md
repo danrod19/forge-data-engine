@@ -4,6 +4,12 @@
 
 ## Entradas Recentes
 
+- **2026-08-18** — Estudo V1 study_notes polish — 18/08/2026
+  - Polidas as 31 `src/data/parts/part-*-content.json` (módulos 1–6; O que é · Quando usar/NÃO ou prova/TShoot · Exemplo · tech · Armadilhas · Ligação Simulado+Trilha CLI)
+  - Regen: `node scripts/gen-estudo-content.mjs` → `src/data/estudo-content-bank/{1..6}.*.json` + `estudo-content.ts`
+  - Backup: `scripts/output/estudo_v1_content_before_polish/` (31 arquivos)
+  - `1.4-drill` sem content próprio (prática); part_id estáveis; traditional/tickets curated intocados
+
 - **2026-08-18** — Estudo V2 study_notes polish — 18/08/2026
   - Polidas as 17 `v2/parts/part-v2-*-content.json` (O que é · Quando usar/NÃO ou prova/TShoot · Exemplo · tech · Armadilhas · Ligação Simulado+Trilha CLI)
   - Regen: `node scripts/gen-estudo-content.mjs` → `src/data/estudo-content-bank/v2-*.json` + `estudo-content.ts`

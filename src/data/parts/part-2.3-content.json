@@ -19,102 +19,95 @@
   ],
   "study_notes": [
     {
-      "heading": "Por que Spanning Tree existe",
+      "heading": "O que é STP / RSTP",
       "bullets": [
-        "Redundância L2 (dois uplinks entre switches) cria loops: broadcast e unknown unicast podem circular sem fim (broadcast storm).",
-        "STP/RSTP constroem uma topologia lógica em árvore: um caminho ativo e caminhos redundantes em standby (bloqueados).",
-        "Sem STP, a tabela MAC fica instável (flapping) e a rede pode colapsar por saturação de CPU e links.",
-        "O objetivo da prova: explicar por que uma porta está blocking e quem é o Root Bridge da instância.",
-        "STP atua no domínio L2 (por VLAN/instance no modelo Cisco comum de estudo — PVST+ / Rapid-PVST)."
+        "Spanning Tree evita loops L2 quando há caminhos redundantes: constrói uma árvore lógica (um path ativo, outros em standby bloqueado).",
+        "No CCNA (módulo 2), foque Root Bridge (menor BID), papéis de porta (RP/DP/Alternate), estados e PortFast + BPDU Guard na edge.",
+        "Sem STP: broadcast/unknown unicast em loop (storm), MAC flapping e saturação de CPU/links.",
+        "RSTP (802.1w) converge bem mais rápido que STP clássico (802.1D); em Cisco de estudo é comum Rapid-PVST (por VLAN)."
       ],
       "exam_tips": [
-        "Loop físico + STP desligado/mal desenhado = storm. Porta blocked costuma ser o “herói” da redundância."
+        "Porta blocked/discarding costuma ser o “herói” da redundância — não é automaticamente cabo ruim."
       ]
     },
     {
-      "heading": "Root Bridge e Bridge ID",
+      "heading": "Quando usar / quando NÃO (prova e TShoot)",
       "bullets": [
-        "Root Bridge é a raiz da árvore STP daquela instância (ex.: por VLAN).",
-        "Bridge ID (BID) = prioridade da bridge + endereço MAC do switch (e campos de system ID em extensões Cisco; na prova: menor BID vence).",
-        "Prioridade default clássica 32768; valores configuráveis em múltiplos de 4096 no modelo comum.",
-        "Menor prioridade (numericamente) tende a eleger o root; em empate, o menor MAC decide.",
-        "spanning-tree vlan <id> root primary (e secondary) ajusta a prioridade de forma “inteligente” para tornar o switch root (ou backup root).",
-        "Escolher root no core/distribution, não em um access switch de ponta — design estável e paths previsíveis."
+        "Use STP/RSTP sempre que houver redundância L2 entre switches (dois uplinks, triângulo de switches).",
+        "Use PortFast + BPDU Guard em portas access de endpoint (PC/phone) para subir rápido e proteger contra switch na mesa.",
+        "Use spanning-tree vlan <id> root primary no core/distribution — não deixe o access switch virar root por acaso.",
+        "NÃO habilite PortFast em uplink entre switches — risco de loop se um switch for plugado ali.",
+        "NÃO trate “porta BLK” como falha antes de perguntar: quem é o Root? qual o custo? é Alternate legítima?",
+        "NÃO desligue spanning-tree “para liberar a porta” em produção/lab de prova sem entender o storm."
       ],
       "exam_tips": [
-        "Decore: menor BID = Root. Priority + MAC. Root no lugar errado distorce todos os Root Ports."
+        "Fluxo: Quem é Root? Qual a Root Port deste switch? Por que esta porta não é Designated? PortFast indevido?"
       ]
     },
     {
-      "heading": "Path cost e eleição de portas",
+      "heading": "Exemplo concreto",
       "bullets": [
-        "Cada link tem um path cost (inverso à velocidade: 10G < 1G < 100M em custo típico).",
-        "Root Port (RP): em cada switch não-root, a porta com menor custo até o Root (tie-breakers: BID do vizinho, port ID, etc.).",
-        "Designated Port (DP): em cada segmento, a porta que anuncia o melhor caminho a partir daquele link em direção à árvore (em geral, a que “ganha” o segmento).",
-        "Alternate Port: caminho alternativo para o Root (bloqueado no RSTP — backup do Root Port).",
-        "Backup Port: backup de uma Designated no mesmo segmento (cenário menos comum na topologia simples de prova).",
-        "Soma de custos no caminho determina quem fica forwarding e quem fica discarding/blocking."
+        "SW-Core (priority baixa / root primary) ↔ SW-Access com dois uplinks Gi1/0/1 e Gi1/0/2 (redundância).",
+        "Eleição: Core vira Root; no Access, Gi1/0/1 vira Root Port (menor custo); Gi1/0/2 fica Alternate/discarding.",
+        "PC em Gi1/0/10: spanning-tree portfast + bpduguard — forwarding rápido; se alguém plugar um switch e mandar BPDU → err-disable.",
+        "Se Access virar root (priority default + MAC menor): todos os Root Ports “apontam” para o lugar errado — paths distorcidos.",
+        "Verify: show spanning-tree vlan 10 (Root ID, role/state por porta); show spanning-tree root."
       ],
       "exam_tips": [
-        "Por switch não-root: 1 Root Port. Por link: 1 Designated. O resto tende a Alternate/Backup (blocked)."
+        "Por switch não-root: 1 Root Port. Por segmento: 1 Designated. O resto tende a Alternate/Backup (blocked)."
       ]
     },
     {
-      "heading": "Estados de porta: STP e RSTP",
+      "heading": "Root, custos, papéis e estados",
       "bullets": [
-        "STP clássico (802.1D): Disabled → Blocking → Listening → Learning → Forwarding (tempos longos de convergência, dezenas de segundos).",
-        "Blocking: não encaminha frames de usuário; processa BPDUs.",
-        "Listening: participa da eleição, ainda não aprende MAC de usuário como no forwarding pleno.",
-        "Learning: popula tabela MAC, ainda sem encaminhar dados de usuário.",
-        "Forwarding: encaminha frames e aprende MACs.",
-        "RSTP (802.1w): convergência bem mais rápida; estados práticos Discarding / Learning / Forwarding.",
-        "Discarding no RSTP agrupa ideias de blocking/listening do clássico (não encaminha dados de usuário).",
-        "Na prova, relacione “porta blocked/discarding” a caminho redundante perdedor, não necessariamente a cabo ruim."
+        "BID = priority (+ system ID em extensões Cisco) + MAC; menor BID = Root. Default clássico 32768; ajustes em múltiplos de 4096.",
+        "Path cost: link mais rápido → custo menor (ideia 10G < 1G < 100M). RP = melhor caminho ao Root; DP vence o segmento; Alternate = backup do RP (RSTP).",
+        "802.1D: Blocking → Listening → Learning → Forwarding (convergência lenta). RSTP: Discarding / Learning / Forwarding (Discarding ≈ não passa dados de usuário).",
+        "Learning ≠ Forwarding: pode popular MAC e ainda não encaminhar dados.",
+        "PVST+/Rapid-PVST: árvore por VLAN — show spanning-tree vlan <id>; dá para balancear root por VLAN (visão leve)."
       ],
       "exam_tips": [
-        "RSTP = rápido. Blocking/Discarding = não passa tráfego de usuário. Learning ≠ Forwarding."
+        "Menor BID = Root. RSTP = rápido. Blocking/Discarding = sem tráfego de usuário."
       ]
     },
     {
-      "heading": "PortFast e BPDU Guard",
+      "heading": "PortFast, BPDU Guard e leitura operacional",
       "bullets": [
-        "PortFast (edge): em porta access de endpoint, acelera a ida para forwarding (evita atraso longo de STP no boot do PC).",
-        "Use PortFast só onde não há switch a jusante — tipicamente host, impressora, telefone (com cuidado de design).",
-        "PortFast em uplink entre switches é perigoso: pode criar loop temporário/permanente se um switch for plugado ali.",
-        "BPDU Guard: se uma porta PortFast/edge recebe BPDU, a porta é err-disabled (protege contra switch indevido na porta de usuário).",
-        "Combinação clássica de acesso: PortFast + BPDU Guard na edge port.",
-        "BPDU Filter existe em alguns contextos, mas o CCNA enfatiza Guard como proteção “fail closed” na borda."
+        "PortFast (edge): acelera forwarding em access de host; só onde não há switch a jusante.",
+        "BPDU Guard: BPDU na edge → err-disabled (fail closed). Combo clássico de acesso: PortFast + Guard.",
+        "show spanning-tree / show spanning-tree vlan <id> / show spanning-tree interface <if> detail: root, roles, estados.",
+        "Root inesperado: ajuste root primary/secondary no lugar certo do campus.",
+        "Sintoma de loop: CPU alta, flooding, MAC flapping — confirme se STP está ativo na instância e se ninguém pôs PortFast no uplink.",
+        "EtherChannel (2.4) agrega links (um path lógico); STP quebra loops — ferramentas vizinhas, papéis diferentes."
       ],
       "exam_tips": [
-        "PortFast = access/edge. Uplink entre switches = sem PortFast. BPDU na edge + Guard = err-disable."
+        "PortFast = edge. Uplink = sem PortFast. BPDU na edge + Guard = err-disable."
       ]
     },
     {
-      "heading": "Leitura operacional e troubleshooting",
+      "heading": "Armadilhas comuns",
       "bullets": [
-        "show spanning-tree: root ID, bridge ID local, papéis e estados por porta (e por VLAN no PVST).",
-        "show spanning-tree root: visão rápida de quem é root e custos.",
-        "show spanning-tree vlan <id>: foca a instância da VLAN.",
-        "Porta em BLK/DISCARDING: verifique se é Alternate legítima ou se o root/priority/custo está errado.",
-        "Root inesperado: access switch virou root por priority default e MAC menor — ajuste root primary no core.",
-        "Após mudança de cabo/uplink: reavaliar Root Port e se o blocked migrou de porta (redundância saudável).",
-        "Sintoma de loop: CPU alta, flooding, MAC flapping — confirme se STP está ativo e se ninguém desligou spanning-tree na VLAN."
+        "Achar que porta blocked = cabo/SFP ruim sem olhar role Alternate.",
+        "PortFast no uplink entre switches “para ficar mais rápido”.",
+        "Access switch vira Root e ninguém olha show spanning-tree root.",
+        "Responder “estado do switch” genérico sem VLAN (PVST) quando o stem é vlan 10.",
+        "Culpar STP por demora de DHCP na mesa sem checar se PortFast está na access (e DHCP em si).",
+        "Confundir BPDU Guard (err-disable) com “só ignorar BPDU” (Filter — não é o ênfase fail-closed da borda no CCNA)."
       ],
       "exam_tips": [
-        "Fluxo: Quem é Root? Qual é a Root Port deste switch? Por que esta porta não é Designated? PortFast indevido?"
+        "Antes do gabarito: Root → Root Port → por que BLK → PortFast/Guard na edge."
       ]
     },
     {
-      "heading": "STP por VLAN (visão essentials)",
+      "heading": "Ligação com Simulado e Trilha (CLI)",
       "bullets": [
-        "No modelo Cisco cobrado no CCNA, é comum STP por VLAN (PVST+/Rapid-PVST): cada VLAN pode ter sua árvore e até root diferente.",
-        "Isso permite balancear: VLAN 10 root no SW1, VLAN 20 root no SW2 (design avançado leve na prova).",
-        "Comandos com vlan <id> (priority, root primary, show spanning-tree vlan) refletem essa instância.",
-        "Não confunda com EtherChannel (agrega links) — STP trata loops; EtherChannel é outra ferramenta (parte seguinte).",
-        "Trunk carrega várias VLANs; STP bloqueia topologia por instância, não “desliga o trunk inteiro” só por uma VLAN em todos os casos de leitura simplificada."
+        "No Estudo, fixe eleição de Root, RP/DP/Alternate e o par PortFast+BPDU Guard.",
+        "No Simulado V1, espere outputs de show spanning-tree com porta BLK, root inesperado ou err-disable por Guard.",
+        "Na Trilha (tickets CLI), correlacione MAC flapping/storm com topologia L2 e papéis STP antes de culpar L3.",
+        "Comandos âncora: show spanning-tree vlan <id>, spanning-tree vlan <id> root primary, spanning-tree portfast, spanning-tree bpduguard enable."
       ],
       "exam_tips": [
-        "show spanning-tree vlan 10 — responda root e port roles daquela VLAN, não “do switch genérico” sem contexto."
+        "Ordem: notas → marcar lido → praticar → cruzar com 2.1 (MAC flap) e 2.4 (bundle vs multi-path) na Trilha."
       ]
     }
   ],

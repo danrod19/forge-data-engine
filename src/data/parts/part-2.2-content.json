@@ -19,95 +19,95 @@
   ],
   "study_notes": [
     {
-      "heading": "VLAN: segmentação lógica em L2",
+      "heading": "O que é VLAN / trunk (802.1Q)",
       "bullets": [
-        "VLAN (Virtual LAN) divide um switch (ou um campus L2) em domínios de broadcast lógicos separados.",
-        "Hosts em VLANs diferentes não se comunicam só com switching L2: precisam de roteamento inter-VLAN (L3).",
-        "Cada VLAN tem seu próprio espaço de endereçamento IP na prática de design (ex.: VLAN 10 = 10.10.10.0/24).",
-        "Benefícios: segmentação, segurança básica por isolamento, organização por departamento/função e controle de broadcast.",
-        "VLAN ID: 1–4094 no 802.1Q (faixas reservadas/normal e extended conforme plataforma; no CCNA foque no uso de IDs comuns 1–1005 e extended quando citado)."
+        "VLAN (Virtual LAN) divide o switch/campus L2 em domínios de broadcast lógicos separados.",
+        "No CCNA (módulo 2), o trio crítico é: access (uma VLAN no endpoint), trunk (várias VLANs no uplink) e tag 802.1Q + native/allowed.",
+        "Hosts em VLANs diferentes não se comunicam só com switching L2 — precisam de roteamento inter-VLAN (L3).",
+        "Benefícios: segmentação, isolamento básico, organização por função e controle de broadcast."
       ],
       "exam_tips": [
-        "Mesma VLAN = mesmo broadcast domain L2. VLANs diferentes = precisam de L3 para falar entre si."
+        "Mesma VLAN = mesmo broadcast domain. VLANs diferentes = precisam de L3 entre si."
       ]
     },
     {
-      "heading": "Porta access vs porta trunk",
+      "heading": "Quando usar / quando NÃO (prova e TShoot)",
       "bullets": [
-        "Porta access: carrega tráfego de uma única VLAN de dados (a access VLAN configurada). Ideal para endpoint (PC, impressora, câmera).",
-        "Comando típico: switchport mode access + switchport access vlan <id>.",
-        "Porta trunk: transporta várias VLANs entre switches, roteadores (subinterfaces) ou APs/WLC em cenários de uplink.",
-        "Comando típico: switchport mode trunk (e, se necessário, encapsulamento 802.1Q — em plataformas modernas costuma ser o padrão).",
-        "Erro clássico: endpoint em trunk “aberto” ou access na VLAN errada — sintoma de “não pega IP / não fala com o gateway”."
+        "Use mode access + access vlan X no PC, impressora, câmera e IoT de uma VLAN de dados.",
+        "Use mode trunk entre switches, switch–router (ROAS/SVI uplink) ou onde várias VLANs precisam atravessar o mesmo cabo.",
+        "Use allowed list para carregar só as VLANs necessárias no uplink; alinhe native nos dois lados.",
+        "NÃO deixe endpoint típico em trunk “aberto” só porque “precisa de duas VLANs” — no campus clássico use access (± voice em outra part).",
+        "NÃO culpe a tabela MAC antes de validar membership (show vlan brief) e trunk (show interfaces trunk).",
+        "NÃO confunda DTP (negociar trunk/access) com VTP (propagar banco de VLANs)."
       ],
       "exam_tips": [
-        "PC na mesa → access. Switch–switch ou switch–router L3 → trunk (na maioria dos designs CCNA)."
+        "PC na mesa → access. Switch–switch / L3 uplink → trunk na maioria dos stems CCNA."
       ]
     },
     {
-      "heading": "802.1Q: tagged, untagged e native VLAN",
+      "heading": "Exemplo concreto",
       "bullets": [
-        "802.1Q insere uma tag de 4 bytes no frame Ethernet (TPID 0x8100 + PCP/DEI + VLAN ID) para identificar a VLAN no trunk.",
-        "Frames tagged carregam o VLAN ID explicitamente; o switch de saída remove a tag ao entregar em porta access daquela VLAN.",
-        "Native VLAN: VLAN cujos frames atravessam o trunk sem tag (untagged) por padrão.",
-        "Os dois lados do trunk devem concordar na native VLAN; native mismatch gera problemas sutis (tráfego na VLAN errada, CDP/STP “estranhos”, vazamento de untagged).",
-        "Boas práticas comuns: evitar usar VLAN 1 como native de produção; alinhar native em ambos os extremos; documentar o ID."
+        "SW1 e SW2 ligados por Gi1/0/1; PC-A access VLAN 10 em SW1; PC-B access VLAN 10 em SW2; servidores em VLAN 20.",
+        "Gi1/0/1 nos dois: switchport mode trunk, native vlan 99, allowed vlan 10,20,99.",
+        "PC-A fala com PC-B na VLAN 10 via trunk tagged; VLAN 20 também atravessa; untagged = native 99.",
+        "Falha típica de lab: allowed sem 10 → local OK no SW1, sem alcance ao SW2; ou native 1 de um lado e 99 do outro → mismatch sutil.",
+        "Verify: show vlan brief (porta do PC na 10), show interfaces trunk (native/allowed-and-active), show interfaces Gi1/0/1 switchport."
       ],
       "exam_tips": [
-        "Tagged = VLAN identificada no trunk. Untagged no trunk = native. Mismatch de native = armadilha de prova e de campo."
+        "Checklist trunk: mode nos dois lados + mesma native + VLAN no allowed + VLAN existe (show vlan brief)."
       ]
     },
     {
-      "heading": "Allowed VLANs e o que o trunk realmente carrega",
+      "heading": "802.1Q, native e allowed",
       "bullets": [
-        "Por padrão, um trunk pode permitir todas as VLANs; na prática usa-se switchport trunk allowed vlan para restringir.",
-        "Se a VLAN não está no allowed list de um lado (ou de ambos), o tráfego daquela VLAN não atravessa o trunk.",
-        "Sintoma: host na VLAN 20 access OK localmente, mas não alcança a VLAN 20 no outro switch — confira allowed + existência da VLAN no banco (show vlan).",
-        "A VLAN precisa existir no switch (criada / aprendida) e estar active; “allowed” sozinho não cria a VLAN.",
-        "Prune conceitual: menos VLANs no trunk = menos broadcast/unknown unicast atravessando uplinks desnecessariamente."
+        "802.1Q: tag de 4 bytes (TPID 0x8100 + PCP/DEI + VLAN ID) no frame do trunk; na access da VLAN correta a tag é removida na entrega.",
+        "Native VLAN: frames dessa VLAN passam untagged no trunk; os dois extremos devem concordar.",
+        "Native mismatch: untagged cai em VLANs diferentes — vazamento, CDP/STP “estranhos”, sintomas difíceis.",
+        "Allowed: se a VLAN não está na lista de um lado (ou ambos), o tráfego não atravessa de forma útil.",
+        "“Allowed” não cria a VLAN: ela precisa existir/active no switch (vlan <id> / show vlan).",
+        "Boas práticas: evitar VLAN 1 como native de produção; documentar native; restringir allowed."
       ],
       "exam_tips": [
-        "Checklist trunk: mode trunk nos dois lados + mesma native + VLAN no allowed + VLAN existe (show vlan brief)."
+        "Tagged = VLAN explícita no trunk. Untagged no trunk = native. Mismatch de native = clássico de prova."
       ]
     },
     {
-      "heading": "DTP em visão leve",
+      "heading": "DTP, comandos e leitura",
       "bullets": [
-        "DTP (Dynamic Trunking Protocol) tenta negociar se a porta vira trunk ou access (modos como auto, desirable, on — nomes variam na UI mental da prova).",
-        "switchport mode trunk / access fixa o comportamento e reduz surpresa; switchport nonegotiate desliga DTP em muitos IOS.",
-        "Risco: porta em dinâmica pode virar trunk sem você querer, ou falhar a negociação e ficar access quando se esperava trunk.",
-        "Em designs estáveis de CCNA, prefira configurar trunk/access explicitamente e alinhar os dois lados.",
-        "Não confunda DTP com VTP (propagação de banco de VLANs) — assuntos vizinhos, mas papéis diferentes."
+        "DTP tenta negociar trunk vs access (auto/desirable/on em visão de prova); mode access/trunk explícito + nonegotiate reduz surpresa.",
+        "Risco dinâmico: porta vira trunk sem querer, ou fica access quando se esperava trunk.",
+        "show vlan brief: VLANs e portas access; show interfaces trunk: native, allowed, allowed-and-active.",
+        "show interfaces <if> switchport: mode admin/operacional, access VLAN, native, allowed.",
+        "Ordem TShoot: access ou trunk operacional? access vlan certa? native igual? VLAN no allowed? VLAN existe?"
       ],
       "exam_tips": [
-        "Prova gosta de “por que o trunk não subiu?”: mode incompatível / DTP / um lado access e outro trunk."
+        "show vlan brief não “lista trunk como membro access” da mesma forma — uplink = show interfaces trunk."
       ]
     },
     {
-      "heading": "Comandos e leitura de saída",
+      "heading": "Armadilhas comuns",
       "bullets": [
-        "show vlan brief: lista VLANs e portas access associadas; confira se a porta do host está na VLAN certa.",
-        "show interfaces trunk: mostra quais interfaces são trunk, native VLAN, VLANs allowed e allowed-and-active.",
-        "show interfaces <if> switchport: resume mode administrativo/operacional, access VLAN, native, allowed, voice (se houver).",
-        "switchport trunk native vlan <id> e switchport trunk allowed vlan add/remove/except/all — ferramentas de ajuste fino.",
-        "Ordem de troubleshooting: a porta está access ou trunk operacional? access vlan correta? trunk com native igual? VLAN no allowed? VLAN existe?"
+        "Access na VLAN errada: host não alcança o gateway da subnet esperada — show vlan brief denuncia.",
+        "Um lado trunk e outro access: só a native/access “parece” funcionar; demais VLANs não multiplexam.",
+        "VLAN missing no allowed ou VLAN não criada no remoto — sintoma “quase conecta” entre switches.",
+        "Native mismatch ignorado porque “o ping na VLAN X às vezes passa”.",
+        "Culpar IP/rota enquanto o PC está no broadcast domain errado.",
+        "Confiar em DTP em lab/prova em vez de mode explícito alinhado nos dois lados."
       ],
       "exam_tips": [
-        "show vlan brief não lista portas trunk como “membros” da VLAN da mesma forma que access — use show interfaces trunk para o uplink."
+        "Sintoma “só a VLAN nativa passa no uplink” → trunk quebrado ou um lado em access."
       ]
     },
     {
-      "heading": "Troubleshooting clássico de VLAN/trunk",
+      "heading": "Ligação com Simulado e Trilha (CLI)",
       "bullets": [
-        "Access na VLAN errada: host não alcança o gateway da subnet esperada; show vlan brief denuncia a porta no ID errado.",
-        "Native mismatch: untagged cai em VLANs diferentes em cada extremo; altere native nos dois lados para o mesmo ID.",
-        "VLAN missing no allowed: show interfaces trunk mostra allowed sem o ID necessário — adicione a VLAN na lista.",
-        "VLAN não criada no switch remoto: allowed pode listar, mas não há forwarding útil se a VLAN não existe/active.",
-        "Um lado trunk e outro access: só a native/access VLAN “parece” funcionar; o restante das VLANs não multiplexa.",
-        "Não culpe a tabela MAC antes de validar membership de VLAN e estado do trunk — o host pode estar no broadcast domain errado."
+        "No Estudo, memorize access vs trunk, native e allowed — coração do módulo 2 de VLANs.",
+        "No Simulado V1, espere stems com show vlan brief / show interfaces trunk e causas: native mismatch, allowed incompleto, access errada.",
+        "Na Trilha (tickets CLI), isole membership e estado do trunk antes de culpar MAC flapping ou L3.",
+        "Comandos âncora: show vlan brief, show interfaces trunk, show interfaces <if> switchport, switchport mode/access/trunk/native/allowed."
       ],
       "exam_tips": [
-        "Sintoma “só a VLAN nativa passa no uplink” → desconfie de trunk quebrado ou um lado em access."
+        "Ordem: notas → marcar lido → praticar → cruzar com 2.1 (MAC) e 2.3 (STP no trunk) na Trilha."
       ]
     }
   ],

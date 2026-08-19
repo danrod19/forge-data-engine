@@ -1,0 +1,560 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7101 — usuário não abre o portal HTTPS em 10.10.10.50 e jura que “a rede está fora”. Cabo e link no notebook já foram conferidos pelo júnior.",
+    "cli_output": "PC-Cliente> ping 10.10.10.50\nResposta de 10.10.10.50: bytes=32 tempo=1ms TTL=64\n\nPC-Cliente> netstat -an | findstr 10.10.10.50\n  TCP    192.168.1.20:51244    10.10.10.50:443    SYN_SENT\n  TCP    192.168.1.20:51245    10.10.10.50:443    SYN_SENT\n\nSRV-WEB> netstat -an | findstr :443\n  TCP    0.0.0.0:80            0.0.0.0:0            LISTENING\n  TCP    0.0.0.0:8080          0.0.0.0:0            LISTENING",
+    "alternativas": [
+      "Falha de camada 1: o cabo do cliente está com CRC alto e por isso o TCP não completa o handshake",
+      "O host alcança o servidor em L3 (ping OK), mas nada escuta TCP 443 no destino; o serviço HTTPS não está em escuta na porta esperada",
+      "Problema exclusivo de MAC: o switch não aprendeu o MAC do cliente, logo o IP 10.10.10.50 é inalcançável",
+      "O cliente deveria usar UDP 443; TCP 443 nunca é usado para HTTPS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para falha na camada de serviço, não na rede básica: ping responde, então L3 até 10.10.10.50 está ok. No CLI, o cliente fica em SYN_SENT na 443 e o servidor só escuta 80/8080 — nada em LISTENING na 443. Insight de troubleshooting: SYN_SENT + ping OK quase sempre manda olhar se a porta/serviço certo está de pé no destino. Cabo/CRC (L1) não explica ping saudável; “MAC do cliente não aprendido” contradiz o alcance IP; HTTPS usa TCP 443, não UDP.",
+    "part_id": "1.1",
+    "_sourceFile": "src/data/parts/part-1.1-tickets.json",
+    "_sourceIndex": 0
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7102 — time de VoIP reclama de atraso e “eco robótico” depois de um “ajuste de segurança” que forçou a mídia a usar o mesmo perfil confiável do portal web (retransmissão inclusa).",
+    "cli_output": "ANALISTA> # captura resumida no fone IP 192.168.20.15\nFrame 1: RTP over UDP 192.168.20.15:40000 -> 192.168.20.1:16384  (payload audio)\n\n# após a mudança de política (mesmo fluxo de voz)\nFrame 40: TCP 192.168.20.15:51210 -> 192.168.20.1:16384  [PSH, ACK]  Seq=1200 Ack=800\nFrame 41: TCP 192.168.20.1:16384 -> 192.168.20.15:51210  [ACK]  Seq=800 Ack=1800\nFrame 55: TCP Retransmission  Seq=1200  (RTT elevado, jitter sobe)\n\nANALISTA> # política atual (trecho)\nmatch media-voip  -> force transport tcp retransmit enable",
+    "alternativas": [
+      "A mídia RTP deveria permanecer em UDP (best-effort); forçar TCP com retransmissão aumenta latência e piora a qualidade de voz",
+      "VoIP exige sempre TCP com handshake de três vias; a captura em UDP inicial estava errada por definição",
+      "O problema é só L1: retransmissão TCP prova cabo rompido entre fones",
+      "Portas dinâmicas 40000/16384 são inválidas; VoIP só usa well-known 0–1023"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para transporte inadequado na mídia: RTP/VoIP prefere UDP best-effort, sem retransmitir atraso. No CLI, a captura começa em RTP/UDP e, após a política, vira TCP com ACK e retransmissões — RTT e jitter sobem exatamente aí. Insight: voz tolera perda pontual melhor do que fila de retransmissão. VoIP não “exige” TCP; a captura UDP inicial estava correta. Retransmissão TCP não prova cabo rompido. Portas altas (40000/16384) são normais em mídia; restringir a well-known 0–1023 é mito.",
+    "part_id": "1.1",
+    "_sourceFile": "src/data/parts/part-1.1-tickets.json",
+    "_sourceIndex": 1
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7103 — o firewall liberou “SSH para o jump-host”, mas o script de automação ainda falha. O operador insiste que “a porta 22 está aberta na rede”.",
+    "cli_output": "PC-OPS> netstat -an | findstr 10.0.5.10\n  TCP    10.0.1.40:53112     10.0.5.10:22     SYN_SENT\n\nJUMP> netstat -an | findstr LISTEN\n  TCP    0.0.0.0:2222        0.0.0.0:0        LISTENING\n  TCP    127.0.0.1:22        0.0.0.0:0        LISTENING\n\nJUMP> # trecho sshd_config\nPort 2222\n# Porta 22 bound only on loopback for local admin",
+    "alternativas": [
+      "O cliente usa porta de origem 22 e por isso o firewall bloqueia a volta",
+      "O serviço SSH escuta em 2222 na interface de rede; a porta 22 só escuta em 127.0.0.1, então conexões remotas à 22 não completam",
+      "SSH nunca usa TCP; o correto é UDP 22 e o netstat do cliente está no protocolo errado",
+      "Falha de encapsulamento L2: falta trailer Ethernet no SYN, por isso SYN_SENT eterno"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para mismatch de porta de escuta: o cliente tenta 10.0.5.10:22 e fica em SYN_SENT. No CLI, o jump escuta 2222 em 0.0.0.0 e a 22 só em 127.0.0.1 — inacessível de fora. Insight: “porta aberta no firewall” não basta se o sshd não escuta na interface/porta que o cliente usa. A origem 53112 é efêmera normal, não o serviço. SSH é TCP, não UDP. Falta de trailer Ethernet não é o diagnóstico de SYN_SENT eterno com bind errado.",
+    "part_id": "1.1",
+    "_sourceFile": "src/data/parts/part-1.1-tickets.json",
+    "_sourceIndex": 2
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7104 — hosts na mesma VLAN 20 conversam, mas ao ir para servidor em outra subnet o tráfego “some”. O técnico de LAN só olhou a MAC table e concluiu: “MAC do servidor não está no switch, então está offline”.",
+    "cli_output": "SwitchA# show vlan brief | include 20\n20   USERS    active    Gi0/1, Gi0/2, Gi0/3\n\nSwitchA# show mac address-table dynamic vlan 20\n  20    0050.56aa.1001    DYNAMIC   Gi0/1   (PC-A)\n  20    0050.56aa.1002    DYNAMIC   Gi0/2   (PC-B)\n  20    0050.56aa.00fe    DYNAMIC   Gi0/24  (Router-GW SVI/trunk access)\n\nPC-A> ipconfig\n   IPv4: 192.168.20.10  Mask: 255.255.255.0  Gateway: 192.168.20.1\n\nPC-A> ping 192.168.20.1\nResposta de 192.168.20.1: tempo=1ms\n\nPC-A> ping 10.10.30.50\nEsgotado o tempo limite do pedido.\n\nRouter-GW# show ip route 10.10.30.50\n% Network not in table\nRouter-GW# show ip interface brief | include 192.168.20.1\nVlan20   192.168.20.1   YES manual up   up",
+    "alternativas": [
+      "O servidor deveria aparecer na tabela MAC da VLAN 20; se não aparece, está definitivamente desligado",
+      "Tráfego para outra subnet é decisão L3 no gateway; ausência do MAC do servidor no switch de acesso é esperada. A causa apontada no output é falta de rota no Router-GW para 10.10.30.50",
+      "Ping ao gateway prova que o problema é só L4 (portas TCP), não L3",
+      "Switch L2 reescreve o IP de destino em cada hop; por isso o MAC do servidor precisa estar em todos os switches do campus"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para roteamento, não para host offline na VLAN local. No CLI, ping ao gateway OK e falha a 10.10.30.50 com “Network not in table” no Router-GW — falta rota L3. O MAC do servidor remoto não precisa (nem deve) aparecer na MAC table da VLAN 20 do access; o que aparece é o GW. Insight: destino off-subnet = decisão L3 no default gateway. Ping ao GW não prova que o problema é só L4. Switch L2 não reescreve IP em cada hop do campus.",
+    "part_id": "1.1",
+    "_sourceFile": "src/data/parts/part-1.1-tickets.json",
+    "_sourceIndex": 3
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7105 — app de inventário fala em “falha de aplicação ao contactar a API”. O NOC viu erros antigos em outra porta e já pediu troca de cabo; DNS e handshake TCP ainda funcionam no host.",
+    "cli_output": "SwitchA# show interfaces Gi0/5\nGi0/5 is up, line protocol is up\n  input errors: 0, CRC: 0, frame: 0, overrun: 0\n  output errors: 0\n  Last clearing of \"show interface\" counters 00:40:12\n\nPC-APP> ping api.empresa.local\nResposta de 10.50.1.8: bytes=32 tempo=2ms TTL=61\n\nPC-APP> curl -v https://api.empresa.local/health\n* Trying 10.50.1.8:443...\n* Connected to api.empresa.local (10.50.1.8) port 443\n* SSL connection using TLSv1.2\n> GET /health HTTP/1.1\n< HTTP/1.1 401 Unauthorized\n{\"error\":\"missing API token\"}\n\n# observação do NOC (ticket antigo)\n# “erros de input” vistos ontem em Gi0/8 de OUTRO host, não neste link",
+    "alternativas": [
+      "Há falha de encapsulamento L1 no Gi0/5: CRC zero ainda assim impede a montagem do quadro de retorno",
+      "Sintoma relatado como “aplicação”, mas a causa é ausência de rota L3 — o TCP 443 nunca chegaria a completar",
+      "L1/L2 do link estão saudáveis e L3/L4 sobem até HTTPS; a falha é de aplicação (401 sem token), não de cabo nem de porta fechada",
+      "MAC e IP estão invertidos no encapsulamento: o host colocou o IP no cabeçalho Ethernet e o switch descartou o frame"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para falha de aplicação, não de cabo: Gi0/5 está up/up sem CRC/input errors. No CLI, ping OK, TCP 443 conecta e a API devolve HTTP 401 com “missing API token” — o caminho L3/L4 chegou até o app. Insight: se o payload de erro da aplicação volta, a rede entregou; foque em credencial/autorização. CRC zero não “impede” quadro de retorno. Sem rota o TCP 443 não completaria. IP no cabeçalho Ethernet não é o modelo (MAC em L2, IP em L3).",
+    "part_id": "1.1",
+    "_sourceFile": "src/data/parts/part-1.1-tickets.json",
+    "_sourceIndex": 4
+  },
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7201 — usuários da VLAN 10 não abrem o file server na VLAN 20. O júnior diz que “o access não tem o MAC do servidor, então o servidor está offline”. Ping entre PCs da VLAN 10 funciona.",
+    "cli_output": "Access1# show vlan brief | include 10|20\n10   USERS     active    Gi1/0/1-24\n20   SERVERS   active    (nenhuma porta de acesso neste switch)\n\nAccess1# show mac address-table dynamic vlan 10\n  10  0050.56aa.1001  DYNAMIC  Gi1/0/3   (PC-A)\n  10  0050.56aa.1002  DYNAMIC  Gi1/0/4   (PC-B)\n  10  0050.56aa.00fe  DYNAMIC  Gi1/0/48  (uplink Dist1)\n\nAccess1# show ip interface brief\nVlan1   unassigned   YES unset  up  up\n(nenhuma SVI 10/20 neste access)\n\nPC-A> ipconfig\n   IPv4: 192.168.10.25  Mask: 255.255.255.0  Gateway: 192.168.10.1\n\nPC-A> ping 192.168.10.26\nResposta de 192.168.10.26: tempo<1ms\n\nPC-A> ping 192.168.20.10\nEsgotado o tempo limite do pedido.\n\nDist1# show ip interface brief | include Vlan\nVlan10  192.168.10.1  YES manual up  up\nVlan20  192.168.20.1  YES manual up  up\n\nDist1# show ip route 192.168.20.0\nC    192.168.20.0/24 is directly connected, Vlan20\n\nDist1# show ip interface Vlan20\nVlan20 is up, line protocol is up\n  Internet address is 192.168.20.1/24\n\nDist1# ping 192.168.20.10\n.....  Success rate is 0 percent (0/5)\n\nServer-FS> ipconfig\n   IPv4: 192.168.20.10  Mask: 255.255.255.0  Gateway: 192.168.20.1\nServer-FS> ping 192.168.20.1\nEsgotado o tempo limite do pedido.",
+    "alternativas": [
+      "O access switch deveria aprender o MAC do servidor na VLAN 10; a ausência prova que o cabo do PC-A está ruim",
+      "Falta criar VLAN 20 no Access1; sem isso o L2 do campus inteiro fica inoperante",
+      "Inter-VLAN depende do L3 (SVIs no Dist1). O gateway 192.168.20.1 não responde ao servidor: problema no segmento/SVI da VLAN 20, não “servidor offline por MAC ausente no access”",
+      "O correto é desabilitar as SVIs e forçar todo tráfego VLAN 10↔20 só por tabela MAC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para inter-VLAN com problema no segmento da VLAN 20, não para “MAC ausente no access”. No CLI, L2 da VLAN 10 está saudável; Dist1 tem SVIs 10/20, mas Dist1 e o server não se pingam em 192.168.20.1↔.10. Insight: o MAC do server não precisa aparecer na VLAN 10 do access — o tráfego sobe ao gateway L3. Culpar o cabo do PC-A contradiz o ping local. Falta de VLAN 20 no Access1 (sem portas de server) não derruba o campus. Desligar SVIs e forçar só MAC entre VLANs é o oposto do modelo inter-VLAN.",
+    "part_id": "1.2",
+    "_sourceFile": "src/data/parts/part-1.2-tickets.json",
+    "_sourceIndex": 0
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7202 — notebook associa no Wi-Fi CORP-WIFI, pega IP, mas não alcança a Intranet em outra subnet. No corredor já ouvem: “coloca um AP autônomo novo que resolve”.",
+    "cli_output": "Laptop> netsh wlan show interfaces\n    SSID                   : CORP-WIFI\n    State                  : connected\n    Radio type             : 802.11ac\n    Receive rate           : 400 Mbps\n    Signal                 : 88%\n\nLaptop> ipconfig\n   IPv4 Address. . . . . . : 10.50.40.88\n   Subnet Mask . . . . . . : 255.255.255.0\n   Default Gateway . . . . : 10.50.40.1\n\nLaptop> ping 10.50.40.1\nEsgotado o tempo limite do pedido.\n\nLaptop> ping 10.50.10.20\nEsgotado o tempo limite do pedido.\n\nWLC1> show ap summary\nAP Name      AP Model   Ethernet MAC   Location   Country  IP Address     State\nAP-Andar3    2802I      00a1.b2c3.d4e5  Floor3     BR       10.50.2.33     Registered\n\nWLC1> show wlan summary\nWLAN ID  WLAN Profile Name / SSID   Status  Interface Name\n1        CORP-WIFI / CORP-WIFI      Enabled  wifi-users\n\nCore-L3# show ip interface brief | include 10.50.40\nVlan40   10.50.40.1   YES manual  up   down\n\nCore-L3# show vlan brief | include 40\n40   WIFI-USERS   active\n\nCore-L3# show interfaces status | include 40\nGi1/0/24  trunk-to-wlc-path   connected  trunk  a-1000\n(observação: SVI Vlan40 line protocol down)",
+    "alternativas": [
+      "Associação e RF estão OK (AP Registered + cliente connected); o gateway 10.50.40.1 está com SVI Vlan40 up/down — falha L3 da subnet Wi-Fi, não se resolve trocando por AP autônomo",
+      "O notebook precisa de IP na faixa da WLC (10.50.2.0/24) para sair à Intranet",
+      "Signal 88% prova falha de camada 1 no cabo do servidor de Intranet",
+      "Basta criar SSID novo no AP sem WLC; SVIs não se aplicam a clientes wireless"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para gateway/SVI da subnet Wi-Fi, não para RF. No CLI, cliente connected com bom sinal e AP Registered na WLC; o default 10.50.40.1 não responde e a SVI Vlan40 está up/down. Insight: associação wireless OK + falha off-subnet = olhe L3 da VLAN de usuários antes de trocar AP. Migrar para AP autônomo não levanta SVI caída. O notebook não precisa de IP da faixa de management da WLC. Sinal alto não diagnostica o servidor remoto; cliente wireless também usa gateway L3.",
+    "part_id": "1.2",
+    "_sourceFile": "src/data/parts/part-1.2-tickets.json",
+    "_sourceIndex": 1
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7203 — portal da DMZ na TCP 443 “passa no firewall”, mas o SOC viu exploit conhecido e o ataque não foi bloqueado. O time de rede quer só “abrir mais portas”.",
+    "cli_output": "FW-EDGE# show running-config | section policy-map|class-map|zone\nzone security LAN\nzone security DMZ\nzone security WAN\nzone-pair security LAN-to-DMZ source LAN destination DMZ\n  service-policy type inspect POLICY-LAN-DMZ\n\nclass-map type inspect match-any CM-WEB\n match protocol https\npolicy-map type inspect POLICY-LAN-DMZ\n class type inspect CM-WEB\n  inspect\n class class-default\n  drop\n\nFW-EDGE# show policy-firewall sessions | include 10.20.30.50\nSession 1022: 10.10.5.40:52011 => 10.20.30.50:443  prot tcp  (INSPECT)  ALLOW\n\nFW-EDGE# show running-config | include ips|ngfw|utd|threat\n(no matching inspection / IPS policy bound to zone-pair)\n\nSOC-ALERT> signature id 29455 \"Known web exploit pattern\" action would-be-drop\n           status: NOT ENFORCED on path LAN->DMZ (firewall allow only)\n\nPC-TEST> curl -vk https://10.20.30.50/login\n* Connected to 10.20.30.50 port 443\n* SSL handshake OK\n< HTTP/1.1 200 OK",
+    "alternativas": [
+      "A sessão ALLOW na 443 prova que o cabo da DMZ está rompido e por isso o IPS não age",
+      "É preciso desabilitar a zone LAN e deixar só WAN para o ataque parar",
+      "O file server deveria aparecer na MAC table do firewall para o HTTPS funcionar",
+      "O zone-pair permite HTTPS com inspect (porta OK), mas não há política IPS/NGFW de ameaça aplicada no caminho — abrir mais portas não bloqueia o exploit visto pelo SOC"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O sintoma aponta para gap de prevenção de ameaça, não para porta fechada. No CLI, zone-pair LAN→DMZ faz inspect HTTPS com sessão ALLOW 443 e a app responde; não há policy IPS/UTD/threat bound e o alerta do SOC diz NOT ENFORCED. Insight: permitir a porta ≠ inspecionar payload malicioso — abrir mais portas só aumenta superfície. Cabo rompido contradiz sessão ALLOW e HTTP 200. Desligar a zone LAN não é mitigação de exploit. MAC do file server no firewall não é requisito para HTTPS funcionar.",
+    "part_id": "1.2",
+    "_sourceFile": "src/data/parts/part-1.2-tickets.json",
+    "_sourceIndex": 2
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7204 — projeto de “modernização” propôs spine-leaf com dois spines no escritório de 8 pessoas. O inventário real do site foi colado no ticket para validar o design.",
+    "cli_output": "INVENTARIO-SITE-FILIAL08\nDispositivos gerenciados:\n  1x ISR-4331  (WAN/Internet, NAT, VPN)     hostname: BR-SOHO-R1\n  1x CBS250-24T (switch acesso 24p)         hostname: BR-SOHO-SW1\n  1x AP1800 (autônomo, SSID unico)          hostname: BR-SOHO-AP1\n  8x endpoints (PC/impressora)\n\nBR-SOHO-R1# show ip interface brief\nGigabitEthernet0/0/0  203.0.113.10  YES DHCP   up  up   (WAN)\nGigabitEthernet0/0/1  192.168.0.1   YES manual up  up   (LAN)\n\nBR-SOHO-SW1# show cdp neighbors\nDevice ID        Local Intrfce    Holdtme  Capability  Platform  Port ID\nBR-SOHO-R1       Gig 0/1          150         R S I     ISR4331   Gig 0/0/1\nBR-SOHO-AP1      Gig 0/8          140         T         AP1800    Gig 0\n\nBR-SOHO-R1# show ip route | include Gateway|0.0.0.0\nGateway of last resort is 203.0.113.1 to network 0.0.0.0\nS*  0.0.0.0/0 [1/0] via 203.0.113.1\n\nPROPOSTA-ARQUITETO (trecho):\n  \"Implantar 2x Spine + 4x Leaf, MLAG, e Core three-tier dedicado\"",
+    "alternativas": [
+      "O inventário mostra topologia SOHO (roteador borda + switch acesso + AP); spine-leaf/three-tier dedicado é oversized e não se sustenta nos dispositivos existentes",
+      "Com 8 PCs é obrigatório three-tier completo Access-Distribution-Core",
+      "O default route na WAN prova que o site já é spine-leaf de data center",
+      "CDP só lista o AP; por isso o switch não existe e o design correto é apenas dois spines sem leaf"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para oversizing: inventário e CDP mostram SOHO (roteador WAN/LAN + switch de acesso + AP). No CLI, default na WAN é borda Internet, não fabric de DC; CDP lista o ISR e o AP no switch. Insight: desenhe pelo porte e pelos dispositivos existentes, não pelo buzzword. Three-tier completo não é obrigatório com 8 PCs. Default route na WAN não prova spine-leaf. Negar a existência do switch contradiz o próprio CDP.",
+    "part_id": "1.2",
+    "_sourceFile": "src/data/parts/part-1.2-tickets.json",
+    "_sourceIndex": 3
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7205 — a LAN da matriz acessa servidores locais e SaaS pela Internet, mas a subnet da filial 10.60.0.0/16 ficou inacessível após um “ajuste de cloud”. Usuários locais não reclamam da Intranet on-prem.",
+    "cli_output": "PC-MATRIZ> ping 10.10.10.50\nResposta de 10.10.10.50: tempo=1ms   (servidor on-prem OK)\n\nPC-MATRIZ> ping 10.60.5.10\nEsgotado o tempo limite do pedido.   (host da filial)\n\nEdge-MATRIZ# show ip route 10.60.0.0\n% Network not in table\n\nEdge-MATRIZ# show ip route 0.0.0.0\nS*  0.0.0.0/0 [1/0] via 198.51.100.1, GigabitEthernet0/0   (Internet)\n\nEdge-MATRIZ# show crypto session\nCrypto session current status\n  Interface: Tunnel0\n  Session status: DOWN\n  Peer: 203.0.113.50 (filial)  Idle time: 02:14:11\n\nEdge-MATRIZ# show ip interface brief | include Tunnel0|10.255\nTunnel0   10.255.0.1   YES manual  up   down\n\nEdge-FILIAL# show ip interface brief | include Tunnel0\nTunnel0   10.255.0.2   YES manual  up   down\n\nEdge-MATRIZ# show running-config | include ip route 10.60\n(no static route to 10.60.0.0/16)\n(observação: rota da filial era aprendida via Tunnel0 quando UP)",
+    "alternativas": [
+      "Como o ping ao servidor on-prem falha, o problema é spine-leaf no access da matriz",
+      "Basta trocar o switch L2 da matriz por WLC; rotas WAN não se aplicam a filiais",
+      "LAN local OK e default para Internet presente, mas Tunnel0 up/down, sessão crypto DOWN e sem rota para 10.60.0.0/16 — falha na borda WAN/VPN híbrida com a filial, não na LAN on-prem",
+      "SaaS na nuvem exige remover o Tunnel0 permanentemente para a filial voltar"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para a borda WAN/VPN híbrida, não para a LAN on-prem. No CLI, ping a 10.10.10.50 OK e há default para Internet, mas Tunnel0 está up/down, crypto session DOWN e 10.60.0.0/16 fora da tabela. Insight: LAN local saudável + prefixo de filial ausente = olhe túnel/crypto antes de redesenhar o access. Não há evidência de falha spine-leaf; trocar switch por WLC não restaura rota WAN. Remover o Tunnel0 “por causa de SaaS” só piora o acesso à filial.",
+    "part_id": "1.2",
+    "_sourceFile": "src/data/parts/part-1.2-tickets.json",
+    "_sourceIndex": 4
+  },
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7301 — uplink entre Access1 e Dist1 “fica lento e cai”. O júnior já reiniciou o STP e culpou o core. Contadores da porta de uplink foram anexados.",
+    "cli_output": "Access1# show interfaces GigabitEthernet1/0/48\nGigabitEthernet1/0/48 is up, line protocol is up (connected)\n  Full-duplex, 1000Mb/s, media type is 1000BaseSX SFP\n  Input queue: 0/75/0/0 (size/max/drops/flushes)\n  5 minute input rate 82000 bits/sec, 90 packets/sec\n     1844221 packets input, 0 no buffer\n     Received 12012 broadcasts (4011 multicasts)\n     0 runts, 0 giants, 0 throttles\n     18440 input errors, 17902 CRC, 0 frame, 0 overrun, 0 ignored\n     0 watchdog, 0 multicast, 0 pause input\n     12 output errors, 0 collisions, 1 interface resets\n\nAccess1# show interfaces GigabitEthernet1/0/48 status\nPort      Name        Status    Vlan  Duplex  Speed  Type\nGi1/0/48  uplink-dist connected trunk full    1000   1000BaseSX\n\nDist1# show interfaces GigabitEthernet1/0/1 | include duplex|errors|CRC|media\n  Full-duplex, 1000Mb/s, media type is 1000BaseSX SFP\n     2 input errors, 0 CRC, 0 frame\n\n# observação do campo: patch OM4 com conector sujo no lado Access1; limpeza pendente",
+    "alternativas": [
+      "STP no core é a única causa possível de CRC assimétrico",
+      "O duplex half no Access1 explica as colisões (não há full-duplex no output)",
+      "Gi1/0/48 up/up com 17902 CRC e milhares de input errors no Access1 aponta problema de meio/óptica/conector no enlace, não de rota no core",
+      "CRC alto prova que o SSID do andar está no canal 3"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para meio físico no enlace: Gi1/0/48 up/up full 1G com milhares de input errors e ~17902 CRC só no Access1. No CLI, esse padrão clássico de sujeira/dano em fibra/SFP/cabo. Insight: CRC assimétrico no uplink manda limpar/trocar mídia antes de mexer em STP ou core. STP no core não gera esse contador local. O status mostra full-duplex, não half. SSID/canal Wi-Fi não explica CRC Ethernet do uplink.",
+    "part_id": "1.3",
+    "_sourceFile": "src/data/parts/part-1.3-tickets.json",
+    "_sourceIndex": 0
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7302 — dois APs novos no switch de acesso não acendem os LEDs de rádio. O cabo de dados foi testado em notebook e tem link; APs antigos no mesmo switch estão OK.",
+    "cli_output": "Access2# show power inline\nModule   Available     Used     Remaining\n          (Watts)     (Watts)    (Watts)\n------   ---------   --------   ---------\n1           370.0       368.4        1.6\n\nInterface Admin  Oper       Power   Device              Class Max\n          State  State      (Watts)\n--------- ------ ---------- ------- ------------------- ----- ----\nGi1/0/1   auto   on         15.4    IP Phone 8841       3     30.0\nGi1/0/2   auto   on         15.4    IP Phone 8841       3     30.0\nGi1/0/5   auto   on         30.0    AIR-AP2802I         4     30.0\nGi1/0/6   auto   on         30.0    AIR-AP2802I         4     30.0\nGi1/0/7   auto   on         30.0    AIR-AP3802I         4     30.0\nGi1/0/10  auto   on         30.0    AIR-AP2802I         4     30.0\nGi1/0/11  auto   on         15.4    IP Phone 8851       3     30.0\nGi1/0/12  auto   on         15.4    IP Phone 8851       3     30.0\n... (várias portas on) ...\nGi1/0/23  auto   off        0.0     n/a                 n/a   30.0\nGi1/0/24  auto   off        0.0     n/a                 n/a   30.0\n\nAccess2# show interfaces status | include 23|24\nGi1/0/23  AP-novo-A   connected  40   a-full  a-1000  10/100/1000BaseTX\nGi1/0/24  AP-novo-B   connected  40   a-full  a-1000  10/100/1000BaseTX",
+    "alternativas": [
+      "Gi1/0/23-24 connected sem PoE (Oper off) e Remaining 1.6 W: power budget esgotado; link de dados sobe, mas não há watts para os APs novos",
+      "LEDs apagados porque o canal Wi-Fi 11 está proibido no Brasil",
+      "connected a-1000 prova que monomodo foi exigido nas portas de acesso",
+      "CRC infinito nas portas 23/24 é a única leitura possível do show power inline"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para PoE esgotado, não para cabo de dados. No CLI, show power inline deixa Used ≈ Available (368.4 de 370) com Remaining 1.6 W; Gi1/0/23-24 ficam Oper off com 0 W embora connected — link sobe sem watts. Insight: connected ≠ powered; confira power budget antes de culpar RF. Canal 11 e fibra monomodo não explicam Oper off. O comando exibido não lista CRC infinito; a evidência é orçamento de potência.",
+    "part_id": "1.3",
+    "_sourceFile": "src/data/parts/part-1.3-tickets.json",
+    "_sourceIndex": 1
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7303 — porta do servidor de homologação “não sobe” após a janela de mudança. Cabo e NIC do servidor já foram validados em outro switch.",
+    "cli_output": "Access3# show interfaces GigabitEthernet1/0/15\nGigabitEthernet1/0/15 is administratively down, line protocol is down (disabled)\n  Hardware is Gigabit Ethernet, address is 00a1.b2c3.d415 (bia 00a1.b2c3.d415)\n  MTU 1500 bytes, BW 1000000 Kbit/sec\n  Encapsulation ARPA, loopback not set\n  Keepalive set (10 sec)\n  Auto-duplex, Auto-speed, media type is 10/100/1000BaseTX\n\nAccess3# show running-config interface GigabitEthernet1/0/15\ninterface GigabitEthernet1/0/15\n description SRV-HML\n switchport access vlan 30\n switchport mode access\n shutdown\n spanning-tree portfast\n\nAccess3# show interfaces GigabitEthernet1/0/15 status\nPort      Name       Status       Vlan  Duplex  Speed  Type\nGi1/0/15  SRV-HML    disabled     30    auto    auto   10/100/1000BaseTX",
+    "alternativas": [
+      "CRC elevado no output obriga troca imediata do patch OM4",
+      "A interface está administratively down (shutdown / disabled); é preciso no shutdown — não é falha de cabo do servidor já testado em outro switch",
+      "Status disabled significa ESS sem SSID no AP do rack",
+      "Auto-duplex prova duplex mismatch permanente com o NIC"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para interface desabilitada administrativamente. No CLI, administratively down / line protocol down, shutdown na running-config e status disabled. Insight: se o peer já funciona em outro switch, rode no shutdown local antes de trocar patch de novo. Não há CRC elevado no recorte para forçar troca OM4. “Disabled” não significa ESS/SSID no AP do rack. Auto-duplex com porta down não prova mismatch permanente com o NIC.",
+    "part_id": "1.3",
+    "_sourceFile": "src/data/parts/part-1.3-tickets.json",
+    "_sourceIndex": 2
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7304 — usuários do 2º andar associam no SSID CORP com sinal “bom”, mas a rede fica lenta no horário de pico. Survey rápido dos APs do andar foi colado no ticket.",
+    "cli_output": "WLC1> show ap config general AP-2A | include Channel|Power|SSID\n  AP Name                         : AP-2A\n  Country Code                    : BR\n  AP Primary SSID                 : CORP\n  2.4GHz Channel                  : 6\n  2.4GHz Tx Power                 : 8 (Highest)\n\nWLC1> show ap config general AP-2B | include Channel|Power|SSID\n  AP Name                         : AP-2B\n  AP Primary SSID                 : CORP\n  2.4GHz Channel                  : 6\n  2.4GHz Tx Power                 : 8 (Highest)\n\nWLC1> show ap config general AP-2C | include Channel|Power|SSID\n  AP Name                         : AP-2C\n  AP Primary SSID                 : CORP\n  2.4GHz Channel                  : 6\n  2.4GHz Tx Power                 : 7\n\nLaptop-user> netsh wlan show interfaces\n  SSID                   : CORP\n  State                  : connected\n  Signal                 : 82%\n  Radio type             : 802.11n\n  Channel                : 6\n\n# planta: AP-2A, AP-2B e AP-2C cobrem o mesmo open space com forte sobreposição",
+    "alternativas": [
+      "Associação e SSID CORP formam ESS, mas os três APs no canal 6 com potência alta geram interferência co-canal — planejar 1/6/11 e reduzir sobreposição",
+      "Signal 82% prova que o cliente não está associado (BSS inexistente)",
+      "Canal 6 único em todos os APs é o desenho non-overlapping ideal em 2,4 GHz",
+      "A lentidão só pode ser CRC na fibra monomodo do notebook"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para interferência co-canal: cliente connected ~82% no canal 6 e três APs CORP também no 6 com Tx alto. No CLI, associação/ESS está ok; o RF está mal planejado. Insight: em 2,4 GHz use 1/6/11 entre vizinhos e reduza sobreposição — sinal alto não nega BSS congestionada. Signal 82% prova associação, não BSS inexistente. Canal 6 único em todos os APs não é desenho non-overlapping. Lentidão desse padrão não se resume a CRC na fibra monomodo do notebook.",
+    "part_id": "1.3",
+    "_sourceFile": "src/data/parts/part-1.3-tickets.json",
+    "_sourceIndex": 3
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7305 — novo link entre prédios não sobe. A obra usou o que “sobrou no almoxarifado”. Inventário do enlace e do módulo foi anexado.",
+    "cli_output": "Dist-A# show interfaces TenGigabitEthernet1/1/1\nTenGigabitEthernet1/1/1 is down, line protocol is down (notconnect)\n  media type is 10Gbase-SR (SFP+)\n  ...\nDist-A# show inventory | include Te1/1/1|SFP\nNAME: \"Te1/1/1\", DESCR: \"1000/10000BaseSR SFP+\"\nPID: SFP-10G-SR\n\nDist-B# show interfaces TenGigabitEthernet1/1/1\nTenGigabitEthernet1/1/1 is down, line protocol is down (notconnect)\n  media type is 10Gbase-SR (SFP+)\n\nFACILITIES> plant-cable-id: BLDG-A-B-01\n  Cable type marked on jacket: OS2 Single-Mode\n  Measured length: 312 m\n  Connectors: LC-LC\n  Note: team also tried a spare UTP Cat5e run of 140 m on copper ports (link flapped, CRC)\n\nDist-A# show interfaces GigabitEthernet1/0/48 | include CRC|protocol|duplex\nGigabitEthernet1/0/48 is up, line protocol is up\n  Full-duplex, 100Mb/s\n     9021 input errors, 8804 CRC",
+    "alternativas": [
+      "LC-LC em 312 m sempre negocia 10G independentemente do tipo de fibra",
+      "notconnect com SFP-10G-SR (MMF) em planta OS2 monomodo é incompatibilidade de meio; o teste UTP 140 m ainda excede ~100 m e gerou CRC — ambos os meios estão incorretos para o desenho",
+      "CRC no cobre prova que o SFP-SR está saudável no monomodo",
+      "O link óptico está administratively down com shutdown explícito no output Te1/1/1"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para incompatibilidade de meio: SFP-10G-SR é multimodo de curto alcance, mas a planta é OS2 monomodo a 312 m — notconnect no óptico. No CLI, o teste UTP de 140 m ainda excede ~100 m e gerou CRC. Insight: combine transceiver e fibra (ou cobre no limite) antes de culpar protocolo. LC-LC sozinho não garante 10G em qualquer fibra. CRC no cobre não “prova” que o SR está saudável no monomodo. O óptico está notconnect, não administratively down com shutdown.",
+    "part_id": "1.3",
+    "_sourceFile": "src/data/parts/part-1.3-tickets.json",
+    "_sourceIndex": 4
+  },
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7401 — notebook novo “não sai da VLAN de usuários”. Ping no gateway falha; o júnior jura que o IP está “na mesma faixa 192.168.10”.",
+    "cli_output": "PC-USER> ipconfig\n   IPv4 Address. . . . . . . . . . . : 192.168.10.20\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 192.168.10.1\n\nPC-USER> ping 192.168.10.1\nEsgotado o tempo limite do pedido.\n\nDist1# show ip interface brief | include Vlan10\nVlan10   192.168.10.1   YES manual   up   up\n\nDist1# show running-config interface Vlan10\ninterface Vlan10\n ip address 192.168.10.1 255.255.255.128\n\nDist1# show ip route | include 192.168.10\nC        192.168.10.0/25 is directly connected, Vlan10\n\n# DHCP pool (trecho do servidor) — máscara entregue aos PCs:\n   Network: 192.168.10.0  Mask: 255.255.255.0  Gateway: 192.168.10.1",
+    "alternativas": [
+      "O gateway 192.168.10.1 está em outra cidade porque o ping falhou",
+      "PC em 192.168.10.0/24 (máscara .0) e SVI em 192.168.10.0/25 (.128): planos diferentes — host .20 e gateway .1 só coincidem na /25 se ambos usarem /25; com /24 no PC o desenho fica inconsistente com a rota C 192.168.10.0/25",
+      "SVI up/up prova que o notebook está em 169.254.0.0/16",
+      "Bastaria usar broadcast 192.168.10.255 como gateway do PC"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para mismatch de máscara entre host e infra. No CLI, o PC usa /24 (.0) e a SVI Vlan10 está em 192.168.10.0/25 (.128) com rota C /25 — planos diferentes. Insight: “mesma faixa 192.168.10” sem conferir prefix length gera falso positivo de L3. O .1 existe na SVI up/up; não “sumiu para outra cidade”. Não há APIPA no ipconfig. Usar broadcast 192.168.10.255 como gateway é inválido.",
+    "part_id": "1.4",
+    "_sourceFile": "src/data/parts/part-1.4-tickets.json",
+    "_sourceIndex": 0
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7402 — depois de “padronizar gateways no .0 da VLAN”, a subnet 10.50.4.0/26 ficou muda. O servidor de impressão não entrega pacotes ao default gateway.",
+    "cli_output": "PRINT-SRV> ipconfig\n   IPv4 Address. . . . . . . . . . . : 10.50.4.10\n   Subnet Mask . . . . . . . . . . . : 255.255.255.192\n   Default Gateway . . . . . . . . . : 10.50.4.0\n\nPRINT-SRV> ping 10.50.4.0\nEsgotado o tempo limite do pedido.\n\nDist2# show running-config interface Vlan40\ninterface Vlan40\n ip address 10.50.4.1 255.255.255.192\n\nDist2# show ip interface brief | include Vlan40\nVlan40   10.50.4.1   YES manual   up   up\n\n# cálculo de referência no runbook do time:\n# 10.50.4.0/26 → rede 10.50.4.0 | hosts 10.50.4.1–10.50.4.62 | broadcast 10.50.4.63",
+    "alternativas": [
+      "O gateway correto no output do servidor está em 10.50.4.0, endereço de rede /26; a SVI utilizável está em 10.50.4.1 — por isso o ping ao .0 falha",
+      "10.50.4.0/26 tem broadcast 10.50.4.0 e por isso o .0 é o melhor gateway",
+      "Vlan40 up/up com .1 indica que o servidor deveria usar 10.50.4.63 como gateway",
+      "Máscara .192 no servidor está errada; o correto seria /24 para qualquer VLAN 40"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para gateway apontando para endereço de rede. Em /26 o bloco tem 64 IPs: rede .0, hosts .1–.62, broadcast .63. No CLI, o servidor usa 10.50.4.0 enquanto a SVI está em 10.50.4.1 — ping ao .0 falha por isso. Insight: nunca configure gateway = network address do prefixo. Broadcast não é .0; .63 também não serve de gateway. A máscara .192 do servidor está coerente com o /26; não precisa virar /24.",
+    "part_id": "1.4",
+    "_sourceFile": "src/data/parts/part-1.4-tickets.json",
+    "_sourceIndex": 1
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7403 — usuário diz que “já tem IP, então a rede está ok”, mas não acessa nada interno nem a Internet. O helpdesk leu 169.254 e fechou o chamado como “configurado”.",
+    "cli_output": "PC-FIN> ipconfig /all\n   Ethernet adapter Ethernet:\n   DHCP Enabled. . . . . . . . . . . : Yes\n   Autoconfiguration Enabled . . . . : Yes\n   IPv4 Address. . . . . . . . . . . : 169.254.88.17(Preferred)\n   Subnet Mask . . . . . . . . . . . : 255.255.0.0\n   Default Gateway . . . . . . . . . :\n   DHCP Server . . . . . . . . . . . :\n   Autoconfiguration IPv4 Address. . : 169.254.88.17\n\nPC-FIN> ping 192.168.20.1\nEsgotado o tempo limite do pedido.\n\nAccess1# show mac address-table dynamic interface Gi1/0/12\n  20    0050.56aa.fin1    DYNAMIC   Gi1/0/12\n\nAccess1# show interfaces Gi1/0/12 status\nPort      Name       Status    Vlan  Duplex  Speed  Type\nGi1/0/12  PC-FIN     connected 20    a-full  a-1000 10/100/1000BaseTX",
+    "alternativas": [
+      "169.254.88.17 é unicast privado RFC 1918 equivalente a 10/8",
+      "Sem default gateway no output o host usará automaticamente 127.0.0.1 como saída",
+      "MAC aprendido na VLAN 20 prova que o DHCP entregou 192.168.20.x com sucesso",
+      "IP 169.254.88.17/16 (APIPA), sem DHCP Server e sem gateway no ipconfig: o host não recebeu lease — não é endereçamento corporativo válido"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O sintoma aponta para APIPA por falha de DHCP, não para IP corporativo válido. No CLI, 169.254.88.17 Preferred com Autoconfiguration, DHCP Server vazio e gateway vazio. Insight: 169.254/16 = “não obtive lease”; reabra o chamado e cheque DHCP/helper/SVI. 169.254 não é RFC1918 como 10/8. Sem gateway o host não usa 127.0.0.1 como saída. MAC aprendido na VLAN 20 só confirma L2 — não prova lease 192.168.20.x.",
+    "part_id": "1.4",
+    "_sourceFile": "src/data/parts/part-1.4-tickets.json",
+    "_sourceIndex": 2
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7404 — link /30 entre R1 e R2 não forma adjacência de roteamento. Um lado “aceita” o IP; o outro recusa ou não responde ping.",
+    "cli_output": "R1# show running-config interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n description LINK-R1-R2\n ip address 10.255.0.0 255.255.255.252\n\nR1# show ip interface brief | include GigabitEthernet0/0\nGigabitEthernet0/0   10.255.0.0   YES manual   up   up\n\nR2# show running-config interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n description LINK-R2-R1\n ip address 10.255.0.1 255.255.255.252\n\nR2# show ip interface brief | include GigabitEthernet0/0\nGigabitEthernet0/0   10.255.0.1   YES manual   up   up\n\nR2# ping 10.255.0.0\n.....  Success rate is 0 percent (0/5)\n\n# bloco /30 10.255.0.0/30:\n# rede 10.255.0.0 | hosts 10.255.0.1 e 10.255.0.2 | broadcast 10.255.0.3",
+    "alternativas": [
+      "R1 usa 10.255.0.0/30, que é o endereço de rede do /30; hosts válidos no link são .1 e .2 — o ping a .0 falha e o endereçamento de R1 está incorreto",
+      "Em /30 todos os quatro IPs (.0–.3) são hosts utilizáveis iguais",
+      "R2 com .1 está no broadcast do /30 e por isso não deveria pingar",
+      "Máscara .252 exige wildcard 0.0.0.0 para o link funcionar"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para IP de rede usado como endereço de interface no /30. No CLI, R1 tem 10.255.0.0/30 (network); hosts válidos no link são .1 e .2, broadcast .3 — por isso ping a .0 falha. Insight: em /30 só dois IPs utilizáveis; confira network/broadcast antes de culpar o IGP. Os quatro IPs (.0–.3) não são hosts iguais. R2 com .1 não está no broadcast. Máscara .252 não exige wildcard 0.0.0.0 na interface para o link subir.",
+    "part_id": "1.4",
+    "_sourceFile": "src/data/parts/part-1.4-tickets.json",
+    "_sourceIndex": 3
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7405 — duas VLANs “novas” no mesmo /24 (impressoras e IoT). Após o cutover, hosts de IoT colidem com impressoras e o Dist reporta rede inconsistente.",
+    "cli_output": "DOC-ENDEREÇAMENTO (pós-mudança)\n  VLAN 50 PRINT  192.168.50.0/26   gateway 192.168.50.1\n  VLAN 60 IOT    192.168.50.32/26  gateway 192.168.50.33\n\nDist3# show ip interface brief | include Vlan50|Vlan60\nVlan50   192.168.50.1    YES manual   up   up\nVlan60   192.168.50.33   YES manual   up   up\n\nDist3# show ip route | include 192.168.50\nC        192.168.50.0/26 is directly connected, Vlan50\nC        192.168.50.32/26 is directly connected, Vlan60\n\nPRINT-01> ipconfig\n   IPv4: 192.168.50.40  Mask: 255.255.255.192  Gateway: 192.168.50.1\n\nIOT-CAM> ipconfig\n   IPv4: 192.168.50.40  Mask: 255.255.255.192  Gateway: 192.168.50.33\n\n# verificação de blocos:\n# 192.168.50.0/26  → .0–.63\n# 192.168.50.32/26 → sobrepõe .32–.63 com o bloco anterior",
+    "alternativas": [
+      "Os dois hosts com .40 estão corretos porque gateways diferentes separam as subnets magicamente",
+      "Vlan50 e Vlan60 up/up provam que não há sobreposição possível em VLSM",
+      "192.168.50.0/26 ocupa .0–.63; 192.168.50.32/26 invade o mesmo intervalo — sobreposição VLSM visível nas rotas C e no IP .40 duplicado em PRINT e IOT",
+      "O correto seria manter ambos como /24 192.168.50.0 e usar o mesmo gateway .1"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para sobreposição VLSM: 192.168.50.0/26 ocupa .0–.63 e 192.168.50.32/26 invade o mesmo intervalo. No CLI, rotas C listam as duas e PRINT/IOT aparecem com o mesmo .40 em “redes” que se cruzam. Insight: alinhe blocos sem overlap (.0/26 e .64/26) antes do cutover. Gateways diferentes não legalizam overlap. SVI up/up não prova ausência de colisão de prefixo. Colapsar tudo em um /24 com o mesmo .1 anula a segmentação pretendida.",
+    "part_id": "1.4",
+    "_sourceFile": "src/data/parts/part-1.4-tickets.json",
+    "_sourceIndex": 4
+  },
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7501 — servidor de aplicação “tem IPv6 ligado”, mas não alcança o backend com GUA 2001:db8:10::50 em outra VLAN. Ping local no enlace às vezes responde em FE80.",
+    "cli_output": "SRV-APP> ipconfig\n   Ethernet adapter Ethernet0:\n   IPv6 Address. . . . . . . . . . . :\n   Link-local IPv6 Address . . . . . : fe80::a1b2:c3d4:e5f6:7788%12\n   IPv4 Address. . . . . . . . . . . : 10.10.10.20\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.10.10.1\n\nSRV-APP> ping 2001:db8:10::50\nPinging 2001:db8:10::50 with 32 bytes of data:\nDestination host unreachable.\n\nR1# show ipv6 interface brief GigabitEthernet0/1\nGi0/1    [up/up]\n    FE80::1\n    2001:DB8:20::1\n\nR1# show ipv6 interface GigabitEthernet0/1 | include advert|Joined|FE80|2001\n  No global unicast address advertised via RA to this segment check:\n  (RA suppressed / ipv6 nd ra suppress configured on access VLAN of SRV)\n  Joined group address(es):\n    FF02::1\n    FF02::2\n\nAccess-SVI# show running-config interface Vlan20\ninterface Vlan20\n ipv6 address 2001:DB8:20::1/64\n ipv6 nd ra suppress",
+    "alternativas": [
+      "O IPv4 10.10.10.20 prova que o GUA IPv6 2001:db8:10::50 está na mesma subnet do servidor",
+      "Destination host unreachable com apenas fe80::… no ipconfig e RA suppress na SVI: o host não formou GUA via SLAAC/RA — só link-local não alcança GUA remoto",
+      "FE80:: na interface significa GUA global válido para qualquer destino",
+      "FF02::1 no roteador substitui a necessidade de prefixo /64 no host"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para host só com link-local, sem GUA. No CLI, ipconfig lista fe80::…, a SVI tem ipv6 nd ra suppress (sem RA/SLAAC) e o ping ao GUA remoto falha com unreachable. Insight: FE80 não roteia off-link; sem RA ou config manual não nasce GUA. IPv4 OK não cria GUA IPv6. FE80 na interface não é GUA global válido. Multicast FF02::1 no roteador não atribui unicast /64 ao host.",
+    "part_id": "1.5",
+    "_sourceFile": "src/data/parts/part-1.5-tickets.json",
+    "_sourceIndex": 0
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7502 — notebook dual-stack acessa sistemas legados IPv4, mas falha em portais internos publicados só em IPv6. O time de app já culpou o certificado TLS.",
+    "cli_output": "PC-ENG> ipconfig\n   IPv4 Address. . . . . . . . . . . : 192.168.40.55\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 192.168.40.1\n   IPv6 Address. . . . . . . . . . . : 2001:db8:40:0:a1b2:c3d4:e5f6:99aa\n   Link-local IPv6 Address . . . . . : fe80::a1b2:c3d4:e5f6:99aa%8\n   Default Gateway . . . . . . . . . : fe80::1%8\n\nPC-ENG> ping 192.168.40.1\nResposta de 192.168.40.1: tempo=1ms\n\nPC-ENG> ping 2001:db8:90::10\nPinging 2001:db8:90::10 with 32 bytes of data:\nDestination net unreachable.\n\nPC-ENG> route print -6 | findstr /i \"::/0 2001\"\n  None listed for ::/0\n  2001:db8:40::/64  on-link\n\nCore# show ipv6 route ::/0\n% Route not found\nCore# show ip route 0.0.0.0\nS*  0.0.0.0/0 [1/0] via 203.0.113.1",
+    "alternativas": [
+      "Há GUA 2001:db8:40:… e on-link /64, mas não existe ::/0 no host nem no Core — dual-stack com default só IPv4; destinos IPv6 remotos ficam unreachable",
+      "Default gateway fe80::1%8 no PC prova que a rota ::/0 está instalada no Core",
+      "Ping IPv4 ao .1 falhando explicaria o IPv6; no output o IPv4 está ok e por isso o IPv6 deve usar 169.254",
+      "Certificado TLS é a única leitura possível de “net unreachable” no ping IPv6"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para falta de default IPv6. No CLI, route print -6 sem ::/0 e Core sem ::/0, enquanto 0.0.0.0/0 IPv4 existe — daí IPv4 OK e IPv6 remoto unreachable. Insight: dual-stack com GUA on-link mas sem ::/0 quebra só o caminho IPv6 remoto; TLS não é a primeira leitura de “net unreachable”. fe80::1%8 no PC não prova ::/0 instalada no Core. Ping IPv4 ok não manda o IPv6 para 169.254. Certificado não explica unreachable de L3.",
+    "part_id": "1.5",
+    "_sourceFile": "src/data/parts/part-1.5-tickets.json",
+    "_sourceIndex": 1
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7503 — estagiário afirmou que o PC “já recebeu IP válido” e encerrou o chamado de Internet. O usuário ainda não acessa nada da empresa.",
+    "cli_output": "PC-RECEP> ipconfig /all\n   DHCP Enabled. . . . . . . . . . . : Yes\n   Autoconfiguration Enabled . . . . : Yes\n   IPv4 Address. . . . . . . . . . . : 169.254.14.200(Preferred)\n   Subnet Mask . . . . . . . . . . . : 255.255.0.0\n   Default Gateway . . . . . . . . . :\n   DHCP Server . . . . . . . . . . . :\n   DNS Servers . . . . . . . . . . . :\n   Autoconfiguration IPv4 Address. . : 169.254.14.200\n\nPC-RECEP> ping 192.168.5.1\nEsgotado o tempo limite do pedido.\n\nAccess5# show interfaces Gi1/0/8 status\nPort      Name        Status     Vlan  Duplex  Speed  Type\nGi1/0/8   RECEP-PC    connected  50    a-full  a-1000 10/100/1000BaseTX\n\nAccess5# show mac address-table dynamic interface Gi1/0/8\n  50   0050.56aa.recp   DYNAMIC  Gi1/0/8",
+    "alternativas": [
+      "169.254.14.200 é GUA IPv6 comprimida incorretamente no Windows",
+      "DHCP Server vazio com gateway e DNS preenchidos prova lease completo RFC1918",
+      "IP 169.254.14.200/16 (APIPA), sem DHCP Server, sem gateway e sem DNS no ipconfig: o cliente não obteve lease — não é IP corporativo válido",
+      "MAC na VLAN 50 garante que o default gateway 192.168.5.1 já foi instalado via RA"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para APIPA disfarçado de “IP válido”. No CLI, Autoconfiguration 169.254.14.200, DHCP Server/gateway/DNS vazios — típico de falha de DHCP. Insight: se não há DHCP Server nem gateway no ipconfig, o lease não aconteceu. 169.254 não é GUA IPv6 comprimida. Gateway/DNS preenchidos com DHCP Server vazio não seria o cenário deste output. MAC na VLAN 50 só confirma L2; não instala 192.168.5.1 via RA.",
+    "part_id": "1.5",
+    "_sourceFile": "src/data/parts/part-1.5-tickets.json",
+    "_sourceIndex": 2
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7504 — “a Internet caiu” no setor financeiro. O analista viu ping 1.1.1.1 funcionando e culpou o firewall de borda.",
+    "cli_output": "PC-FIN> ipconfig /all\n   IPv4 Address. . . . . . . . . . . : 10.60.2.44\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.60.2.1\n   DNS Servers . . . . . . . . . . . : 10.255.255.255\n                                       10.255.255.254\n\nPC-FIN> ping 1.1.1.1\nResposta de 1.1.1.1: tempo=12ms\n\nPC-FIN> ping www.empresa.local\nPing request could not find host www.empresa.local.\n\nPC-FIN> nslookup www.empresa.local\nDNS request timed out.\n    timeout was 2 seconds.\nServer:  UnKnown\nAddress:  10.255.255.255\n\n# observação NOC: 10.255.255.255/254 não são os resolvers oficiais (oficiais = 10.60.0.10 e 10.60.0.11)",
+    "alternativas": [
+      "Ping 1.1.1.1 OK com nslookup timeout em 10.255.255.255: gateway/rota de saída funcionam; o problema visível é DNS inválido no cliente, não queda total de Internet L3",
+      "Default gateway 10.60.2.1 está em outra subnet porque a máscara é /24",
+      "Falha de nome com ping IP OK prova ausência de NAT PAT na borda",
+      "10.255.255.255 no campo DNS é o loopback IPv6 ::1"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para DNS inválido, não para queda total de L3. No CLI, ping 1.1.1.1 OK (IP/máscara/gateway permitem saída) e nslookup para 10.255.255.255 dá timeout — nome não resolve. Insight: ping a IP público + falha de nome = confira DNS do cliente antes de culpar firewall/NAT. Gateway 10.60.2.1 é coerente com 10.60.2.44/24. Falha de nome com ping IP OK não prova ausência de PAT. 10.255.255.255 no campo DNS não é ::1.",
+    "part_id": "1.5",
+    "_sourceFile": "src/data/parts/part-1.5-tickets.json",
+    "_sourceIndex": 3
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7505 — impressora nova pinga outros hosts da VLAN 30, mas não imprime em filas na VLAN 40 nem “sai para a rede”. A config estática foi digitada no painel web.",
+    "cli_output": "PRN-30> (menu de rede — dump técnico)\n  IP Address      : 192.168.30.80\n  Subnet Mask     : 255.255.255.0\n  Default Gateway : 0.0.0.0\n  DNS Primary     : 192.168.30.10\n\nTech-PC> ping 192.168.30.80\nResposta de 192.168.30.80: tempo<1ms\n\nTech-PC> tracert 192.168.40.20\n  1  192.168.30.1  1 ms\n  2  192.168.40.20  2 ms\n\nDist# show ip interface brief | include Vlan30\nVlan30   192.168.30.1   YES manual   up   up\n\nPRN-30> ping 192.168.30.1\nEsgotado o tempo limite do pedido.   # gateway em branco/0.0.0.0 no device\nPRN-30> ping 192.168.40.20\nEsgotado o tempo limite do pedido.",
+    "alternativas": [
+      "DNS 192.168.30.10 na mesma VLAN obriga gateway 0.0.0.0",
+      "Ping local ao .80 prova que a impressora já tem rota para 192.168.40.0/24",
+      "Vlan30 SVI .1 down explica o tracert bem-sucedido do Tech-PC",
+      "Default Gateway 0.0.0.0 no dump da impressora: tráfego local na /24 funciona, mas sem gateway válido (deveria ser 192.168.30.1) não há saída para a VLAN 40"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O sintoma aponta para default gateway 0.0.0.0 na impressora. No CLI, pings a 192.168.30.1 e 192.168.40.20 falham nela, enquanto hosts locais a alcançam e o Tech-PC faz tracert via .1; SVI Vlan30 está up/up. Insight: ping local na /24 não prova rota off-subnet — corrija o gateway para 192.168.30.1. DNS na mesma VLAN não obriga gateway 0.0.0.0. Ping ao .80 é só alcance local. SVI down não explicaria o tracert bem-sucedido do Tech-PC.",
+    "part_id": "1.5",
+    "_sourceFile": "src/data/parts/part-1.5-tickets.json",
+    "_sourceIndex": 4
+  },
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7601 — proposta de “modernização” da filial de 7 pessoas inclui spine-leaf e core three-tier. O inventário real foi anexado para validação.",
+    "cli_output": "INVENTARIO-FILIAL-07\n  Endpoints: 7 PCs + 1 impressora\n  1x ISR-1121 (WAN/NAT/VPN)     BR-FIL07-R1\n  1x CBS250-16T (access)        BR-FIL07-SW1\n  1x AP1815 (autônomo)\n\nBR-FIL07-R1# show ip interface brief\nGi0/0/0  198.51.100.20  YES DHCP   up  up  (WAN)\nGi0/0/1  192.168.7.1    YES manual up  up  (LAN)\n\nBR-FIL07-SW1# show cdp neighbors\nDevice ID        Local Intrfce   Capability  Platform\nBR-FIL07-R1      Gi1/0/1         R S I        ISR1121\nBR-FIL07-AP1     Gi1/0/8         T            AP1815\n\nPROPOSTA-ARQUITETO:\n  \"2x Spine + 4x Leaf + Core three-tier dedicado + 2x distribution\"",
+    "alternativas": [
+      "CDP sem leaf prova que spine-leaf já está em produção e deve expandir",
+      "Inventário é SOHO (roteador+switch+AP, 7 endpoints); spine-leaf/three-tier completo é oversized para o porte",
+      "Default WAN no ISR exige fabric leaf por PC",
+      "Seven PCs tornam collapsed core ilegal"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para oversize de arquitetura. No CLI/inventário, ISR + CBS250 + AP1815 e 7 endpoints — SOHO clássico via CDP; a proposta com spines/leafs/core multi-tier não encontra base no porte. Insight: dimensione pelo inventário e pelo tráfego, não pelo slide de DC. CDP sem leaf não prova fabric em produção. Default WAN no ISR não exige leaf por PC. Collapsed core não fica “ilegal” com sete PCs — aqui o fit é SOHO.",
+    "part_id": "1.6",
+    "_sourceFile": "src/data/parts/part-1.6-tickets.json",
+    "_sourceIndex": 0
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7602 — campus de 3 prédios discute se precisa de core separado ou collapsed core. O diagrama textual do NOC foi colado no ticket.",
+    "cli_output": "CAMPUS-MEDIO (rascunho atual)\n  Predio-A/B/C: ~180 access ports total\n  Access switches: 12x (um por andar)\n  Agregacao atual: 2x 9300 em stack  (AGG1)\n  Links AGG1 <-> WAN edge: 2x 10G\n  NAO existe par de core separado hoje\n  Crescimento previsto: +1 predio em 18 meses, politica L3 na agregacao\n\nshow cdp neighbors (AGG1) — trecho\n  Access-A1 ... Access-C4  (todos uplinks no AGG1)\n  Edge-FW1\n\nOPCAO-1: manter AGG1 como collapsed core (two-tier)\nOPCAO-2: inserir par Core dedicado e rebaixar AGG a distribution only",
+    "alternativas": [
+      "Com ~180 portas, um único tier de agregação/backbone e crescimento moderado, two-tier (collapsed core) costuma bastar; three-tier só se houver necessidade clara de core dedicado separado",
+      "Todo campus com 12 access switches obriga spine-leaf de DC",
+      "Sem core separado o CDP não funciona",
+      "WAN edge 10G proíbe collapsed core para sempre"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para decisão de tier adequada ao porte médio. No rascunho, ~180 portas, access→AGG stack→edge já opera collapsed; two-tier costuma bastar, three-tier só se houver necessidade clara de core dedicado. Insight: não escale para three-tier/spine-leaf sem dor de agregação ou política L3 que exija. Doze access switches não obrigam fabric de DC. CDP não depende de core separado. WAN edge 10G não proíbe collapsed core.",
+    "part_id": "1.6",
+    "_sourceFile": "src/data/parts/part-1.6-tickets.json",
+    "_sourceIndex": 1
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7603 — o negócio pediu “servidor na nuvem”; compras abriu SaaS ilimitado. O time de app precisa instalar Windows e o ERP próprio com RDP e patch interno.",
+    "cli_output": "TICKET-COMPRAS #C-9921\n  Item solicitado: \"Cloud Server SaaS Enterprise Unlimited\"\n  Justificativa usuario: \"subir Windows Server, SQL e ERP legados\"\n  Restricoes:\n    - precisamos de RDP/admin no SO\n    - patch mensal do Windows pela equipe interna\n    - backup de VM sob nosso controle\n\nEMAIL-ARQUITETO (trecho)\n  \"SaaS = app pronta (ex.: e-mail). IaaS = VM/infra. PaaS = plataforma.\"\n\nCATALOGO-PROVEDOR (mock)\n  SKU-SAAS-MAIL   ... aplicacao de e-mail\n  SKU-IAAS-VM     ... vCPU/RAM/disk + hypervisor gerenciado, SO guest do cliente\n  SKU-PAAS-DB     ... banco gerenciado sem SO guest",
+    "alternativas": [
+      "SKU-SAAS-MAIL atende RDP e patch de Windows do ERP",
+      "SKU-PAAS-DB entrega SO Windows completo para o ERP monólito",
+      "Requisito de SO guest, RDP e patch interno casa com IaaS (SKU-IAAS-VM), não com SaaS de app pronta do ticket de compras",
+      "Qualquer SKU cloud é SaaS se a palavra “Enterprise” aparecer"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para modelo de serviço errado no pedido de compras. Os requisitos (SO guest, RDP, patch e backup da VM sob controle) casam com IaaS (SKU-IAAS-VM), não com app pronta. Insight: classifique pelo que você administra no guest, não pelo rótulo “Enterprise”. SaaS-mail não entrega RDP/Windows do ERP. PaaS-DB não entrega SO Windows completo para monólito. A palavra “Enterprise” não transforma qualquer SKU em SaaS adequado.",
+    "part_id": "1.6",
+    "_sourceFile": "src/data/parts/part-1.6-tickets.json",
+    "_sourceIndex": 2
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7604 — o time debate como empacotar o novo microserviço. Requisitos de isolamento e runtime foram colados no ticket de plataforma.",
+    "cli_output": "REQ-PLATAFORMA v1.3\n  - App: API Node.js + deps npm\n  - Deploy: 20x/dia em CI\n  - Isolamento: processo/namespace suficiente; NAO precisa kernel Windows dedicado\n  - Startup alvo: < 3 segundos por instancia\n  - Imagem deve caber em pipeline de registry\n\nLAB-HYPERVISOR (opcao A)\n  VM full: Windows Server 2022 + app  | boot ~90s | vCPU 4 / RAM 8GB\n\nLAB-CONTAINER (opcao B)\n  image: node:20-alpine + app         | start ~2s  | CPU 0.5 / RAM 256MB\n\nCOMENTARIO-DEV\n  \"Nao temos driver de kernel custom. So runtime de app.\"",
+    "alternativas": [
+      "Com app stateless leve, deploys frequentes e sem kernel guest dedicado, container (opção B) atende melhor que VM full Windows",
+      "VM de 90s é obrigatória para qualquer API Node",
+      "SaaS de e-mail substitui o registry de imagens",
+      "Requisito de <3s prova que só three-tier resolve o runtime"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para container como melhor fit: API Node leve, deploys 20×/dia, sem kernel Windows dedicado e startup <3s. No lab, node:20-alpine sobe ~2s com 256 MB vs VM Windows ~90s/8 GB. Insight: escolha runtime pelo isolamento necessário — processo/namespace basta aqui. VM de 90s não é obrigatória para qualquer API Node. SaaS de e-mail não substitui registry de imagens. Meta de <3s não prova que “só three-tier” resolve o empacotamento.",
+    "part_id": "1.6",
+    "_sourceFile": "src/data/parts/part-1.6-tickets.json",
+    "_sourceIndex": 3
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #7605 — DC novo com tráfego server↔server forte; a mesma planilha de BoM foi colada por engano na filial de 5 PCs.",
+    "cli_output": "DC-PROJETO (válido)\n  48 racks app/db | east-west alto\n  Leaf por rack | dual-home a 4 spines | 100G fabric\n  Justificativa: paths curtos server-server\n\nFILIAL-05 (BoM colado por engano)\n  Endpoints: 5\n  Mesmo BoM: 4 spines + 48 leafs + 100G\n\nshow inventory FILIAL-05 (hoje)\n  NAME: \"Chassis\"  DESCR: \"C1111-8P\" \n  NAME: \"Switch\"   DESCR: \"CBS110-8T\"\n\nANALISE-CUSTO\n  BoM DC na filial = 40x o CAPEX do site atual",
+    "alternativas": [
+      "Filial de 5 PCs deve herdar 48 leafs porque east-west de DC é universal",
+      "C1111+CBS110 já é spine-leaf de produção",
+      "100G fabric é o mínimo CCNA para qualquer SOHO",
+      "Spine-leaf se justifica no DC (east-west/racks); na filial o inventário e o CAPEX pedem SOHO/two-tier — copiar o BoM do DC é incorreto"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O sintoma aponta para BoM de DC aplicado no lugar errado. Spine-leaf com 48 leafs/100G se justifica no DC (east-west/racks); na filial, inventário C1111+CBS110 e 5 endpoints pedem SOHO/two-tier — CAPEX ~40×. Insight: não copie fabric de DC para site SOHO só porque a planilha estava aberta. East-west de DC não é universal na filial. C1111+CBS110 não é spine-leaf de produção. 100G não é “mínimo CCNA” para qualquer SOHO.",
+    "part_id": "1.6",
+    "_sourceFile": "src/data/parts/part-1.6-tickets.json",
+    "_sourceIndex": 4
+  },
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8201 — servidor de arquivos foi movido da sala A para a sala B. Usuários reclamam de lentidão e “tráfego estranho” no uplink; o júnior diz que a VLAN sumiu.",
+    "cli_output": "Access1# show mac address-table dynamic | include 0050.56aa.f001\n  (empty — no entry for 0050.56aa.f001)\n\nAccess1# show mac address-table dynamic interface Gi1/0/8\n  (empty)\n\nAccess1# show interfaces status | include Gi1/0/8|Gi1/0/22\nGi1/0/8   SRV-OLD-PATCH   notconnect   1    auto   auto   10/100/1000BaseTX\nGi1/0/22  SRV-NEW-LOC     connected    1    a-full a-1000  10/100/1000BaseTX\n\nAccess1# show mac address-table dynamic interface Gi1/0/22\n  (empty — capture during idle)\n\n# após ping forçado do notebook do técnico para o IP do servidor:\nAccess1# show mac address-table dynamic | include 0050.56aa.f001\n    1    0050.56aa.f001    DYNAMIC     Gi1/0/22\n\nTech-PC# (debug textual) first frames to SRV showed high unknown-unicast rate on uplink until MAC relearned",
+    "alternativas": [
+      "Gi1/0/8 notconnect e MAC ausente na porta antiga; após tráfego o MAC 0050.56aa.f001 aparece em Gi1/0/22 — unknown unicast/flood até reaprendizado na porta nova, não “VLAN sumida”",
+      "MAC vazio em Gi1/0/22 idle prova que o switch roteia por IP na CAM",
+      "notconnect em Gi1/0/8 significa aging zero no chassis inteiro",
+      "Flood de unknown unicast só ocorre com destino FFFF.FFFF.FFFF"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para reaprendizado de MAC após move físico. No CLI, Gi1/0/8 (porta antiga) notconnect sem MAC; após ping, 0050.56aa.f001 aparece em Gi1/0/22 — até lá houve flood de unknown unicast no uplink. Insight: host mudou de porta = flood temporário até a CAM reaprender; isso não é “VLAN sumida”. CAM vazia em idle não prova roteamento por IP. notconnect na porta antiga não zera aging do chassis inteiro. Flood de unknown unicast não exige destino FFFF.FFFF.FFFF (isso é broadcast).",
+    "part_id": "2.1",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 0
+  }
+]

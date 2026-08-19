@@ -11,7 +11,7 @@
       "6 camadas, numeradas de 1 (Enlace) a 6 (Aplicação)"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "O OSI organiza a comunicação em sete camadas: Física (1) até Aplicação (7). A opção com 4 camadas descreve o TCP/IP, não o OSI. Cinco ou seis camadas não correspondem ao modelo de referência padrão usado na classificação de dispositivos e no troubleshooting do CCNA.",
+    "explicacao_profunda": "O modelo OSI padroniza sete camadas numeradas de baixo para cima: Física (1), Enlace (2), Rede (3), Transporte (4), Sessão (5), Apresentação (6) e Aplicação (7). Quatro camadas com Aplicação no topo descrevem a pilha TCP/IP prática, não o OSI. Cinco camadas começando em 0 (Bits) misturam nomenclatura informal com numeração inválida — o OSI não usa camada 0. Seis camadas a partir do Enlace omitem a Física e quebram a contagem oficial. Dica de prova: se pedirem OSI, responda 7 (1 Física → 7 Aplicação); se pedirem TCP/IP, pense em 4.",
     "part_id": "1.1"
   },
   {
@@ -26,7 +26,7 @@
       "Bits"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Na camada 3 a PDU é o pacote, usado com endereçamento IP e encaminhamento. Segmento (ou datagrama UDP) é de L4; quadro é de L2 (Enlace); bits são de L1 (Física). Usar o termo correto da camada evita confusão em questões de encapsulamento.",
+    "explicacao_profunda": "Na camada de Rede (L3) a PDU é o pacote: cabeçalho IP + dados, com endereçamento lógico e decisão de encaminhamento/roteamento. Segmento é a PDU típica do TCP em L4 (UDP costuma chamar datagrama). Quadro (frame) pertence ao Enlace (L2), com MAC e FCS. Bits são a PDU da Física (L1) no meio. Tip de prova: memorize PDU por camada — bits → quadro → pacote → segmento/datagrama — para não cair em troca de termos no encapsulamento.",
     "part_id": "1.1"
   },
   {
@@ -41,7 +41,7 @@
       "Fragmenta obrigatoriamente o fluxo em bits sem manter cabeçalhos"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "No envio, cada camada inferior acrescenta seu cabeçalho aos dados; em Ethernet a camada de Enlace também adiciona trailer. Remover cabeçalhos é desencapsulamento no destino. Converter IP em MAC e fragmentar em bits são etapas pontuais, não a definição geral do encapsulamento.",
+    "explicacao_profunda": "No encapsulamento no host de origem, cada camada inferior recebe a SDU da superior e acrescenta seu próprio cabeçalho; em Ethernet a camada de Enlace ainda coloca trailer (FCS). Remover cabeçalho/trailer é desencapsulamento no destino, não no envio. Converter IP em MAC (ARP) é um serviço pontual de L3→L2 antes de montar o quadro, não a definição geral do encapsulamento. Fragmentar o fluxo em bits sem manter cabeçalhos invertiria o modelo: os cabeçalhos viajam até a camada correspondente no peer. No troubleshooting, pense “quem adiciona o quê” ao subir/descer a pilha.",
     "part_id": "1.1"
   },
   {
@@ -56,7 +56,7 @@
       "4: Aplicação, Transporte, Internet e Acesso à rede"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "O TCP/IP prático usa quatro camadas: Aplicação, Transporte, Internet (ou Rede) e Acesso à rede/meio. As sete camadas listadas são do OSI. Modelos de 2 ou 3 camadas não representam a pilha TCP/IP padrão estudada no CCNA.",
+    "explicacao_profunda": "A pilha TCP/IP usada no CCNA tem quatro camadas: Aplicação, Transporte, Internet (Rede) e Acesso à rede (meio/enlace). Sete camadas com Apresentação e Sessão separadas são o OSI, não o TCP/IP. Três camadas (Host/Gateway/Meio) é simplificação informal sem padronização de prova. Duas (Lógica/Física) é demais grosso e não posiciona Transporte nem Internet. Dica: mapeie mentalmente Aplicação TCP/IP ↔ OSI 5–7, Transporte ↔ 4, Internet ↔ 3, Acesso ↔ 1–2.",
     "part_id": "1.1"
   },
   {
@@ -71,7 +71,7 @@
       "Apenas à camada 4 (Transporte)"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "No TCP/IP, a Aplicação agrupa o que o OSI separa em Aplicação, Apresentação e Sessão (5–7). Não fica restrita só à L7. L1/L2 formam o Acesso à rede no TCP/IP, e L4 permanece como Transporte em ambos os modelos.",
+    "explicacao_profunda": "No mapeamento clássico, a Aplicação do TCP/IP agrega Sessão, Apresentação e Aplicação do OSI (camadas 5, 6 e 7): o host não separa essas funções em pilhas distintas na prática. Restringir só à L7 ignora compressão/sessão que o TCP/IP embute na mesma faixa. L1 e L2 formam o Acesso à rede do TCP/IP, não a Aplicação. L4 continua sendo Transporte nos dois modelos — HTTP/DNS/SSH não “viram” Transporte. Em questão de mapeamento, fuja da armadilha “Aplicação = só camada 7”.",
     "part_id": "1.1"
   },
   {
@@ -86,7 +86,7 @@
       "Física (camada 1)"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "A camada de Rede (L3) trata de IP, pacotes e encaminhamento/roteamento entre redes. Enlace (L2) usa MAC e quadros no domínio local; Transporte (L4) usa portas e TCP/UDP; Física (L1) lida com bits e sinais no meio.",
+    "explicacao_profunda": "Endereçamento lógico global (IPv4/IPv6) e roteamento entre redes são funções da camada de Rede (L3): o pacote carrega o IP e os roteadores decidem o próximo salto. Enlace (L2) trabalha com MAC e quadros dentro do domínio de broadcast. Transporte (L4) multiplexa processos com portas TCP/UDP e confiabilidade opcional. Física (L1) trata sinal, cabo, bits e mídia — sem IP. Tip TShoot: se o ping falha entre subnets diferentes com L2 local ok, suba para L3 (gateway/rota), não fique só na MAC table.",
     "part_id": "1.1"
   },
   {
@@ -101,7 +101,7 @@
       "TCP não usa portas; UDP usa portas e sequência de bytes"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "TCP oferece conexão, sequência, ACK, retransmissão e controle de fluxo/congestionamento. UDP não estabelece conexão e entrega best-effort, com cabeçalho mais simples. As demais opções invertem papéis ou atribuem ao UDP recursos exclusivos do TCP.",
+    "explicacao_profunda": "TCP é orientado a conexão (three-way handshake), confiável (seq/ACK/retransmissão) e com controle de fluxo/congestionamento; UDP é connectionless e best-effort, com cabeçalho mínimo. A opção que diz o contrário (UDP confiável / TCP só best-effort) inverte os papéis. Afirmar que ambos fazem handshake e reordenam igual atribui ao UDP recursos exclusivos do TCP. Dizer que TCP não usa portas é falso — ambos usam portas; sequência de bytes é tipicamente TCP. Dica de prova: voz/vídeo em tempo real → UDP; arquivo com garantia → TCP.",
     "part_id": "1.1"
   },
   {
@@ -116,7 +116,7 @@
       "SYN, SYN-ACK, ACK"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "O estabelecimento TCP usa SYN do originador, SYN-ACK do destinário e ACK final do originador. FIN aparece no encerramento; RST aborta; sequências com ACK/FIN/SYN fora dessa ordem não representam o three-way handshake de abertura.",
+    "explicacao_profunda": "A abertura TCP usa three-way handshake: o cliente envia SYN, o servidor responde SYN-ACK e o cliente fecha com ACK — só então a sessão está estabelecida. ACK, SYN, FIN mistura confirmação com término e não é a ordem de abertura. SYN, ACK, RST termina/aborta em vez de completar a sessão. FIN, ACK, SYN começa pelo encerramento. FIN e RST aparecem no fechamento ou reset; não substituem o trio de abertura. No Wireshark/CLI, procure exatamente essa sequência no início do fluxo.",
     "part_id": "1.1"
   },
   {
@@ -131,7 +131,7 @@
       "1 a 65535 sem subdivisão oficial"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Well-known ports ocupam 0–1023 e costumam ser usadas por serviços de servidor. Registradas vão de 1024 a 49151; dinâmicas/privadas de 49152 a 65535. Não há uma única faixa “sem subdivisão” na classificação IANA estudada.",
+    "explicacao_profunda": "A IANA classifica well-known ports em 0–1023: serviços de servidor clássicos (SSH 22, HTTP 80, HTTPS 443, etc.). 1024–49151 são registered ports. 49152–65535 são dynamic/private (efêmeras de cliente). Não existe na classificação estudada uma única faixa “1–65535 sem subdivisão”. Tip de prova: destino well-known no servidor + origem efêmera no cliente é o padrão cliente–servidor web.",
     "part_id": "1.1"
   },
   {
@@ -146,7 +146,7 @@
       "O MAC substitui o IP sempre que o host usa TCP em vez de UDP"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "MAC (L2) identifica hosts no domínio de broadcast Ethernet; IP (L3) fornece endereçamento lógico que permite rotear entre redes. Não são sinônimos, não operam em L4 e o tipo de transporte (TCP/UDP) não faz o MAC substituir o IP.",
+    "explicacao_profunda": "MAC identifica a interface no domínio L2 Ethernet (broadcast local); IP fornece endereçamento lógico na Rede e permite rotear entre redes distintas. Afirmar que o MAC é “global na Internet” e o IP “só na LAN” inverte os papéis. MAC e IP não são sinônimos nem operam na Transporte (L4). O uso de TCP versus UDP não faz o MAC substituir o IP — as camadas cooperam no encapsulamento. Em TShoot: mesmo IP errado com MAC ok ainda quebra L3; mesmo MAC errado com IP ok quebra a entrega no enlace local.",
     "part_id": "1.1"
   },
   {
@@ -161,7 +161,7 @@
       "Enlace (camada 2)"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Apresentação (L6) cuida de como os dados são representados e formatados. Sessão (L5) gerencia diálogos; Transporte (L4) entrega entre processos com portas; Enlace (L2) enquadra e endereça com MAC. Confundir L5 com L6 é erro comum.",
+    "explicacao_profunda": "A camada de Apresentação (L6) cuida de representação, codificação, compressão e formatação dos dados para a aplicação. Sessão (L5) gerencia o diálogo (estabelecer/manter/encerrar sessões). Transporte (L4) entrega entre processos com portas e TCP/UDP. Enlace (L2) monta quadros e usa MAC/FCS. Confundir L5 com L6 é armadilha clássica: “sessão” ≠ “como os bytes são apresentados”.",
     "part_id": "1.1"
   },
   {
@@ -176,7 +176,7 @@
       "Switch de camada 2"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "O switch L2 aprende e encaminha por MAC. Roteador opera em L3 com IP. Firewall de aplicação atua em níveis superiores. Repetidor regenera sinal em L1 e não usa tabela MAC. A associação dispositivo–camada é ponto clássico de prova.",
+    "explicacao_profunda": "Switch de camada 2 aprende MACs na CAM table e encaminha/filtra quadros entre portas no mesmo domínio L2. Roteador decide por IP em L3 e reescreve o quadro a cada hop. Firewall de aplicação (L7) inspeciona conteúdo/políticas de app, não é o encaminhador MAC padrão. Repetidor só regenera sinal em L1 e não mantém tabela de endereços. Associe dispositivo → camada: hub/repetidor L1, switch L2, roteador L3.",
     "part_id": "1.1"
   },
   {
@@ -191,7 +191,7 @@
       "Quadro Ethernet"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Em L4, TCP usa o termo segmento e UDP costuma usar datagrama. Pacote é PDU de L3; quadro é de L2. Chamar o UDP de “segmento” ou “pacote” sem contexto perde a precisão pedida em questões de nomenclatura de PDU.",
+    "explicacao_profunda": "Na nomenclatura de PDU de Transporte, UDP usa datagrama; TCP usa segmento. Pacote IP é PDU da Rede (L3). Quadro Ethernet é PDU do Enlace (L2). Chamar UDP de “segmento” mistura termos TCP; chamar de “pacote” sobe uma camada sem necessidade. Em questões de encapsulamento, o termo exato da PDU costuma valer ponto — memorize o par protocolo↔PDU.",
     "part_id": "1.1"
   },
   {
@@ -206,7 +206,7 @@
       "Camada 7 (Aplicação)"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Internet no TCP/IP alinha-se à Rede do OSI (L3): IP e roteamento. Transporte TCP/IP = L4; Acesso à rede une L1+L2; Aplicação TCP/IP cobre L5–L7. Misturar “Internet” com L4 ou L7 é armadilha frequente.",
+    "explicacao_profunda": "A camada Internet do TCP/IP corresponde à Rede do OSI (L3): IP, ICMP e roteamento. Transporte TCP/IP alinha-se à L4. Acesso à rede cobre Física+Enlace (1–2). Aplicação TCP/IP cobre 5–7, não a Internet. Rotular “Internet” como L4 ou L7 é armadilha de nome parecido com “Internet” do dia a dia. Mapa rápido: Internet stack = pacotes IP.",
     "part_id": "1.1"
   },
   {
@@ -221,7 +221,7 @@
       "Converter bits em quadros antes do protocolo IP"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "A multiplexação por portas permite que várias aplicações compartilhem o mesmo IP sem misturar fluxos. MAC é de L2 e não identifica aplicação; rota é de L3; conversão bits/quadro é de L1/L2, não a função de multiplexação da Transporte.",
+    "explicacao_profunda": "A Transporte multiplexa várias aplicações no mesmo host usando números de porta de origem e destino (socket com o IP). MAC identifica a NIC em L2, não o processo. Rota L3 no switch/roteador escolhe próximo salto entre redes, não separa processos no host. Converter bits em quadros é papel de L1/L2 antes/depois do IP, não a multiplexação L4. Tip: netstat/ss mostram exatamente essa associação IP:porta por fluxo.",
     "part_id": "1.1"
   },
   {
@@ -236,7 +236,7 @@
       "Reagrupar os dados na ordem correta antes de entregar à aplicação"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "Sequência identifica bytes e permite reordenar segmentos no destino, entregando um fluxo contíguo à aplicação. Não se descarta tudo por padrão, não se entrega à Rede (L3) nem se converte TCP em UDP. Reordenação é base da confiabilidade TCP.",
+    "explicacao_profunda": "Números de sequência TCP identificam bytes no fluxo; o receptor reordena segmentos que chegaram fora de ordem e só então entrega o stream contíguo à aplicação. Descartar tudo e reiniciar o handshake não é o comportamento padrão ante reordenação. Entregar bytes aleatórios à Rede (L3) inverte direção e camada. Converter TCP em UDP para “reduzir latência” não existe no protocolo. Sem sequência, a confiabilidade fim a fim do TCP não se sustenta.",
     "part_id": "1.1"
   },
   {
@@ -251,7 +251,7 @@
       "A porta well-known que o servidor deve escutar"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Window size implementa controle de fluxo: limita quantos dados ficam em trânsito sem ACK. Não define rotas, MTU Ethernet nem número de porta de serviço. Confundir janela com porta ou com tamanho de quadro é erro típico.",
+    "explicacao_profunda": "O window size limita quantos dados a origem pode ter em trânsito sem nova confirmação — controle de fluxo do receptor. Não define quantas rotas OSPF o host instala (isso é plano de controle L3). Não fixa o tamanho dos quadros Ethernet (MTU/L2). Não escolhe a well-known port do servidor (isso é o serviço em escuta). Em prova, janela = “quanto posso enviar antes do próximo ACK”, não porta nem MTU.",
     "part_id": "1.1"
   },
   {
@@ -266,7 +266,7 @@
       "Apagar a tabela MAC do switch mais próximo"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Segmentos não confirmados são retransmitidos após timeout, voltando ao último ACK recebido. Isso não desliga a interface, não troca TCP por UDP e não altera a tabela MAC do switch. Muitas retransmissões podem indicar perda ou congestionamento.",
+    "explicacao_profunda": "Se os ACKs não chegam a tempo, o TCP retransmite a partir do último ponto confirmado (RTO). Isso não desliga a interface física do host. Não troca a sessão permanentemente para UDP. Não apaga a tabela MAC do switch — L2 é outro plano. Muitas retransmissões no Wireshark sugerem perda, congestionamento ou caminho ruim; trate a causa, não “reinicie a NIC” como primeira resposta conceitual.",
     "part_id": "1.1"
   },
   {
@@ -281,7 +281,7 @@
       "NAT overload obrigatório em toda sessão"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Controle de congestionamento no TCP usa janelamento dinâmico, incluindo slow start e janela móvel. ARP, STP e NAT não são mecanismos de congestionamento da sessão TCP. A prova costuma ligar “slow start/janela” a TCP, não a protocolos de L2/L3 de comutação.",
+    "explicacao_profunda": "Controle de congestionamento TCP começa com few data (slow start) e ajusta a janela de transmissão conforme ACK/perda. ARP proxy estático resolve/anuncia L3↔L2, não congestionamento. STP evita loops L2 em switches. NAT overload (PAT) traduz endereços/portas na borda — independente da janela TCP. Quando o enunciado fala “inicia com poucos dados e aumenta a janela”, associe slow start/congestion window.",
     "part_id": "1.1"
   },
   {
@@ -296,7 +296,7 @@
       "UDP é connectionless, best-effort, e a recuperação de erros fica tipicamente a cargo da aplicação"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "UDP não estabelece conexão e oferece entrega best-effort; mantém checksum, mas não replica o conjunto de confiabilidade do TCP. Handshake, sequência/reordenação obrigatória e retransmissão automática são características do TCP, não do UDP.",
+    "explicacao_profunda": "UDP é connectionless e best-effort: sem handshake, sem retransmissão automática nem reordenação obrigatória; a aplicação (ou protocolo acima, ex. RTP+RTCP) trata perda se precisar. Ele não faz three-way handshake. Não obriga sequência de 32 bits como o TCP. Não elimina checksum — UDP tem checksum (opcional em IPv4, obrigatório em IPv6); CRC Ethernet é de L2 e não substitui o modelo UDP. Foque: leveza vs confiabilidade da aplicação.",
     "part_id": "1.1"
   },
   {
@@ -311,7 +311,7 @@
       "ICMP, pois carrega mídia em mensagens de eco"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "VoIP/RTP costuma preferir UDP pela menor sobrecarga e ausência de retransmissões que atrasariam o áudio. TCP adiciona conexão e retransmissão; IP sozinho não multiplexa processos; ICMP não transporta mídia de voz. A escolha TCP vs UDP segue o requisito da aplicação.",
+    "explicacao_profunda": "VoIP/RTP prioriza baixa latência e cabeçalho enxuto: UDP evita handshake e retransmissões que atrasariam áudio já “velho”. TCP com retransmissão agressiva piora jitter/eco em voz. “Somente IP sem transporte” não multiplexa portas de mídia/sinalização. ICMP eco não carrega fluxo de voz — é diagnóstico. Tip TShoot: se alguém forçou voz em TCP com retransmit, espere atraso; o desenho clássico mantém RTP em UDP.",
     "part_id": "1.1"
   },
   {
@@ -326,7 +326,7 @@
       "80 a 443 apenas"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Dinâmicas/privadas: 49152–65535, comuns como portas de origem de clientes. 0–1023 são well-known; 1024–49151 são registradas. 80 e 443 são exemplos de serviços web, não a faixa dinâmica completa.",
+    "explicacao_profunda": "A IANA marca 49152–65535 como dynamic/private — portas efêmeras típicas de origem no cliente. 0–1023 são well-known. 1024–49151 são registered. 80–443 são só dois exemplos de serviço web, não a faixa dinâmica. No CLI (netstat), a origem alta + destino 443 é o padrão esperado em navegação HTTPS.",
     "part_id": "1.1"
   },
   {
@@ -341,7 +341,7 @@
       "Apenas o nome do host resolvido por DNS"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Socket associa IP + porta (e o transporte TCP ou UDP) a uma extremidade da sessão. MAC, VLAN e nome DNS não definem sozinhos o socket de transporte. Sem IP e porta, a multiplexação de aplicações no host não fica identificada.",
+    "explicacao_profunda": "Um socket lógico identifica uma extremidade por endereço IP + número de porta (e o protocolo de transporte TCP ou UDP). Só o MAC de origem não define o processo. VLAN ID/switch não formam socket de Transporte. Nome DNS resolve para IP, mas o socket usa o IP e a porta após a resolução. Sem IP+porta, a multiplexação L4 no host fica indefinida.",
     "part_id": "1.1"
   },
   {
@@ -356,7 +356,7 @@
       "Destino: porta do serviço no servidor (ex.: 80 ou 443); origem: porta efêmera do cliente"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "O cliente envia à porta well-known do serviço (80/443) e usa porta efêmera como origem para a resposta. Inverter origem/destino, forçar ambas iguais a 80 ou tratar portas como MAC contradiz o modelo de multiplexação L4.",
+    "explicacao_profunda": "No primeiro segmento do cliente web, o destino é a porta do serviço no servidor (80/443) e a origem é uma porta efêmera escolhida pelo cliente para a resposta. Inverter (destino efêmero / origem 80) quebraria o modelo servidor em escuta. Forçar ambas iguais a 80 não é necessário nem típico. Portas não são endereços MAC — MAC vive no quadro L2. Tip: firewall/ACL costuma liberar destino 80/443; a origem efêmera volta no stateful return.",
     "part_id": "1.1"
   },
   {
@@ -371,7 +371,7 @@
       "Sessão (camada 5)"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Cabo, conector e sinal são domínio da Física (L1). Aplicação, Sessão e Transporte tratam software, diálogos e portas/TCP-UDP, não a integridade do meio físico. Troubleshooting por camadas começa pelo sintoma na camada correta.",
+    "explicacao_profunda": "Cabo danificado e sinal elétrico inconsistente são sintomas de camada Física (L1): meio, conector, potência, CRC por mídia. Aplicação (L7) trata protocolos de usuário. Transporte (L4) lida com portas/TCP-UDP. Sessão (L5) gerencia diálogos. Troubleshooting bottom-up: valide link/luzes/CRC antes de culpar app. No CLI, show interfaces com CRC/input errors altos empurra o olhar para L1.",
     "part_id": "1.1"
   },
   {
@@ -386,7 +386,7 @@
       "TFTP"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "SSH escuta em TCP 22. HTTP usa 80/443; DNS frequentemente UDP 53 (também TCP em casos específicos), não 22; TFTP usa UDP e porta conhecida diferente. Associar serviço–porta–transporte é aplicação prática da Parte 1.1.",
+    "explicacao_profunda": "SSH usa TCP na well-known 22 para acesso remoto seguro (CLI de roteadores/switches/servidores). HTTP é 80 (e HTTPS 443), não 22. DNS usa com frequência UDP 53 (e TCP 53 em transferências/respostas grandes), não a 22. TFTP é UDP (porta 69 clássica), inadequado como “SSH”. Memorize o trio serviço–transporte–porta para questões rápidas de Aplicação/Transporte.",
     "part_id": "1.1"
   },
   {
@@ -401,7 +401,7 @@
       "O roteador remove o IP e encaminha apenas com base na porta TCP"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Em cada hop o roteador decide por IP (L3) e monta um novo quadro L2 para o próximo enlace. O frame Ethernet não atravessa a Internet intacto; MACs mudam a cada segmento L2. Encaminhar só por porta TCP sem IP não é o modelo de roteamento.",
+    "explicacao_profunda": "Em cada hop o roteador encaminha pelo IP de destino (L3) e monta um novo quadro L2 para o próximo enlace (MACs locais daquele segmento). O quadro Ethernet original não atravessa a Internet intacto. MACs mudam a cada hop L2 — não ficam fixos após o primeiro switch de campus. Remover o IP e encaminhar só por porta TCP não é o modelo de roteamento IP. Tip: traceroute muda o L3 hop-by-hop; o encapsulamento L2 é refeito em cada enlace.",
     "part_id": "1.1"
   },
   {
@@ -416,7 +416,7 @@
       "O próximo byte esperado pelo receptor (podendo cobrir vários segmentos)"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "ACKs trabalham com bytes: indicam o próximo byte esperado e um único ACK pode confirmar vários segmentos. Não confirmam porta de origem como campo de sequência, nem rotas ou CRC físico. Entender ACK em bytes é essencial para confiabilidade TCP.",
+    "explicacao_profunda": "O ACK TCP indica o próximo byte esperado pelo receptor e pode cobrir vários segmentos (ACK cumulativo). Não confirma “o número da porta de origem” como se fosse campo de sequência. Não fala de rotas na FIB. Não valida CRC de fibra (isso é L1/L2 no enlace). Entender ACK em bytes explica retransmissão seletiva/cumulativa e windowing na mesma sessão.",
     "part_id": "1.1"
   },
   {
@@ -431,7 +431,7 @@
       "Física (camada 1)"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Aplicação (L7) é a interface dos softwares com a rede. Enlace e Física tratam quadros/bits; Rede trata IP e roteamento. Mesmo no TCP/IP, esses protocolos de alto nível ficam na camada de Aplicação da pilha prática.",
+    "explicacao_profunda": "Aplicação (L7) é a interface entre programas do usuário e a rede: HTTP/HTTPS, DNS, SSH, etc. Enlace (L2) trata quadros/MAC. Rede (L3) trata IP/roteamento. Física (L1) trata bits/sinal. Mesmo no TCP/IP, esses protocolos de alto nível ficam na camada de Aplicação da pilha prática (agregando papéis de 5–7 do OSI).",
     "part_id": "1.1"
   },
   {
@@ -446,7 +446,7 @@
       "Somente MAC flooding no switch para garantir entrega ordenada"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Transferência que exige ordem e recuperação de perdas combina com TCP (conexão, seq, ACK, retransmissão). UDP é best-effort; CRC físico e mecanismos de switch L2 não substituem a confiabilidade fim a fim da camada de Transporte entre aplicações.",
+    "explicacao_profunda": "Transferência de arquivos que exige ordem e retransmissão casa com TCP: conexão, sequência, ACK e reenvio. UDP é best-effort e empurra a confiabilidade para a aplicação — ruim se o requisito já pede garantia no transporte. CRC do cabo (L1) detecta erro local de frame, não reconstrói o arquivo fim a fim. MAC flooding no switch não garante entrega ordenada entre aplicações. Escolha o transporte pelo requisito: confiabilidade → TCP.",
     "part_id": "1.1"
   }
 ]

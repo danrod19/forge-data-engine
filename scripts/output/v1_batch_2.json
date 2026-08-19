@@ -1,0 +1,560 @@
+[
+  {
+    "id": 8,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9203 — SVIs 10 e 20 up/up, hosts pingam o próprio gateway, mas não a outra VLAN. “O L3 switch não roteia”.",
+    "cli_output": "L3SW# show ip interface brief | include Vlan\nVlan10   192.168.10.1   YES manual up  up\nVlan20   192.168.20.1   YES manual up  up\n\nL3SW# show ip route\nCodes: C - connected, L - local, S - static\nGateway of last resort is not set\n\nL3SW# show running-config | include ip routing\nno ip routing\n\nL3SW# show vlan brief | include 10|20\n10  USERS   active  Gi1/0/1-12\n20  VOICE   active  Gi1/0/13-20\n\nPC-10> ping 192.168.10.1\nResposta de 192.168.10.1: tempo=1ms\nPC-10> ping 192.168.20.10\nEsgotado o tempo limite do pedido.",
+    "alternativas": [
+      "SVIs down/down no brief",
+      "ip routing está habilitado e há C 192.168.10.0/24 na tabela",
+      "no ip routing na running com SVIs up/up e show ip route sem connected das VLANs: L3 desabilitado — inter-VLAN não ocorre no switch",
+      "VLAN 20 inexistente no brief"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "no ip routing + tabela sem C das SVIs apesar de up/up explica o sintoma. VLANs existem; gateways respondem L2/local à SVI mas sem routing entre elas.",
+    "part_id": "3.2",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 7
+  },
+  {
+    "id": 9,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9204 — ROAS com subinterfaces 10 e 40 configuradas com encap. Hosts da 40 não saem do switch de acesso.",
+    "cli_output": "R1# show run | section GigabitEthernet0/0.40\ninterface GigabitEthernet0/0.40\n encapsulation dot1Q 40\n ip address 192.168.40.1 255.255.255.0\n\nSW-Access# show interfaces trunk\nPort        Mode   Encapsulation  Status     Native vlan\nGi1/0/48    on     802.1q         trunking   1\nPort        Vlans allowed on trunk\nGi1/0/48    1,10,20,30\nPort        Vlans allowed and active in management domain\nGi1/0/48    1,10,20,30\n\nSW-Access# show vlan brief | include 40\n40   IOT   active    Gi1/0/5, Gi1/0/6\n\nSW-Access# show interfaces status | include Gi1/0/5\nGi1/0/5  CAM-01   connected  40  a-full  a-1000\n\nPC-IOT> ping 192.168.40.1\nEsgotado o tempo limite do pedido.",
+    "alternativas": [
+      "VLAN 40 fora do allowed do trunk Gi1/0/48 (só 1,10,20,30) — ROAS .40 com encap não recebe a tag no uplink",
+      "encapsulation ausente em Gi0/0.40 no run",
+      "VLAN 40 inexistente e portas notconnect",
+      "Native 40 vs 1 é a linha do show trunk"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Allowed omite 40; encap existe; VLAN e portas active/connected. Native é 1, não 40 no trunk output.",
+    "part_id": "3.2",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 8
+  },
+  {
+    "id": 10,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9205 — Time misturou “porta L3” com SVI. Uplink entre cores não roteia; VLANs de usuário no mesmo link “somem”.",
+    "cli_output": "CoreA# show running-config interface GigabitEthernet1/0/1\ninterface GigabitEthernet1/0/1\n description TO-CORE-B\n no switchport\n ip address 10.0.0.1 255.255.255.252\n\nCoreA# show interfaces Gi1/0/1 switchport\nSwitchport: Disabled\n\nCoreA# show interfaces trunk\n\nCoreB# show run interface Gi1/0/1\ninterface GigabitEthernet1/0/1\n switchport mode trunk\n switchport trunk allowed vlan 10,20,30\n switchport trunk native vlan 99\n\nCoreB# show interfaces trunk | include Gi1/0/1\nGi1/0/1   on   802.1q   trunking   99\n\nCoreA# show ip interface brief | include GigabitEthernet1/0/1\nGigabitEthernet1/0/1   10.0.0.1   YES manual up  up\n\n# expectativa do projeto: L3 p2p /30 entre cores — CoreB ainda em trunk",
+    "alternativas": [
+      "Ambos os lados com no switchport e /30",
+      "CoreA routed (no switchport, Switchport Disabled) vs CoreB trunk native 99 allowed 10–30 — mismatch de modelo L3 vs L2 trunk no mesmo link",
+      "SVI Vlan99 down é a única saída do brief de Gi1/0/1",
+      "show interfaces trunk em CoreA lista Gi1/0/1 trunking"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "CoreA é routed port L3; CoreB é trunk 802.1Q — modelos incompatíveis no enlace. Trunk em CoreA está vazio. Brief mostra IP na física, não SVI. Não há ambos no switchport.",
+    "part_id": "3.2",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 9
+  },
+  {
+    "id": 11,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9301 — Link novo entre R1 e R2 “não forma OSPF”. Cabo e IPs ok; NOC já reiniciou as interfaces.",
+    "cli_output": "R1# show ip ospf interface GigabitEthernet0/0\nGigabitEthernet0/0 is up, line protocol is up\n  Internet Address 10.0.0.1/30, Area 0\n  Process ID 1, Router ID 1.1.1.1, Network Type BROADCAST, Cost: 1\n  Timer intervals configured, Hello 10, Dead 40, WaitUp 40, Retransmit 5\n  Neighbor Count is 0\n\nR2# show ip ospf interface GigabitEthernet0/0\nGigabitEthernet0/0 is up, line protocol is up\n  Internet Address 10.0.0.2/30, Area 0\n  Process ID 1, Router ID 2.2.2.2, Network Type BROADCAST, Cost: 1\n  Timer intervals configured, Hello 5, Dead 20, WaitUp 40, Retransmit 5\n  Neighbor Count is 0\n\nR1# show ip ospf neighbor\nR2# show ip ospf neighbor\n\nR1# show ip interface brief | include GigabitEthernet0/0\nGigabitEthernet0/0   10.0.0.1   YES manual up  up",
+    "alternativas": [
+      "Area mismatch 0 vs 1 no output",
+      "Hello/Dead 10/40 em R1 vs 5/20 em R2 — timers mismatch; Neighbor Count 0 em ambos",
+      "RID duplicado 1.1.1.1 nos dois",
+      "Interfaces down/down no brief"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show ip ospf interface mostra Hello/Dead diferentes e 0 vizinhos; mesma area 0 e RIDs distintos; interface up/up. Timers são a causa.",
+    "part_id": "3.3",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 10
+  },
+  {
+    "id": 12,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9302 — OSPF sobe em outros links, mas o link 10.10.10.0/30 entre Dist e Core “não entra no processo”.",
+    "cli_output": "Core# show running-config | section router ospf\nrouter ospf 1\n router-id 3.3.3.3\n network 10.1.0.0 0.0.255.255 area 0\n network 192.168.0.0 0.0.0.255 area 0\n\nCore# show ip interface brief | include GigabitEthernet0/1\nGigabitEthernet0/1   10.10.10.1   YES manual up  up\n\nCore# show ip ospf interface brief\nInterface    PID   Area   IP Address/Mask    Cost  State Nbrs F/C\nGi0/0        1     0      10.1.1.1/24        1     DR    1/1\nLo0          1     0      3.3.3.3/32         1     LOOP  0/0\n\nCore# show ip ospf neighbor\nNeighbor ID  Pri  State      Dead Time  Address    Interface\n1.1.1.1        1  FULL/BDR   00:00:35   10.1.1.2   GigabitEthernet0/0\n\n# Gi0/1 10.10.10.1/30 NÃO aparece em ospf interface brief",
+    "alternativas": [
+      "Gi0/1 está down no brief",
+      "RID ausente no processo",
+      "network 10.1.0.0 0.0.255.255 não cobre 10.10.10.1/30 — interface fora do OSPF (não está no brief OSPF; só Gi0/0 e Lo0)",
+      "Area 1 na interface Gi0/0 impede qualquer neighbor"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "network casa 10.1.0.0–10.1.255.255, não 10.10.10.1. Gi0/1 up/up mas ausente do ospf interface brief. Neighbor existe em outro link. RID está configurado.",
+    "part_id": "3.3",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 11
+  },
+  {
+    "id": 13,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9303 — Após clonar config de lab, adjacências OSPF “enlouquecem” e logs citam router-id.",
+    "cli_output": "R1# show ip ospf\n Routing Process \"ospf 1\" with ID 10.0.0.1\n\nR2# show ip ospf\n Routing Process \"ospf 1\" with ID 10.0.0.1\n\nR1# show ip ospf neighbor\nNeighbor ID  Pri  State        Dead Time  Address     Interface\n10.0.0.1       1  FULL/DR      00:00:08   10.1.1.2    GigabitEthernet0/0\n\nR2# show run | include router-id\nrouter-id 10.0.0.1\n\nR1# show run | include router-id\nrouter-id 10.0.0.1\n\n# ambos foram provisionados do mesmo template de lab",
+    "alternativas": [
+      "Hello 10 vs 40 no output de show ip ospf",
+      "Area 0 vs area 1 no neighbor table",
+      "Passive-interface default em ambos",
+      "RID duplicado 10.0.0.1 em R1 e R2 (show ip ospf ID idêntico e router-id iguais na running)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Ambos com Routing Process ID 10.0.0.1 e router-id 10.0.0.1 na running — RID duplicado. Neighbor FULL/DR com mesmo Neighbor ID reforça o problema. Sem evidência de timers/area/passive no recorte.",
+    "part_id": "3.3",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 12
+  },
+  {
+    "id": 14,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9304 — NOC queria o core como DR do segmento de usuários; o access virou DR e o core ficou DROTHER.",
+    "cli_output": "Access# show ip ospf interface Vlan10\nVlan10 is up, line protocol is up\n  Internet Address 10.10.10.2/24, Area 0\n  Router ID 9.9.9.9, Network Type BROADCAST, Cost: 1\n  Transmit Delay is 1 sec, State DR, Priority 1\n  Designated Router (ID) 9.9.9.9, Interface address 10.10.10.2\n  Backup Designated Router (ID) 1.1.1.1, Interface address 10.10.10.1\n\nCore# show ip ospf interface Vlan10\nVlan10 is up, line protocol is up\n  Internet Address 10.10.10.1/24, Area 0\n  Router ID 1.1.1.1, Network Type BROADCAST, Cost: 1\n  Transmit Delay is 1 sec, State BDR, Priority 0\n  Designated Router (ID) 9.9.9.9, Interface address 10.10.10.2\n  Backup Designated Router (ID) 1.1.1.1, Interface address 10.10.10.1\n\nCore# show run interface Vlan10 | include priority\n ip ospf priority 0",
+    "alternativas": [
+      "Core com priority 0 (inelegível a DR) e Access State DR com RID 9.9.9.9 — DR inesperado por priority 0 no core; Access vira DR",
+      "Core está State DR no output",
+      "Network Type POINT_TO_POINT elimina DR no recorte",
+      "Timers Hello diferentes entre Access e Core no trecho exibido"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Core priority 0 → BDR/não DR; Access é DR. Network BROADCAST. Sem timers no recorte. Core não está State DR.",
+    "part_id": "3.3",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 13
+  },
+  {
+    "id": 15,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9305 — Neighbor Full com o WAN peer, mas a LAN 192.168.50.0/24 do site remoto não entra na tabela. “OSPF está up!”",
+    "cli_output": "HQ# show ip ospf neighbor\nNeighbor ID  Pri  State      Dead Time  Address       Interface\n5.5.5.5        0  FULL/ -    00:00:38   10.0.0.2      GigabitEthernet0/0/0\n\nHQ# show ip route ospf\n\nHQ# show ip route 192.168.50.0\n% Network not in table\n\nBR# show running-config | section router ospf\nrouter ospf 1\n router-id 5.5.5.5\n passive-interface Vlan50\n network 10.0.0.0 0.0.0.3 area 0\n\nBR# show ip interface brief | include Vlan50|GigabitEthernet0/0/0\nVlan50                 192.168.50.1   YES manual up  up\nGigabitEthernet0/0/0   10.0.0.2       YES manual up  up\n\nBR# show ip ospf interface brief\nInterface    PID  Area  IP Address/Mask   Cost  State Nbrs F/C\nGi0/0/0      1    0     10.0.0.2/30       1     P2P   1/1\n\n# Vlan50 NÃO está no ospf interface brief — network statement não cobre 192.168.50.0",
+    "alternativas": [
+      "Neighbor não está Full no HQ",
+      "Vlan50 aparece em ospf interface brief no BR",
+      "Full no WAN ok, mas network só 10.0.0.0/30: LAN 192.168.50.0/24 fora do OSPF (passive sozinho não anuncia se a if não está no processo) — rota O ausente",
+      "Cost 65535 na Gi0/0/0 impede Full"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Neighbor Full só no /30; network não inclui Vlan50; brief OSPF sem Vlan50; HQ sem rota O. Passivelan50 up não basta. Full existe; cost não aparece 65535 nem impede Full no output.",
+    "part_id": "3.3",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 14
+  },
+  {
+    "id": 16,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9401 — Servidor “com IPv6 ligado” não é alcançável por GUA a partir de outra VLAN. Admin jura que ativou IPv6 na interface.",
+    "cli_output": "SRV# show ipv6 interface brief\nGigabitEthernet0/0     [up/up]\n    FE80::A1B2:C3D4:E5F6:1\nVlan1                  [administratively down/down]\n    unassigned\n\nSRV# show running-config interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n ipv6 enable\n no ipv6 address\n\nSRV# show ipv6 route\nIPv6 Routing Table - default - 1 entries\nCodes: C - Connected, L - Local\nL   FE80::/10 [0/0]\n     via GigabitEthernet0/0, receive\n\nPC-TEST# ping 2001:db8:10::50\n% Unrecognized host or address, or protocol not running.",
+    "alternativas": [
+      "Há GUA 2001:db8 na interface no brief",
+      "ipv6 enable sem ipv6 address: só FE80 no brief e rota L FE80 — falta GUA estática/SLAAC para destino global",
+      "Default ::/0 via 2001:db8:0:1::1 está instalada",
+      "Interface administratively down no Gi0/0"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Brief mostra só FE80; run tem ipv6 enable sem address; tabela sem GUA nem ::/0. Gi0/0 está up/up. Sem GUA o servidor não é alcançável por endereço global.",
+    "part_id": "3.4",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 15
+  },
+  {
+    "id": 17,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9402 — PCs da VLAN 40 não montam GUA via SLAAC; só aparecem link-local. Gateway IPv4 funciona.",
+    "cli_output": "Dist# show running-config interface Vlan40\ninterface Vlan40\n ip address 10.40.40.1 255.255.255.0\n ipv6 address 2001:DB8:40:0::1/64\n ipv6 nd ra suppress\n\nDist# show ipv6 interface Vlan40 | include RA|FF02|FE80|2001\n  IPv6 is enabled, link-local address is FE80::1\n  Global unicast address(es):\n    2001:DB8:40:0::1, subnet is 2001:DB8:40:0::/64\n  ND DAD is enabled\n  ND reachable time is 30000 milliseconds\n  ND advertised reachable time is 0\n  Hosts use stateless autoconfig for addresses. (RA suppressed)\n  Joined group address(es):\n    FF02::1\n    FF02::2\n\nPC# ipconfig\n   IPv6 Address. . . . . . . . . . . :\n   Link-local IPv6 Address . . . . . : fe80::b1c2:d3e4:f5a6:7788%12\n   IPv4 Address. . . . . . . . . . . : 10.40.40.50\n   Default Gateway . . . . . . . . . : 10.40.40.1",
+    "alternativas": [
+      "Hosts têm GUA 2001:db8:40 no ipconfig",
+      "Vlan40 sem endereço IPv6 no Dist",
+      "ipv6 nd ra suppress na SVI: RA não chega aos hosts — SLAAC não forma GUA; só FE80 no PC",
+      "FF02::2 ausente impede IPv4"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "ra suppress na SVI com GUA no roteador; PC só FE80 e IPv4. Sem GUA no host. FF02::2 está joined no Dist.",
+    "part_id": "3.4",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 16
+  },
+  {
+    "id": 18,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9403 — Dual-stack: sites IPv4 ok, portais só-IPv6 falham. Host tem GUA na LAN.",
+    "cli_output": "PC# ipconfig\n   IPv4 Address. . . . . . . . . . . : 192.168.10.20\n   Default Gateway . . . . . . . . . : 192.168.10.1\n   IPv6 Address. . . . . . . . . . . : 2001:db8:10:0:a:b:c:d\n   Link-local IPv6 Address . . . . . : fe80::a:b:c:d%8\n   Default Gateway . . . . . . . . . : fe80::1%8\n\nPC# route print -6 | findstr /i \"::/0\"\n  (no ::/0 entry)\n\nR1# show ipv6 route\nC   2001:DB8:10::/64 [0/0]\n     via Vlan10, directly connected\nL   2001:DB8:10::1/128 [0/0]\n     via Vlan10, receive\n\nR1# show running-config | include ipv6 route\n\nR1# show ip route | include Gateway\nGateway of last resort is 203.0.113.1 to network 0.0.0.0\n\nPC# ping 2001:db8:99::10\nDestination net unreachable.",
+    "alternativas": [
+      "R1 tem ipv6 route ::/0 na running",
+      "PC sem GUA no ipconfig",
+      "Gateway of last resort IPv4 ausente",
+      "GUA local ok, mas sem ::/0 no PC e sem ipv6 route default no R1 — default IPv4 não serve IPv6; net unreachable remoto"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Sem ::/0 no host e sem ipv6 route no R1; IPv4 tem last resort. PC tem GUA. Falta default IPv6 na pilha/roteador.",
+    "part_id": "3.4",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 17
+  },
+  {
+    "id": 19,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9404 — Auditoria de EUI-64: endereço “não parece” o MAC da placa. Time suspeita de bug.",
+    "cli_output": "R1# show interface GigabitEthernet0/0 | include address is|bia\n  Hardware is CSR vNIC, address is 0011.2233.4455 (bia 0011.2233.4455)\n\nR1# show running-config interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n ipv6 address 2001:DB8:1:1::/64 eui-64\n\nR1# show ipv6 interface brief GigabitEthernet0/0\nGigabitEthernet0/0     [up/up]\n    FE80::211:22FF:FE33:4455\n    2001:DB8:1:1:211:22FF:FE33:4455\n\n# MAC 0011.2233.4455 → EUI-64 clássico: 0211:22FF:FE33:4455 (U/L flip + FFFE)\n# FE80 e GUA mostram 211:22FF:FE33:4455",
+    "alternativas": [
+      "EUI-64 válido: MAC 0011.2233.4455 vira IID 0211:22FF:FE33:4455 (FFFE + bit U/L) — 2001:DB8:1:1:211:22FF:FE33:4455 no brief",
+      "O endereço ignora o MAC e usa só ::1",
+      "eui-64 na running está ausente",
+      "Interface down/down impede qualquer IID"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "MAC e eui-64 batem com FFFE e flip do 7º bit (00→02). Brief up/up com GUA derivada. Não é ::1 nem config ausente.",
+    "part_id": "3.4",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 18
+  },
+  {
+    "id": 20,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9405 — Dual-stack WAN: OSPFv2 Full, mas IPv6 entre sites não aprende rotas. “OSPFv3 não sobe”.",
+    "cli_output": "R1# show ip ospf neighbor\nNeighbor ID  Pri  State      Dead Time  Address     Interface\n2.2.2.2        0  FULL/ -    00:00:38   10.0.0.2    GigabitEthernet0/0/0\n\nR1# show ipv6 ospf neighbor\n%OSPFv3 is not enabled on GigabitEthernet0/0/0\n\nR1# show running-config interface GigabitEthernet0/0/0\ninterface GigabitEthernet0/0/0\n ip address 10.0.0.1 255.255.255.252\n ipv6 address 2001:DB8:0:12::1/64\n ipv6 enable\n ! sem ipv6 ospf 1 area 0\n\nR1# show run | include ipv6 router ospf|router ospf\nrouter ospf 1\n router-id 1.1.1.1\n network 10.0.0.0 0.0.0.3 area 0\n! (sem ipv6 router ospf)\n\nR1# show ipv6 interface brief GigabitEthernet0/0/0\nGigabitEthernet0/0/0   [up/up]\n    FE80::1\n    2001:DB8:0:12::1",
+    "alternativas": [
+      "OSPFv3 enabled com Full na tabela ipv6 ospf neighbor",
+      "Interface sem GUA e sem link-local",
+      "IPv6 up (FE80+GUA) e OSPFv2 Full, mas sem ipv6 ospf area / ipv6 router ospf — OSPFv3 não habilitado na interface; dual-stack L3 ok não implica v3",
+      "ipv6 address ausente no run da interface"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "OSPFv3 not enabled; run só tem OSPFv2 network. Interface tem FE80 e GUA. Falta ativar OSPFv3 no IPv6 da if/processo.",
+    "part_id": "3.4",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 19
+  },
+  {
+    "id": 21,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9501 — Tráfego para 10.1.1.40 “deveria” sair pelo firewall (rota /8), mas o NetFlow e o traceroute mostram path pelo DC. NOC jura que a estática do firewall está correta.",
+    "cli_output": "Edge# show ip route\nCodes: C - connected, S - static, O - OSPF, L - local\nGateway of last resort is 203.0.113.1 to network 0.0.0.0\n\nS*    0.0.0.0/0 [1/0] via 203.0.113.1\nS     10.0.0.0/8 [1/0] via 203.0.113.10\nS     10.1.1.0/24 [1/0] via 10.255.0.2\nC     10.255.0.0/30 is directly connected, GigabitEthernet0/0\nL     10.255.0.1/32 is directly connected, GigabitEthernet0/0\nC     203.0.113.0/30 is directly connected, GigabitEthernet0/1\n\nEdge# show ip route 10.1.1.40\nRouting entry for 10.1.1.0/24\n  Known via \"static\", distance 1, metric 0\n  Routing Descriptor Blocks:\n  * 10.255.0.2, from 10.255.0.2, 00:12:04 ago\n      Route metric is 0, traffic share count is 1\n\nEdge# show run | include ip route\nip route 0.0.0.0 0.0.0.0 203.0.113.1\nip route 10.0.0.0 255.0.0.0 203.0.113.10\nip route 10.1.1.0 255.255.255.0 10.255.0.2\n\nEdge# traceroute 10.1.1.40\n 1 10.255.0.2 1 msec\n 2 10.1.1.40 2 msec",
+    "alternativas": [
+      "Gateway of last resort ausente impede qualquer /24",
+      "AD da /8 é pior que o /24, por isso o firewall perde",
+      "Bug: show ip route 10.1.1.40 deveria listar só 10.0.0.0/8",
+      "Longest match: 10.1.1.0/24 via DC vence 10.0.0.0/8 via firewall para 10.1.1.40 — path “inesperado” mas correto"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Ambas as estáticas existem na running e na tabela, ambas com AD 1. O lookup de 10.1.1.40 casa com /8 e /24; o mais específico (/24) vence — show ip route 10.1.1.40 e traceroute via 10.255.0.2 confirmam. Last resort está setado; AD não diferencia lengths iguais aqui. O “erro” do NOC foi olhar só a /8 do firewall.",
+    "part_id": "3.5",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 20
+  },
+  {
+    "id": 22,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9502 — Link de backup com floating static AD 200 “não assume” para 172.16.0.0/16. Primary WAN com OSPF ainda up. Operador espera ver a S 200 na tabela ativa.",
+    "cli_output": "BR# show ip route 172.16.0.0\nRouting entry for 172.16.0.0/16\n  Known via \"ospf 1\", distance 110, metric 20, type intra area\n  Last update from 10.0.0.2 on GigabitEthernet0/0, 02:14:11 ago\n  Routing Descriptor Blocks:\n  * 10.0.0.2, from 2.2.2.2, 02:14:11 ago, via GigabitEthernet0/0\n      Route metric is 20, traffic share count is 1\n\nBR# show ip route ospf | include 172.16\nO        172.16.0.0/16 [110/20] via 10.0.0.2, 02:14:11, GigabitEthernet0/0\n\nBR# show run | include ip route\nip route 172.16.0.0 255.255.0.0 10.0.1.2 200\n\nBR# show ip ospf neighbor\nNeighbor ID  Pri  State      Dead Time  Address     Interface\n2.2.2.2        1  FULL/BDR   00:00:37   10.0.0.2    GigabitEthernet0/0\n\nBR# show ip interface brief | include GigabitEthernet0/0|GigabitEthernet0/1\nGigabitEthernet0/0   10.0.0.1    YES manual up  up\nGigabitEthernet0/1   10.0.1.1    YES manual up  up\n\nBR# show ip route static\n(no static entries for 172.16.0.0/16)",
+    "alternativas": [
+      "Floating AD 200 não assume porque a primária OSPF AD 110 ainda está instalada (neighbor FULL)",
+      "Interface Gi0/1 está down e por isso a running perdeu o ip route",
+      "OSPF FULL prova que a floating deveria estar em ECMP com a O",
+      "show run | include ip route está vazio — floating nunca foi configurada"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Mesmo prefixo /16: O com AD 110 vence floating AD 200. Neighbor FULL e entry Known via ospf confirmam primária up. A floating aparece na running com distance 200, mas show ip route static não a lista na ativa — comportamento esperado. Gi0/1 está up/up; não há ECMP forçado entre AD 110 e 200.",
+    "part_id": "3.5",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 21
+  },
+  {
+    "id": 23,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9503 — PCs da VLAN 30 não saem da subnet nem alcançam a VLAN 40. Cabo e switch de acesso “ok” segundo o usuário.",
+    "cli_output": "PC30# ipconfig\n   IPv4 Address. . . . . . . . . . . : 192.168.30.50\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 192.168.40.1\n\nPC30# ping 192.168.40.1\nRequest timed out.\nPC30# ping 192.168.30.1\nRequest timed out.\n\nDist# show ip interface brief | include Vlan30|Vlan40\nVlan30   192.168.30.1   YES manual up  up\nVlan40   192.168.40.1   YES manual up  up\n\nDist# show run | include ip routing\nip routing\n\nDist# show ip route | include 192.168.30|192.168.40\nC        192.168.30.0/24 is directly connected, Vlan30\nL        192.168.30.1/32 is directly connected, Vlan30\nC        192.168.40.0/24 is directly connected, Vlan40\nL        192.168.40.1/32 is directly connected, Vlan40\n\nDist# show interfaces Vlan30 | include line protocol|Internet address\nVlan30 is up, line protocol is up\n  Internet address is 192.168.30.1/24",
+    "alternativas": [
+      "ip routing está off — inter-VLAN impossível com SVIs up",
+      "Gateway do PC aponta 192.168.40.1 (VLAN 40) em vez de 192.168.30.1 — host sem gateway da própria subnet",
+      "Vlan30 está administratively down no brief",
+      "Falta rota O entre as connected 30 e 40 na tabela"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "SVIs 30 e 40 up/up com IPs corretos, ip routing presente e C/L das duas redes na tabela — o L3 switch está pronto. O PC na 192.168.30.50 usa gateway 192.168.40.1 (outra subnet): ping ao 30.1 e ao 40.1 falham do host. Gateway errado é o eixo inter-VLAN revisitado; não falta OSPF entre connected locais.",
+    "part_id": "3.5",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 22
+  },
+  {
+    "id": 24,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9504 — Rotas estáticas “sumiram” após manutenção no link WAN. Operador ainda vê ip route na running, mas o destino remoto não responde.",
+    "cli_output": "R1# show run | include ip route\nip route 10.99.0.0 255.255.0.0 10.10.10.2\nip route 0.0.0.0 0.0.0.0 203.0.113.1\n\nR1# show ip route\nCodes: C - connected, S - static, L - local\nGateway of last resort is not set\n\nC     192.168.1.0/24 is directly connected, GigabitEthernet0/0\nL     192.168.1.1/32 is directly connected, GigabitEthernet0/0\nC     10.10.10.0/30 is directly connected, GigabitEthernet0/1\nL     10.10.10.1/32 is directly connected, GigabitEthernet0/1\n\nR1# show ip interface brief\nInterface              IP-Address      OK? Method Status                Protocol\nGigabitEthernet0/0     192.168.1.1     YES manual up                    up\nGigabitEthernet0/1     10.10.10.1      YES manual up                    up\nGigabitEthernet0/2     203.0.113.2     YES manual down                  down\n\nR1# show ip route 10.99.1.10\n% Network not in table\n\nR1# ping 10.10.10.2\n..... Success rate is 0 percent (0/5)\n\nR1# ping 10.99.1.10\n..... Success rate is 0 percent (0/5)",
+    "alternativas": [
+      "Default e 10.99/16 estão ativas com S* e S na tabela mostrada",
+      "Gi0/0 down explica a perda de todas as estáticas",
+      "Rota existe na running mas não na RIB: next-hop 10.10.10.2 unreachable (ping 0%) e default via 203.0.113.1 com Gi0/2 down — path inutilizado",
+      "Running vazia de ip route — configuração nunca existiu"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "show run ainda tem as estáticas, mas show ip route não lista S para 10.99/16 nem last resort: next-hop 10.10.10.2 não responde (interface Gi0/1 up mas vizinho morto) e a interface da default (Gi0/2 203.0.113.2) está down/down. “Rota na config ≠ rota usável”. Gi0/0 up não é a causa; running não está vazia.",
+    "part_id": "3.5",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 23
+  },
+  {
+    "id": 25,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9505 — Dual-stack: sites e DNS IPv4 ok; portais e APIs só-IPv6 falham. Host tem GUA na LAN. Time discute se “AD da static IPv4 está errada”.",
+    "cli_output": "PC# ipconfig\n   IPv4 Address. . . . . . . . . . . : 10.10.10.25\n   Default Gateway . . . . . . . . . : 10.10.10.1\n   IPv6 Address. . . . . . . . . . . : 2001:db8:10:0:a:b:c:d\n   Link-local IPv6 Address . . . . . : fe80::a:b:c:d%12\n   Default Gateway . . . . . . . . . : fe80::1%12\n\nPC# ping 8.8.8.8\nReply from 8.8.8.8: bytes=32 time=12ms TTL=117\nPC# ping 2001:db8:99::10\nDestination net unreachable.\n\nR1# show ip route | include Gateway|0.0.0.0\nGateway of last resort is 203.0.113.1 to network 0.0.0.0\nS*    0.0.0.0/0 [1/0] via 203.0.113.1\n\nR1# show ipv6 route\nIPv6 Routing Table - default - 4 entries\nCodes: C - Connected, L - Local, S - Static, O - OSPF\nC   2001:DB8:10::/64 [0/0]\n     via Vlan10, directly connected\nL   2001:DB8:10::1/128 [0/0]\n     via Vlan10, receive\nL   FE80::/10 [0/0]\n     via Null0, receive\n\nR1# show run | include ipv6 route\n\nR1# show ipv6 interface brief Vlan10\nVlan10                 [up/up]\n    FE80::1\n    2001:DB8:10::1\n\nR1# show ip route static\nS* 0.0.0.0/0 [1/0] via 203.0.113.1",
+    "alternativas": [
+      "AD da static IPv4 0/0 está 255 e por isso o IPv6 quebra",
+      "PC sem GUA — só FE80 no ipconfig",
+      "IPv4 ok (S* e ping 8.8.8.8); IPv6 sem ::/0 na tabela e sem ipv6 route na running — default v4 não serve a pilha v6",
+      "Vlan10 down/down impede qualquer GUA no R1"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "IPv4: last resort e ping 8.8.8.8 ok. IPv6: GUA no PC e no R1 (Vlan10 up), mas show ipv6 route sem ::/0 e show run | include ipv6 route vazio — net unreachable remoto. AD da static IPv4 (1) não governa IPv6; PC tem GUA, não só FE80. Diagnóstico dual-stack clássico do content 3.5: repetir default por pilha.",
+    "part_id": "3.5",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 24
+  },
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4101 — Usuários da LAN não saem à Internet após “ativar NAT”. Pool e ACL foram colados do lab, mas ninguém traduz.",
+    "cli_output": "R1# show run | include nat\nip nat pool NET 203.0.113.10 203.0.113.20 netmask 255.255.255.0\nip nat inside source list 1 pool NET overload\naccess-list 1 permit 192.168.1.0 0.0.0.255\n\nR1# show run interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n ip address 192.168.1.1 255.255.255.0\n ! sem ip nat inside\n\nR1# show run interface GigabitEthernet0/1\ninterface GigabitEthernet0/1\n ip address 203.0.113.1 255.255.255.0\n ! sem ip nat outside\n\nR1# show ip nat translations\n\nR1# show ip nat statistics\nTotal active translations: 0 (0 static, 0 dynamic; 0 extended)\nOutside interfaces:\nInside interfaces:\nHits: 0  Misses: 0\n\nR1# show ip interface brief\nGigabitEthernet0/0   192.168.1.1   YES manual up  up\nGigabitEthernet0/1   203.0.113.1   YES manual up  up",
+    "alternativas": [
+      "Pool NET está vazio na configuração",
+      "ACL 1 nega 192.168.1.0/24 explicitamente",
+      "Interfaces up/up sem IP",
+      "Falta ip nat inside em Gi0/0 e ip nat outside em Gi0/1 — statistics sem inside/outside; 0 translations"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Policy list+pool+overload e ACL permit da LAN existem, mas as interfaces não têm ip nat inside/outside. Statistics lista Outside/Inside interfaces vazias e 0 translations. Brief mostra up/up com IP. Pool e ACL não são o gap — falta a marcação de interfaces no fluxo.",
+    "part_id": "4.1",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 0
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4102 — Hosts 10.10.10.x não navegam. Outro site 10.20.20.0/24 no mesmo roteador traduz. Técnico jura que o NAT “está igual”.",
+    "cli_output": "R1# show run | include nat|access-list\nip nat inside source list 7 interface GigabitEthernet0/1 overload\naccess-list 7 permit 10.20.20.0 0.0.0.255\nip nat inside\nip nat outside\n\nR1# show run interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n ip address 10.10.10.1 255.255.255.0\n ip nat inside\n\nR1# show run interface GigabitEthernet0/2\ninterface GigabitEthernet0/2\n ip address 10.20.20.1 255.255.255.0\n ip nat inside\n\nR1# show run interface GigabitEthernet0/1\ninterface GigabitEthernet0/1\n ip address 198.51.100.1 255.255.255.252\n ip nat outside\n\nR1# show ip nat translations\nPro Inside global      Inside local       Outside local      Outside global\ntcp 198.51.100.1:1025  10.20.20.50:51515  93.184.216.34:443  93.184.216.34:443\n\nR1# ping\n! origem simulada 10.10.10.50 — sem nova translation para 10.10.10.0/24\nR1# show ip nat statistics\nHits: 128  Misses: 40\nExpired translations: 12",
+    "alternativas": [
+      "Falta ip nat outside na WAN",
+      "ACL 7 só permite 10.20.20.0/24 — 10.10.10.0/24 não é elegível à list; translations só de 10.20.20.50",
+      "Gi0/0 está down no brief",
+      "Overload ausente no show run"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Inside/outside e overload estão presentes; translation só para 10.20.20.50. ACL 7 permit apenas 10.20.20.0/24 — a LAN 10.10.10.0/24 não casa a list. WAN tem outside. O gap é a ACL da list, não a marcação de interface nem falta de overload.",
+    "part_id": "4.1",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 1
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4103 — Só os quatro primeiros notebooks saem; o quinto e seguintes falham em horário de pico. Não há overload na config de pool.",
+    "cli_output": "Edge# show run | include nat|access-list|ip nat pool\nip nat pool SMALL 203.0.113.10 203.0.113.13 netmask 255.255.255.0\nip nat inside source list 1 pool SMALL\naccess-list 1 permit 192.168.50.0 0.0.0.255\n\nEdge# show ip nat translations\nPro Inside global      Inside local       Outside local      Outside global\n--- 203.0.113.10       192.168.50.11      ---                ---\n--- 203.0.113.11       192.168.50.12      ---                ---\n--- 203.0.113.12       192.168.50.13      ---                ---\n--- 203.0.113.13       192.168.50.14      ---                ---\n\nEdge# show ip nat statistics\nTotal active translations: 4 (0 static, 4 dynamic; 0 extended)\nHits: 900  Misses: 220\nPool SMALL: netmask 255.255.255.0\n    start 203.0.113.10 end 203.0.113.13\n    type generic, total addresses 4, allocated 4 (100%), misses 220\nOutside interfaces:\n  GigabitEthernet0/1\nInside interfaces:\n  GigabitEthernet0/0\n\nEdge# show run interface GigabitEthernet0/0\n ip nat inside\nEdge# show run interface GigabitEthernet0/1\n ip nat outside",
+    "alternativas": [
+      "ACL 1 está vazia",
+      "Falta ip nat inside/outside",
+      "Dynamic pool de 4 IPs 100% allocated, sem overload — pool esgotado; misses no statistics",
+      "Static 1:1 em excesso ocupa o pool"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Pool SMALL tem 4 endereços e allocated 100% com 4 dynamics 1:1; misses 220. Comando source list pool SEM overload. Inside/outside ok; ACL permite a LAN; 0 static. Novos hosts falham até liberar IP ou até adicionar overload/ampliar pool.",
+    "part_id": "4.1",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 2
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4104 — Funcionários navegam (PAT ok). Clientes externos não abrem https no servidor interno 10.30.30.50. “Internet do escritório funciona”.",
+    "cli_output": "R1# show run | include nat\nip nat inside source list 1 interface GigabitEthernet0/1 overload\naccess-list 1 permit 10.30.30.0 0.0.0.255\n! sem ip nat inside source static\n\nR1# show ip nat translations\nPro Inside global         Inside local       Outside local      Outside global\ntcp 198.51.100.1:49152    10.30.30.20:51500  93.184.216.34:443  93.184.216.34:443\ntcp 198.51.100.1:49153    10.30.30.21:52001  8.8.8.8:53         8.8.8.8:53\n! nenhuma linha estática 10.30.30.50 ↔ IP público fixo\n\nR1# show ip nat statistics\nTotal active translations: 2 (0 static, 2 dynamic; 2 extended)\nOutside interfaces:\n  GigabitEthernet0/1\nInside interfaces:\n  GigabitEthernet0/0\n\nR1# show run interface GigabitEthernet0/0\n ip address 10.30.30.1 255.255.255.0\n ip nat inside\nR1# show run interface GigabitEthernet0/1\n ip address 198.51.100.1 255.255.255.252\n ip nat outside\n\nR1# show ip interface brief | include GigabitEthernet0/0|GigabitEthernet0/1\nGigabitEthernet0/0   10.30.30.1     YES manual up  up\nGigabitEthernet0/1   198.51.100.1   YES manual up  up",
+    "alternativas": [
+      "PAT/overload e inside/outside ok para saída; falta static 1:1 do servidor 10.30.30.50 para inside global público (0 static no statistics)",
+      "Falta ip nat outside — por isso o PAT aparece nas translations",
+      "Pool esgotado impede qualquer PAT",
+      "ACL 1 bloqueia toda a 10.30.30.0/24 e mesmo assim há translations de .20/.21"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Translations dinâmicas estendidas mostram PAT de saída funcionando; statistics: 0 static. Não há ip nat inside source static para 10.30.30.50. Inside/outside presentes. Inbound a servidor interno não é resolvido só com overload — falta o mapeamento 1:1 (e permissões de caminho).",
+    "part_id": "4.1",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 3
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4105 — Auditor pergunta “qual IP o usuário 192.168.10.55 usa na Internet?”. Estagiário aponta a coluna errada no show.",
+    "cli_output": "R1# show ip nat translations\nPro Inside global      Inside local       Outside local      Outside global\ntcp 203.0.113.5:50432  192.168.10.55:49152 93.184.216.34:443 93.184.216.34:443\nudp 203.0.113.5:53100  192.168.10.55:53100 8.8.8.8:53        8.8.8.8:53\n\nR1# show ip nat statistics\nTotal active translations: 2 (0 static, 2 dynamic; 2 extended)\nHits: 44  Misses: 2\nOutside interfaces:\n  GigabitEthernet0/1\nInside interfaces:\n  Vlan10\n\nR1# show run | include nat\nip nat inside source list 10 interface GigabitEthernet0/1 overload\nip nat inside\nip nat outside\naccess-list 10 permit 192.168.10.0 0.0.0.255\n\nR1# show ip interface brief | include Vlan10|GigabitEthernet0/1\nVlan10               192.168.10.1   YES manual up  up\nGigabitEthernet0/1   203.0.113.5    YES manual up  up",
+    "alternativas": [
+      "Outside global 93.184.216.34 é o IP com que o usuário sai na Internet",
+      "Inside local 192.168.10.55 já é o endereço público pós-NAT",
+      "Inside global 203.0.113.5:50432 (e :53100) é o IP/porta com que 192.168.10.55 aparece na Internet",
+      "Misses: 2 provam que não há translation para o usuário"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Inside local 192.168.10.55 é o privado; inside global 203.0.113.5 com portas PAT é a identidade na Internet. Outside global 93.184.216.34/8.8.8.8 são destinos. Há 2 translations ativas — misses baixos não negam o mapeamento. Interpretação correta da tabela é o foco do ticket.",
+    "part_id": "4.1",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 4
+  },
+  {
+    "id": 6,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4201 — Notebooks da VLAN 30 “pegam rede” (IP ok) mas não acessam Internet nem outras VLANs. Gateway no desenho é 10.30.30.1.",
+    "cli_output": "PC# ipconfig\n   IPv4 Address. . . . . . . . . . . : 10.30.30.44\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . :\n\nDist# show run | section dhcp\nip dhcp excluded-address 10.30.30.1 10.30.30.10\nip dhcp pool VLAN30\n network 10.30.30.0 255.255.255.0\n dns-server 8.8.8.8\n lease 0 8\n ! sem default-router\n\nDist# show ip dhcp binding\nBindings from all pools not associated with VRF:\nIP address          Client-ID/              Lease expiration        Type\n                    Hardware address\n10.30.30.44         0100.1a.2b.3c.4d.5e     Mar 12 2026 04:00 PM    Automatic\n\nDist# show ip interface brief | include Vlan30\nVlan30   10.30.30.1   YES manual up  up\n\nPC# ping 10.30.30.1\nReply from 10.30.30.1: bytes=32 time=1ms TTL=64\nPC# ping 8.8.8.8\nDestination host unreachable.",
+    "alternativas": [
+      "Pool network não cobre 10.30.30.0/24",
+      "Binding ausente prova que DORA falhou",
+      "Falta ip helper-address — por isso há IP no PC",
+      "Pool sem default-router: PC com IP/máscara mas gateway vazio; ping local ok e remoto unreachable"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Binding e IP 10.30.30.44 mostram lease ok; network e exclusões coerentes; SVI .1 up. Falta default-router no pool — ipconfig sem Default Gateway. Ping ao .1 ok, 8.8.8.8 unreachable. Helper não é necessário com servidor local na subnet. Eixo: pool sem gateway.",
+    "part_id": "4.2",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 5
+  },
+  {
+    "id": 7,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4202 — PCs da VLAN 40 sem IP (APIPA). Servidor DHCP 10.99.0.10 na VLAN 99 funciona para a VLAN 50.",
+    "cli_output": "Dist# show run | include helper|name-server\nip helper-address 10.99.0.10\n! a linha acima está sob interface Vlan50 apenas — ver sections\n\nDist# show run interface Vlan40\ninterface Vlan40\n ip address 10.40.40.1 255.255.255.0\n ! sem ip helper-address\n\nDist# show run interface Vlan50\ninterface Vlan50\n ip address 10.50.50.1 255.255.255.0\n ip helper-address 10.99.0.10\n\nDist# show run interface Vlan99\ninterface Vlan99\n ip address 10.99.0.1 255.255.255.0\n\nDist# show ip interface brief | include Vlan40|Vlan50|Vlan99\nVlan40   10.40.40.1   YES manual up  up\nVlan50   10.50.50.1   YES manual up  up\nVlan99   10.99.0.1    YES manual up  up\n\nPC40# ipconfig\n   IPv4 Address. . . . . . . . . . . : 169.254.12.34\n   Default Gateway . . . . . . . . . :\n\n! Servidor 10.99.0.10 tem scope 10.40.40.0/24 configurado (fora deste recorte)",
+    "alternativas": [
+      "Vlan40 down/down no brief",
+      "ip helper-address ausente na SVI do cliente (Vlan40); helper só em Vlan50 — relay não atende a VLAN 40",
+      "name-server no Dist bloqueia DHCP",
+      "APIPA prova lease bem-sucedido do scope 40"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Servidor está em outra subnet; Vlan50 tem helper e funciona; Vlan40 up/up sem helper — Discover não chega ao 10.99.0.10. APIPA confirma falha de lease. name-server não desliga DHCP. Scope no servidor existe conforme o chamado; o gap no output é helper na interface do cliente.",
+    "part_id": "4.2",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 6
+  },
+  {
+    "id": 8,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4203 — VLAN 60 nova: helper ok, PCs ainda sem IP. Servidor DHCP é o próprio Dist.",
+    "cli_output": "Dist# show run | section dhcp\nip dhcp excluded-address 10.60.60.1 10.60.60.20\nip dhcp pool VLAN60\n network 10.16.60.0 255.255.255.0\n default-router 10.60.60.1\n dns-server 1.1.1.1\n\nDist# show run interface Vlan60\ninterface Vlan60\n ip address 10.60.60.1 255.255.255.0\n ! servidor local — sem helper (não necessário na mesma subnet)\n\nDist# show ip dhcp binding\nBindings from all pools not associated with VRF:\nIP address          Client-ID/              Lease expiration        Type\n                    Hardware address\n! (vazio para clientes da VLAN 60)\n\nDist# show ip interface brief | include Vlan60\nVlan60   10.60.60.1   YES manual up  up\n\nDist# show ip dhcp pool VLAN60\nPool VLAN60 :\n Utilization mark (high/low)    : 100 / 0\n Subnet size (first/next)       : 0 / 0\n Total addresses                : 254\n Leased addresses               : 0\n Pending event                  : none\n 1 subnet is currently in the pool :\n Current index        IP address range                    Leased addresses\n 10.16.60.1          10.16.60.1        - 10.16.60.254     0",
+    "alternativas": [
+      "Falta default-router no pool",
+      "SVI Vlan60 administratively down",
+      "network do pool 10.16.60.0/24 não cobre a subnet real da VLAN 10.60.60.0/24 — scope errado",
+      "Helper obrigatório mesmo com servidor na SVI local e binding cheio"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "SVI 10.60.60.1 up; default-router e dns presentes; binding/leased 0. O network do pool é 10.16.60.0/24 (typo/scope) enquanto a VLAN é 10.60.60.0/24 — pool não serve o segmento. Servidor local dispensa helper. Corrigir network (e exclusões) alinha o scope.",
+    "part_id": "4.2",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 7
+  },
+  {
+    "id": 9,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4204 — Impressora nova não obtém IP; outros PCs na mesma VLAN ok. Há um host “esquecido” com IP estático no range.",
+    "cli_output": "R1# show run | section dhcp\nip dhcp excluded-address 192.168.80.1 192.168.80.10\nip dhcp pool OFFICE\n network 192.168.80.0 255.255.255.0\n default-router 192.168.80.1\n dns-server 192.168.80.10\n\nR1# show ip dhcp binding\nIP address          Client-ID/              Lease expiration        Type\n                    Hardware address\n192.168.80.50       0100.aa.bb.cc.dd.01     Mar 12 2026 01:00 PM    Automatic\n192.168.80.51       0100.aa.bb.cc.dd.02     Mar 12 2026 01:10 PM    Automatic\n\nR1# show ip dhcp conflict\nIP address        Detection method   Detection time\n192.168.80.60     Ping               Mar 11 2026 09:12 AM\n\nR1# show ip interface brief | include Vlan80\nVlan80   192.168.80.1   YES manual up  up\n\n! Log do lab: host legado com IP estático 192.168.80.60/24 ainda ligado\n! Impressora tenta obter endereço; administrador notou .60 “sumido” do pool",
+    "alternativas": [
+      "show ip dhcp conflict marca 192.168.80.60 (Ping) — IP em disputa com host estático; binding de PCs ok mostra DHCP ativo",
+      "Pool sem network 192.168.80.0/24",
+      "default-router ausente no pool OFFICE",
+      "Vlan80 down impede qualquer binding existente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Conflict lista 192.168.80.60 detectado por Ping — típico de duplicata com estático indevido. Bindings de .50/.51 provam DHCP e VLAN ok. Pool tem network e default-router; Vlan80 up. Remova/altere o estático e trate o conflict; não é falta de network nem SVI down.",
+    "part_id": "4.2",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 8
+  },
+  {
+    "id": 10,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4205 — Usuário navega por IP numérico (http://203.0.113.10) mas nomes falham. Admin no roteador também não resolve FQDN.",
+    "cli_output": "PC# ipconfig /all\n   IPv4 Address. . . . . . . . . . . : 10.10.10.55\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.10.10.1\n   DNS Servers . . . . . . . . . . . :\n\nPC# ping 8.8.8.8\nReply from 8.8.8.8: bytes=32 time=14ms TTL=117\nPC# ping google.com\nPing request could not find host google.com.\n\nR1# show run | section dhcp\nip dhcp pool LAN\n network 10.10.10.0 255.255.255.0\n default-router 10.10.10.1\n ! sem dns-server\n\nR1# show run | include name-server|domain-lookup\nno ip domain-lookup\n! (sem ip name-server)\n\nR1# show ip dhcp binding | include 10.10.10.55\n10.10.10.55         0100.11.22.33.44.55     Mar 12 2026 06:00 PM    Automatic\n\nR1# show ip interface brief | include GigabitEthernet0/0\nGigabitEthernet0/0   10.10.10.1   YES manual up  up",
+    "alternativas": [
+      "Falta default-router — contradiz ipconfig com gateway 10.10.10.1",
+      "Binding ausente para o PC",
+      "Pool sem dns-server (host sem DNS) e roteador sem ip name-server / com no ip domain-lookup — resolução de nomes falha; IP/rota ok",
+      "Helper-address obrigatório na mesma subnet com binding presente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "IP, gateway e ping 8.8.8.8 ok; DNS Servers vazio no PC — pool sem dns-server. R1 sem name-server e com no domain-lookup — CLI também não resolve. Binding existe; helper local desnecessário. Sintoma clássico de DNS, não de DHCP de endereço.",
+    "part_id": "4.2",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 9
+  },
+  {
+    "id": 11,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4301 — Logs do edge e do firewall “não batem” no horário. Equipe suspeita de ataque; relógios divergem em horas.",
+    "cli_output": "Edge# show ntp status\nClock is unsynchronized, stratum 16, no reference clock\nnominal freq is 250.0000 Hz, actual freq is 250.0000 Hz, precision is 2**10\nreference time is 00000000.00000000 (00:00:00.000 UTC Mon Jan 1 1900)\n\nEdge# show ntp associations\n  address         ref clock       st   when   poll   reach  delay  offset   disp\n ~203.0.113.10    .INIT.          16      -     64      0     0.0    0.0  16000\n * master (synced), # master (unsynced), + selected, - candidate, ~ configured\n\nEdge# show run | include ntp\nntp server 203.0.113.10\n\nEdge# show logging | include time|Log Buffer\nNo time-source configured or time not synchronized\nLog Buffer (8192 bytes):\n*Mar  1 02:11:44.201: %LINK-3-UPDOWN: Interface GigabitEthernet0/1, changed state to up\n\nEdge# ping 203.0.113.10\n..... Success rate is 0 percent (0/5)",
+    "alternativas": [
+      "show ntp status indica synchronized stratum 1",
+      "ping ao servidor NTP 100% prova alcance",
+      "ntp server ausente na running-config",
+      "Clock unsynchronized stratum 16, association ~ sem reach, ping 0% — fonte NTP configurada mas inalcançável/unsync"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "status unsynchronized/stratum 16; association com reach 0 e .INIT.; ping ao 203.0.113.10 falha. A linha ntp server existe — o problema é alcance/serviço, não ausência de comando. Timestamps de log ficam não confiáveis até haver sync.",
+    "part_id": "4.3",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 10
+  },
+  {
+    "id": 12,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4302 — Servidor Syslog quase vazio; só raríssimas mensagens “emergency”. No device, show logging mostra errors e warnings no buffer.",
+    "cli_output": "R1# show run | include logging\nservice timestamps log datetime msec\nlogging buffered 16384 warnings\nlogging host 10.255.255.50\nlogging trap emergencies\nlogging console warnings\n\nR1# show logging\nSyslog logging: enabled (0 messages dropped, 0 flushes, 0 overruns)\n    Console logging: level warnings, 42 messages logged\n    Buffer logging: level warnings, 38 messages logged\n    Trap logging: level emergencies, 2 message lines logged\n        Logging to 10.255.255.50 (udp port 514, audit disabled,\n              link up), 2 message lines logged\nLog Buffer (16384 bytes):\n*Aug 12 10:01:02.111: %LINK-3-UPDOWN: Interface GigabitEthernet0/0, changed state to down\n*Aug 12 10:01:05.200: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/0, changed state to down\n*Aug 12 10:02:11.004: %SYS-5-CONFIG_I: Configured from console by admin\n\nR1# show ntp status\nClock is synchronized, stratum 3, reference is 10.0.0.1",
+    "alternativas": [
+      "NTP unsync explica a ausência total de buffer local",
+      "logging trap emergencies restringe o host a severidade 0 — errors/notifications no buffer não sobem ao Syslog server",
+      "logging host está ausente no show run",
+      "Trap level debugging floodaria e o output mostra level debugging"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Trap logging level emergencies com só 2 linhas ao host; buffer tem LINK-3 e SYS-5 que não passam no filtro 0. logging host 10.255.255.50 existe. NTP está synchronized. O gap é trap restritivo demais, não host ausente.",
+    "part_id": "4.3",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 11
+  },
+  {
+    "id": 13,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4303 — SIEM no IP 10.50.50.100 não recebe nada do core. Console e buffer locais mostram eventos normalmente.",
+    "cli_output": "Core# show run | include logging|ntp|snmp\nservice timestamps log datetime msec\nlogging buffered 32768 informational\nlogging console informational\nlogging trap informational\nlogging host 10.50.50.200\nntp server 10.0.0.1\nsnmp-server community OpsRO ro\n\nCore# show logging\nSyslog logging: enabled\n    Console logging: level informational, 120 messages logged\n    Buffer logging: level informational, 118 messages logged\n    Trap logging: level informational, 115 message lines logged\n        Logging to 10.50.50.200 (udp port 514, link up), 115 message lines logged\nLog Buffer (32768 bytes):\n*Aug 12 14:22:01.001: %SYS-5-CONFIG_I: Configured from console by admin\n\nCore# show ntp status\nClock is synchronized, stratum 2, reference is 10.0.0.1\n\n! Inventário do NOC: SIEM real = 10.50.50.100 (não .200)",
+    "alternativas": [
+      "logging trap está em emergencies e bloqueia tudo",
+      "NTP unsynchronized no output",
+      "logging host aponta 10.50.50.200 — destino errado; SIEM esperado é .100; trap informational e buffer ok",
+      "snmp-server community ausente impede Syslog"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Trap informational com 115 linhas para 10.50.50.200; buffer e console ativos; NTP sync. O SIEM do inventário é .100 — host de log errado. Community SNMP não carrega Syslog. Não há trap emergencies nem unsync no recorte.",
+    "part_id": "4.3",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 12
+  }
+]

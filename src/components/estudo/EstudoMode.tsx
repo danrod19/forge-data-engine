@@ -19,7 +19,6 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
-  pickPartPracticeQuestions,
   pickDrillQuestions,
   getPartQuestions,
   partAccentClasses,
@@ -66,6 +65,7 @@ import {
 import { useTrack, type TrackId } from "@/lib/track-context";
 import { TerminalCLI } from "@/components/ticket/TerminalCLI";
 import { shuffleQuestions } from "@/data/simulado-questions";
+import { preferPtQuestions } from "@/lib/question-lang";
 
 type View = "list" | "detail" | "practice" | "result";
 type DetailTab = "content" | "practice";
@@ -132,6 +132,7 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
   const [practiceAccent, setPracticeAccent] = useState<AccentStyle | null>(
     null
   );
+  const [practiceEnFallback, setPracticeEnFallback] = useState(false);
   const [practiceQuestions, setPracticeQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -278,6 +279,7 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
       label: string;
       questions: Question[];
       accent: AccentStyle;
+      usedEnglishFallback?: boolean;
       part?: StudyPartManifest | null;
       domain?: AwsStudyDomain | null;
     }) => {
@@ -285,6 +287,7 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
       progressSavedRef.current = false;
       // Mantém ids originais do banco (progresso masteredIds)
       setPracticeQuestions(opts.questions);
+      setPracticeEnFallback(opts.usedEnglishFallback === true);
       setPracticeKey(opts.key);
       setPracticeLabel(opts.label);
       setPracticeAccent(opts.accent);
@@ -301,18 +304,30 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
 
   const startCcnaPractice = useCallback(
     (part: StudyPartManifest, mode: "part" | "drill" = "part") => {
-      const picked =
-        mode === "drill"
-          ? pickDrillQuestions(ESTUDO_PRACTICE_LIMIT)
-          : pickPartPracticeQuestions(part.part_id, ESTUDO_PRACTICE_LIMIT);
+      if (mode === "drill") {
+        const picked = pickDrillQuestions(ESTUDO_PRACTICE_LIMIT);
+        beginPractice({
+          key: "1.4-drill",
+          label: "Drill de subnetting",
+          questions: picked,
+          accent: partAccentClasses(part.accent),
+          part,
+          domain: null,
+        });
+        return;
+      }
+      const full = getPartQuestions(part.part_id);
+      const { pool, usedEnglishFallback } = preferPtQuestions(full);
+      const picked = shuffleQuestions(pool).slice(
+        0,
+        Math.min(ESTUDO_PRACTICE_LIMIT, pool.length)
+      );
       beginPractice({
-        key: mode === "drill" ? "1.4-drill" : part.part_id,
-        label:
-          mode === "drill"
-            ? "Drill de subnetting"
-            : `${part.part_id} · ${part.title}`,
+        key: part.part_id,
+        label: `${part.part_id} · ${part.title}`,
         questions: picked,
         accent: partAccentClasses(part.accent),
+        usedEnglishFallback,
         part,
         domain: null,
       });
@@ -326,15 +341,17 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
         awsTraditionalQuestions,
         domain
       );
-      const picked = shuffleQuestions(filtered).slice(
+      const { pool, usedEnglishFallback } = preferPtQuestions(filtered);
+      const picked = shuffleQuestions(pool).slice(
         0,
-        Math.min(ESTUDO_PRACTICE_LIMIT, filtered.length)
+        Math.min(ESTUDO_PRACTICE_LIMIT, pool.length)
       );
       beginPractice({
         key: domain.id,
         label: domain.name,
         questions: picked,
         accent: awsDomainAccentClasses(domain.accent),
+        usedEnglishFallback,
         part: null,
         domain,
       });
@@ -474,6 +491,9 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
           />
           <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
             {headerCopy.hint}
+          </p>
+          <p className="mt-1.5 text-[11px] font-medium text-neon-cyan/80">
+            {estudoUiCopy.journeyLine}
           </p>
         </div>
 
@@ -750,6 +770,9 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
             <p className="text-[12px] leading-relaxed text-slate-400">
               {estudoUiCopy.practiceHint}
             </p>
+            <p className="text-[11px] text-slate-500">
+              {estudoUiCopy.journeyLine}
+            </p>
             {!canPractice && readable && !entry.contentRead && (
               <p className="rounded-xl border border-amber-500/25 bg-amber-500/5 px-3 py-2 text-[11px] text-amber-200/90">
                 {estudoUiCopy.practiceCtaLocked}
@@ -846,6 +869,11 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
           </span>
         </div>
         <Progress value={progressPct} className="h-1 bg-slate-800" />
+        {practiceEnFallback && (
+          <p className="rounded-xl border border-amber-500/25 bg-amber-500/5 px-3 py-2 text-[11px] text-amber-200/90">
+            {estudoUiCopy.practiceEnFallback}
+          </p>
+        )}
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
           <div className="mb-3 flex items-center gap-2">
             <Target className={cn("size-3.5", accent.text)} />

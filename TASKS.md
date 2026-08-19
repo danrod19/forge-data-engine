@@ -18,6 +18,15 @@
 - [x] Deploy prep: README, .env.example, vercel.json headers, npm run qa:tracks
 - [x] Estudo: fluxo Conteúdo → marcar lido → Praticar (até 30) + content bank
 - [x] Copy audit multi-track (Home/TopBar/Simulado/Paywall/Trilha/Estudo)
+- [x] Jornada de estudo + Simulado PT/EN (detectQuestionLang + report:lang)
+- [x] Trilha V2: revisão PT de 85 tickets — commit `e78fcdf`
+- [x] Trilha AWS: revisão PT de 60 tickets — commit `fd4b615`
+- [x] 3A.3 Trilha V1: 155 tickets curated — commit `e29d730`
+- [x] 3B.1 Traditional V2: 506 explicacao_profunda em PT (bad=0)
+- [x] 3B.2 Traditional AWS: 360 explicacao_profunda em PT (bad=0)
+- [x] 3B.3 Traditional V1 UI pool: 949 explicacao_profunda em PT (bad=0)
+- [x] AWS Trilha = cenários traditional (sem CLI); tickets_aws.json preservado
+- [x] DECISIONS.md: Opção A + Opção B (Trilha AWS) + pools UI + escopo curadoria fechado 18/08/2026
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção

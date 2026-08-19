@@ -1,0 +1,560 @@
+[
+  {
+    "id": 14,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4304 — a ferramenta NMS falha a autenticação SNMP no switch de acesso. A community configurada no NMS é \"public\".",
+    "cli_output": "SW1# show run | include snmp|ntp|logging\nsnmp-server community CampusRO ro\nsnmp-server community CampusRW rw\nntp server 10.0.0.1\nlogging host 10.50.50.100\nlogging trap warnings\n\nSW1# show snmp\nChassis: FOC1234X0AB\n0 SNMP packets input\n    0 Bad Community names\n    0 Illegal operation for community name supplied\n    0 Encoding errors\n0 SNMP packets output\n\nSW1# show ntp status\nClock is synchronized, stratum 3, reference is 10.0.0.1\n\nSW1# show run | include community\nsnmp-server community CampusRO ro\nsnmp-server community CampusRW rw\n! nenhuma community \"public\"",
+    "alternativas": [
+      "Agent só tem communities CampusRO/CampusRW — NMS com “public” não autentica (v2c string errada)",
+      "logging trap warnings desliga o agent SNMP",
+      "NTP stratum 3 proíbe qualquer SNMP",
+      "show snmp prova community public ativa"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para community string errada: no CLI, o running só tem CampusRO e CampusRW — não existe \"public\". Com essa string o NMS não autentica em SNMPv2c. logging trap warnings só define severidade de syslog e não desliga o agent SNMP. NTP stratum 3 sincronizado não proíbe SNMP. show snmp com zero packets e sem community public não prova que public esteja ativa. Insight: quando o NMS falha auth SNMP, compare a string do NMS com as communities reais no device antes de culpar NTP ou logging.",
+    "part_id": "4.3",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 13
+  },
+  {
+    "id": 15,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4305 — após uma queda de link, o NMS não mostrou alerta SNMP; o buffer local registrou %LINK-3-UPDOWN com horário \"no passado\". Na manutenção o NTP ficou desligado.",
+    "cli_output": "R2# show run | include ntp|logging|snmp\nlogging buffered 8192 warnings\nlogging console warnings\nlogging trap warnings\nlogging host 10.50.50.100\nsnmp-server community Monitor ro\n! sem ntp server\n! sem snmp-server host / snmp-server enable traps (nenhuma linha de trap destination)\n\nR2# show ntp status\n%NTP is not enabled.\n\nR2# show logging\nSyslog logging: enabled\n    Trap logging: level warnings, 40 message lines logged\n        Logging to 10.50.50.100, 40 message lines logged\nLog Buffer (8192 bytes):\n*Mar  1 01:04:12.000: %LINK-3-UPDOWN: Interface GigabitEthernet0/1, changed state to down\n*Mar  1 01:04:13.000: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/1, changed state to down\n\nR2# show snmp\nChassis: FTX9999\n0 SNMP packets input\n0 SNMP packets output\n\nR2# show clock\n*01:10:00.000 UTC Fri Mar 1 2002",
+    "alternativas": [
+      "ntp server e synchronized stratum 1 estão explícitos no output",
+      "snmp-server host de traps está configurado e show snmp mostra tráfego alto de traps",
+      "Syslog host ausente — contradiz logging host 10.50.50.100",
+      "NTP não habilitado (relógio/timestamps ruins) e SNMP só com community RO sem snmp-server host/traps — NMS não recebe traps; eventos ficam no Syslog/buffer"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "No CLI, NTP is not enabled e o clock está em 2002 — isso explica timestamps no passado. logging host 10.50.50.100 existe e o buffer tem LINK-3; o Syslog host não está ausente. SNMP tem community Monitor, mas zero packets e o include não mostra snmp-server host nem enable traps — traps não vão ao NMS. Afirmar ntp server/stratum 1 ou snmp-server host com tráfego alto contradiz o output. Insight: em chamado de \"NMS não alertou\", separe relógio ruim (NTP) de trap destination ausente; Syslog no buffer não prova trap SNMP.",
+    "part_id": "4.3",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 14
+  },
+  {
+    "id": 16,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4401 — o time diz que \"habilitou SSH\", mas o cliente reporta serviço indisponível. A VTY já tem transport input ssh.",
+    "cli_output": "R1# show ip ssh\nSSH Disabled - version 2.0\n%Please create RSA keys to enable SSH (and of atleast 768 bits for SSHv2).\nAuthentication timeout: 120 secs; Authentication retries: 3\n\nR1# show run | include hostname|domain-name|crypto|username|ip ssh\nhostname Router\n! sem ip domain-name\nusername admin secret 5 $1$abcd$efghijklm\nip ssh version 2\n! sem crypto key / sem rsa key pair\n\nR1# show run | section line vty\nline vty 0 4\n login local\n transport input ssh\n\nR1# show users\n    Line       User       Host(s)              Idle       Location\n*  0 con 0                idle                 00:00:00\n\nR1# show access-lists\n! (vazio — sem access-class)",
+    "alternativas": [
+      "transport input está telnet only no section vty",
+      "login local está ausente",
+      "access-class deny any bloqueia o admin",
+      "SSH Disabled por falta de chave RSA e ip domain-name ausente — pré-requisitos de crypto incompletos"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "No CLI, show ip ssh mostra SSH Disabled pedindo RSA keys; o running está sem crypto key e sem ip domain-name. A VTY já tem login local e transport ssh; access-lists vazio — não há access-class deny. username admin existe. O gap é o engine SSH (chave/domínio), não a linha VTY. transport input não está telnet only e login local não está ausente. Insight: transport input ssh na VTY não liga o serviço se faltar chave RSA (e tipicamente domain-name) — confirme com show ip ssh antes de culpar a VTY.",
+    "part_id": "4.4",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 15
+  },
+  {
+    "id": 17,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4402 — o cliente SSH é recusado; Telnet ainda abre e pede senha. A auditoria de hardening falhou.",
+    "cli_output": "R1# show ip ssh\nSSH Enabled - version 2.0\nAuthentication methods: publickey,keyboard-interactive,password\nAuthentication timeout: 120 secs; Authentication retries: 3\nMinimum expected Diffie Hellman key size : 1024 bits\nIOS Keys in SECSH format(ssh-rsa, base64 encoded): MIIBIjANBgkqh...\n\nR1# show run | section line vty\nline vty 0 4\n password cisco\n login\n transport input telnet\n\nR1# show run | include username|domain-name|hostname|ip ssh\nhostname Edge1\nip domain-name lab.local\nip ssh version 2\nusername admin secret 5 $1$xxxx$yyyy\n\nR1# show access-lists\nStandard IP access list 10\n    10 permit 10.0.0.0, wildcard bits 0.0.0.255",
+    "alternativas": [
+      "SSH Disabled no show ip ssh",
+      "transport input telnet only — SSH recusado na VTY; Telnet cleartext ainda aceito (chave/engine ok)",
+      "Falta username na running",
+      "domain-name e hostname ausentes"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para VTY só em Telnet: show ip ssh está Enabled com chave, hostname/domain/user ok, mas line vty tem transport input telnet e login+password legado. Por isso SSH é recusado e Telnet cleartext ainda entra. username existe; domain-name e hostname estão presentes. A ACL 10 existe, mas não está aplicada no section vty deste recorte. Insight: engine SSH \"ok\" não basta — o transport input da VTY decide o que realmente aceita.",
+    "part_id": "4.4",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 16
+  },
+  {
+    "id": 18,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4403 — o handshake SSH parece ok, mas Authentication failed para todos os técnicos. Ninguém criou usuários locais.",
+    "cli_output": "SW1# show ip ssh\nSSH Enabled - version 2.0\nAuthentication timeout: 120 secs; Authentication retries: 3\n\nSW1# show run | section line vty\nline vty 0 15\n login local\n transport input ssh\n\nSW1# show run | include username|hostname|domain-name|crypto|ip ssh\nhostname Access1\nip domain-name corp.internal\nip ssh version 2\n! crypto key presente (par rsa já gerado em boot — omitido por tamanho)\n! nenhuma linha username\n\nSW1# show users\n    Line       User       Host(s)              Idle       Location\n*  0 con 0                idle                 00:00:12\n\nSW1# show access-lists\n! (nenhuma ACL)\n\n! Cliente: ssh admin@10.1.1.2 → Permission denied (password / auth fail)",
+    "alternativas": [
+      "SSH Disabled por falta de versão 2",
+      "transport input telnet no section",
+      "login local sem nenhum username na running — database local vazio; autenticação VTY falha",
+      "access-class 99 in bloqueia conforme show run vty"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "No CLI, SSH Enabled e VTY com login local + transport ssh, porém o include não lista nenhuma linha username — database local vazio. Daí Permission denied. Não é SSH Disabled por falta de versão 2; transport não está telnet; não há access-class 99 no section vty. Insight: login local sem username = falha de autenticação garantida; valide username <user> secret antes de reabrir ticket de \"SSH quebrado\".",
+    "part_id": "4.4",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 17
+  },
+  {
+    "id": 19,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4404 — o admin 172.16.5.20 não consegue SSH; o colega em 10.0.0.15 entra normal. Ping de ambos ao device está ok.",
+    "cli_output": "R1# show ip ssh\nSSH Enabled - version 2.0\n\nR1# show run | section line vty\nline vty 0 4\n access-class 10 in\n login local\n transport input ssh\n\nR1# show access-lists 10\nStandard IP access list 10\n    10 permit 10.0.0.0, wildcard bits 0.0.0.255\n    20 deny   any\n\nR1# show run | include username|hostname|domain-name\nhostname Core1\nip domain-name lab.local\nusername netops secret 5 $1$aabb$ccdd\n\nR1# show users\n    Line       User       Host(s)              Idle       Location\n   2 vty 0     netops     idle                 00:01:00 10.0.0.15\n\n! Tentativa de 172.16.5.20: connection closed / refused by ACL behavior",
+    "alternativas": [
+      "access-class 10 permite só 10.0.0.0/24 — 172.16.5.20 cai no deny any; sessão de 10.0.0.15 no show users confirma",
+      "Falta transport input ssh",
+      "SSH Disabled no show ip ssh",
+      "username netops ausente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para filtro de gerência: access-class 10 in com permit só 10.0.0.0/24 e deny any. 172.16.5.20 cai no deny; show users confirma sessão de 10.0.0.15. SSH enabled, transport ssh e username ok — não faltam esses itens. Ping ok isola o problema no access-class, não no path L3 genérico. Insight: se ping passa e SSH \"fecha\" só para um range, olhe access-class/ACL de VTY antes de recriar chave RSA.",
+    "part_id": "4.4",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 18
+  },
+  {
+    "id": 20,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4405 — a política exige SSHv2; o auditor encontra SSH disabled e reclamação de \"version 1 only\" em backup antigo. Estado atual no device:",
+    "cli_output": "R1# show ip ssh\nSSH Disabled - version 1.99\n%Please create RSA keys to enable SSH.\nAuthentication timeout: 120 secs; Authentication retries: 3\n\nR1# show run | include ip ssh|hostname|domain-name|crypto|username\nhostname BR1\nip domain-name branch.example\nip ssh version 1\nusername admin secret 5 $1$zzzz$wwww\n! sem chave RSA na config (key pair ausente)\n\nR1# show run | section line vty\nline vty 0 4\n login local\n transport input ssh\n\nR1# show access-lists\n! vazio\n\nR1# show users\n*  0 con 0                idle                 00:00:00",
+    "alternativas": [
+      "SSH Enabled version 2 com chave 2048 visível no show ip ssh",
+      "transport input telnet only impede qualquer menção a ssh na VTY",
+      "SSH Disabled, ip ssh version 1 na running e sem chave RSA — serviço inativo/legado; VTY já pede ssh+login local",
+      "access-class é a única causa e aparece no section vty"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "No CLI, show ip ssh: Disabled pedindo RSA; running com ip ssh version 1 e sem key pair. A VTY já está login local + transport ssh; ACL vazia — access-class não é a causa. Não há SSH Enabled version 2 com chave 2048; transport não está telnet only. Corrija: gerar chave, ip ssh version 2 e revalidar show ip ssh Enabled. Insight: \"Disabled - version 1.99\" + version 1 na config = serviço legado/inativo; trate chave e versão juntas.",
+    "part_id": "4.4",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 19
+  },
+  {
+    "id": 21,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4501 — chamadas VoIP \"robotizadas\" no horário de pico. Os telefones marcam DSCP EF; no core a classe de voz chega vazia.",
+    "cli_output": "Access# show run interface GigabitEthernet1/0/10\ninterface GigabitEthernet1/0/10\n description PC-USER\n switchport mode access\n switchport access vlan 20\n ! sem trust de DSCP/CoS — política de edge: untrusted (remark para 0)\n mls qos\n ! nota de lab: interface do phone em Gi1/0/12 confia; Gi1/0/10 (softphone no PC) não\n\nAccess# show run interface GigabitEthernet1/0/12\ninterface GigabitEthernet1/0/12\n description IP-PHONE\n switchport mode access\n switchport voice vlan 30\n mls qos trust dscp\n\nCore# show interfaces GigabitEthernet0/0/0 | include drops|output|input\n  Input queue: 0/375/0/0 (size/max/drops/flushes); Total output drops: 12840\n  Output queue: 0/40 (size/max)\n\n! Captura de lab no uplink do softphone (resumo):\n! IP DSCP chegando ao core = 0x00 (CS0) apesar do app marcar EF no host\n! Softphone conectado em Gi1/0/10 (untrusted)",
+    "alternativas": [
+      "Porta do softphone untrusted reescreve/zera marking — voz chega best-effort; trust só na porta do IP phone",
+      "Output drops 0 em todo o core no show",
+      "mls qos trust dscp está na porta do PC-USER no output",
+      "TFTP no path de voz remove DSCP por padrão"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para trust boundary: Gi1/0/12 (IP phone) tem mls qos trust dscp; Gi1/0/10 (PC/softphone) é untrusted e remarca/zera o marking — a captura mostra CS0 no core. Output drops altos no uplink batem com congestão sem PHB de voz. Não há trust na porta do PC-USER; drops não são zero; TFTP não \"come\" DSCP por padrão nesse cenário. Insight: softphone no PC herda a política da porta do PC — se a porta é untrusted, EF do app não sobrevive até o core.",
+    "part_id": "4.5",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 20
+  },
+  {
+    "id": 22,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4502 — durante o backup noturno (FTP full), as filas de voz estouram. Não há política de prioridade; tudo sai em FIFO.",
+    "cli_output": "Edge# show interfaces GigabitEthernet0/1\nGigabitEthernet0/1 is up, line protocol is up\n  MTU 1500 bytes, BW 100000 Kbit/sec\n  reliability 255/255, txload 240/255, rxload 40/255\n  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 45210\n  Output queue: 0/40 (size/max)\n  5 minute output rate 92000000 bits/sec, 8123 packets/sec\n\nEdge# show run | include policy-map|priority|shape|police\n! (vazio — nenhuma policy de QoS aplicada na interface)\n\nEdge# show run | include tftp|ftp\n! backups agendados via host interno FTP (fora do IOS) — tráfego bulk na WAN\n\n! NOC note: codec G.711 reporta loss/jitter altos só no window do backup\n! Nenhuma classe LLQ/priority configurada",
+    "alternativas": [
+      "txload baixo e zero drops contradizem congestão",
+      "Congestão (txload alto, output drops) sem policy de prioridade — voz compete em best-effort/FIFO com bulk FTP",
+      "priority/LLQ está explícito no show run | include priority",
+      "O problema é apenas stratum NTP 16"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "No CLI, txload 240/255 e dezenas de milhares de output drops; show run | include policy-map|priority está vazio. Bulk FTP e voz competem em best-effort. Não há priority/LLQ explícito; txload baixo/zero drops contradiz o output; stratum NTP 16 não aparece como causa. Insight: sob congestão sem LLQ, voz sofre jitter/loss mesmo com codec ok — confirme PHB antes de culpar o telefone.",
+    "part_id": "4.5",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 21
+  },
+  {
+    "id": 23,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4503 — o analista diz que \"o shaping está dropando a voz\". Na WAN há police na classe de dados, shape no parent e voz em priority.",
+    "cli_output": "R1# show policy-map interface GigabitEthernet0/0\n GigabitEthernet0/0\n  Service-policy output: WAN-OUT\n    Class-map: VOICE (match-all)\n      120034 packets, 18432000 bytes\n      Queueing\n        Strict Priority\n        Output Queue: Conversation 264\n        Bandwidth 512 (kbps) Burst 12800 (Bytes)\n        (pkts matched/bytes matched) 120034/18432000\n        (total drops) 12\n    Class-map: BULK (match-all)\n      890122 packets\n      police:\n          cir 5000000 bps, bc 156250 bytes\n        conformed 800000 packets, actions: transmit\n        exceeded 90122 packets, actions: drop\n    Class-map: class-default (match-any)\n      shape (average) cir 20000000, bc 80000, be 80000\n      target shape rate 20000000\n\nR1# show interfaces GigabitEthernet0/0 | include drops|rate\n  5 minute output rate 18500000 bits/sec\n  Total output drops: 90500\n\n! Nota: excesso dropado concentra-se no contador police da classe BULK",
+    "alternativas": [
+      "Drops do police na classe BULK (exceeded drop) — não é shaping “dropando voz”; VOICE está em strict priority com drops mínimos",
+      "VOICE total drops 120034 no output de priority",
+      "Não há police em nenhuma classe no policy-map",
+      "shape average na default prova que voz está em best-effort only"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "No CLI, VOICE está em Strict Priority com só 12 drops; BULK tem police com 90122 exceeded drop. O shape average no parent suaviza a taxa do link — não é o shaping \"matando\" a voz. Há police sim; VOICE não tem 120034 drops de priority; shape na default não prova voz em best-effort only. Insight: leia policy-map interface por classe — confunda police (drop excesso) com shape (atrasa/suaviza) e você culpa a ferramenta errada.",
+    "part_id": "4.5",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 22
+  },
+  {
+    "id": 24,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4504 — no upgrade de IOS, copy tftp: flash: falha. O servidor TFTP 10.9.9.9 está na mesma gerência.",
+    "cli_output": "R1# show ip interface brief | include GigabitEthernet0/0\nGigabitEthernet0/0   10.9.9.1   YES manual up  up\n\nR1# ping 10.9.9.9\n!!!!! Success rate is 100 percent (5/5)\n\nR1# show run | include tftp|access-list|ip access-group\nip access-group BLOCK-TFTP in\naccess-list 120 deny udp any any eq tftp\naccess-list 120 permit ip any any\ninterface GigabitEthernet0/0\n ip access-group BLOCK-TFTP in\n\nR1# copy tftp: flash:\nAddress or name of remote host []? 10.9.9.9\nSource filename []? c1900-universalk9.bin\nDestination filename [c1900-universalk9.bin]?\nAccessing tftp://10.9.9.9/c1900-universalk9.bin...\n%Error opening tftp://10.9.9.9/c1900-universalk9.bin (Timed out)\n\nR1# show flash: | include bytes\n7749468160 bytes total (5200000000 bytes free)",
+    "alternativas": [
+      "Flash sem espaço livre no show flash",
+      "Ping 0% prova que o servidor está down L3",
+      "ACL BLOCK-TFTP deny udp … eq tftp na interface — TFTP (UDP) filtrado apesar do ping ICMP ok",
+      "copy usa FTP no output exibido"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para ACL filtrando TFTP: ping 100% e flash com espaço livre, mas ACL 120 deny udp any any eq tftp com ip access-group BLOCK-TFTP in na Gi0/0 — o copy dá Timed out. Ping ICMP não valida UDP/69. O copy usa tftp no output, não FTP. Insight: se ping ok e TFTP timeout, procure deny udp … eq tftp (ou firewall) no path de gerência.",
+    "part_id": "4.5",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 23
+  },
+  {
+    "id": 25,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #4505 — o time tentou \"TFTP com usuário/senha\" no servidor Linux; ops exige conta. O firewall libera só TCP 21 e range passivo.",
+    "cli_output": "Admin-PC# tftp 10.50.50.10\ntftp> get ios.bin\nTransfer timed out.\n\nAdmin-PC# ftp 10.50.50.10\nConnected to 10.50.50.10.\n220 FTP Server ready\nName: netops\n331 Password required\nPassword: ********\n230 Login successful\nftp> binary\nftp> get ios.bin\n226 Transfer complete\n\nFW# show run | include tftp|ftp|access-list|permit\naccess-list EXT permit tcp any host 10.50.50.10 eq ftp\naccess-list EXT permit tcp any host 10.50.50.10 range 50000 51000\n! (sem permit udp ... tftp)\n\nR-Core# show run | include tftp|ftp\n! nenhum client tftp server global especial\n\n! Conclusão de lab: TFTP timeout; FTP com auth e TCP liberado funciona",
+    "alternativas": [
+      "TFTP autenticou com netops/senha no output",
+      "Firewall libera UDP TFTP explicitamente no ACL mostrado",
+      "get tftp completou com 226 Transfer complete",
+      "Escolha errada de protocolo: TFTP (UDP, sem auth) falha/filtrado; FTP (TCP+login) atende auth e ACL do firewall"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "No CLI, tftp get dá timeout; ftp autentica e completa 226. A ACL só permite TCP ftp/range passivo — sem permit udp tftp. TFTP não autenticou com netops; o firewall não libera UDP TFTP; get tftp não completou com 226. Insight: requisito de conta + ACL TCP = FTP; TFTP é UDP sem auth nativo — escolha o protocolo que casa com policy e firewall.",
+    "part_id": "4.5",
+    "_sourceFile": "src/data/tickets_module4.json",
+    "_sourceIndex": 24
+  },
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5101 — auditoria: \"enable está fraco\". O backup da running foi parar em repositório amplo da equipe.",
+    "cli_output": "R1# show run | include enable|username|password|secret|service\nenable password Cisco123\nenable secret 5 $1$mERr$hx5rVt7rPNoS4wqbXKX7m0\nservice password-encryption\nusername ops password 7 0822455D0A16544541\n\nR1# show privilege\nCurrent privilege level is 15\n\nR1# show run | section line vty\nline vty 0 4\n login local\n transport input ssh\n\nR1# show run | include transport\n transport input ssh\n\n! Nota: enable password ainda presente em paralelo ao secret; username usa password 7 (não secret)",
+    "alternativas": [
+      "Só existe enable secret; enable password está ausente",
+      "transport input telnet only no section vty",
+      "show privilege prova nível 1 apenas",
+      "enable password legado ainda na running (e user com password 7) — secret existe, mas password em claro/fraco e tipo 7 violam hardening"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "No CLI há enable password Cisco123 em paralelo ao enable secret; username usa password 7, não secret. A VTY já está em transport ssh — não é telnet only. Privilege 15 na sessão atual, não nível 1. \"Só existe enable secret\" é falso. Remova enable password e migre users para secret; tipo 7 não protege se a config vazar. Insight: se a running vazou, password legado e tipo 7 são o achado — secret não apaga o risco do enable password ainda presente.",
+    "part_id": "5.1",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 0
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5102 — sniffer no span port capturou usuário e senha em texto durante \"acesso remoto\". A equipe jura que usa secret forte.",
+    "cli_output": "R1# show run | include enable|username|secret|password\nenable secret 9 $9$xxxxxxxx\nusername netadmin secret 9 $9$yyyyyyyy\n\nR1# show run | section line vty\nline vty 0 4\n login local\n transport input telnet\n\nR1# show run | include transport\n transport input telnet\n\nR1# show privilege\nCurrent privilege level is 1\n\n! Captura de lab (resumo): sessão Telnet com “netadmin / ****” legível em ASCII no payload",
+    "alternativas": [
+      "enable secret ausente na running",
+      "transport input telnet — sessão de gerenciamento em cleartext; secret forte no device não cifra o Telnet",
+      "login local está ausente",
+      "username netadmin usa password em claro tipo 0 no include"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para Telnet cleartext: enable secret e username secret 9 estão ok, mas a VTY tem transport input telnet. O sniffer lê a sessão, não o hash do secret. login local está presente; username não está em password tipo 0. Corrija para transport input ssh. Insight: secret forte no device não cifra Telnet — o canal de gerenciamento é o que o sniffer vê.",
+    "part_id": "5.1",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 1
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5103 — Authentication failed para todos na VTY com login local. Ninguém chegou a criar usuários com secret no device.",
+    "cli_output": "SW1# show run | include enable|username|password|secret\nenable secret 5 $1$abcd$efghijklmnop\n! nenhuma linha username\n\nSW1# show run | section line vty\nline vty 0 15\n login local\n transport input ssh\n\nSW1# show run | section line console\nline console 0\n login local\n\nSW1# show privilege\nCurrent privilege level is 15\n\n! Cliente SSH: Permission denied (publickey,password)",
+    "alternativas": [
+      "transport input telnet only impede SSH no section",
+      "enable secret ausente",
+      "login local sem username na running — database local vazio; autenticação VTY/console falha",
+      "show privilege nível 1 prova que o enable secret não existe"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "No CLI, login local sem nenhuma linha username — database local vazio. enable secret e transport ssh ok; privilege 15 é da sessão console do admin e não prova que o enable secret \"não existe\". Não é telnet only. Crie username <user> secret. Insight: Authentication failed com login local quase sempre é falta de username (ou senha errada) — confira o include username antes de regenerar chave SSH.",
+    "part_id": "5.1",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 2
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5104 — o show run projetado na sala de reunião mostrou senhas legíveis. service password-encryption não está ativo.",
+    "cli_output": "R1# show run | include enable|username|password|secret|service password\nenable password LabPass1\nusername temp password Summer2024\n! (sem enable secret)\n! (sem service password-encryption)\n\nR1# show run | section line vty\nline vty 0 4\n password VtyVisible\n login\n transport input ssh\n\nR1# show privilege\nCurrent privilege level is 15\n\nR1# show run | include transport\n transport input ssh",
+    "alternativas": [
+      "service password-encryption e secrets tipo 5/9 protegem todas as linhas do output",
+      "Todas as senhas já estão como secret 9 no include",
+      "transport input telnet explica o projetor",
+      "Senhas em claro (enable password, username password, VTY password) e ausência de service password-encryption — config legível no show run"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O sintoma aponta para senhas em claro na running: enable password, username password e password de VTY legíveis; sem service password-encryption e sem secrets tipo 5/9. SSH no transport não esconde a config no projetor. Não é transport telnet que explica o projetor. Migre para secret, ative password-encryption como camada extra e evite exibir full run em público. Insight: service password-encryption + secret reduzem legibilidade no show run — mas não substituem não projetar a config.",
+    "part_id": "5.1",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 3
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5105 — o estagiário plugou o console e caiu direto no prompt sem senha. O acesso remoto também preocupa a equipe.",
+    "cli_output": "R1# show run | section line console\nline console 0\n exec-timeout 0 0\n ! sem login / sem password / sem login local\n\nR1# show run | section line vty\nline vty 0 4\n transport input all\n ! sem login / sem password / sem login local\n\nR1# show run | include enable|username|secret|password\nenable secret 5 $1$qqqq$rrrrrrrrrr\n! sem username\n\nR1# show privilege\nCurrent privilege level is 1\n\nR1# show run | include transport\n transport input all",
+    "alternativas": [
+      "Console e VTY sem método de autenticação (login/password/login local) — acesso de linha aberto; transport all ainda expõe Telnet",
+      "enable secret ausente no include",
+      "login local + username secret já configurados nas duas linhas",
+      "show privilege 15 prova que o estagiário já estava authenticated como root"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "No CLI, console e VTY sem login/password/login local — linhas abertas; transport input all ainda expõe Telnet. enable secret existe, mas só protege o enable depois de entrar na linha. Privilege 1 é user EXEC, não \"root autenticado\". Não há login local + username já configurados. Configure autenticação nas linhas e restrinja transport a ssh. Insight: linha sem método de auth = acesso aberto mesmo com enable secret forte.",
+    "part_id": "5.1",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 4
+  },
+  {
+    "id": 6,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5201 — após \"bloquear só a subnet 10.10.10.0/24\", ninguém da empresa navega. Outras subnets também morreram.",
+    "cli_output": "R1# show access-lists 10\nStandard IP access list 10\n    10 deny   10.10.10.0, wildcard bits 0.0.0.255 (512 matches)\n\nR1# show ip interface GigabitEthernet0/1 | include access list\n  Outgoing access list is 10\n  Inbound  access list is not set\n\nR1# show run | section access-list 10|interface GigabitEthernet0/1\ninterface GigabitEthernet0/1\n ip address 203.0.113.2 255.255.255.252\n ip access-group 10 out\n!\naccess-list 10 deny 10.10.10.0 0.0.0.255\n\nR1# show access-lists 10\nStandard IP access list 10\n    10 deny   10.10.10.0, wildcard bits 0.0.0.255\n! (sem permit; implicit deny any no final)\n\n! Hosts 10.20.20.50 e 10.10.10.50: ambos falham para Internet via G0/1",
+    "alternativas": [
+      "ACL 10 tem permit ip any any explícito no show",
+      "Inbound access list is 10 no show ip interface",
+      "Só 10.10.10.0/24 é afetada; 10.20.20.0 passa por permit implícito",
+      "Só existe deny da /24 e implicit deny any — todo source sem permit é negado na out G0/1"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "No CLI, ACL 10 tem só deny 10.10.10.0/24 aplicada out em G0/1; sem permit — o implicit deny any mata o resto (10.20.20.x inclusive). Não há permit ip any any; inbound não é 10; não é \"só a /24 afetada\". Adicione permit para o tráfego legítimo após o deny específico. Insight: em standard ACL com um único deny, lembre do implicit deny — \"bloquear só X\" sem permit do restante derruba a rede inteira.",
+    "part_id": "5.2",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 5
+  },
+  {
+    "id": 7,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5202 — querem bloquear tráfego vindo da LAN G0/0. A ACL \"BLOCK-LAN\" está na WAN com out; hosts da LAN ainda alcançam o servidor DMZ.",
+    "cli_output": "R1# show run | section access-list|interface GigabitEthernet0/0|interface GigabitEthernet0/1\ninterface GigabitEthernet0/0\n description LAN\n ip address 192.168.1.1 255.255.255.0\n! sem access-group\ninterface GigabitEthernet0/1\n description WAN\n ip address 203.0.113.2 255.255.255.252\n ip access-group BLOCK-LAN out\n!\nip access-list extended BLOCK-LAN\n deny   ip 192.168.1.0 0.0.0.255 host 10.50.50.50\n permit ip any any\n\nR1# show ip interface GigabitEthernet0/0 | include access list\n  Outgoing access list is not set\n  Inbound  access list is not set\n\nR1# show ip interface GigabitEthernet0/1 | include access list\n  Outgoing access list is BLOCK-LAN\n  Inbound  access list is not set\n\nR1# show access-lists BLOCK-LAN\nExtended IP access list BLOCK-LAN\n    10 deny ip 192.168.1.0 0.0.0.255 host 10.50.50.50 (0 matches)\n    20 permit ip any any (8900 matches)\n\n! Topologia: servidor 10.50.50.50 alcançado saindo por G0/0 (DMZ), não por G0/1",
+    "alternativas": [
+      "0 matches no deny e apply só out na WAN — tráfego LAN→DMZ não passa por G0/1 out; interface/direção erradas",
+      "deny tem milhares de matches no output",
+      "G0/0 tem Inbound access list BLOCK-LAN",
+      "permit ip any any está ausente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para apply errado: deny com 0 matches e permit 8900; a ACL só está out na G0/1 (WAN), mas o path ao 10.50.50.50 não sai por essa interface. G0/0 sem ACL. permit existe; não há inbound BLOCK-LAN em G0/0. Aplique na interface/direção do path real (ex.: G0/0 in ou interface DMZ out). Insight: 0 hits no deny com sintoma \"ainda passa\" = ACL no lugar errado — valide o path antes de apertar a ACE.",
+    "part_id": "5.2",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 6
+  },
+  {
+    "id": 8,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5203 — \"liberei a VLAN 30 inteira\" com ACL 30, mas quase ninguém casa o permit. A wildcard está suspeita.",
+    "cli_output": "R1# show run | section access-list 30|interface Vlan30\ninterface Vlan30\n ip address 10.30.30.1 255.255.255.0\n ip access-group 30 in\naccess-list 30 permit 10.30.30.0 255.255.255.0\naccess-list 30 deny any\n\nR1# show access-lists 30\nStandard IP access list 30\n    10 permit 10.30.30.0, wildcard bits 255.255.255.0 (2 matches)\n    20 deny   any (4400 matches)\n\nR1# show ip interface Vlan30 | include access list\n  Outgoing access list is not set\n  Inbound  access list is 30\n\n! Intenção do NOC: permitir 10.30.30.0/24 (wildcard 0.0.0.255)\n! Hosts 10.30.30.50 falham; poucos matches estranhos no permit",
+    "alternativas": [
+      "Wildcard 0.0.0.255 está configurada no show run",
+      "ACL não está aplicada (inbound not set)",
+      "Wildcard 255.255.255.0 (subnet mask invertida) — match incorreto; deny any leva a maior parte dos hits",
+      "Standard ACL 30 não pode usar deny any"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "No CLI, access-list 30 permit 10.30.30.0 255.255.255.0 — wildcard invertida (deveria 0.0.0.255). Hits: permit 2 vs deny any 4400. A ACL está applied in em Vlan30. Standard ACL pode usar deny any. Corrija a wildcard. Insight: wildcard 255.255.255.0 como se fosse máscara de subnet é erro clássico — confira bits \"don't care\" e os contadores de hit.",
+    "part_id": "5.2",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 7
+  },
+  {
+    "id": 9,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5204 — pedido: bloquear só HTTP (tcp/80) de 192.168.5.0/24 ao servidor 10.1.1.80; o resto ok. Usaram ACL standard.",
+    "cli_output": "R1# show run | section access-list|interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n ip address 192.168.5.1 255.255.255.0\n ip access-group 50 in\naccess-list 50 deny 192.168.5.0 0.0.0.255\naccess-list 50 permit any\n\nR1# show access-lists 50\nStandard IP access list 50\n    10 deny   192.168.5.0, wildcard bits 0.0.0.255 (2100 matches)\n    20 permit any (50 matches)\n\nR1# show ip interface GigabitEthernet0/0 | include access list\n  Outgoing access list is not set\n  Inbound  access list is 50\n\n! Sintoma: SSH, HTTPS, ping e HTTP da /24 para 10.1.1.80 falham todos\n! Requisito era negar somente tcp/80 para o host 10.1.1.80",
+    "alternativas": [
+      "Extended com tcp eq 80 e dest 10.1.1.80 já está no access-list 50",
+      "Standard 50 só filtra source — deny da /24 bloqueia todo IP da LAN, não só HTTP ao servidor",
+      "permit any está ausente e explica hits 50",
+      "ACL 50 é extended numbered na faixa 50"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para tipo de ACL errado: standard 50 deny da /24 bloqueia todo IP da origem (SSH/HTTPS/ping/HTTP), não só tcp/80 ao host. Precisa extended com deny tcp … eq 80 + permits. permit any está presente; a faixa 50 é standard, não extended 100–199; não há ACE tcp eq 80 no 50. Insight: standard só vê source — se o requisito cita protocolo/porta/destino, use extended.",
+    "part_id": "5.2",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 8
+  },
+  {
+    "id": 10,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5205 — o admin 10.255.1.20 não abre SSH; o colega 10.0.0.15 entra. Engine SSH ok.",
+    "cli_output": "R1# show run | section line vty|access-list 10\nline vty 0 4\n access-class 10 in\n login local\n transport input ssh\naccess-list 10 permit 10.0.0.0 0.0.0.255\naccess-list 10 deny any\n\nR1# show access-lists 10\nStandard IP access list 10\n    10 permit 10.0.0.0, wildcard bits 0.0.0.255 (88 matches)\n    20 deny   any (14 matches)\n\nR1# show run | include username|ip ssh\nusername netops secret 9 $9$xxxx\nip ssh version 2\n\nR1# show ip interface GigabitEthernet0/0 | include access list\n  Outgoing access list is not set\n  Inbound  access list is not set\n\n! 10.255.1.20 tenta SSH → connection closed / refused by ACL\n! 10.0.0.15 sessão VTY ativa",
+    "alternativas": [
+      "SSH disabled por falta de username",
+      "Inbound ACL de dados em G0/0 bloqueia conforme show ip interface",
+      "access-class 10 permite só 10.0.0.0/24 — 10.255.1.20 casa deny any (first match após falha do permit)",
+      "transport input telnet only no section vty"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "No CLI, access-class 10 permite só 10.0.0.0/24; 10.255.1.20 cai no deny any (hits 14). username e ip ssh version 2 ok; G0/0 sem ACL de dados; transport é ssh, não telnet only. Ajuste a ACL de gerência ou a origem do admin. Insight: SSH \"ok\" + um admin fora do permit = access-class; compare o source com o first match da ACL.",
+    "part_id": "5.2",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 9
+  },
+  {
+    "id": 11,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5301 — mesa 14 \"caiu a rede\". O LED da porta apagou depois que o usuário ligou um switch de mesa barato.",
+    "cli_output": "SW1# show interfaces status err-disabled\nPort      Name               Status       Reason\nGi1/0/14  MESA-14            err-disabled psecure-violation\n\nSW1# show port-security interface GigabitEthernet1/0/14\nPort Security              : Enabled\nPort Status                : Secure-shutdown\nViolation Mode             : Shutdown\nMaximum MAC Addresses      : 1\nTotal MAC Addresses        : 1\nConfigured MAC Addresses   : 0\nSticky MAC Addresses       : 1\nLast Source Address:Vlan   : 0011.2233.4455:20\nSecurity Violation Count   : 1\n\nSW1# show port-security address | include Gi1/0/14\nGi1/0/14  0011.2233.4455  SecureSticky  20\n\nSW1# show run interface GigabitEthernet1/0/14\ninterface GigabitEthernet1/0/14\n switchport mode access\n switchport access vlan 20\n switchport port-security\n switchport port-security maximum 1\n switchport port-security mac-address sticky\n switchport port-security violation shutdown",
+    "alternativas": [
+      "DHCP snooping untrusted derrubou a porta para err-disabled",
+      "DAI trust faltando causa Secure-shutdown",
+      "Violation Mode Restrict com maximum 50 no output",
+      "Port-security violation shutdown (maximum 1 + sticky) — err-disabled psecure-violation após MAC extra do hub/switch de mesa"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "No CLI, err-disabled psecure-violation; Secure-shutdown; maximum 1 + sticky + violation shutdown — MAC extra do hub/switch de mesa viola. Não há evidência de DHCP snooping/DAI derrubando a porta; não é Restrict com maximum 50. Remova o hub, limpe sticky se preciso e faça shut/no shut. Insight: maximum 1 + hub de mesa = psecure-violation clássico — confira Reason no err-disabled antes de culpar o cabo.",
+    "part_id": "5.3",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 10
+  },
+  {
+    "id": 12,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5302 — softphone + PC na mesma porta via hub; maximum 2 com sticky. Depois do notebook de visita, as violações sobem e o tráfego do visitante some (porta ainda up).",
+    "cli_output": "SW1# show port-security interface GigabitEthernet1/0/22\nPort Security              : Enabled\nPort Status                : Secure-up\nViolation Mode             : Restrict\nMaximum MAC Addresses      : 2\nTotal MAC Addresses        : 2\nSticky MAC Addresses       : 2\nLast Source Address:Vlan   : aabb.ccdd.eeff:30\nSecurity Violation Count   : 17\n\nSW1# show port-security address | include Gi1/0/22\nGi1/0/22  000a.0b0c.0d0e  SecureSticky  30\nGi1/0/22  0001.0203.0405  SecureSticky  30\n\nSW1# show run interface GigabitEthernet1/0/22\ninterface GigabitEthernet1/0/22\n switchport mode access\n switchport access vlan 30\n switchport port-security\n switchport port-security maximum 2\n switchport port-security mac-address sticky\n switchport port-security violation restrict\n\nSW1# show interfaces status | include Gi1/0/22\nGi1/0/22  MESA-22     connected    30         a-full a-100 10/100/1000BaseTX",
+    "alternativas": [
+      "Porta err-disabled no status (contradiz connected)",
+      "Maximum 2 atingido com 2 sticky; violation restrict dropa MAC extra (visitante) sem derrubar a porta — count 17",
+      "Total MAC Addresses 0 no show",
+      "Violation Mode Shutdown no running"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "No CLI, Secure-up/connected, maximum=total=2 sticky, violation restrict, count 17 — o terceiro MAC é dropado sem derrubar a porta. O status não está err-disabled; Total MAC não é 0; Mode não é Shutdown no running. Ajuste maximum ou remova sticky antigos se o design permitir softphone+PC+visita. Insight: Restrict mantém a porta up e silencia o MAC extra — violation count subindo com porta connected é a assinatura.",
+    "part_id": "5.3",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 11
+  },
+  {
+    "id": 13,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5303 — após \"ligar segurança DHCP\", PCs da VLAN 40 ficaram em APIPA. Servidor DHCP 10.99.0.10 no core.",
+    "cli_output": "SW1# show ip dhcp snooping\nSwitch DHCP snooping is enabled\nDHCP snooping is configured on following VLANs:\n40\nDHCP snooping is operational on following VLANs:\n40\nDHCP snooping is configured on the following L3 Interfaces:\nInsertion of option 82 is enabled\n\nSW1# show run interface GigabitEthernet1/0/48\ninterface GigabitEthernet1/0/48\n description UPLINK-CORE\n switchport mode trunk\n ! sem ip dhcp snooping trust\n\nSW1# show run interface GigabitEthernet1/0/10\ninterface GigabitEthernet1/0/10\n switchport access vlan 40\n switchport mode access\n ! untrusted (default)\n\nSW1# show ip dhcp snooping binding\nMacAddress          IpAddress        Lease(sec)  Type           VLAN  Interface\n------------------  ---------------  ----------  -------------  ----  --------------------\n! (vazio)\n\nSW1# show ip dhcp snooping | include Trust\n! none listed as trusted in operational summary (lab)\n\nPC# ipconfig\n   IPv4 Address. . . . . . . . . . . : 169.254.22.10",
+    "alternativas": [
+      "Binding cheia prova leases ok",
+      "Uplink Gi1/0/48 trusted no running",
+      "Snooping VLAN 40 on, uplink sem trust, binding vazia, APIPA — offers do servidor dropados no path untrusted",
+      "Port-security err-disabled em todas as portas da VLAN 40 no output"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para uplink untrusted: snooping on na VLAN 40, Gi1/0/48 sem ip dhcp snooping trust, binding vazia, cliente 169.254 — offers do servidor dropados no path. Binding não está cheia; uplink não está trusted no running; não há err-disabled em massa no output. Configure trust no uplink e reteste DORA. Insight: snooping sem trust no caminho ao servidor oficial vira \"DHCP morto\" para a VLAN inteira.",
+    "part_id": "5.3",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 12
+  },
+  {
+    "id": 14,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5304 — \"DHCP de testes\" no armário (PC com ISC DHCP) na VLAN 20; produção sem lease do rogue. Snooping ligado.",
+    "cli_output": "SW1# show ip dhcp snooping\nSwitch DHCP snooping is enabled\nDHCP snooping is configured on following VLANs:\n20\n\nSW1# show run interface GigabitEthernet1/0/7\ninterface GigabitEthernet1/0/7\n description ROGUE-LAB-PC\n switchport access vlan 20\n switchport mode access\n ! untrusted — sem ip dhcp snooping trust\n\nSW1# show run interface GigabitEthernet1/0/48\ninterface GigabitEthernet1/0/48\n description UPLINK\n switchport mode trunk\n ip dhcp snooping trust\n\nSW1# show ip dhcp snooping binding\nMacAddress          IpAddress        Lease(sec)  Type           VLAN  Interface\n0011.2233.4455      10.20.20.50      86400       dhcp-snooping  20    Gi1/0/11\n\nSW1# show logging | include DHCP_SNOOPING\n%DHCP_SNOOPING-5-DHCP_SNOOPING_UNTRUSTED_PORT: [shortened] drop offer on Gi1/0/7\n\n! Servidor oficial no core (via Gi1/0/48 trusted) — leases ok em outras mesas\n! PC rogue em Gi1/0/7 tenta oferecer 10.20.20.x",
+    "alternativas": [
+      "Offers do servidor no access untrusted (Gi1/0/7) são dropados; binding mostra lease legítimo em outra porta",
+      "Uplink sem trust — contradiz ip dhcp snooping trust em Gi1/0/48",
+      "Snooping desabilitado no show ip dhcp snooping",
+      "Binding vazia globalmente no output"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "No CLI, log UNTRUSTED_PORT drop offer em Gi1/0/7 (access untrusted); uplink Gi1/0/48 trusted; binding mostra lease legítimo em Gi1/0/11. Snooping enabled; binding não vazia. O \"servidor\" no access é tratado como rogue — comportamento esperado do feature. Insight: offers em porta access untrusted devem cair; se a produção quebra, confira se o oficial está no uplink trusted — aqui ele está.",
+    "part_id": "5.3",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 13
+  },
+  {
+    "id": 15,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5305 — o host 10.30.30.88/24 estático (impressora) não comunica depois de \"ativar ARP inspection\". PCs com DHCP ok.",
+    "cli_output": "SW1# show ip arp inspection vlan 30\nSource Mac Validation      : Disabled\nDestination Mac Validation : Disabled\nIP Address Validation      : Disabled\n\nVlan     Configuration    Operation   ACL Match          Static ACL\n----     -------------    ---------   ---------          ----------\n30       Enabled          Active\n\nSW1# show ip dhcp snooping binding | include 10.30.30.88\n! (sem linha para 10.30.30.88)\n\nSW1# show ip dhcp snooping binding | count\nNumber of bindings: 24\n\nSW1# show ip arp inspection statistics vlan 30\nVlan      Forwarded        Dropped\n----      ---------        -------\n30        10220            188\n\nSW1# show run interface GigabitEthernet1/0/33\ninterface GigabitEthernet1/0/33\n description PRINTER-STATIC\n switchport access vlan 30\n switchport mode access\n ! sem ip arp inspection trust\n\nSW1# show run interface GigabitEthernet1/0/48\ninterface GigabitEthernet1/0/48\n ip dhcp snooping trust\n ip arp inspection trust\n\n! Impressora: IP estático configurado na NIC; nunca usou DHCP",
+    "alternativas": [
+      "DAI VLAN 30 off no show (Configuration Disabled)",
+      "Binding contém 10.30.30.88 explicitamente",
+      "Uplink sem arp inspection trust",
+      "DAI ativo na VLAN 30; impressora estática sem binding — ARP dropado na porta untrusted (drops 188); uplink trusted ok"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "No CLI, DAI Enabled/Active na VLAN 30; sem binding para .88; porta access untrusted; Dropped 188. O uplink tem arp inspection trust. DAI não está Disabled; binding não contém .88. Crie binding/ARP ACL estática ou reservation DHCP. Insight: DAI valida ARP contra binding do snooping — IP estático sem entrada vira drop seletivo.",
+    "part_id": "5.3",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 14
+  },
+  {
+    "id": 16,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5401 — auditoria de guest: \"qualquer um entra e o Wireshark no notebook vizinho lê HTTP claro de usuários\".",
+    "cli_output": "WLC# show wlan 12\nWLAN Identifier.................................. 12\nProfile Name..................................... GUEST-OPEN\nNetwork Name (SSID).............................. Guest\nStatus........................................... Enabled\nSecurity\n   802.11 Authentication:........................ Open System\n   Static WEP Keys............................... Disabled\n   802.1X........................................ Disabled\n   Wi-Fi Protected Access (WPA/WPA2/WPA3)....... Disabled\n   CKIP ......................................... Disabled\n   IP Security................................... Disabled\n\nWLC# show wlan summary | include 12\n12    Guest          GUEST-OPEN     Enabled   UP\n\n! Cliente: Connected, Security: None\n! Captura no canal: frames de dados legíveis (HTTP) de outros hosts na mesma BSS",
+    "alternativas": [
+      "WPA2-AES e AKM PSK estão enabled no show wlan 12",
+      "802.1X está Enabled com RADIUS",
+      "WEP está Enabled como cipher principal",
+      "WLAN Open (WPA disabled, 802.11 Authentication Open) — sem confidencialidade WPA; tráfego exposto no ar"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "No CLI, show wlan 12: Open System, WPA/WPA2/WPA3 Disabled, 802.1X Disabled — sem confidencialidade WPA; tráfego exposto no ar. Não há WPA2-AES/PSK, 802.1X nem WEP enabled como cipher principal nesse WLAN. Migrar guest para portal+WPA2/WPA3 ou assumir o risco com segmentação. Insight: Open + captura no canal = leitura de payload claro entre clientes na BSS.",
+    "part_id": "5.4",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 15
+  },
+  {
+    "id": 17,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5402 — scanner de inventário antigo \"só funciona com WEP\". O time reativou WEP na WLAN CORP-LEGACY.",
+    "cli_output": "WLC# show wlan 5\nWLAN Identifier.................................. 5\nProfile Name..................................... CORP-LEGACY\nNetwork Name (SSID).............................. CorpOld\nStatus........................................... Enabled\nSecurity\n   802.11 Authentication:........................ Shared Key\n   Static WEP Keys............................... Enabled\n   WEP Key sizes................................. 104-bit\n   802.1X........................................ Disabled\n   Wi-Fi Protected Access (WPA/WPA2/WPA3)....... Disabled\n\nWLC# show wlan summary\n5    CorpOld        CORP-LEGACY   Enabled   UP\n12   Guest          GUEST-OPEN    Enabled   UP\n20   Corp           CORP-WPA2     Enabled   UP\n\n! Nota de risco: CORP-WPA2 usa WPA2-AES; CORP-LEGACY ainda no ar com WEP",
+    "alternativas": [
+      "WPA3-SAE enabled na CORP-LEGACY",
+      "Static WEP 104-bit enabled e WPA disabled — WLAN legada insegura no ar (WEP quebrável)",
+      "Todas as WLANs do summary estão com WPA2 only",
+      "802.1X Enabled no show wlan 5"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para WEP legado: Static WEP 104-bit Enabled, WPA disabled, 802.1X Disabled. Não é WPA3-SAE; o summary tem outras WLANs (incl. CORP-WPA2), mas o achado do chamado é a legada. Isole/retire o scanner e desligue WEP. Insight: WEP no ar é finding de auditoria mesmo com SSID WPA2 paralelo — inventarie WLANs legadas.",
+    "part_id": "5.4",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 16
+  },
+  {
+    "id": 18,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5403 — notebooks não entram em \"CorpWiFi\". No celular a PSK recém-trocada funciona; no notebook o perfil ainda tem a senha antiga.",
+    "cli_output": "WLC# show wlan 20\nSSID............................................. CorpWiFi\nSecurity\n   Wi-Fi Protected Access (WPA/WPA2)............ Enabled\n   WPA2......................................... Enabled\n      AES Cipher................................ Enabled\n      TKIP Cipher............................... Disabled\n   AKM\n      PSK....................................... Enabled\n      802.1X.................................... Disabled\n   PSK Format................................... ASCII\n\nWLC# show client detail aaaa.bbbb.cccc\n! notebook problemático\nClient State..................................... Idle / excluded (auth)\nPolicy Type...................................... WPA2\nEncryption Cipher................................ CCMP (AES)\nAuthentication Key Management.................... PSK\nRecent failure................................... 4-way handshake failed / MIC failure (lab summary)\n\n! Admin confirmou PSK nova no WLC: C0rp!2026-Secure\n! Perfil Windows do notebook ainda com PSK antiga Corp2020",
+    "alternativas": [
+      "WLAN está Open no show wlan 20",
+      "Cipher só TKIP no WLC",
+      "PSK mismatch cliente vs WLC — WPA2-AES-PSK ok no AP; 4-way fail no notebook com senha antiga",
+      "AKM 802.1X Enabled e PSK Disabled no wlan 20"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "No CLI, wlan 20: WPA2-AES, TKIP off, PSK on; o cliente tem 4-way handshake failed e o perfil Windows ainda com PSK antiga. Não está Open; cipher não é só TKIP; AKM não é 802.1X Enabled/PSK Disabled. Atualize/recrie o perfil no notebook com a passphrase nova. Insight: se um client autentica e outro falha 4-way na mesma WLAN PSK, compare a passphrase armazenada no perfil — não redesenhe o cipher no WLC primeiro.",
+    "part_id": "5.4",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 17
+  },
+  {
+    "id": 19,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #5404 — RH exige login com usuário do AD no Wi-Fi. A WLAN \"Corp\" está só com PSK de grupo. Clientes 802.1X falham.",
+    "cli_output": "WLC# show wlan 20\nSSID............................................. Corp\nSecurity\n   WPA2......................................... Enabled\n      AES Cipher................................ Enabled\n   AKM\n      PSK....................................... Enabled\n      802.1X.................................... Disabled\n   FT over-the-ds............................... Disabled\n\nWLC# show radius summary\n! (servidores RADIUS configurados no sistema para outras WLANs — omitido)\n\nClient log (supplicant):\nAuth type: PEAP / 802.1X\nResult: Association rejected / AKM not acceptable (lab paraphrase)\n\n! Perfil corporativo do notebook: EAP-PEAP + user AD\n! PSK de grupo CorpShared! ainda documentada no wiki antigo",
+    "alternativas": [
+      "WLAN exige Enterprise mas está só PSK (802.1X Disabled) — mismatch de AKM com cliente 802.1X/AD",
+      "AES Cipher Disabled no show",
+      "PSK e 802.1X ambos Enabled e o cliente errou o SSID apenas",
+      "WEP Enabled explica o PEAP"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "No CLI, PSK Enabled e 802.1X Disabled com AES ok — AKM PSK-only incompatível com cliente PEAP/802.1X/AD. AES não está Disabled; não há ambos PSK+802.1X enabled; WEP não explica PEAP. Habilite 802.1X/RADIUS na WLAN (e remova PSK se a policy exigir). Insight: \"AKM not acceptable\" no cliente Enterprise contra WLAN só PSK é mismatch de método, não de senha de grupo.",
+    "part_id": "5.4",
+    "_sourceFile": "src/data/tickets_module5.json",
+    "_sourceIndex": 18
+  }
+]

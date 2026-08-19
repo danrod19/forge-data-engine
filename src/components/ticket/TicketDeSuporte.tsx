@@ -22,6 +22,7 @@ import {
   getQuestionPrompt,
   hasDeepExplanation,
   isTraditionalQuestion,
+  shouldShowTerminalCli,
 } from "@/types/question";
 
 interface TicketDeSuporteProps {
@@ -186,7 +187,10 @@ export function TicketDeSuporte({
         <div>
           <h2 className="text-lg font-bold text-slate-50">Sessão concluída</h2>
           <p className="mt-1 text-sm text-slate-400">
-            Tickets de Suporte · Troubleshooting
+            {sessionTitle?.includes("Cenário") ||
+            sessionTitle?.includes("Arquitetura")
+              ? "Cenários · Arquitetura AWS"
+              : "Tickets de Suporte · Troubleshooting"}
           </p>
           <div className="mt-3 flex flex-wrap items-center justify-center gap-3 text-sm">
             <span className="rounded-lg border border-neon-green/30 bg-neon-green/10 px-3 py-1.5 font-semibold text-neon-green">
@@ -202,7 +206,14 @@ export function TicketDeSuporte({
           <p className="mt-2 text-xs text-slate-500">
             Vidas restantes: {isPro ? "∞" : lives}
             {typeof bankSize === "number" && bankSize > 0 && (
-              <> · Banco: {bankSize} tickets</>
+              <>
+                {" "}
+                · Banco: {bankSize}{" "}
+                {sessionTitle?.includes("Cenário") ||
+                sessionTitle?.includes("Arquitetura")
+                  ? "cenários"
+                  : "tickets"}
+              </>
             )}
           </p>
         </div>
@@ -242,7 +253,7 @@ export function TicketDeSuporte({
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-widest text-neon-cyan">
                 {isTraditional
-                  ? "Modo Traditional"
+                  ? sessionTitle ?? "Cenário · Arquitetura"
                   : sessionTitle ?? "Trilha · Tickets de Suporte"}
               </p>
               <p className="text-xs text-slate-500">
@@ -250,7 +261,7 @@ export function TicketDeSuporte({
                   <span className="text-neon-green">{score} acerto{score === 1 ? "" : "s"} · </span>
                 )}
                 {isTraditional
-                  ? "Questão de prova"
+                  ? sessionSubtitle ?? "Escolha o melhor desenho / decisão"
                   : sessionSubtitle
                     ? sessionSubtitle
                     : typeof bankSize === "number" && bankSize > 0
@@ -271,7 +282,7 @@ export function TicketDeSuporte({
             </div>
             <div className="flex items-center gap-1 rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 text-[10px] text-slate-400">
               <Headphones className="size-3 text-neon-green" />
-              {isTraditional ? "Q" : "TKT-"}
+              {isTraditional ? "SCN-" : "TKT-"}
               {String(question.id).padStart(4, "0")}
             </div>
           </div>
@@ -301,14 +312,16 @@ export function TicketDeSuporte({
           transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           className="space-y-4"
         >
-          {!isTraditional && question.cli_output && (
+          {shouldShowTerminalCli(question) && question.cli_output && (
             <TerminalCLI output={question.cli_output} />
           )}
 
           {/* ── Alternativas ── */}
           <div className="space-y-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-              {isTraditional ? "Selecione a resposta" : "Selecione o diagnóstico"}
+              {isTraditional
+                ? "Selecione a melhor opção"
+                : "Selecione o diagnóstico"}
             </p>
 
             {question.alternativas.map((alt, index) => {
@@ -483,7 +496,7 @@ export function TicketDeSuporte({
               {currentIndex + 1 >= total
                 ? "Ver resultado"
                 : isTraditional
-                  ? "Próxima questão"
+                  ? "Próximo cenário"
                   : "Próximo ticket"}
               <ChevronRight className="size-4" />
             </Button>

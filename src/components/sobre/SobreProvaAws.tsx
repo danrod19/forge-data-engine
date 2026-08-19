@@ -18,10 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { awsDomains, awsDomainAccentClasses } from "@/data/domains-aws";
-import {
-  TOTAL_AWS_TRADITIONAL,
-  TOTAL_AWS_TICKETS,
-} from "@/data/aws-banks";
+import { TOTAL_AWS_TRADITIONAL } from "@/data/aws-banks";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/types/question";
 
 const fadeUp = {
@@ -255,32 +252,32 @@ export function SobreProvaAws() {
         accent="cyan"
       >
         <p className="mb-3 text-[12px] text-slate-400">
-          Três frentes no track AWS — mesmo visual hacker/terminal do CCNA.
+          Três frentes no track AWS — foco em decisão de arquitetura, não em CLI.
         </p>
         <div className="space-y-2.5">
-          <HowCard
-            icon={ClipboardList}
-            title={`Simulado · ${TOTAL_AWS_TRADITIONAL} questões`}
-            color="text-neon-cyan"
-            border="border-neon-cyan/25"
-            bg="bg-neon-cyan/10"
-            desc="Banco traditional scenario-based (parts 1.1–1.12). Timer opcional; treino de ritmo de prova."
-          />
-          <HowCard
-            icon={Ticket}
-            title={`Trilha · ${TOTAL_AWS_TICKETS} tickets`}
-            color="text-neon-green"
-            border="border-neon-green/25"
-            bg="bg-neon-green/10"
-            desc="Tickets estilo TShoot AWS: sintoma + CLI/policy/logs — diagnóstico operacional."
-          />
           <HowCard
             icon={BookOpen}
             title="Estudo por domínio"
             color="text-amber-300"
             border="border-amber-400/25"
             bg="bg-amber-400/10"
-            desc="Oito domínios de estudo (Identity → Observability). Até 15 questões por sessão; progresso em chave :aws."
+            desc="Oito domínios (Identity → Observability). Leia, marque como lido e pratique até 30 questões."
+          />
+          <HowCard
+            icon={ClipboardList}
+            title={`Simulado · ${TOTAL_AWS_TRADITIONAL} questões`}
+            color="text-neon-cyan"
+            border="border-neon-cyan/25"
+            bg="bg-neon-cyan/10"
+            desc="Modos Conhecimento (PT) e Prova (EN). Timer opcional; ritmo de exame."
+          />
+          <HowCard
+            icon={Ticket}
+            title={`Trilha · ${TOTAL_AWS_TRADITIONAL} cenários`}
+            color="text-neon-green"
+            border="border-neon-green/25"
+            bg="bg-neon-green/10"
+            desc="Cenário · Arquitetura: enunciado rico + 4 opções + explicação PT — sem terminal."
           />
         </div>
         <div className="mt-4 rounded-xl border border-slate-700/80 bg-slate-950/60 p-3 font-mono text-[11px] leading-relaxed text-slate-400">
@@ -289,11 +286,11 @@ export function SobreProvaAws() {
           <span className="text-neon-cyan">~</span>
           <span className="text-slate-600">$ </span>
           <span className="text-slate-300">
-            suggest plan --daily tickets --weekly simulado --estudo domains
+            suggest plan --daily estudo --weekly simulado --trilha cenarios
           </span>
           <p className="mt-2 text-slate-500">
-            → Tickets diários, um simulado por semana e Estudo nos domínios com
-            menor progresso. Consistência &gt; maratona.
+            → Estudo nos domínios fracos, um simulado por semana e Trilha de
+            cenários para fixar decisões. Consistência &gt; maratona.
           </p>
         </div>
       </Section>

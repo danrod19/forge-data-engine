@@ -1,0 +1,274 @@
+[
+  {
+    "id": 52,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4202: time de campo reporta Connection refused no SSH do R1; Telnet também cai na hora. O equipamento responde no console e o IP de gerenciamento faz ping.",
+    "cli_output": "R1# show run | include hostname|domain-name|crypto key|ip ssh\nhostname R1\n (no ip domain-name)\n (no crypto key rsa)\n (no ip ssh version)\n\nR1# show ip ssh\n%SSH has not been enabled\n\nR1# show run | section line vty\nline vty 0 4\n password cisco\n login\n transport input ssh\n\nR1# show ip interface brief | include Vlan10\nVlan10  10.10.10.1  YES NVRAM  up  up\n\nConsole works; management IP pings from PC.",
+    "alternativas": [
+      "Falta domain-name e crypto key generate rsa — SSH not enabled; gerar chave e completar pré-requisitos",
+      "Problema exclusivo de access-class (não configurada)",
+      "transport input ssh está errado e deve ser só telnet",
+      "VLAN 10 down (output mostra up)"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para SSH ainda não habilitado: show ip ssh diz explicitamente que o serviço não está enabled, e no running-config faltam ip domain-name e crypto key rsa — pré-requisitos clássicos para gerar o par e subir o servidor SSH. A VTY já tem transport input ssh (intenção correta), então forçar só Telnet piora a postura e não resolve o refused. Não há access-class no trecho, logo não é filtro de origem. A Vlan10 aparece up/up e o ping do IP de gerência confirma caminho L3; o buraco é completar domain-name + chave RSA e só então validar show ip ssh.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 53,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4203: backup noturno dos cores vai por TFTP para servidor na DMZ e carrega running-config com secrets. Segurança reprovou o fluxo no caminho compartilhado do campus.",
+    "cli_output": "CORE# show run | include tftp|scp|sftp|ftp\nip tftp source-interface Loopback0\n\n! cron/script excerpt:\ncopy running-config tftp://203.0.113.50/core-run.cfg\n\nCORE# show ip ssh\nSSH Enabled - version 2.0\n\nCORE# show run | include username\nusername backup privilege 15 secret 9 $9$...\n\nThreat model: path crosses shared campus to DMZ TFTP server\nConfig contains enable secret hashes and local users",
+    "alternativas": [
+      "Manter TFTP; hashes nunca são úteis a atacantes",
+      "Trocar para Telnet paste diário",
+      "Migrar backup para SCP ou SFTP (SSH já enabled) em repositório controlado",
+      "Desligar SSH e usar só FTP anônimo"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "TFTP manda a config em claro num path que cruza o campus até a DMZ — hashes de enable/secret e usuários locais ainda são material sensível se caírem em captura ou em servidor mal protegido. No CLI, SSH 2.0 já está enabled e existe usuário backup: o caminho seguro é SCP/SFTP para um repositório controlado. Manter TFTP porque “hash não serve” ignora cracking offline e vazamento de topologia. Telnet paste diário e FTP anônimo só ampliam exposição. Insight: depois da migração, confirme source-interface e ACL de gestão no destino, não só o protocolo.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 54,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4204: admin no jump 10.50.1.20 não consegue SSH no switch; do jump 10.255.1.5 entra normal. Servidor SSH sobe e o IP de gerência responde ping dos dois.",
+    "cli_output": "SW# show ip ssh\nSSH Enabled - version 2.0\n\nSW# show run | section line vty\nline vty 0 4\n login local\n transport input ssh\n access-class MGMT-ONLY in\n\nSW# show run | section access-list MGMT-ONLY|ip access-list\nip access-list standard MGMT-ONLY\n 10 permit 10.255.0.0 0.0.255.255\n 20 deny   any log\n\nSW# show logging | include MGMT-ONLY|VTY\n%SEC-6-IPACCESSLOGS: list MGMT-ONLY denied 10.50.1.20\n\nPC-JUMP-A 10.50.1.20: ssh fails (timeout/refused after SYN)\nPC-JUMP-B 10.255.1.5: ssh works\nBoth can ping 10.40.0.2 management IP",
+    "alternativas": [
+      "Gerar nova chave RSA imediatamente (server já enabled e funciona do jump B)",
+      "Trocar transport para telnet",
+      "Desligar login local",
+      "access-class MGMT-ONLY nega 10.50.1.20 — ajustar ACL/permit do jump legítimo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "A assimetria entre jumps isola a access-class: o log mostra MGMT-ONLY negando 10.50.1.20, e a ACL só permite 10.255.0.0/16. SSH enabled + login local + transport ssh estão ok — o jump B prova o servidor. Regenerar chave RSA não explica um deny seletivo. Trocar para Telnet enfraquece o acesso sem corrigir a ACL. Desligar login local quebra autenticação sem liberar o jump A. Inclua 10.50.1.20 (ou a subnet do jump legítimo) na MGMT-ONLY e valide com novo SSH e hits na linha permit.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 55,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4205: estagiário quer mandar running-config (com senhas) por FTP ao backup interno. Comparar com a opção SCP já disponível no edge.",
+    "cli_output": "Proposed:\n  copy running-config ftp://user:Passw0rd@10.20.5.10/edge.cfg\n\nAlternative available:\n  copy running-config scp://backup@10.20.5.10/edge.cfg\n\nEDGE# show ip ssh\nSSH Enabled - version 2.0\n\nEDGE# show run | include username backup\nusername backup privilege 15 secret 9 $9$...\n\nPacket capture risk on SPAN of management VLAN: credentials visible on FTP control channel (demonstrated in lab)",
+    "alternativas": [
+      "FTP é preferível porque mostra a senha no comando para auditoria",
+      "FTP e SCP são igualmente cleartext",
+      "Preferir SCP: canal SSH cifrado; FTP envia credenciais/dados em claro mesmo em rede interna",
+      "Desabilitar SSH para forçar FTP"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Mesmo na VLAN de gerenciamento interna, FTP leva usuário/senha e payload em claro — a captura de lab no SPAN mostra isso. SCP usa o canal SSH já enabled, com usuário backup pronto. Colocar a senha na linha de comando do FTP não é “auditoria”; é vazamento em history e em sniffer. SCP não é cleartext como FTP. Desligar SSH para forçar FTP inverte a prioridade de segurança. Insight de troubleshooting: se alguém insistir em FTP “só na rede confiável”, pergunte se a VLAN de gerência tem SPAN, mirror ou hop compartilhado — quase sempre tem.",
+    "part_id": "v2-4.2"
+  },
+  {
+    "id": 56,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4301: hosts 10.40.0.0/24 sem Internet. Default route está lá, NAT configurado, mas show ip nat translations fica vazio e o ping para 8.8.8.8 falha.",
+    "cli_output": "EDGE# show run | section nat|include access-list 1|ip nat\naccess-list 1 permit 10.40.0.0 0.0.0.255\nip nat inside source list 1 interface GigabitEthernet0/0/1 overload\ninterface GigabitEthernet0/0/0\n description LAN\n ip address 10.40.0.1 255.255.255.0\n ip nat outside\ninterface GigabitEthernet0/0/1\n description WAN\n ip address 203.0.113.2 255.255.255.252\n ip nat inside\nip route 0.0.0.0 0.0.0.0 203.0.113.1\n\nEDGE# show ip nat translations\n\nEDGE# show ip nat statistics\nTotal active translations: 0\n\nPC 10.40.0.50: ping 10.40.0.1 OK; ping 8.8.8.8 FAIL / no translation created",
+    "alternativas": [
+      "ACL 1 está errada para /24",
+      "Falta default route",
+      "Pool esgotado",
+      "ip nat inside/outside invertidos (LAN=outside, WAN=inside) — zero translations"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Zero translations com ACL 1 correta (10.40.0.0/24), overload na interface e default route presente aponta para direção NAT invertida: LAN está marked outside e WAN inside. Assim o tráfego dos hosts não entra no fluxo “inside→outside” e nada é criado na tabela. A ACL não está errada para /24; a rota default existe no running-config; e não há pool dinâmico para esgotar — é PAT na interface. Corrija: ip nat inside na LAN e ip nat outside na WAN, depois reteste ping e show ip nat translations.",
+    "part_id": "v2-4.3"
+  },
+  {
+    "id": 57,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4302: VLAN 10 navega normalmente; a VLAN 40 nova sobe L3 com ip nat inside, mas os hosts dela não geram entrada de NAT para a Internet.",
+    "cli_output": "EDGE# show run | include access-list 10|nat inside source\naccess-list 10 permit 10.10.0.0 0.0.0.255\nip nat inside source list 10 interface GigabitEthernet0/0/1 overload\n\nEDGE# show run interface Vlan40\ninterface Vlan40\n ip address 10.40.0.1 255.255.255.0\n ip nat inside\n\nEDGE# show run interface GigabitEthernet0/0/1\n ip nat outside\n\nEDGE# show ip nat translations\nPro Inside global      Inside local\ntcp 203.0.113.2:1025   10.10.0.20:53100\n (only 10.10.x hosts)\n\nPC-40 10.40.0.55: ping 8.8.8.8 FAIL; show ip nat translations still no 10.40 entry",
+    "alternativas": [
+      "Vlan40 não tem ip nat inside",
+      "ACL 10 não inclui 10.40.0.0/24 — hosts da 40 não são interesting traffic",
+      "Outside está na LAN",
+      "Falta static NAT do .55"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Vlan40 já tem ip nat inside e a WAN está outside; as translations existentes só mostram 10.10.x porque a ACL 10 só permite 10.10.0.0/24. Hosts 10.40 não são interesting traffic para o overload, então não aparece linha na tabela. Outside não está na LAN neste output. Static 1:1 do .55 seria excesso pontual — o padrão é acrescentar permit 10.40.0.0 0.0.0.255 na list (ou ACL dedicada). Insight: sempre cruze “quem traduz” em show ip nat translations com o que a ACL realmente casa.",
+    "part_id": "v2-4.3"
+  },
+  {
+    "id": 58,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4303: os primeiros usuários saem à Internet; a partir do sexto simultâneo a navegação falha. Pool dinâmico sem overload e estatística com misses altos.",
+    "cli_output": "EDGE# show run | section nat\nip nat pool PUBLIC 203.0.113.10 203.0.113.14 netmask 255.255.255.0\naccess-list 1 permit 10.40.0.0 0.0.0.255\nip nat inside source list 1 pool PUBLIC\ninterface Vlan40\n ip nat inside\ninterface GigabitEthernet0/0/1\n ip nat outside\n\nEDGE# show ip nat statistics\n... Pool PUBLIC: ... misses 48 ...\nTotal translations: 5\n\nEDGE# show ip nat translations\n--- 203.0.113.10  10.40.0.11 ...\n--- 203.0.113.11  10.40.0.12 ...\n--- 203.0.113.12  10.40.0.13 ...\n--- 203.0.113.13  10.40.0.14 ...\n--- 203.0.113.14  10.40.0.15 ...\n\nNew PC 10.40.0.50: cannot get translation; pool exhausted (5 addresses)",
+    "alternativas": [
+      "inside/outside invertidos",
+      "ACL não casa 10.40",
+      "Static conflitando",
+      "Pool de 5 IPs sem overload esgotado — adicionar overload (PAT) ou ampliar o pool"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Cinco globais no pool, cinco translations ativas, misses subindo e o sexto host sem linha: dynamic NAT sem overload esgotou o mapeamento 1:1. Inside/outside e a ACL 10.40 estão coerentes — quem já entrou traduz. Não há static competindo no trecho. Habilite overload no list/pool (PAT) ou aumente o range público. Insight operacional: “primeiros N ok, depois falha” + pool size N é assinatura clássica de falta de PAT, não de rota default.",
+    "part_id": "v2-4.3"
+  },
+  {
+    "id": 59,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4304: o server 10.40.0.10 tem static e responde de fora pelo IP público; os demais PCs da mesma VLAN não navegam e a tabela NAT só mostra a linha estática.",
+    "cli_output": "EDGE# show run | include nat|access-list 1\nip nat inside source static 10.40.0.10 203.0.113.10\naccess-list 1 permit 10.40.0.0 0.0.0.255\n (no ip nat inside source list ... overload)\ninterface Vlan40\n ip nat inside\ninterface GigabitEthernet0/0/1\n ip nat outside\nip route 0.0.0.0 0.0.0.0 203.0.113.1\n\nEDGE# show ip nat translations\n--- 203.0.113.10   10.40.0.10\n (only static line)\n\nPC 10.40.0.50: ping 8.8.8.8 FAIL\nExternal: connect to 203.0.113.10 reaches internal server OK",
+    "alternativas": [
+      "Ampliar a static para any any",
+      "Remover ip nat outside",
+      "Static 1:1 cobre só o server — falta PAT (list + interface overload) para o resto da LAN",
+      "Default route está errada porque o server funciona de fora"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A static 1:1 só amarra .10 ↔ 203.0.113.10; a ACL 1 existe, mas não há ip nat inside source list … overload para o restante da LAN — por isso a tabela só tem uma linha e o PC .50 não sai. “Ampliar static any any” não é o modelo certo. Remover ip nat outside quebra o que já funciona. A default route não está “errada só porque o server responde de fora”; o path inbound do static prova L3 básico. Adicione PAT com a list 1 na interface WAN e confirme novas translations dos usuários.",
+    "part_id": "v2-4.3"
+  },
+  {
+    "id": 60,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4305: usuário na Vlan40 pinga 8.8.8.8; o edge encaminha, mas show ip nat translations continua vazio e o source na WAN permanece 10.40.0.50.",
+    "cli_output": "EDGE# show run | include nat|access-list\naccess-list 1 permit 10.50.0.0 0.0.0.255\nip nat inside source list 1 interface GigabitEthernet0/0/1 overload\ninterface Vlan40\n ip address 10.40.0.1 255.255.255.0\n ip nat inside\ninterface GigabitEthernet0/0/1\n ip address 203.0.113.2 255.255.255.252\n ip nat outside\nip route 0.0.0.0 0.0.0.0 203.0.113.1\n\nEDGE# show ip nat translations\n\nEDGE# debug path note: ICMP from 10.40.0.50 egresses Gi0/0/1 with source still 10.40.0.50 (no rewrite)\n\nPC 10.40.0.50 in Vlan40",
+    "alternativas": [
+      "Interesting traffic ACL permite 10.50/24, não 10.40/24 — pacotes saem sem NAT (source RFC1918 na WAN)",
+      "Falta ip nat outside",
+      "Falta default route",
+      "Overload não funciona com ICMP nunca"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Inside/outside, overload e default route estão presentes; o debug mostra o ICMP saindo ainda com source 10.40.0.50 — típico de ACL de interesting traffic que não casa. A list 1 só permite 10.50.0.0/24, então a Vlan40 nunca entra no NAT e o privado vaza na WAN. ip nat outside já está na Gi0/0/1; a rota default também. Overload sim traduz ICMP quando a list casa. Corrija a ACL para 10.40.0.0/24 (ou a rede certa) e revalide translations + source reescrito.",
+    "part_id": "v2-4.3"
+  },
+  {
+    "id": 61,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4401: usuários abrem o portal pelo IP 10.20.5.40, mas o atalho https://portal.empresa.local falha. Ping por nome não resolve.",
+    "cli_output": "PC-USER> ping 10.20.5.40\nReply from 10.20.5.40: bytes=32 time=1ms TTL=64\n\nPC-USER> ping portal.empresa.local\nPing request could not find host portal.empresa.local.\nPlease check the name and try again.\n\nPC-USER> nslookup portal.empresa.local\nServer:  dns-int.empresa.local\nAddress:  10.10.10.53\n\n*** dns-int.empresa.local can't find portal.empresa.local: Non-existent domain\n\nPC-USER> ipconfig /all | findstr /i \"DNS Servers\"\n   DNS Servers . . . . . . . . . . . : 10.10.10.53\n\nDNS-INT (admin view) zone empresa.local has hosts web01, mail01 — no portal name.",
+    "alternativas": [
+      "Problema de duplex no uplink do core",
+      "Rota default ausente no PC (IP do portal responde, logo L3 local ok)",
+      "Registro A (ou AAAA) de portal.empresa.local ausente/errado — DNS do cliente responde NXDOMAIN",
+      "clear ip ospf process no ABR"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "IP responde e nslookup devolve NXDOMAIN no resolvedor 10.10.10.53: o caminho L3 até o portal está ok; falta o registro A/AAAA de portal.empresa.local na zona (admin confirma web01/mail01, sem portal). Duplex no uplink não explica resolução por nome falhando com IP ok. Default route no PC também não — o próprio IP do portal responde. clear ip ospf process é ruído fora do sintoma. Crie/corrija o forward do portal e teste nslookup + HTTPS pelo FQDN.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 62,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4402: www.app.local não abre. A equipe garante que ‘o CNAME está criado’. Precisamos checar se a cadeia até o canônico fecha.",
+    "cli_output": "PC> nslookup www.app.local 10.10.10.53\nServer:  dns-int.empresa.local\nAddress:  10.10.10.53\n\nName:    www.app.local\nCanonical name = app-prod.app.local\n\nPC> nslookup app-prod.app.local 10.10.10.53\nServer:  dns-int.empresa.local\nAddress:  10.10.10.53\n\n*** dns-int.empresa.local can't find app-prod.app.local: Non-existent domain\n\nPC> nslookup -type=A www.app.local 10.10.10.53\n(follows CNAME then fails on target)\n\nPC> ping 10.20.8.12\nReply from 10.20.8.12: time<1ms\n(note: that IP is the intended app server, but no A name app-prod)",
+    "alternativas": [
+      "Cadeia CNAME quebrada: alias ok, alvo app-prod.app.local sem A/AAAA — criar A do canônico ou corrigir o CNAME",
+      "Falha exclusiva de PoE na câmera do corredor",
+      "PTR do PC do usuário impede HTTP",
+      "Speed mismatch 10/100 em todo o data center"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O CNAME de www.app.local existe e aponta para app-prod.app.local, mas o canônico devolve NXDOMAIN — cadeia quebrada no alvo. O IP 10.20.8.12 do app responde por ping, então o servidor está vivo; falta o A/AAAA de app-prod (ou um CNAME apontando para nome que já tenha A). PoE de câmera, PTR do PC e speed mismatch no DC não explicam NXDOMAIN seletivo no canônico. Insight: sempre faça nslookup no alias e depois no target; ‘CNAME criado’ sozinho não prova resolução completa.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 63,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4403: parceiros não conseguem entregar e-mail para @empresa.com; o MTA remoto reclama de host do MX. Site www por nome continua ok.",
+    "cli_output": "EXT> nslookup -type=MX empresa.com 8.8.8.8\nNon-authoritative answer:\nempresa.com     MX preference = 10, mail exchanger = mail.empresa.com\n\nEXT> nslookup mail.empresa.com 8.8.8.8\n*** Non-existent domain\n\nEXT> nslookup -type=A www.empresa.com 8.8.8.8\nName:    www.empresa.com\nAddress: 203.0.113.80\n\nEXT> nslookup -type=NS empresa.com 8.8.8.8\nempresa.com     nameserver = ns1.empresa.com\nns1.empresa.com  internet address = 203.0.113.53\n\nQueue log (partner MTA): 'Host not found for MX mail.empresa.com'",
+    "alternativas": [
+      "Problema de CRC na fibra do parceiro apenas",
+      "Falta de registro A de www",
+      "Desligar o NS público",
+      "MX aponta para mail.empresa.com sem A/AAAA — criar A do host MX (ou corrigir o MX)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O MX existe e aponta para mail.empresa.com, mas esse hostname não resolve (NXDOMAIN); o log do parceiro bate com isso. www.empresa.com tem A e os NS públicos respondem, então a zona básica está viva — o buraco é o A/AAAA (ou MX corrigido) do exchanger. CRC na fibra do parceiro não gera ‘Host not found for MX’. www já tem A. Desligar o NS público só piora a resolução externa. Crie o A de mail.empresa.com alinhado ao IP do MTA e revalide MX → A de fora.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 64,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4404: o MTA sai com HELO mail.empresa.com (A=203.0.113.25). Vários destinos rejeitam com 550 por falta de reverse DNS nesse IP.",
+    "cli_output": "OPS> nslookup mail.empresa.com 8.8.8.8\nName:    mail.empresa.com\nAddress: 203.0.113.25\n\nOPS> nslookup 203.0.113.25 8.8.8.8\n*** server can't find 25.113.0.203.in-addr.arpa: Non-existent domain\n\nOPS> nslookup -type=PTR 25.113.0.203.in-addr.arpa 8.8.8.8\n*** Non-existent domain\n\nOPS> nslookup -type=MX empresa.com 8.8.8.8\nempresa.com     MX preference = 10, mail exchanger = mail.empresa.com\n\nRemote bounce sample:\n  550 5.7.1 Rejected: no reverse DNS for 203.0.113.25",
+    "alternativas": [
+      "Apagar o registro A de mail para 'forçar' PTR",
+      "Forward A e MX ok; PTR do IP de saída ausente — solicitar/criar reverse correto no bloco",
+      "Problema de duplex half no MX",
+      "CNAME de www quebra SMTP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Forward A e MX estão corretos; o reverse de 203.0.113.25 não existe (NXDOMAIN em in-addr.arpa) e o bounce cita exatamente isso. Destinos que exigem PTR rejeitam a sessão. Apagar o A de mail não “força” PTR — só quebra entrega e reputação. Duplex half e CNAME de www não explicam rejeição por reverse DNS. Solicite/crie o PTR no bloco do provedor alinhado a mail.empresa.com e confirme nslookup reverso público antes de reabrir filas.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 65,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4405: depois da mudança de DHCP, PCs da VLAN 40 não resolvem nomes internos. No jump host, a zona em 10.50.0.53 responde intranet.empresa.local sem erro.",
+    "cli_output": "PC-VLAN40> ipconfig /all\n   IPv4 Address. . . . . . . . . . . : 10.40.0.88\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.40.0.1\n   DNS Servers . . . . . . . . . . . : 192.0.2.53\n\nPC-VLAN40> ping 192.0.2.53\nRequest timed out.\n\nPC-VLAN40> nslookup intranet.empresa.local\nDNS request timed out.\n    timeout was 2 seconds.\n*** Can't find server name\n\nJUMP> nslookup intranet.empresa.local 10.50.0.53\nName:    intranet.empresa.local\nAddress: 10.20.5.10\n\nSW-DHCP-scope note: option 006 still set to 192.0.2.53 (decommissioned)\nRouter IOS: ip name-server 10.50.0.53  (not used by PCs)",
+    "alternativas": [
+      "Registro A de intranet nunca existiu (jump host prova o contrário)",
+      "Falha de SFP no core apenas",
+      "Cliente com DNS 192.0.2.53 inacessível (option DHCP legada); corrigir DNS do cliente para 10.50.0.53",
+      "MX da zona pública impede intranet"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A zona está saudável em 10.50.0.53 (jump resolve intranet); os PCs da VLAN 40 ainda apontam para 192.0.2.53 descomissionado, que nem responde ping — daí timeout no nslookup. Não é ausência de A. SFP no core não casa com ‘só DNS do cliente falha’. MX público não governa intranet.local. Corrija a option 006 do DHCP para 10.50.0.53, renove lease (ipconfig /renew) e lembre: ip name-server no IOS não alimenta o DNS Server do PC.",
+    "part_id": "v2-4.4"
+  },
+  {
+    "id": 66,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4601: a política era bloquear a subnet guest 10.50.0.0/24 para a Internet, mas convidados ainda navegam e pingam 8.8.8.8.",
+    "cli_output": "EDGE# show run | section access-list|access-group\nip access-list extended BLOCK-GUEST\n deny ip 10.50.0.0 0.0.0.255 any\n permit ip any any\ninterface GigabitEthernet0/0/0\n description LAN-INSIDE\n ip address 10.10.10.1 255.255.255.0\n ip access-group BLOCK-GUEST in\ninterface GigabitEthernet0/0/1\n description WAN\n ip address 203.0.113.2 255.255.255.252\n (no access-group)\n\nEDGE# show ip interface Gi0/0/0 | include access list\n  Outgoing access list is not set\n  Inbound  access list is BLOCK-GUEST\n\nTopology: Guest users are on VLAN 50 behind another L3 hop; their packets arrive on Gi0/0/0 already sourced from 10.50.x only if routed that way — ops note: guest actually exits via Gi0/0/1 path from Dist, not hairpinning in on Gi0/0/0 as 10.50 source in this design.\n\nPC-GUEST 10.50.0.25: ping 8.8.8.8 OK; HTTP OK",
+    "alternativas": [
+      "Implicit deny está desligado",
+      "Wildcard 0.0.0.255 está errada para /24",
+      "ACL está in na LAN errada para o fluxo real de saída — aplicar out na WAN (Gi0/0/1) no path de Internet",
+      "permit ip any any não existe"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "A ACE deny 10.50.0.0/24 e o wildcard 0.0.0.255 estão corretos; o problema é onde a ACL está aplicada. in em Gi0/0/0 não vê o fluxo guest→Internet neste desenho (guest sai pelo path da Dist na WAN). Por isso a política “existe” e o guest ainda navega. Implicit deny não foi “desligado”; permit any any está no fim da lista. Coloque a ACL out em Gi0/0/1 (ou no hop onde o source 10.50 realmente atravessa) e confirme hits na deny. Insight: ACL certa na interface/direção errada = sintoma de “não filtra nada”.",
+    "part_id": "v2-4.6"
+  },
+  {
+    "id": 67,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4602: depois de ‘endurecer’ a ACL de gestão, o jump 10.255.1.10 perdeu SSH no roteador e até ping de qualquer origem some. Hits só na primeira linha.",
+    "cli_output": "R1# show access-lists MGMT\nExtended IP access list MGMT\n    10 deny ip any any\n    20 permit tcp 10.255.0.0 0.0.255.255 host 10.10.10.1 eq 22\n    30 permit icmp any any\n    40 permit ip any any\n\nR1# show run interface Loopback0\nip address 10.10.10.1 255.255.255.255\n\nR1# show run interface Gi0/0/0\n ip access-group MGMT in\n\nR1# show access-lists MGMT\nExtended IP access list MGMT\n    10 deny ip any any (188 matches)\n    20 permit tcp 10.255.0.0 0.0.255.255 host 10.10.10.1 eq 22\n    30 permit icmp any any\n    40 permit ip any any\n\nPC-JUMP 10.255.1.10: ssh 10.10.10.1 → timeout",
+    "alternativas": [
+      "Falta de crypto key SSH",
+      "Linha 10 deny ip any any casa primeiro — permits 20–40 nunca são avaliados para esse tráfego",
+      "Wildcard da 10.255 está errada para /16",
+      "access-group in não se aplica a TCP"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "ACL é first-match: deny ip any any na linha 10 engole SSH, ICMP e o resto antes dos permits — os 188 matches só nessa linha confirmam. A wildcard 0.0.255.255 para 10.255.0.0/16 está ok na intenção do permit 20; ela simplesmente nunca é avaliada. Falta de chave SSH não explica ping morrendo e hits no deny. access-group in aplica-se a TCP sim. Mova o deny genérico para depois dos permits (ou remova-o se a linha 40 já libera o restante) e reabra SSH/ICMP do jump.",
+    "part_id": "v2-4.6"
+  },
+  {
+    "id": 68,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4603: a ACL deveria liberar só 10.40.0.0/24, mas hosts 10.40.5.x e até 10.41.x parecem casar demais. No running-config entrou 255.255.255.0 no campo de wildcard.",
+    "cli_output": "SW-L3# show run | section NOC-LAN\nip access-list extended NOC-LAN\n permit ip 10.40.0.0 255.255.255.0 any\n deny ip any any\n\nSW-L3# show access-lists NOC-LAN\nExtended IP access list NOC-LAN\n    10 permit ip 10.40.0.0 255.255.255.0 any\n    20 deny ip any any\n\nEngineer note: intended /24 for 10.40.0.0–10.40.0.255 only\nWildcard mistakenly entered as subnet mask 255.255.255.0\n\nshow ip interface Gi1/0/1 | include access list\n  Inbound access list is NOC-LAN",
+    "alternativas": [
+      "Trocar 255.255.255.0 por wildcard 0.0.0.255 para representar /24 corretamente",
+      "Usar standard ACL com a mesma mask 255.255.255.0 resolve",
+      "Implicit deny está desabilitado",
+      "permit ip any any no topo é obrigatório"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "No campo de wildcard, 255.255.255.0 não significa /24: a lógica de bits fica invertida em relação à subnet mask e o match fica amplo/estranho (daí 10.40.5.x e até 10.41.x). Para restringir 10.40.0.0–10.40.0.255 use 0.0.0.255 (ou reescreva a ACE). Repetir a mesma ‘mask’ errada numa standard ACL não corrige. Implicit deny continua existindo após a deny any explícita. permit any any no topo anularia o filtro. Insight: na dúvida, digite a ACE pensando em ‘bits que podem variar’, não em máscara de subnet.",
+    "part_id": "v2-4.6"
+  }
+]

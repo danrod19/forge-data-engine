@@ -1,0 +1,257 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1101: o user app-deploy do DevOps não consegue s3:DeleteObject em s3://corp-artifacts/releases/*. Continua AccessDenied mesmo depois de anexarem uma managed policy com Allow s3:*.",
+    "cli_output": "$ aws sts get-caller-identity\n{\n  \"UserId\": \"AIDAEXAMPLE\",\n  \"Account\": \"123456789012\",\n  \"Arn\": \"arn:aws:iam::123456789012:user/app-deploy\"\n}\n\n$ aws s3api delete-object --bucket corp-artifacts --key releases/app-v2.tgz\nAn error occurred (AccessDenied) when calling the DeleteObject operation:\nUser: arn:aws:iam::123456789012:user/app-deploy is not authorized to perform:\ns3:DeleteObject on resource: \"arn:aws:s3:::corp-artifacts/releases/app-v2.tgz\"\nwith an explicit deny in an identity-based policy\n\n$ aws iam list-attached-user-policies --user-name app-deploy\nAttached: arn:aws:iam::123456789012:policy/DeployS3Allow\nAttached: arn:aws:iam::123456789012:policy/ProtectProdDelete\n\n# Trecho get-policy-version ProtectProdDelete:\n\"Effect\": \"Deny\",\n\"Action\": \"s3:DeleteObject\",\n\"Resource\": \"arn:aws:s3:::corp-artifacts/releases/*\"",
+    "alternativas": [
+      "Remover ou ajustar o statement Deny em ProtectProdDelete (Deny explícito vence o Allow)",
+      "Abrir 0.0.0.0/0 no Security Group do bucket S3",
+      "Trocar a região do CLI para us-east-1 sem revisar policies",
+      "Criar um segundo Allow * sem tocar no Deny"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para Deny explícito: no CLI, o AccessDenied cita \"explicit deny in an identity-based policy\" e a ProtectProdDelete tem Effect Deny em s3:DeleteObject no prefix releases/*. Allow em DeployS3Allow (mesmo s3:*) nunca supera um Deny — a avaliação IAM para no primeiro Deny que case. Abrir 0.0.0.0/0 em \"SG de bucket\" não faz sentido: S3 não usa Security Group de EC2 para autorizar DeleteObject. Só trocar a região do CLI não remove o statement Deny. Um segundo Allow * sem mexer no Deny deixa o bloqueio intacto. Insight: quando a mensagem fala explicit deny, liste as policies anexadas e procure Effect Deny antes de ampliar Allow.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1102: a EC2 do app-tier deveria usar a role S3ReadRole, mas a instância não obtém credenciais de role. As permissions na role já incluem s3:GetObject.",
+    "cli_output": "$ aws iam get-role --role-name S3ReadRole --query Role.AssumeRolePolicyDocument\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [{\n    \"Effect\": \"Allow\",\n    \"Principal\": { \"Service\": \"lambda.amazonaws.com\" },\n    \"Action\": \"sts:AssumeRole\"\n  }]\n}\n\n$ aws iam list-attached-role-policies --role-name S3ReadRole\nAttached: arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess\n\n$ aws ec2 describe-iam-instance-profile-associations \\\n  --filters Name=instance-id,Values=i-0abc\nAssociations: []   # nenhuma instance profile associada\n\n# Na instância:\n$ curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/\n(vazio / 404 — sem role)",
+    "alternativas": [
+      "Aumentar o instance type para m7g.large",
+      "Desabilitar IMDSv2",
+      "Corrigir trust para ec2.amazonaws.com e associar instance profile com S3ReadRole à EC2",
+      "Anexar AmazonS3ReadOnlyAccess diretamente ao root user"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "No CLI, o trust da S3ReadRole só permite lambda.amazonaws.com e describe-iam-instance-profile-associations volta vazio — a EC2 não tem profile e, mesmo que tivesse, o serviço EC2 não poderia assumir a role. Por isso o IMDS em /iam/security-credentials/ responde vazio/404. AmazonS3ReadOnlyAccess na role já cobre GetObject; o buraco é trust + associação. Upsize de instance type não cria credencial de role. Desabilitar IMDSv2 não conserta Principal errado nem ausência de profile. Colar a managed policy no root user é anti-padrão e não amarra a workload da instância. Insight: se permissions estão ok mas o metadata não lista role, confira AssumeRolePolicyDocument (ec2.amazonaws.com) e a associação do instance profile na mesma ordem.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1103: a usuária ana.silva não lista filas SQS (sqs:ListQueues). A policy SQS-Support está no grupo Support-L2, mas ana aparece só em Billing-View.",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:iam::123456789012:user/ana.silva\n\n$ aws sqs list-queues\nAn error occurred (AccessDenied) when calling the ListQueues operation:\nUser: arn:aws:iam::123456789012:user/ana.silva is not authorized to perform: sqs:ListQueues\n\n$ aws iam list-groups-for-user --user-name ana.silva\nGroups: [ Billing-View ]\n\n$ aws iam list-attached-group-policies --group-name Billing-View\nAttached: arn:aws:iam::aws:policy/job-function/Billing\n\n$ aws iam list-attached-group-policies --group-name Support-L2\nAttached: arn:aws:iam::123456789012:policy/SQS-Support\n\n$ aws iam get-policy-version --policy-arn arn:aws:iam::123456789012:policy/SQS-Support --version-id v1\nAllow sqs:ListQueues / sqs:GetQueueAttributes on Resource \"*\"",
+    "alternativas": [
+      "Habilitar SQS FIFO em todas as filas",
+      "Adicionar ana.silva ao grupo Support-L2 (ou anexar SQS-Support ao user/group efetivo)",
+      "Remover a policy do Support-L2",
+      "Trocar o endpoint SQS para público na Internet"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para membership errado: SQS-Support Allow ListQueues/GetQueueAttributes está no Support-L2, mas list-groups-for-user mostra só Billing-View (job-function Billing). Ana nunca herda a Allow — daí o AccessDenied. Coloque-a no Support-L2 ou anexe a policy ao principal efetivo. Habilitar FIFO em todas as filas não concede IAM. Remover a policy do Support-L2 tira permissão de quem já está no grupo certo. Endpoint \"público\" da API SQS não substitui autorização identity-based. Insight: em tickets de AccessDenied com groups, compare list-groups-for-user com list-attached-group-policies do grupo que realmente tem a action.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1104: o pipeline CI chama ec2:RunInstances com as credenciais do user ci-bot e falha com UnauthorizedOperation.",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:iam::123456789012:user/ci-bot\n\n$ aws ec2 run-instances --image-id ami-0abc --instance-type t3.micro ...\nAn error occurred (UnauthorizedOperation) when calling the RunInstances operation:\nYou are not authorized to perform this operation.\nEncoded authorization failure message: ...\n\n$ aws iam list-attached-user-policies --user-name ci-bot\nAttached: arn:aws:iam::123456789012:policy/CI-ReadOnly\n\n# Policy CI-ReadOnly (versão v3) statements:\nEffect Allow\nAction:\n  ec2:Describe*\n  ec2:Get*\nResource: \"*\"\n# (sem ec2:RunInstances / ec2:Create*)\n\n$ aws iam list-user-policies --user-name ci-bot\nLocalPolicyNames: []",
+    "alternativas": [
+      "O AMI ID está em formato inválido (evidência mostra UnauthorizedOperation de IAM)",
+      "Falta apenas de Elastic IP na conta",
+      "O tipo t3.micro não existe na região",
+      "Falta Allow de ec2:RunInstances (e correlatas) na policy do ci-bot — hoje só Describe/Get"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "No CLI, UnauthorizedOperation bate com a CI-ReadOnly: só Allow em ec2:Describe* e ec2:Get*, sem RunInstances nem Create*. O bot precisa de Allow explícito para provisionar. AMI em formato inválido geraria outro tipo de erro de parâmetro, não UnauthorizedOperation de IAM. Falta de Elastic IP não bloqueia RunInstances em si. t3.micro inexistente na região também não casa com a evidência de policy só de leitura. Insight: decode-authorization-message (quando disponível) e o trecho Action da policy anexada costumam fechar o caso mais rápido que chutar AMI/tipo/EIP.",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1105: app Node na EC2 usa AWS_ACCESS_KEY_ID do IAM user app-prod embutida no .env em disco. A auditoria de segurança pediu redesign sem keys de longo prazo.",
+    "cli_output": "# /opt/app/.env (trecho)\nAWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE\nAWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\nAWS_DEFAULT_REGION=us-east-1\n\n$ aws iam list-access-keys --user-name app-prod\nAccessKeyId: AKIAIOSFODNN7EXAMPLE  Status: Active  CreateDate: 2024-01-10\n\n$ aws ec2 describe-iam-instance-profile-associations \\\n  --filters Name=instance-id,Values=i-0app\nAssociations: []\n\n# Requisito app: s3:GetObject + s3:PutObject em s3://corp-app-data/*\n# Nenhuma role de workload configurada na conta ainda\n\n$ cat /etc/systemd/system/app.service | grep Environment\nEnvironmentFile=/opt/app/.env",
+    "alternativas": [
+      "Manter a access key e copiá-la para o Slack do time",
+      "Trocar apenas a região no .env para eu-west-1",
+      "Criar role com least privilege S3, instance profile na EC2, remover keys do .env e usar o default credential provider chain",
+      "Usar o root access key no lugar do user app-prod"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para credencial estática em disco: AKIA no .env, key ativa no user e zero instance profile na EC2. O caminho SAA é role least privilege (GetObject/PutObject no prefix), instance profile na instância, apagar as keys do EnvironmentFile e deixar o SDK pegar temporárias via IMDS (default credential provider chain). Copiar a key para o Slack amplia o blast radius. Só mudar AWS_DEFAULT_REGION não elimina a key de longo prazo. Root access key é o pior trade-off de segurança da conta. Insight: em EC2, se Associations: [] e o app ainda chama S3, quase sempre há key embutida — trate isso como finding, não como \"config de região\".",
+    "part_id": "aws-1.1",
+    "source": "aws"
+  },
+  {
+    "id": 6,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1201: a EC2 web-01 na subnet rotulada \"public\" não alcança a Internet (curl https://example.com timeout). SSH a partir do bastion interno funciona.",
+    "cli_output": "$ aws ec2 describe-instances --instance-ids i-0web01 --query Reservations[].Instances[].{SubnetId:SubnetId,PublicIp:PublicIpAddress,SGs:SecurityGroups}\nSubnetId: subnet-0puba\nPublicIp: 3.88.10.20\nSGs: [ sg-web ]\n\n$ aws ec2 describe-security-groups --group-ids sg-web --query SecurityGroups[].IpPermissionsEgress\nOutbound: 0.0.0.0/0 all protocols Allow\n\n$ aws ec2 describe-route-tables --filters Name=association.subnet-id,Values=subnet-0puba\nRoutes:\n  10.0.0.0/16 -> local\n  (no 0.0.0.0/0 entry)\n\n$ aws ec2 describe-internet-gateways --filters Name=attachment.vpc-id,Values=vpc-0app\nIGW igw-0app State: available attached to vpc-0app\n\n$ curl -m 5 https://example.com\nConnection timed out",
+    "alternativas": [
+      "Adicionar rota 0.0.0.0/0 → igw-0app na route table da subnet-0puba",
+      "Remover o IP público da instância",
+      "Criar Deny no NACL default para 443",
+      "Anexar AmazonS3FullAccess à role da instância"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "No CLI, a instância tem PublicIp e SG egress allow all; o IGW está attached — mas a route table de subnet-0puba só tem 10.0.0.0/16 local, sem 0.0.0.0/0 → igw-0app. Sem default route para o IGW não há path de saída à Internet, mesmo com label \"public\". Adicione essa rota. Remover o IP público piora a saída direta. Deny 443 na NACL bloquearia HTTPS de propósito. AmazonS3FullAccess é IAM e não cria rota na VPC. Insight: \"subnet pública\" de verdade = IGW + rota default para o IGW + (em geral) IP público; confira as três peças, não só o nome da subnet.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 7,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1202: health checks do ALB falham no target i-0app01:8080. Da mesma VPC, nc para 8080 dá timeout. O processo da app escuta em 0.0.0.0:8080 e os logs estão OK.",
+    "cli_output": "$ aws elbv2 describe-target-health --target-group-arn arn:aws:elasticloadbalancing:...:targetgroup/app/...\nTarget i-0app01:8080 State: unhealthy Reason: Target.Timeout\n\n$ aws ec2 describe-instances --instance-ids i-0app01 --query Reservations[].Instances[].SecurityGroups\nGroupId: sg-app\n\n$ aws ec2 describe-security-groups --group-ids sg-app\nInbound:\n  TCP 22  Source 10.0.0.0/16\n  (no rule for 8080)\nOutbound: all allow\n\n$ aws ec2 describe-security-groups --group-ids sg-alb\nInbound: TCP 443 0.0.0.0/0\nOutbound: all allow\n\n$ aws ec2 describe-network-acls --filters Name=association.subnet-id,Values=subnet-0priva\nNACL entries: allow 0.0.0.0/0 inbound/outbound (default-like)\n\nApp log: Listening on 8080",
+    "alternativas": [
+      "Trocar o ALB para Network Load Balancer sem revisar SG",
+      "Adicionar inbound no sg-app TCP 8080 com Source = sg-alb (ou CIDR das subnets do ALB)",
+      "Remover a rota local 10.0.0.0/16",
+      "Desligar o target group health check permanentemente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para SG do target: Target.Timeout, app listening em 8080, NACL allow — mas sg-app só tem inbound TCP 22. O ALB (sg-alb) precisa alcançar 8080; falta Allow TCP 8080 com Source = sg-alb (ou CIDR das subnets do ALB). Trocar para NLB sem revisar SG repete o mesmo bloqueio no path de health. Remover a rota local 10.0.0.0/16 quebra o roteamento intra-VPC. Desligar o health check só esconde target morto sem corrigir o fluxo. Insight: unhealthy com Timeout + nc timeout na porta do app quase sempre é SG/NACL antes de culpar o processo — aqui o log já prova que a app escuta.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 8,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1203: EC2 em subnet privada não consegue yum/apt update (timeout nos repositórios). Sem IP público por design.",
+    "cli_output": "$ aws ec2 describe-instances --instance-ids i-0worker --query Reservations[].Instances[].{Subnet:SubnetId,PublicIp:PublicIpAddress}\nSubnet: subnet-0privb\nPublicIp: null\n\n$ aws ec2 describe-route-tables --filters Name=association.subnet-id,Values=subnet-0privb\nRoutes:\n  10.0.0.0/16 -> local\n  (no 0.0.0.0/0)\n\n$ aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=vpc-0app\nNatGatewayId: nat-0a  SubnetId: subnet-0puba  State: available\n\n$ aws ec2 describe-route-tables --filters Name=association.subnet-id,Values=subnet-0priva\nRoutes:\n  10.0.0.0/16 -> local\n  0.0.0.0/0 -> nat-0a\n\n$ aws ec2 describe-security-groups --group-ids sg-worker\nOutbound: 0.0.0.0/0 allow all\n\ncurl -m 5 https://amazonlinux-2-repos... → timeout",
+    "alternativas": [
+      "Atribuir EIP público e abrir SSH 0.0.0.0/0",
+      "Mover o NAT para dentro do RDS",
+      "Adicionar 0.0.0.0/0 → nat-0a na route table de subnet-0privb (espelhar a private que já tem NAT)",
+      "Remover o NAT available da VPC"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "No CLI, nat-0a está available e subnet-0priva já tem 0.0.0.0/0 → nat-0a; subnet-0privb (onde está o worker) só tem rota local. SG egress allow all — falta a rota default via NAT para sair sem IP público. Espelhe a rota da outra privada. EIP + SSH 0.0.0.0/0 fere o design privado e abre superfície. \"Mover NAT para dentro do RDS\" não é arquitetura válida. Remover o NAT available piora todas as privadas que já dependem dele. Insight: NAT \"existe na VPC\" não basta — cada subnet privada precisa da associação de route table com 0.0.0.0/0 → nat-xxxx.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 9,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1204: depois do hardening, a API na 443 falha para clientes externos. O SG do ALB ainda permite 443 de 0.0.0.0/0; antes do change de NACL funcionava.",
+    "cli_output": "$ aws ec2 describe-security-groups --group-ids sg-alb\nInbound: TCP 443 Source 0.0.0.0/0 Allow\nOutbound: all allow\n\n$ aws elbv2 describe-load-balancers --names corp-alb\nState: active  Scheme: internet-facing\nSubnets: subnet-0puba, subnet-0pubb\n\n$ aws ec2 describe-network-acls --network-acl-ids acl-0edge\nAssociations: subnet-0puba, subnet-0pubb\nEntries (inbound):\n  100  Deny  TCP 443  0.0.0.0/0\n  200  Allow TCP 443  0.0.0.0/0\n  *    Deny  all     0.0.0.0/0\nEntries (outbound):\n  100  Allow all 0.0.0.0/0\n  *    Deny all\n\n# Nota: regras NACL avaliadas por número ascendente; 100 Deny casa antes do 200 Allow\n\nClient: curl https://api.example.com → timeout",
+    "alternativas": [
+      "Abrir porta 22 no ALB",
+      "Remover o Internet Gateway",
+      "Duplicar o Allow no Security Group outra vez",
+      "Remover/reordenar o Deny TCP 443 rule 100 na NACL (Deny casa antes do Allow 200)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O sintoma aponta para NACL: SG allow 443, ALB internet-facing active, mas na acl-0edge a regra 100 Deny TCP 443 0.0.0.0/0 é avaliada antes do Allow 200 — NACL é stateless e ordenada por número. Remova ou reordene o Deny para o HTTPS voltar. Abrir 22 no ALB não libera 443. Remover o IGW derruba a saída/entrada pública. Duplicar Allow no SG não contorna Deny na subnet. Insight: se \"antes do change de NACL funcionava\" e o SG parece certo, leia as entries em ordem ascendente — o primeiro match vence, inclusive Deny.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 10,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1205: o RFP pedia produção multi-AZ. Após incidente só em us-east-1a a app ficou 100% down. Inventário de rede e compute confirma o desenho atual.",
+    "cli_output": "$ aws ec2 describe-subnets --filters Name=vpc-id,Values=vpc-0prod\nsubnet-0puba   AZ=us-east-1a  MapPublicIp=true\nsubnet-0priva  AZ=us-east-1a  MapPublicIp=false\n(no subnets in us-east-1b or 1c)\n\n$ aws elbv2 describe-load-balancers --names prod-alb\nAvailabilityZones: [ us-east-1a ]\nScheme: internet-facing\n\n$ aws ec2 describe-instances --filters Name=tag:Env,Values=prod\ni-0app1  AZ=us-east-1a  Subnet=subnet-0priva\ni-0app2  AZ=us-east-1a  Subnet=subnet-0priva\n\n$ aws rds describe-db-instances --db-instance-identifier prod-db\nMultiAZ: false  AvailabilityZone: us-east-1a\n\nPost-mortem: power event / capacity issue limited to us-east-1a",
+    "alternativas": [
+      "Aumentar o instance type na mesma AZ única",
+      "Criar subnets (e ALB/targets/DB conforme serviço) em pelo menos uma segunda AZ e redistribuir a carga",
+      "Remover o ALB e usar só IP público em uma instância",
+      "Desligar health checks para mascarar a AZ down"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "No inventário, subnets, ALB, EC2 e RDS estão só em us-east-1a — SPOF de Availability Zone. Multi-AZ de verdade exige subnets em ≥2 AZs e redistribuir ALB/targets (e MultiAZ no RDS conforme o serviço). Upsize na mesma AZ única não sobrevive a falha de AZ. Remover o ALB e depender de um IP público concentra ainda mais o risco. Desligar health checks mascara target morto sem atender o RFP. Insight: \"duas instâncias\" na mesma subnet/AZ não é alta disponibilidade de AZ — conte AZs distintas no describe-subnets e no ALB antes de chamar o ambiente de multi-AZ.",
+    "part_id": "aws-1.2",
+    "source": "aws"
+  },
+  {
+    "id": 11,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1301: a role app-reader não consegue GetObject em s3://corp-shared/reports/q1.pdf. O time de dados insiste que \"o bucket já tem policy\".",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:sts::111122223333:assumed-role/app-reader/session\n\n$ aws s3api get-object --bucket corp-shared --key reports/q1.pdf outfile.pdf\nAn error occurred (AccessDenied) when calling the GetObject operation:\nUser: arn:aws:sts::111122223333:assumed-role/app-reader/session is not authorized to perform: s3:GetObject\non resource: \"arn:aws:s3:::corp-shared/reports/q1.pdf\"\n\n$ aws iam list-attached-role-policies --role-name app-reader\nAttached: (none managed)\nInline: none\n\n$ aws s3api get-bucket-policy --bucket corp-shared\n{\n  \"Statement\": [{\n    \"Sid\": \"AllowDataTeam\",\n    \"Effect\": \"Allow\",\n    \"Principal\": { \"AWS\": \"arn:aws:iam::111122223333:role/data-etl\" },\n    \"Action\": [\"s3:GetObject\"],\n    \"Resource\": \"arn:aws:s3:::corp-shared/reports/*\"\n  }]\n}\n\n$ aws s3api get-public-access-block --bucket corp-shared\nBlockPublicAcls=true RestrictPublicBuckets=true",
+    "alternativas": [
+      "Anexar policy IAM à role app-reader com s3:GetObject no ARN reports/* (bucket policy hoje só permite data-etl)",
+      "Desligar o Block Public Access e usar Principal *",
+      "Criar Internet Gateway na conta para o S3",
+      "Trocar o nome do objeto para remover o prefixo reports/"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O caller é assumed-role/app-reader sem nenhuma identity policy; a bucket policy Allow GetObject só lista Principal data-etl. \"Ter policy no bucket\" não autoriza app-reader — falta Allow (IAM na role e/ou Principal na bucket policy) para esse ARN em reports/*. Anexe least privilege s3:GetObject no prefix. Desligar BPA com Principal * abre o bucket demais. IGW não autoriza S3 API. Renomear o objeto para fora de reports/ só muda o path; não concede permissão à role. Insight: em AccessDenied S3, confira identity policies do caller e o Principal da resource policy — os dois lados precisam permitir (salvo casos com Deny).",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 12,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1302: o pipeline CI (role ci-writer) toma AccessDenied em PutObject em s3://corp-artifacts/builds/. Havia Allow s3:PutObject; alguém publicou policy nova no bucket.",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:sts::111122223333:assumed-role/ci-writer/build-442\n\n$ aws s3api put-object --bucket corp-artifacts --key builds/app.zip --body app.zip\nAn error occurred (AccessDenied) when calling the PutObject operation:\n... with an explicit deny in a resource-based policy\n\n$ aws iam list-attached-role-policies --role-name ci-writer\nAttached: arn:aws:iam::111122223333:policy/CI-S3-Write\n# CI-S3-Write: Allow s3:PutObject on arn:aws:s3:::corp-artifacts/builds/*\n\n$ aws s3api get-bucket-policy --bucket corp-artifacts\nStatement:\n  - Sid: AllowCIWrite\n    Effect: Allow\n    Principal: { AWS: arn:aws:iam::111122223333:role/ci-writer }\n    Action: s3:PutObject\n    Resource: arn:aws:s3:::corp-artifacts/builds/*\n  - Sid: FreezeProdBuilds\n    Effect: Deny\n    Principal: \"*\"\n    Action: s3:PutObject\n    Resource: arn:aws:s3:::corp-artifacts/builds/*\n    Condition: { StringEquals: { \"s3:x-amz-acl\": \"public-read\" } }\n  - Sid: DenyAllPutsTemp\n    Effect: Deny\n    Principal: { AWS: arn:aws:iam::111122223333:role/ci-writer }\n    Action: s3:PutObject\n    Resource: arn:aws:s3:::corp-artifacts/builds/*\n\n$ aws s3api get-public-access-block --bucket corp-artifacts\nBlockPublicPolicy=true RestrictPublicBuckets=true",
+    "alternativas": [
+      "Adicionar mais um Allow * na role sem tocar no Deny",
+      "Remover ou ajustar o statement DenyAllPutsTemp (Deny explícito no Put do ci-writer)",
+      "Habilitar static website hosting no bucket",
+      "Desligar o versioning para permitir Put"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A mensagem cita explicit deny em resource-based policy: DenyAllPutsTemp nega PutObject para ci-writer em builds/*, mesmo com CI-S3-Write Allow e AllowCIWrite na bucket policy. Deny explícito vence. Remova ou ajuste esse statement (o FreezeProdBuilds com condition de ACL public-read é outro caso). Mais um Allow * na role não anula Deny. Static website hosting não remove Deny de Put. Desligar versioning não autoriza Put bloqueado por policy. Insight: depois de \"alguém publicou policy nova\", diff os Sids Deny primeiro — AllowCIWrite no mesmo documento não salva se houver DenyAllPutsTemp sem Condition.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 13,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1303: o objeto config/app.json \"sumiu\" depois de um delete acidental do estagiário. O bucket tem versioning; a listagem simples não mostra o arquivo.",
+    "cli_output": "$ aws s3api get-bucket-versioning --bucket corp-config\nStatus: Enabled\n\n$ aws s3 ls s3://corp-config/config/\n(no app.json)\n\n$ aws s3api list-object-versions --bucket corp-config --prefix config/app.json\n{\n  \"Versions\": [\n    { \"Key\": \"config/app.json\", \"VersionId\": \"v3\", \"IsLatest\": false, \"Size\": 2048 },\n    { \"Key\": \"config/app.json\", \"VersionId\": \"v2\", \"IsLatest\": false, \"Size\": 1980 }\n  ],\n  \"DeleteMarkers\": [\n    { \"Key\": \"config/app.json\", \"VersionId\": \"dm1\", \"IsLatest\": true }\n  ]\n}\n\n$ aws s3api get-public-access-block --bucket corp-config\nAll BPA flags: true\n\nEstagiário: aws s3 rm s3://corp-config/config/app.json  (sem --version-id)",
+    "alternativas": [
+      "Recriar a conta AWS do zero",
+      "Desligar o Block Public Access para 'restaurar'",
+      "Remover o delete marker (ou get-object com VersionId v3) para restaurar o objeto corrente",
+      "Converter o bucket em EFS"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Versioning Enabled com DeleteMarkers dm1 IsLatest true explica o \"sumiço\" no s3 ls: o delete sem --version-id criou marker, não apagou v2/v3. Restaure removendo o delete marker ou faça get-object com VersionId v3. Recriar a conta é absurdo para um objeto. Desligar BPA não restaura versões. Converter para EFS troca de serviço e não recupera o histórico S3. Insight: em bucket versionado, list-object-versions é o primeiro comando após \"arquivo sumiu\" — procure DeleteMarkers com IsLatest true antes de assumir perda definitiva.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 14,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1304: Cost Explorer mostra S3 Standard alto no bucket de logs (objetos com mais de 120 dias e acesso raro). Não há regra de lifecycle.",
+    "cli_output": "$ aws s3api get-bucket-lifecycle-configuration --bucket corp-logs\nAn error occurred (NoSuchLifecycleConfiguration) when calling the GetBucketLifecycleConfiguration\n\n$ aws s3api list-objects-v2 --bucket corp-logs --prefix app/ --max-items 3\nKey: app/2024-01-01.log  StorageClass: STANDARD  LastModified: 2024-01-01\nKey: app/2024-02-01.log  StorageClass: STANDARD  LastModified: 2024-02-01\nKey: app/2024-03-01.log  StorageClass: STANDARD  LastModified: 2024-03-01\n\n$ aws s3api get-bucket-versioning --bucket corp-logs\nStatus: Suspended\n\n$ aws ce get-cost-and-usage ... (resumo)\nService AmazonS3 Storage STANDARD: elevated MoM\nAccess pattern note: <1 GET per object per month (from analytics)\n\nRequirement: restore within hours ok for compliance audits (not ms API)",
+    "alternativas": [
+      "Manter tudo em STANDARD e comprar mais Requests",
+      "Desligar o logging da aplicação",
+      "Tornar o bucket público para 'baratear'",
+      "Criar lifecycle: transition para STANDARD_IA (e/ou Glacier conforme RTO) após N dias — hoje não há lifecycle"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "NoSuchLifecycleConfiguration + objetos antigos ainda em STANDARD com <1 GET/mês explicam o custo. Crie lifecycle com transition para STANDARD_IA e/ou Glacier alinhado ao RTO (restore em horas ok para auditoria). Manter tudo em STANDARD e \"comprar Requests\" não ataca storage class. Desligar logging da app corta observabilidade em vez de otimizar retenção. Tornar o bucket público não barateia armazenamento e cria risco. Insight: Cost Explorer alto em S3 Standard em bucket de log frio quase sempre cai em lifecycle ausente — confirme com get-bucket-lifecycle-configuration antes de culpar só o volume de PUT.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  },
+  {
+    "id": 15,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1305: o scanner de segurança marca s3://corp-marketing como publicamente legível. Ninguém deveria ter deixado o site aberto.",
+    "cli_output": "$ aws s3api get-public-access-block --bucket corp-marketing\nAn error occurred (NoSuchPublicAccessBlockConfiguration)\n# BPA não configurado no bucket\n\n$ aws s3api get-bucket-policy --bucket corp-marketing\n{\n  \"Statement\": [{\n    \"Sid\": \"PublicReadGetObject\",\n    \"Effect\": \"Allow\",\n    \"Principal\": \"*\",\n    \"Action\": \"s3:GetObject\",\n    \"Resource\": \"arn:aws:s3:::corp-marketing/*\"\n  }]\n}\n\n$ aws s3api get-bucket-acl --bucket corp-marketing\nGrants include AllUsers READ (legacy ACL present)\n\n$ curl -s -o /dev/null -w \"%{http_code}\" https://corp-marketing.s3.amazonaws.com/index.html\n200\n\nAccount BPA (org default): not enforced on this bucket",
+    "alternativas": [
+      "Habilitar Block Public Access no bucket/conta e remover Principal * / ACL AllUsers (ou migrar para CloudFront + origem privada)",
+      "Adicionar mais um Allow s3:* para *",
+      "Habilitar Transfer Acceleration para 'esconder' o bucket",
+      "Suspender versioning como único remédio"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "BPA ausente (NoSuchPublicAccessBlockConfiguration), bucket policy com Principal * GetObject, ACL AllUsers READ e HTTP 200 no objeto confirmam leitura pública indevida. Habilite Block Public Access no bucket/conta, remova Principal * e a ACL legado — ou sirva via CloudFront com origem privada. Mais Allow s3:* para * amplia a exposição. Transfer Acceleration não \"esconde\" o endpoint público. Suspender versioning não remove policy/ACL públicas. Insight: scanner + curl 200 no endpoint s3.amazonaws.com pedem checagem em trio: get-public-access-block, get-bucket-policy e get-bucket-acl — qualquer um dos três pode manter o objeto aberto.",
+    "part_id": "aws-1.3",
+    "source": "aws"
+  }
+]

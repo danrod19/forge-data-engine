@@ -1,0 +1,274 @@
+[
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1101: o servidor de arquivos está lento e com timeouts. Depois que um técnico forçou duplex no switch, a situação piorou. Avalie o link de acesso.",
+    "cli_output": "SW-ACC# show interfaces Gi1/0/18 status\nPort      Name           Status       Vlan  Duplex  Speed Type\nGi1/0/18  SRV-FILES      connected    40    half    a-1000 10/100/1000BaseTX\n\nSW-ACC# show interfaces Gi1/0/18 | include duplex|collision|CRC|errors|reliability\n  Full-duplex, 1000Mb/s, media type is 10/100/1000BaseTX\n  0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored\n  41220 collisions, 18890 late collision, 0 deferred\n  reliability 245/255, txload 40/255, rxload 55/255\n\nSRV (peer NIC status tool):\n  Speed: 1.0 Gbps  Duplex: Full\n\nSW-ACC# show run interface Gi1/0/18 | include duplex|speed\n duplex half\n speed auto",
+    "alternativas": [
+      "Problema de default route no core; ignorar contadores",
+      "Mismatch de duplex (switch half vs servidor full) — alinhar duplex e revalidar late collisions",
+      "Limpar processo OSPF no ABR",
+      "Trocar o chassis do core sem olhar a porta"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para mismatch de duplex: o switch está com duplex half hardcoded e o servidor em full. No CLI, late collisions altos com reliability degradada batem exatamente com esse cenário clássico de L1. Alinhe (auto/auto ou full/full nos dois lados) e confira se os contadores param de subir. Default route no core não explica colisão na porta de acesso; clear OSPF no ABR mexe em L3 sem tocar no link; trocar chassis do core sem olhar a porta só aumenta o blast radius.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1102: perda intermitente no uplink do prédio. O time de roteamento já quer dar clear ip ospf process — olhe os contadores do uplink antes de tocar no IGP.",
+    "cli_output": "EDGE# show ip ospf neighbor\nNeighbor ID     Pri State      Dead Time Address       Interface\n10.0.0.2          1 FULL/BDR   00:00:35  10.0.0.2      Gi0/0/1\n\nEDGE# show interfaces Gi0/0/1 | include error|CRC|collision|reliability|packets input\n  882114220 packets input, 0 no buffer\n  15440 input errors, 14990 CRC, 0 frame, 0 overrun\n  0 collisions, 0 late collision\n  reliability 230/255, txload 70/255, rxload 90/255\n\nEDGE# show interfaces Gi0/0/1 status\nPort      Name     Status    Vlan  Duplex Speed Type\nGi0/0/1   BLD-A    connected routed a-full a-1000 1000BaseSX SFP\n\nEDGE# show logging | include Gi0/0/1\n%LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/0/1, changed state to up\n(flaps earlier overnight)",
+    "alternativas": [
+      "Executar clear ip ospf process porque FULL ainda pode estar 'sujo'",
+      "Remover a default route estática",
+      "Investigar L1 do uplink (CRC/SFP/fibra/patch) — IGP está FULL; contadores apontam mídia",
+      "Desabilitar Spanning Tree globalmente"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "No CLI, OSPF já está FULL/BDR — a adjacência lógica está ok. O que chama atenção são CRC/input errors altos e reliability baixa no uplink óptico, com flaps no log: isso é mídia (SFP, fibra, patch), não protocolo. Insight de troubleshooting: se o vizinho está FULL e o link erra, trate L1 antes de mexer no IGP. clear ip ospf process só reinicia o processo sem limpar CRC; remover default route estática não explica erros de frame; desligar STP globalmente é escopo errado e perigoso.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1103: o novo link entre switches não sobe. Relato de campo: patch de cobre foi enfiado na porta que espera SFP óptico.",
+    "cli_output": "SW-A# show interfaces Gi1/1/1\nGigabitEthernet1/1/1 is down, line protocol is down (notconnect)\n  Hardware is Gigabit Ethernet, address is aabb.cc00.0101\n  MTU 1500 bytes, BW 1000000 Kbit/sec\n  Keepalive set (10 sec)\n  Full Duplex, 1000Mbps, link type is auto, media type is unknown\n\nSW-A# show interfaces Gi1/1/1 status\nPort      Name       Status       Vlan Duplex Speed Type\nGi1/1/1   UPLINK-B   notconnect   1    auto   auto  No XCVR / SFP absent\n\nSW-A# show interfaces transceiver\n(no operational transceiver in Gi1/1/1)\n\nTech note: copper RJ45 patch hanging from the cage adapter incorrectly used.\nSW-B peer port also notconnect.",
+    "alternativas": [
+      "Forçar duplex half resolve notconnect óptico",
+      "O problema é pool DHCP da VLAN 1",
+      "Configurar HSRP para levantar o line protocol",
+      "Link down por SFP/mídia ausente ou tipo errado — instalar SFP correto e patch de fibra (ou usar porta cobre adequada)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O sintoma aponta para falha de mídia física: notconnect com “No XCVR / SFP absent” e media type unknown. Cobre na gaiola óptica não estabelece 1000BaseSX — instale o SFP e a fibra certos, ou use uma porta RJ45 adequada. Forçar duplex half não cria transceiver; pool DHCP da VLAN 1 só entra depois que o link sobe; HSRP é redundância de gateway e não levanta line protocol de uma porta sem mídia.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1104: link de campus em fibra flapping. DOM do lado local mostra RX bem baixo — o patch foi reassentado sem limpeza.",
+    "cli_output": "SW-CORE# show interfaces Te1/1/1 transceiver detail\nITU Channel not available (Wavelength not available),\nTransceiver is internally calibrated.\n  Temperature = 32.10 C\n  Voltage      = 3.30 V\n  Tx Power     = -2.10 dBm\n  Rx Power     = -29.40 dBm   <<< low\n  Optical thresholds approximate:\n    Rx Power Warning low: -20 dBm  Alarm low: -24 dBm\n\nSW-CORE# show interfaces Te1/1/1 | include error|CRC|reliability\n  2200 input errors, 2100 CRC, 0 frame\n  reliability 210/255\n\nSW-CORE# show interfaces Te1/1/1 status\nPort      Name    Status    Vlan Duplex Speed Type\nTe1/1/1   CAMPUS  connected trunk a-full a-10G 10Gbase-SR\n\nField: patch recently reseated without cleaning; run is MM within short reach.",
+    "alternativas": [
+      "RX power abaixo do limiar com CRC — sujeira/patch/atenuação L1; limpar/trocar patch e revalidar DOM",
+      "Apagar o processo BGP do edge",
+      "Problema de access-class na VTY",
+      "Forçar speed 100 no TenGig resolve DOM"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "No CLI, Rx Power −29 dBm está abaixo do alarm low (−24 dBm), com CRC e reliability ruim: sinal óptico insuficiente. Limpeza e troca de patch são a primeira linha — sobretudo após reassentar sem limpar. Insight: DOM baixo + CRC quase sempre manda olhar conectores/fibra antes de protocolo. BGP no edge não altera potência óptica; access-class na VTY só afeta acesso de gerenciamento; forçar speed 100 num 10Gbase-SR não “conserta” DOM.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1105: câmera IP a cerca de 115 m de cabo Cat5e (horizontal + patch) não segura 1G; a porta cai para 100 e os erros sobem.",
+    "cli_output": "SW-ACC# show interfaces Gi1/0/44 status\nPort      Name        Status    Vlan Duplex Speed Type\nGi1/0/44  CAM-PORTAO  connected 55   a-full a-100  10/100/1000BaseTX\n\nSW-ACC# show interfaces Gi1/0/44 | include error|CRC|runts|reliability|duplex\n  Full-duplex, 100Mb/s\n  9800 input errors, 9400 CRC, 400 runts\n  reliability 220/255\n\nSW-ACC# show interfaces Gi1/0/44 | include Last input|30 second\n  Last clearing of \"show interface\" counters 00:40:12\n  30 second input rate 1.2 Mbps\n\nCabling survey:\n  Horizontal Cat5e measured ~115 m IDF to camera junction\n  Peer attempts at 1000 often flap to notconnect\n  No SFP involved (copper only)",
+    "alternativas": [
+      "Configurar OSPF multi-area na câmera",
+      "O problema é apenas banner motd",
+      "Distância/categoria no cobre além do ideal para 1G — erros e queda para 100; encurtar run, melhorar cabeamento ou usar mídia adequada",
+      "Desligar CEF no access switch"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para canal de cobre longo demais para 1G estável: ~115 m em Cat5e, falha a 1000 e status a-100 com CRC/runts. Encurtar o run, melhorar o cabeamento ou usar mídia adequada (fibra/midspan) resolve a degradação L1. OSPF multi-area na câmera não faz sentido; banner motd é cosmético; desligar CEF no access switch não corrige erros de frame no cabo.",
+    "part_id": "v2-1.1"
+  },
+  {
+    "id": 6,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1501: AP-SALA-3 está ligado (PoE delivering, porta connected), mas não aparece Joined no WLC. O SSID do campus não sobe nessa sala.",
+    "cli_output": "SW-ACC# show interfaces Gi1/0/24 status\nPort      Name         Status       Vlan  Duplex  Speed Type\nGi1/0/24  AP-SALA-3    connected    40    a-full  a-1000 10/100/1000BaseTX\n\nSW-ACC# show run interface Gi1/0/24\ninterface GigabitEthernet1/0/24\n description AP-SALA-3\n switchport mode access\n switchport access vlan 40\n spanning-tree portfast\n no shutdown\n\nSW-ACC# show vlan brief | include 20|40\n20   AP-MGMT                          active\n40   USERS                            active    Gi1/0/24, ...\n\nWLC# show ap summary\nAP Name     Slots  AP Model  Ethernet MAC   Location  Country  IP Address   State\nAP-SALA-1   2      AIR-AP    aaaa.bbbb.0001 FLOOR1    BR       10.20.0.11   Joined\n(no AP-SALA-3)\n\nDesign: AP management VLAN 20 / 10.20.0.0/24 · WLC mgmt 10.20.0.5",
+    "alternativas": [
+      "Corrigir switchport access vlan 20 (management do AP) e validar reachability CAPWAP ao WLC",
+      "Aumentar potência RF no rádio 5 GHz",
+      "Configurar ip nat inside na porta do AP",
+      "Remover PortFast para forçar join"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "PoE e L1 estão ok, mas a porta está em access vlan 40 (USERS) em vez da management 20, onde vivem o WLC e o discovery CAPWAP. Sem path de gerenciamento o AP não junta — corrija a VLAN e valide reachability até 10.20.0.5. Aumentar potência RF não ajuda se o AP nem entrou no controller; NAT na porta do AP não coloca o tráfego na VLAN certa; remover PortFast só atrasa o forwarding e não move a VLAN de management.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 7,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1502: AP-CORREDOR está Joined; o SSID CORP anuncia e os clientes associam, mas ninguém pega IP da VLAN 40. Desenho: management no AP e dados centralizados no WLC.",
+    "cli_output": "WLC# show ap summary\nAP Name        State    IP Address\nAP-CORREDOR    Joined   10.20.0.18\n\nWLC# show wlan summary\nWLAN ID  SSID   Status  Interface\n1        CORP   Enabled none / not mapped\n\nSW-ACC# show interfaces Gi1/0/12 status\nPort      Name          Status     Vlan  Duplex Speed\nGi1/0/12  AP-CORREDOR   connected  20    a-full a-1000\n\nSW-ACC# show run interface Gi1/0/12\ninterface GigabitEthernet1/0/12\n description AP-CORREDOR\n switchport mode access\n switchport access vlan 20\n spanning-tree portfast\n\nSW-ACC# show vlan brief | include 20|40\n20   AP-MGMT   active    Gi1/0/12\n40   USERS     active\n\nClient: associated CORP · DHCP timeout · expected 10.40.0.0/24",
+    "alternativas": [
+      "Trocar o cabo Cat5e por fibra monomodo no AP",
+      "Desligar CAPWAP no WLC para forçar local DHCP",
+      "Bind da WLAN CORP à interface/VLAN 40 e validar DHCP na VLAN de usuários",
+      "Mudar access vlan do AP para 1 (default) resolve DHCP de usuário"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "AP Joined e porta na management 20 estão corretos; o buraco é a WLAN CORP sem interface/VLAN mapeada. Sem bind à VLAN 40 não há path de dados nem DHCP de usuário — faça o bind e valide o lease em 10.40.0.0/24. Trocar cabo por fibra não cria o mapeamento no WLC; desligar CAPWAP quebra o modelo centralizado; colocar o AP na VLAN 1 só tira a management do lugar certo.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 8,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1503: design multi-VLAN no cabo do AP (trunk). Após mudança de switch, o AP falha no join; a management deveria ser VLAN 20 untagged (native).",
+    "cli_output": "SW-ACC# show run interface Gi1/0/30\ninterface GigabitEthernet1/0/30\n description AP-ALA-B\n switchport trunk encapsulation dot1q\n switchport mode trunk\n switchport trunk native vlan 1\n switchport trunk allowed vlan 20,40,50\n spanning-tree portfast trunk\n\nSW-ACC# show interfaces trunk\nPort        Mode         Encapsulation  Status        Native vlan\nGi1/0/30    on           802.1q         trunking      1\nPort        Vlans allowed on trunk\nGi1/0/30    20,40,50\n\nSW-ACC# show interfaces Gi1/0/30 status\nGi1/0/30  AP-ALA-B  connected  trunk  a-full  a-1000\n\nWLC# show ap summary\nAP-ALA-B   Not Joined   0.0.0.0\n\nAP expects untagged CAPWAP on VLAN 20 (native 20)",
+    "alternativas": [
+      "Remover VLAN 40 do allowed (piora usuários)",
+      "Habilitar ip routing na access do AP",
+      "Converter o WLC em FlexConnect global sem trunk",
+      "Alinhar switchport trunk native vlan 20 à management do AP e revalidar join"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O trunk já permite 20,40,50, mas a native está em 1 enquanto o AP espera CAPWAP untagged na 20 — o tráfego de management cai na VLAN errada. Alinhe native vlan 20 e revalide o join. Remover a 40 do allowed só piora usuários; ip routing na porta do AP não corrige tagging; mudar o WLC inteiro para FlexConnect sem trunk é redesign, não o fix do mismatch de native.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 9,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1504: AP-SALA-1 está Joined e o WLAN GUEST existe com SSID/PSK, mas não aparece nos clientes e não há associação. A interface dinâmica do guest não está ligada ao WLAN.",
+    "cli_output": "WLC# show ap summary\nAP-SALA-1   Joined   10.20.0.11\nAP-SALA-2   Joined   10.20.0.12\n\nWLC# show wlan summary\nWLAN ID  Profile   SSID    Status   Interface\n1        CORP      CORP    Enabled  vlan40\n2        GUEST     GUEST   Enabled  management  (wrong / no guest dyn interface)\n\nWLC# show interface summary\nInterface Name   VLAN Id   IP Address     Status\nmanagement       20        10.20.0.5      Up\nvlan40           40        10.40.0.1      Up\n(no vlan60 guest interface created/bound)\n\nDesign guest: VLAN 60 · DHCP 10.60.0.0/24 · dyn interface vlan60 missing on WLAN GUEST\n\nSW-DIST# show vlan brief | include 60\n60   GUEST   active",
+    "alternativas": [
+      "Desligar todos os APs e recriar SSIDs CORP",
+      "Associar WLAN GUEST à interface dinâmica VLAN 60 (criar/bind) e validar path/DHCP guest",
+      "Mudar native trunk de todos os APs para 60",
+      "Habilitar LAG no access switch do AP para o SSID aparecer"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "APs Joined e CORP com vlan40 ok; GUEST aponta para management em vez da VLAN 60. Crie a interface dinâmica guest, faça o bind no WLAN e valide path/DHCP em 10.60.0.0/24. Derrubar todos os APs e recriar CORP é blast radius à toa; forçar native 60 nos trunks bagunça a management; LAG no access do AP não faz o SSID “aparecer” sem interface correta.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 10,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1505: engenheiro habilitou LAG no WLC e montou Port-channel no switch de distribuição. Os uplinks não agregam direito e os APs flapeiam — a config foi salva no WLC, mas ainda sem reboot.",
+    "cli_output": "WLC# show lag summary\nLAG Enabled\n(note: change pending / requires reboot on this platform)\n\nDIST# show etherchannel summary\nFlags: D - down  P - bundled in port-channel\nGroup  Port-channel  Protocol    Ports\n1      Po1(SU)         LACP      Gi1/0/1(P)  Gi1/0/2(P)\n\nDIST# show run interface Po1\ninterface Port-channel1\n description WLC-LAG\n switchport mode trunk\n switchport trunk allowed vlan 20,40,50,60\n\nDIST# show interfaces status | include Gi1/0/1|Gi1/0/2|Po1\nGi1/0/1  WLC-1   connected  trunk  a-full a-1000\nGi1/0/2  WLC-2   connected  trunk  a-full a-1000\nPo1      WLC-LAG connected  trunk  a-full a-1000\n\nWLC management path unstable after LAG enable; last change: lag enable + write mem, no reload",
+    "alternativas": [
+      "Remover o Port-channel e usar só access vlan 1 no WLC",
+      "Desabilitar CAPWAP em todos os APs",
+      "Reboot do WLC para aplicar LAG (ideia de prova) e revalidar EtherChannel/trunk com o switch",
+      "Configurar spanning-tree portfast no Po1 do core como único fix"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "No switch o Po1 já está bundlado (LACP P); no WLC o LAG aparece Enabled com mudança pendente de reboot nessa plataforma. Insight típico de prova: write mem sem reload deixa o controller e o switch em estados incompatíveis. Recarregue o WLC e revalide EtherChannel/trunk. Remover o Po1 e cair em access vlan 1 piora o desenho; desabilitar CAPWAP derruba os APs sem aplicar LAG; PortFast no Po1 não substitui o reload do controller.",
+    "part_id": "v2-1.5"
+  },
+  {
+    "id": 11,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "HD-1601: estação Windows ficou 'sem rede' depois que o técnico colocou IP estático na mão. Corrija com base no output.",
+    "cli_output": "C:\\> ipconfig /all\nEthernet adapter Ethernet:\n   DHCP Enabled. . . . . . . . . . . : No\n   IPv4 Address. . . . . . . . . . . : 10.40.0.88\n   Subnet Mask . . . . . . . . . . . : 255.255.0.0\n   Default Gateway . . . . . . . . . : 10.41.0.1\n   DNS Servers . . . . . . . . . . . : 10.40.0.53\n\nC:\\> ping 10.41.0.1\nDestination host unreachable.\n\nC:\\> route print | findstr 0.0.0.0\n          0.0.0.0          0.0.0.0       10.41.0.1     10.40.0.88     25\n\nDesign: VLAN 40 = 10.40.0.0/24, SVI/gateway = 10.40.0.1",
+    "alternativas": [
+      "Corrigir no OS: mask 255.255.255.0 e gateway 10.40.0.1 (estático alinhado à VLAN)",
+      "Manter mask /16 e gateway 10.41 — está correto para /24",
+      "Rodar format C: e reinstalar o core",
+      "O problema é só registro MX da empresa"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O desenho é 10.40.0.0/24 com SVI 10.40.0.1, mas o PC está com mask /16 e gateway 10.41.0.1 — Destination host unreachable confirma GW fora do segmento. No OS, ajuste mask 255.255.255.0 e gateway 10.40.0.1. Manter /16 com 10.41 não é “correto para /24”; format C: e reinstalar core são destrutivos e fora de escopo; registro MX não explica unreachable no primeiro hop.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 12,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "HD-1602: notebook Windows não navega na VLAN com DHCP. O Wi-Fi está associado, mas o IP parece errado.",
+    "cli_output": "C:\\> ipconfig /all\nWireless LAN adapter Wi-Fi:\n   DHCP Enabled. . . . . . . . . . . : Yes\n   Autoconfiguration Enabled . . . . : Yes\n   IPv4 Address. . . . . . . . . . . : 169.254.44.19(Preferred)\n   Subnet Mask . . . . . . . . . . . : 255.255.0.0\n   Default Gateway . . . . . . . . . :\n   DNS Servers . . . . . . . . . . . :\n\nC:\\> ipconfig /renew\nAn error occurred while renewing interface Wi-Fi : unable to contact your DHCP server.\n\nC:\\> ping 10.40.0.1\nPinging 10.40.0.1 with 32 bytes of data:\nDestination host unreachable.\n\nMedia State: Wi-Fi Connected / SSID CORP-USER",
+    "alternativas": [
+      "Tratar 169.254 como IP de produção e criar rota estática para a Internet",
+      "Configurar gateway 169.254.0.1 manualmente",
+      "APIPA: sem lease DHCP — no cliente tentar renew/rede; escalar L2/DHCP (1.7), não inventar estático aleatório",
+      "O DNS 8.8.8.8 fixo resolve APIPA sozinho"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "169.254.x.x com falha no /renew é APIPA: o cliente não completou DORA. No ângulo de host, reconheça APIPA, tente renew/reconectar e escale L2/DHCP — não invente estático. Tratar 169.254 como produção e criar rota para a Internet não resolve lease; gateway 169.254.0.1 é inventado; DNS 8.8.8.8 fixo não atribui endereço IPv4.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 13,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "HD-1603: VM Linux fala com hosts da mesma subnet, mas não sai da LAN — parece residual de IP antigo sem rota default.",
+    "cli_output": "user@vm:~$ ip addr show eth0\n2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP>\n    inet 10.40.0.77/24 brd 10.40.0.255 scope global eth0\n    inet6 fe80::a00:27ff:fe12:3456/64 scope link\n\nuser@vm:~$ ip route show\n10.40.0.0/24 dev eth0 proto kernel scope link src 10.40.0.77\n(no default via ...)\n\nuser@vm:~$ ping -c 2 10.40.0.10\n64 bytes from 10.40.0.10: icmp_seq=1 ttl=64\n\nuser@vm:~$ ping -c 2 10.40.0.1\nconnect: Network is unreachable\n\nuser@vm:~$ ping -c 1 8.8.8.8\nconnect: Network is unreachable",
+    "alternativas": [
+      "Problema exclusivo de certificado TLS",
+      "Mask /24 está errada (não há evidência)",
+      "DNSSEC no browser",
+      "Ausência de default route — configurar gateway (ex. default via 10.40.0.1) ou DHCP options no cliente"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "No CLI, ip route só tem a rota on-link da /24 — sem default via. Por isso LAN local responde e qualquer destino fora (incluindo o próprio GW visto como off-link em alguns casos / Internet) cai em Network is unreachable. Configure default via 10.40.0.1 ou obtenha gateway via DHCP. TLS e DNSSEC não instalam rota default; não há evidência de mask errada com /24 coerente e ping local ok.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 14,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "HD-1604: no Mac/Linux do dev, git clone por IP do servidor funciona; por hostname falha. A rede 'parece ok', mas o DNS não resolve.",
+    "cli_output": "dev@mac:~$ ping -c 2 10.20.5.40\n64 bytes from 10.20.5.40: icmp_seq=0 ttl=62 time=2 ms\n\ndev@mac:~$ ping -c 1 git.empresa.local\nping: cannot resolve git.empresa.local: Unknown host\n\ndev@mac:~$ dig git.empresa.local\n;; connection timed out; no servers could be reached\n\ndev@mac:~$ scutil --dns | head -20\nresolver #1\n  nameserver[0] : 192.0.2.53\n  nameserver[1] : 192.0.2.53\n\ndev@mac:~$ ping -c 1 192.0.2.53\nRequest timeout for icmp_seq 0\n\nip addr/IP config: 10.40.0.66/24  gw 10.40.0.1 (ping gw OK)",
+    "alternativas": [
+      "Trocar a mask para 255.0.0.0",
+      "Problema de duplex no core (sem evidência L1)",
+      "DNS no OS aponta para 192.0.2.53 inacessível — corrigir DNS do cliente; IP path ok",
+      "APIPA IPv4 em andamento"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Ping por IP e ao gateway ok; dig timeout no nameserver 192.0.2.53 configurado no OS, que também não responde ping. O path IP está bom — corrija o DNS do cliente para um resolver corporativo alcançável. Mask /8 não é o problema; não há evidência de duplex no core; o host tem 10.40.0.66/24, então não é APIPA.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 15,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "HD-1605: o usuário jura que 'o PC está errado'. Use o tracert para ver se a falha é local ou mais adiante no path.",
+    "cli_output": "C:\\> ipconfig\n   IPv4 Address. . . . . . . . . . . : 10.40.0.91\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.40.0.1\n\nC:\\> ping 10.40.0.1\nReply from 10.40.0.1: bytes=32 time=1ms TTL=64\n\nC:\\> ping 203.0.113.50\nRequest timed out.\n\nC:\\> tracert -d 203.0.113.50\nTracing route to 203.0.113.50 over a maximum of 30 hops\n  1    <1 ms    <1 ms    <1 ms  10.40.0.1\n  2    <1 ms    <1 ms    <1 ms  10.0.0.2\n  3     *        *        *     Request timed out.\n  4     *        *        *     Request timed out.\n\nC:\\> nslookup intranet.empresa.local\nName:    intranet.empresa.local\nAddress:  10.20.5.10",
+    "alternativas": [
+      "Reconfigurar IP/mask/gateway do PC imediatamente (locais ok)",
+      "Cliente e primeiro hops OK — falha além do path local; não culpar settings do OS sem evidência",
+      "Forçar APIPA no Windows",
+      "Apagar o DNS que resolve intranet"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "ipconfig coerente, ping ao GW ok, tracert passa hops 1 e 2 e morre depois, e o DNS interno resolve. O cliente está verificado — a falha está além do path local. Insight: não reconfigure o OS sem evidência de erro local. Forçar APIPA piora a conectividade; apagar o DNS que resolve intranet remove uma prova de que o host está saudável.",
+    "part_id": "v2-1.6"
+  },
+  {
+    "id": 16,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1701: notebooks na VLAN 40 ficam em 'Obtendo IP' e caem em 169.254.x.x. Porta access e SVI estão up — o server DHCP fica em outra subnet.",
+    "cli_output": "PC> ipconfig\n   IPv4 Address. . . . . . . . . . . : 169.254.67.12\n   Subnet Mask . . . . . . . . . . . : 255.255.0.0\n   Default Gateway . . . . . . . . . :\n\nSW-ACC# show interfaces Gi1/0/22 status\nPort      Name     Status    Vlan Duplex Speed\nGi1/0/22  USER     connected 40   a-full a-1000\n\nCORE# show ip interface brief | include Vlan40\nVlan40                 10.40.0.1       YES NVRAM  up    up\n\nCORE# show run interface Vlan40 | include helper|ip address\n ip address 10.40.0.1 255.255.255.0\n (no helper-address)\n\nDHCP-SERVER: 10.10.10.53 in VLAN 10 (reachable from CORE)\nCORE# show ip route 10.10.10.53\nS*  0.0.0.0/0 ... / or connected path OK to server subnet",
+    "alternativas": [
+      "CRC na fibra do ISP causa APIPA local",
+      "Falta de ip helper-address no SVI Vlan40 — Discover não chega ao server em outra subnet",
+      "Pool DNS AAAA ausente",
+      "Desligar o SVI 40 resolve o lease"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "APIPA com L2 e SVI up, server remoto alcançável do CORE e zero helper no SVI 40: o Discover em broadcast não cruza L3. Configure ip helper-address 10.10.10.53 em Vlan40. CRC no ISP não explica APIPA na LAN de acesso; pool DNS AAAA não entrega lease IPv4; desligar o SVI 40 só tira o gateway do segmento.",
+    "part_id": "v2-1.7"
+  },
+  {
+    "id": 17,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-1702: existe ip helper-address, mas alguém colocou no uplink WAN em vez do SVI dos usuários. A VLAN 30 continua em APIPA.",
+    "cli_output": "CORE# show run | include helper-address\n ip helper-address 10.10.10.53\n\nCORE# show run interface GigabitEthernet0/0/1\n description UPLINK-WAN\n ip address 203.0.113.2 255.255.255.252\n ip helper-address 10.10.10.53\n\nCORE# show run interface Vlan30\n ip address 10.30.0.1 255.255.255.0\n (no helper-address)\n\nPC-VLAN30> ipconfig\n   IPv4 Address. . . . . . . . . . . : 169.254.11.9\n\nCORE# show ip interface brief | include Vlan30\nVlan30   10.30.0.1   YES NVRAM  up   up\n\nServer 10.10.10.53 counters: no Discover seen from 10.30.0.0/24",
+    "alternativas": [
+      "Helper no uplink WAN atende automaticamente Vlan30",
+      "APIPA indica sucesso de DORA",
+      "Mover/configurar ip helper-address no SVI Vlan30 (segmento do cliente), não só no WAN",
+      "Forçar duplex half nas portas de usuário"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O helper precisa estar na interface/SVI onde o Discover chega — no caso, Vlan30. No uplink WAN ele não “ouve” o broadcast dos PCs da 30; a evidência é zero Discover no server e APIPA nos hosts. Mova/configure o helper no SVI certo. Helper só no WAN não atende a VLAN de usuários; APIPA é falha de lease, não sucesso de DORA; forçar duplex half nas portas de usuário não cria relay DHCP.",
+    "part_id": "v2-1.7"
+  }
+]

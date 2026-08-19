@@ -1,0 +1,257 @@
+[
+  {
+    "id": 31,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1701: O failover DNS do primary para o secondary não dispara. A aplicação no primary está fora (503 na home), mas o Route 53 continua servindo o ALB principal.",
+    "cli_output": "$ aws route53 get-health-check --health-check-id abcdef\nHealthCheckConfig:\n  FullyQualifiedDomainName: primary.exemplo.com\n  Port: 443\n  Type: HTTPS\n  ResourcePath: /health\n  RequestInterval: 30\n  FailureThreshold: 3\n\n$ aws route53 get-health-check-status --health-check-id abcdef\nStatus: Success: HTTP Status Code: 200   # still Success!\n\n# primary.exemplo.com ALIAS → ALB that is actually returning 503 to users on /\n# /health on primary still returns 200 from a static OK page\n\n$ aws route53 list-resource-record-sets --hosted-zone-id Z123\nprimary.exemplo.com  Failover PRIMARY  ALIAS dualstack.app-alb-...  HealthCheckId: abcdef  EvaluateTargetHealth: false\nsecondary.exemplo.com Failover SECONDARY ALIAS dualstack.static-alb-...  (no health check)\n\n# dig primary.exemplo.com → still ALB primary",
+    "alternativas": [
+      "Ajustar health check para path que reflita falha real (ou Evaluate Target Health no alias ALB) — /health 200 esconde o 503 da app",
+      "Apagar o secondary record",
+      "Trocar TTL para 86400",
+      "Abrir 0.0.0.0/0 no SG do secondary apenas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para health check desconectado da falha real: o check HTTPS em /health ainda devolve 200 (página estática OK), então o status fica Success e o failover PRIMARY→SECONDARY nunca arma — mesmo com 503 para usuários em /. No CLI, get-health-check-status Success + EvaluateTargetHealth false no alias fecham o diagnóstico. Ajuste o ResourcePath para um endpoint que falhe quando a app está ruim, ou habilite Evaluate Target Health no alias do ALB. Apagar o secondary remove o destino de contingência e não faz o primary marcar unhealthy. TTL 86400 só atrasa a propagação depois do failover; não cria a condição de unhealthy. Abrir 0.0.0.0/0 no SG do secondary não mexe no health do primary nem no registro Failover. Insight: em failover R53, o path do health check precisa refletir a saúde do serviço que o usuário vê.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 32,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1702: CloudFront d111.cloudfront.net devolve 403 em index.html. A origin é o bucket S3 privado corp-web; o objeto existe e abre com credenciais de admin.",
+    "cli_output": "$ aws cloudfront get-distribution --id E123\nOrigins:\n  DomainName: corp-web.s3.us-east-1.amazonaws.com\n  S3OriginConfig: null\n  OriginAccessControlId: (empty)\n  OriginAccessIdentity: (empty)\n\n$ aws s3api get-bucket-policy --bucket corp-web\n{\n  \"Statement\": [{\n    \"Effect\": \"Deny\",\n    \"Principal\": \"*\",\n    \"Action\": \"s3:*\",\n    \"Resource\": [\"arn:aws:s3:::corp-web\",\"arn:aws:s3:::corp-web/*\"],\n    \"Condition\": {\"Bool\": {\"aws:SecureTransport\": \"false\"}}\n  }]\n}\n# No Allow for CloudFront service principal / OAC\n\n$ aws s3api get-public-access-block --bucket corp-web\nBlockPublicAcls=true RestrictPublicBuckets=true\n\ncurl -I https://d111.cloudfront.net/index.html\nHTTP/2 403\n\n# Object exists:\naws s3api head-object --bucket corp-web --key index.html → 200 with admin creds",
+    "alternativas": [
+      "Configurar OAC (ou OAI) na origin e Allow GetObject na bucket policy para o CloudFront — hoje não há origin access nem allow",
+      "Só criar invalidation /* sem policy",
+      "Mudar o record MX do domínio",
+      "Habilitar Multi-AZ no Route 53 hosted zone"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para origin S3 sem acesso pela distribuição: OriginAccessControlId e OAI vazios, e a bucket policy só tem Deny de HTTP inseguro — não há Allow GetObject para o serviço CloudFront. No CLI, curl na edge retorna 403 enquanto head-object com admin dá 200: o objeto existe, falta identidade de origin + policy. Configure OAC (ou OAI) na origin e Allow GetObject na bucket policy para o CloudFront. Invalidation /* não concede IAM nem cria OAC. Record MX é e-mail e não afeta GET de objeto estático. Multi-AZ em hosted zone Route 53 não existe como ‘feature’ que libera S3 privado para a edge. Insight: CloudFront 403 em S3 privado quase sempre é OAC/OAI + bucket policy.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 33,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1703: Depois da migração para o ALB, o apex exemplo.com não resolve direito; www.exemplo.com responde normal. NS no registrador já apontam para o Route 53.",
+    "cli_output": "$ aws route53 list-resource-record-sets --hosted-zone-id Z999\nexemplo.com.     CNAME  app-alb-123.us-east-1.elb.amazonaws.com.   # INVALID pattern for apex\nwww.exemplo.com. A ALIAS dualstack.app-alb-123.us-east-1.elb.amazonaws.com.\n\n$ dig exemplo.com CNAME +short\napp-alb-123.us-east-1.elb.amazonaws.com.\n# many resolvers / DNS standards: CNAME at apex coexists badly / not allowed with other data\n\n$ dig www.exemplo.com +short\n# returns ALB IPs via alias\n\n# Registrador NS → Route 53 OK\n# App healthy behind ALB",
+    "alternativas": [
+      "Manter CNAME no apex e adicionar TXT only",
+      "Trocar o apex para A/AAAA ALIAS para o ALB (como o www) — CNAME no apex é o erro",
+      "Criar health check na porta 22 do ALB",
+      "Mover o certificado ACM para eu-west-1 apenas"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "No CLI, exemplo.com está como CNAME para o DNS do ALB, enquanto www já usa A ALIAS dualstack — padrão inválido/problemático no apex (CNAME não convive bem com outros dados no zone apex). Troque o apex para A/AAAA ALIAS apontando ao ALB, no mesmo modelo do www. Manter CNAME no apex e só acrescentar TXT não corrige a restrição de apex nem estabiliza a resolução. Health check na porta 22 do ALB é irrelevante: o ALB não é SSH e a app já está healthy. Mover o certificado ACM só para eu-west-1 não faz o apex resolver; o problema é o tipo de registro DNS, não TLS. Insight: apex → ALB no Route 53 = ALIAS A/AAAA; reserve CNAME para subdomínios não-apex.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 34,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1704: Deploy de logo.png no S3 há cerca de 40 minutos, mas o CloudFront ainda entrega a logo antiga. Equipe de front confirma ETag velha na edge.",
+    "cli_output": "$ aws cloudfront get-distribution-config --id E456\nDefaultCacheBehavior:\n  MinTTL: 0\n  DefaultTTL: 86400\n  MaxTTL: 31536000\n  ViewerProtocolPolicy: redirect-to-https\nOrigins: S3 corp-cdn with OAC ok\n\n$ aws s3api head-object --bucket corp-cdn --key assets/logo.png\nLastModified: 40 minutes ago  ETag: \"newetag\"\n\n$ curl -sI https://d456.cloudfront.net/assets/logo.png | egrep -i 'x-cache|age|etag'\nx-cache: Hit from cloudfront\nage: 28000\netag: \"oldetag\"\n\n$ aws cloudfront list-invalidations --distribution-id E456\nItems: []   # none recent",
+    "alternativas": [
+      "Create-invalidation para /assets/logo.png (ou /*) — Hit/age alto e ETag velha com DefaultTTL 86400",
+      "Desligar OAC",
+      "Remover o record ALIAS",
+      "Abrir 3306 no SG do RDS de origem"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para objeto stale na edge: no CLI, x-cache Hit from cloudfront, age ~28000 e ETag oldetag, enquanto o S3 já tem LastModified recente e ETag nova — DefaultTTL 86400 e list-invalidations vazio explicam o atraso. Rode create-invalidation em /assets/logo.png (ou /*) ou use filename versionado. Desligar OAC não limpa cache e ainda pode quebrar a origin. Remover o record ALIAS só afeta DNS, não o conteúdo já cacheado em d456.cloudfront.net. Abrir 3306 no SG do RDS não tem relação com asset estático em CloudFront/S3. Insight: Hit + age alto com arquivo novo no S3 = invalidation (ou cache-busting no nome do arquivo).",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 35,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1705: Health check do Route 53 no endpoint público do ALB fica unhealthy (timeout). Pela VPN corporativa (10.x) o /ready responde 200; pela Internet pública falha.",
+    "cli_output": "$ aws route53 get-health-check --health-check-id hc-9\nType: HTTPS  Port: 443  ResourcePath: /ready  FQDN: app.exemplo.com\n\n$ aws route53 get-health-check-status --health-check-id hc-9\nFailure: Timeout / Connection failed (from checker)\n\n$ aws elbv2 describe-load-balancers --names app-alb\nScheme: internet-facing\nState: active\nSecurityGroups: [sg-alb]\n\n$ aws ec2 describe-security-groups --group-ids sg-alb\nInbound:\n  TCP 443  Source 10.0.0.0/8\n  (no 0.0.0.0/0 or AWS health checker ranges)\nOutbound: all\n\n$ curl -sk https://app.exemplo.com/ready   # from corporate VPN 10.x → 200 OK\n# from public Internet / online checker → timeout",
+    "alternativas": [
+      "Permitir HTTPS 443 no sg-alb a partir da Internet (ou ranges necessários aos health checkers R53) — check é externo, 10.0.0.0/8 não basta",
+      "Trocar o health path para / no S3 website only",
+      "Desligar o ALB multi-AZ",
+      "Converter hosted zone em privada para o check passar"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para filtragem no SG do ALB: o checker do Route 53 é externo, mas o inbound do sg-alb só aceita TCP 443 de 10.0.0.0/8 — daí Failure: Timeout no get-health-check-status, enquanto curl via VPN passa. Libere HTTPS 443 a partir da Internet (ou dos ranges necessários aos health checkers). Trocar o path para / em website S3 não abre o SG do ALB nem muda a origem do check. Desligar multi-AZ do ALB piora resiliência e não resolve timeout de SG. Converter a hosted zone em privada faz o check público continuar sem caminho — o problema não é o tipo de zona. Insight: health check R53 em endpoint internet-facing precisa de caminho de rede público até o ALB, não só RFC1918 no SG.",
+    "part_id": "aws-1.7",
+    "source": "aws"
+  },
+  {
+    "id": 36,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1801: Workers demoram ~4 minutos por mensagem na fila pay-jobs; as msgs reaparecem no meio do processamento e geram cobranças duplicadas.",
+    "cli_output": "$ aws sqs get-queue-attributes --queue-url https://sqs.us-east-1.amazonaws.com/111122223333/pay-jobs --attribute-names All\nVisibilityTimeout: 30\nReceiveMessageWaitTimeSeconds: 20\nApproximateNumberOfMessagesVisible: 120\nApproximateNumberOfMessagesNotVisible: 40\nRedrivePolicy: {\"deadLetterTargetArn\":\"arn:aws:sqs:...:pay-dlq\",\"maxReceiveCount\":\"10\"}\n\n# Worker log (i-0w1):\nreceived msg-9 at 10:00:00\nprocessing... (still running at 10:00:45)\nreceived msg-9 AGAIN on i-0w2 at 10:00:35  # duplicate\n# DeleteMessage only called after success ~10:04:00\n\n$ aws sqs receive-message --queue-url ... --max-number-of-messages 1\n# shows same body after 30s if not deleted",
+    "alternativas": [
+      "Aumentar VisibilityTimeout (ex. 300–360s) ou estender com ChangeMessageVisibility durante o job — 30s < 4 min de processamento",
+      "Trocar a fila para FIFO sem ajustar timeout",
+      "Desligar long polling",
+      "Remover a DLQ"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para VisibilityTimeout curto demais: a fila está em 30s e o job só chama DeleteMessage ~4 min depois — no log, a mesma msg-9 volta em outro worker aos 35s. Aumente VisibilityTimeout (ex. 300–360s) ou use ChangeMessageVisibility durante o processamento. Trocar para FIFO sem ajustar o timeout só muda ordenação/dedupe; a reentrega por visibility continua. Desligar long polling afeta latência de receive, não a janela em que a msg fica invisível. Remover a DLQ não evita a duplicata no caminho feliz — só tira a rede de segurança após maxReceiveCount. Insight: se a msg reaparece no meio do job, visibility < tempo real de processamento.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 37,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1802: A DLQ pay-dlq não para de crescer (~1800 msgs) enquanto a fila principal parece ‘saudável’. Workers logam erro de parse no JSON e não fazem DeleteMessage.",
+    "cli_output": "$ aws sqs get-queue-attributes --queue-url .../pay-jobs --attribute-names RedrivePolicy,ApproximateNumberOfMessagesVisible\nRedrivePolicy: {\"deadLetterTargetArn\":\"arn:aws:sqs:us-east-1:111122223333:pay-dlq\",\"maxReceiveCount\":\"3\"}\nApproximateNumberOfMessagesVisible: 5\n\n$ aws sqs get-queue-attributes --queue-url .../pay-dlq --attribute-names ApproximateNumberOfMessagesVisible\nApproximateNumberOfMessagesVisible: 1842\n\n# Sample message in DLQ (body):\n{\"orderId\": null, \"amount\": \"NaN\"}   # poison payload\n\n# CloudWatch: NumberOfMessagesReceived high on pay-jobs; deletes low for bad payloads\n# Worker log: JSON parse error; no DeleteMessage; receive count increments to 3 → DLQ",
+    "alternativas": [
+      "Ignorar a DLQ e aumentar maxReceiveCount para 1000 sem corrigir o producer",
+      "Corrigir o formato da mensagem no producer e/ou handler; inspecionar poison na DLQ — maxReceiveCount=3 está movendo falhas repetidas",
+      "Abrir 0.0.0.0/0 no SG da fila",
+      "Desabilitar SSE-SQS"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "No CLI, maxReceiveCount=3 com payload venenoso (orderId null, amount NaN) e parse error sem delete explica o redrive: a msg falha três vezes e vai para a DLQ. Corrija o formato no producer e/ou o handler; inspecione as poison messages antes de redrive em massa. Ignorar a DLQ e subir maxReceiveCount para 1000 só adia o descarte e aumenta custo/ruído — não sanita o payload. Abrir 0.0.0.0/0 no ‘SG da fila’ não se aplica a SQS gerenciado e não corrige JSON inválido. Desabilitar SSE-SQS enfraquece criptografia e não para o fluxo para a DLQ. Insight: DLQ enchendo = leia a mensagem venenosa; trate a causa no producer/handler antes do redrive.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 38,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1803: A role api-producer não consegue enviar mensagens para a fila orders — AccessDenied em sqs:SendMessage. GetQueueAttributes na role existe; SendMessage não.",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:sts::111122223333:assumed-role/api-producer/session\n\n$ aws sqs send-message --queue-url https://sqs.us-east-1.amazonaws.com/111122223333/orders --message-body '{\"ok\":1}'\nAn error occurred (AccessDenied) when calling the SendMessage operation:\nUser: arn:aws:sts::111122223333:assumed-role/api-producer/session is not authorized to perform: sqs:SendMessage\non resource: arn:aws:sqs:us-east-1:111122223333:orders\n\n$ aws iam list-attached-role-policies --role-name api-producer\nAttached: arn:aws:iam::111122223333:policy/ApiReadOnly\n# ApiReadOnly: s3:GetObject, sqs:GetQueueAttributes  (no SendMessage)\n\n$ aws sqs get-queue-attributes --queue-url .../orders --attribute-names Policy\nPolicy: (none / default)\n\nVisibilityTimeout: 60  # irrelevant to AccessDenied",
+    "alternativas": [
+      "Anexar/allow sqs:SendMessage no ARN da fila orders à role api-producer",
+      "Só aumentar VisibilityTimeout para 3600",
+      "Converter a fila em tópico SNS",
+      "Criar health check Route 53 na fila"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para IAM incompleto: a role só tem ApiReadOnly (s3:GetObject, sqs:GetQueueAttributes) e a fila não tem policy própria — o erro AccessDenied em SendMessage casa com a evidência. Anexe Allow sqs:SendMessage no ARN da fila orders à role api-producer. Só aumentar VisibilityTimeout não concede permissão de API. Converter a fila em tópico SNS muda o modelo de pub/sub e não autoriza a role atual a SendMessage nessa fila. Criar health check Route 53 na fila é ortogonal a IAM de SQS. Insight: AccessDenied em SendMessage → policy da role (e/ou queue policy), nunca ‘ajuste de timeout’.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 39,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1804: Publish no SNS topic order-events retorna 200/MessageId, mas a fila fulfillment-q continua vazia. A subscription SQS está Confirmada.",
+    "cli_output": "$ aws sns list-subscriptions-by-topic --topic-arn arn:aws:sns:us-east-1:111122223333:order-events\nSubscriptionArn: arn:aws:sns:...:order-events:uuid\nProtocol: sqs\nEndpoint: arn:aws:sqs:us-east-1:111122223333:fulfillment-q\n# Status: Confirmed\n\n$ aws sns publish --topic-arn arn:aws:sns:us-east-1:111122223333:order-events --message '{\"order\":1}'\nMessageId: 9b3c...\n\n$ aws sqs get-queue-attributes --queue-url .../fulfillment-q --attribute-names All\nApproximateNumberOfMessagesVisible: 0\nPolicy: {\n  \"Statement\": [{\n    \"Effect\": \"Allow\",\n    \"Principal\": {\"AWS\": \"arn:aws:iam::111122223333:root\"},\n    \"Action\": \"sqs:SendMessage\",\n    \"Resource\": \"arn:aws:sqs:us-east-1:111122223333:fulfillment-q\"\n  }]\n}\n# Missing: Principal Service sns.amazonaws.com + Condition aws:SourceArn = topic\n\n$ aws sqs receive-message --queue-url .../fulfillment-q --wait-time-seconds 5\n(no messages)",
+    "alternativas": [
+      "Atualizar a queue policy para permitir sns.amazonaws.com SendMessage com SourceArn do topic order-events",
+      "Remover a subscription confirmada",
+      "Trocar o topic para FIFO SNS sem policy (fora do foco e não corrige principal)",
+      "Aumentar o retention da fila para 14 dias apenas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para queue policy que não autoriza o serviço SNS: a policy atual só Allow Principal AWS root da conta, sem Principal Service sns.amazonaws.com nem Condition aws:SourceArn do topic — por isso ApproximateNumberOfMessagesVisible fica 0 após publish. Atualize a policy para permitir sns.amazonaws.com:SendMessage com SourceArn de order-events. Remover a subscription confirmada corta o caminho de entrega em vez de consertá-lo. Trocar para FIFO SNS sem corrigir a policy não resolve o principal faltante. Só aumentar retention para 14 dias guarda msgs que nunca chegaram. Insight: subscription Confirmada + fila vazia após publish SNS → quase sempre falta Allow ao sns.amazonaws.com na queue policy.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 40,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1805: Após migrar telemetria de alto volume para fila FIFO, aparece throttling e backlog enorme. Ordem global das métricas não era requisito de negócio.",
+    "cli_output": "$ aws sqs get-queue-attributes --queue-url .../telemetry-fifo.fifo --attribute-names All\nFifoQueue: true\nContentBasedDeduplication: true\nApproximateNumberOfMessagesVisible: 900000\nVisibilityTimeout: 30\n\n# Producer errors:\nTotal Throughput Limit Exceeded / rate issues on SendMessage batch\n# All messages use MessageGroupId = \"global\"\n\n$ aws cloudwatch get-metric-statistics ... NumberOfMessagesSent\n# plateau below expected 100k+/min design target\n\n# Business: metrics order not required; idempotent aggregators exist",
+    "alternativas": [
+      "Manter um único MessageGroupId global e subir só o visibility",
+      "Desligar a Internet da VPC",
+      "Migrar telemetria para SQS standard (ou múltiplos group ids se FIFO for obrigatório) — hot group FIFO limita paralelismo/throughput",
+      "Abrir a fila com Principal * SendMessage"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "No CLI, FifoQueue true com MessageGroupId único \"global\" e ~900k msgs visíveis casa com hot partition: FIFO serializa por group id e o throughput fica aquém do alvo 100k+/min. Como ordem global não é necessária e há agregadores idempotentes, migre para SQS standard (ou, se FIFO for obrigatório, disperse em vários MessageGroupId). Manter um group global e só subir visibility não aumenta paralelismo de envio. ‘Desligar a Internet da VPC’ quebra conectividade e não remove o limite de FIFO. Abrir Principal * SendMessage é risco de segurança e não eleva o teto de throughput do hot group. Insight: telemetria high-volume sem ordem → standard; um MessageGroupId global em FIFO = gargalo.",
+    "part_id": "aws-1.8",
+    "source": "aws"
+  },
+  {
+    "id": 41,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1901: A role app-api falha ao ler objetos S3 com SSE-KMS — AccessDenied em kms:Decrypt. A policy AppS3Read só tem s3:GetObject.",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:sts::111122223333:assumed-role/app-api/session\n\n$ aws s3api get-object --bucket corp-data --key reports/a.bin outfile\nAn error occurred (AccessDenied) when calling the GetObject operation:\n... not authorized to perform: kms:Decrypt on resource: arn:aws:kms:us-east-1:111122223333:key/abcd-...\n\n$ aws iam list-attached-role-policies --role-name app-api\nAttached: arn:aws:iam::111122223333:policy/AppS3Read\n# AppS3Read: s3:GetObject on arn:aws:s3:::corp-data/*   (no kms:*)\n\n$ aws kms get-key-policy --key-id abcd-... --policy-name default --output text\n# Statement allows root + key-admins only; no app-api role\n\n$ aws kms describe-key --key-id abcd-...\nKeyState: Enabled\nKeyManager: CUSTOMER",
+    "alternativas": [
+      "Adicionar kms:Decrypt (e necessários) à role app-api e Allow correspondente na key policy da CMK",
+      "Só aumentar o visibility timeout da fila",
+      "Só criar invalidation CloudFront",
+      "Desabilitar a CMK"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para permissão KMS ausente no caminho GetObject cifrado: IAM sem kms:* e key policy da CMK só com root/admins — a role app-api não aparece. Adicione kms:Decrypt (e ações necessárias) na role e Allow correspondente na key policy da CMK. Visibility timeout de fila SQS não autoriza KMS. Invalidation CloudFront não altera Decrypt de objeto no bucket corp-data. Desabilitar a CMK piora: novos Decrypts falham de propósito. Insight: AccessDenied kms:Decrypt em GetObject SSE-KMS → IAM kms + key policy; s3:GetObject sozinho não basta.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 42,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1902: RDS app-db cifrado com CMK; a cópia do snapshot para a conta de backup falha com erro de KMS (KMSKeyNotAccessibleFault / not authorized na chave de origem).",
+    "cli_output": "$ aws rds describe-db-instances --db-instance-identifier app-db\nStorageEncrypted: true\nKmsKeyId: arn:aws:kms:us-east-1:111122223333:key/cmk-rds\n\n$ aws rds copy-db-snapshot --source-db-snapshot-identifier snap-1 \\\n  --target-db-snapshot-identifier snap-1-bck --kms-key-id arn:aws:kms:us-east-1:222233334444:key/bck\nAn error occurred (KMSKeyNotAccessibleFault) / not authorized for kms on source key\n\n$ aws kms get-key-policy --key-id cmk-rds --policy-name default\n# No statement allowing account 222233334444 or its roles to use/create grant on cmk-rds\n\n$ aws kms describe-key --key-id cmk-rds\nKeyState: Enabled",
+    "alternativas": [
+      "Atualizar key policy/grants da CMK de origem para permitir o uso/cópia pela conta de backup (e CMK de destino)",
+      "Abrir 3306 0.0.0.0/0 no SG do RDS",
+      "Trocar o endpoint para público",
+      "Remover Multi-AZ"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para CMK de origem sem permissão cross-account: a key policy de cmk-rds não permite a conta 222233334444 (nem roles dela) usar/criar grant na chave — copy-db-snapshot com KMS de destino na conta de backup quebra aí. Atualize key policy/grants da CMK de origem para a conta de backup e use a CMK de destino corretamente. Abrir 3306 0.0.0.0/0 no SG do RDS não autoriza operação de snapshot/KMS. Endpoint público também não concede kms na CMK. Remover Multi-AZ muda HA da instance, não o share/cópia cifrada cross-account. Insight: snapshot encrypted cross-account exige key policy/grant na CMK de origem, não só share do snapshot.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 43,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1903: A Lambda billing-fn recebe AccessDenied em GetSecretValue no secret prod/stripe/key. A role só tem logs:* e s3:GetObject na inline policy.",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:sts::111122223333:assumed-role/billing-fn-role/session\n\n$ aws secretsmanager get-secret-value --secret-id prod/stripe/key\nAn error occurred (AccessDeniedException) when calling the GetSecretValue operation:\nUser: ...billing-fn-role... is not authorized to perform: secretsmanager:GetSecretValue\non resource: arn:aws:secretsmanager:us-east-1:111122223333:secret:prod/stripe/key-AbCd\n\n$ aws iam get-role-policy --role-name billing-fn-role --policy-name inline\n# Allows logs:* and s3:GetObject only\n\n$ aws secretsmanager get-resource-policy --secret-id prod/stripe/key\n{\n  \"ResourcePolicy\": \"{\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::111122223333:role/payments-admin\"},\"Action\":\"secretsmanager:GetSecretValue\",\"Resource\":\"*\"}]}\"\n}\n# billing-fn-role not listed\n\n$ aws kms describe-key --key-id alias/aws/secretsmanager\nKeyState: Enabled",
+    "alternativas": [
+      "Allow secretsmanager:GetSecretValue no secret ARN à role da Lambda e alinhar resource policy do secret se houver restrição",
+      "Só aumentar memória da Lambda para 10 GB",
+      "Só criar fila FIFO",
+      "Desligar o CloudTrail"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para autorização incompleta no Secrets Manager: a role billing-fn-role não tem secretsmanager:GetSecretValue, e a resource policy do secret só Allow a payments-admin. Conceda GetSecretValue no ARN do secret à role da Lambda e alinhe a resource policy se houver restrição. Só aumentar memória para 10 GB não muda IAM. Criar fila FIFO é outro serviço e não libera o secret. Desligar CloudTrail reduz auditoria e não concede GetSecretValue. Insight: GetSecretValue AccessDenied → IAM da role + resource policy do secret (e KMS se o secret for CMK-customer).",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 44,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1904: Auditoria flagrou o secret prod/db/master sem rotação (RotationEnabled false). A política interna exige credenciais de banco com rotação ≤90 dias; a app já lê via GetSecretValue.",
+    "cli_output": "$ aws secretsmanager describe-secret --secret-id prod/db/master\nName: prod/db/master\nRotationEnabled: false\nLastChangedDate: 2024-01-10\nLastAccessedDate: 2026-08-01\nKmsKeyId: arn:aws:kms:us-east-1:111122223333:key/cmk-sec\nVersionIdsToStages: AWSCURRENT\n\n$ aws secretsmanager list-secrets --filters Key=name,Values=prod/db/master\n# confirms no RotationLambdaARN\n\n# Compliance control: database credentials must rotate at least every 90 days\n# App already uses GetSecretValue (not hardcoded) — good baseline",
+    "alternativas": [
+      "Habilitar rotation no Secrets Manager (Lambda/integração) e garantir que a app sempre lê AWSCURRENT",
+      "Commitar a senha no repositório para 'facilitar'",
+      "Desabilitar a CMK do secret",
+      "Tornar o secret public via resource policy Principal *"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "No CLI, RotationEnabled false, sem RotationLambdaARN e LastChangedDate antigo violam o controle de 90 dias. Habilite rotation no Secrets Manager (Lambda/integração suportada) e garanta que a app sempre leia AWSCURRENT. Commitar a senha no repositório piora o risco e não cumpre rotação gerenciada. Desabilitar a CMK do secret quebra Decrypt/GetSecretValue. Tornar o secret público com Principal * é falha grave de segurança, não compliance. Insight: compliance de rotação de senha de DB na AWS → RotationEnabled (e app sem senha hardcoded).",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  },
+  {
+    "id": 45,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1905: Depois de uma ‘limpeza de custos’, objetos S3 SSE-KMS e secrets param de abrir. A CMK aparece como PendingDeletion — ticket da semana passada agendou delete na chave errada.",
+    "cli_output": "$ aws kms describe-key --key-id abcd-prod-cmk\nKeyState: PendingDeletion\nDeletionDate: 2026-09-01\nKeyManager: CUSTOMER\n\n$ aws s3api get-object --bucket corp-data --key x.bin -\nAn error occurred (AccessDenied) ... kms:Decrypt ... key is pending deletion / not available\n\n$ aws secretsmanager get-secret-value --secret-id prod/api\nAn error occurred ... related to KMS key state\n\n$ aws kms list-keys\n# key still listed with PendingDeletion\n\n# Change ticket from last week: \"schedule deletion unused keys\" — wrong key tagged",
+    "alternativas": [
+      "cancel-key-deletion na CMK e reabilitar uso; revisar tags antes de schedule-key-deletion",
+      "create-invalidation /* no CloudFront como único fix",
+      "delete-bucket corp-data",
+      "Abrir 0.0.0.0/0 no SG do bastion"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para CMK em PendingDeletion: Decrypt de S3 e GetSecretValue falham enquanto a chave ainda está no waiting period. No CLI, KeyState PendingDeletion + DeletionDate futuros confirmam. Execute cancel-key-deletion na CMK, reabilite o uso e revise tags antes de novo schedule-key-deletion. create-invalidation /* no CloudFront não restaura a chave KMS. delete-bucket corp-data destrói dados e não ‘recupera’ a CMK. Abrir 0.0.0.0/0 no SG do bastion não tem relação com estado da chave. Insight: KeyState PendingDeletion + falha kms:Decrypt → cancel-key-deletion imediatamente na janela de espera.",
+    "part_id": "aws-1.9",
+    "source": "aws"
+  }
+]

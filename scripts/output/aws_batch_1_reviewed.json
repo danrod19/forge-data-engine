@@ -1,0 +1,257 @@
+[
+  {
+    "id": 16,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1401: a app-01 está running, mas usuários reportam timeout na 8080. Em sessão SSM o processo escuta a porta — o health do target group está unhealthy com Target.Timeout.",
+    "cli_output": "$ aws ec2 describe-instances --instance-ids i-0app01 \\\n  --query 'Reservations[].Instances[].{State:State.Name,AZ:Placement.AvailabilityZone,Subnet:SubnetId,SGs:SecurityGroups,Priv:PrivateIpAddress}'\nState: running\nAZ: us-east-1a\nSubnet: subnet-0priva\nSGs: [{GroupId: sg-app, GroupName: app-tier}]\nPriv: 10.0.10.25\n\n$ aws ec2 describe-security-groups --group-ids sg-app\nInbound:\n  TCP 22  Source sg-bastion\n  (no TCP 8080)\nOutbound: all 0.0.0.0/0\n\n$ aws ec2 describe-security-groups --group-ids sg-alb\nInbound: TCP 443 0.0.0.0/0\nOutbound: all\n\n$ aws elbv2 describe-target-health --target-group-arn arn:...:targetgroup/app/...\ni-0app01:8080 State: unhealthy Reason: Target.Timeout\n\n$ aws ec2 describe-instance-status --instance-ids i-0app01\nInstanceStatus: ok  SystemStatus: ok",
+    "alternativas": [
+      "Adicionar inbound no sg-app TCP 8080 com Source = sg-alb (ou CIDR das subnets do ALB)",
+      "Recriar a AMI e relançar sem revisar SG",
+      "Aumentar o tamanho do volume root para 2 TB",
+      "Trocar On-Demand por Spot imediatamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para filtragem no Security Group da app: instance e status checks ok, processo escutando 8080, mas o target group marca Target.Timeout. No CLI, sg-app só libera SSH do bastion — não há inbound TCP 8080 do ALB. Liberar 8080 com Source = sg-alb (ou CIDR das subnets do ALB) abre o path de health e tráfego. Insight: unhealthy por Timeout com app local ok quase sempre é SG/NACL, não “app caída”. Recriar AMI sem revisar SG só repete o mesmo buraco; volume root maior não abre porta; trocar On-Demand por Spot não muda regra de firewall.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 17,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1402: o time não consegue anexar o volume de dados à instance de relatório. O attach falha com InvalidVolume.ZoneMismatch.",
+    "cli_output": "$ aws ec2 describe-instances --instance-ids i-0report \\\n  --query 'Reservations[].Instances[].{State:State.Name,AZ:Placement.AvailabilityZone}'\nState: running\nAZ: us-east-1a\n\n$ aws ec2 describe-volumes --volume-ids vol-0data\nVolumeId: vol-0data\nState: available\nSize: 500\nAvailabilityZone: us-east-1b\nAttachments: []\n\n$ aws ec2 attach-volume --volume-id vol-0data --instance-id i-0report --device /dev/sdf\nAn error occurred (InvalidVolume.ZoneMismatch) when calling the AttachVolume operation:\nThe volume 'vol-0data' is not in the same availability zone as instance 'i-0report'\n\n$ aws ec2 describe-snapshots --snapshot-ids snap-0data\nSnapshotId: snap-0data  State: completed  VolumeSize: 500",
+    "alternativas": [
+      "Forçar attach com --force-cross-az (API inexistente para EBS clássico)",
+      "Criar novo volume a partir de snap-0data na us-east-1a e anexar a i-0report",
+      "Abrir porta 2049 no SG para o volume aparecer",
+      "Converter a instance para another account"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para mismatch de AZ: a instance está em us-east-1a e o vol-0data em us-east-1b. No CLI, InvalidVolume.ZoneMismatch confirma que EBS clássico não atravessa AZ. Como o snap-0data está completed, o caminho certo é create-volume na AZ da instance e só então attach. Insight: ZoneMismatch → recrie o volume na mesma AZ via snapshot; não existe “force cross-AZ” para EBS clássico. Abrir 2049 no SG é história de NFS, não de attach EBS; mudar a instance de conta não alinha AZ.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 18,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1403: depois do terminate da instance de CI, o root sumiu e o job perdeu o workspace. Não havia snapshot desse disco.",
+    "cli_output": "$ aws ec2 describe-instances --instance-ids i-0ci01\nState: terminated\nStateTransitionReason: User initiated (terminate)\n\n$ aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=i-0ci01\n(no volumes — attachments gone)\n\n# Launch template / block device mapping (histórico):\nRoot /dev/xvda  Ebs.DeleteOnTermination: true  VolumeSize: 30\nData /dev/sdf   Ebs.DeleteOnTermination: false  (este volume NÃO estava no launch desta instance)\n\n$ aws ec2 describe-snapshots --owner-ids self --filters Name=description,Values=*i-0ci01*\n(no matching snapshots)\n\n$ aws ce get-cost-and-usage ... \nEC2-Instances hours dropped after terminate (expected)",
+    "alternativas": [
+      "Terminate nunca apaga root — o volume deve reaparecer em 24h",
+      "Reserved Instance restaura o disco automaticamente",
+      "Root com DeleteOnTermination true foi removido no terminate; sem snapshot não há restore — revisar flag e política de snapshot/AMI",
+      "Basta start-instances no id terminated"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para perda definitiva do root: terminate com DeleteOnTermination true e zero snapshots. No CLI, a instance está terminated, não há volumes anexados e não há snapshot de i-0ci01 — o workspace não volta sozinho. Revise a flag no launch template e passe a tirar snapshot/AMI (ou DeleteOnTermination false em volumes de dados). Insight: terminate + DeleteOnTermination true = disco some; snapshot/AMI é o seguro. A ideia de que o root “reaparece em 24h” é mito; Reserved Instance só afeta billing, não restaura EBS; start-instances em id terminated não revive a máquina.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 19,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1404: a app na EC2 não lê s3://corp-config/*. Não é timeout de rede — a API devolve AccessDenied / sem credenciais de role.",
+    "cli_output": "$ aws ec2 describe-instances --instance-ids i-0cfg \\\n  --query 'Reservations[].Instances[].{State:State.Name,Subnet:SubnetId,Profile:IamInstanceProfile}'\nState: running\nSubnet: subnet-0priva\nProfile: null\n\n$ aws ec2 describe-iam-instance-profile-associations \\\n  --filters Name=instance-id,Values=i-0cfg\nAssociations: []\n\n# Na instance (SSM):\n$ curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/\n(empty / 404)\n\n$ aws s3api get-object --bucket corp-config --key app.json out.json\nUnable to locate credentials / AccessDenied (no role)\n\n$ aws iam get-role --role-name ConfigReadRole\nRole exists; Trust: ec2.amazonaws.com\nAttached: ReadOnly on arn:aws:s3:::corp-config/*\n\n$ aws ec2 describe-security-groups --group-ids sg-cfg\nOutbound: 0.0.0.0/0 allow",
+    "alternativas": [
+      "Abrir inbound 443 0.0.0.0/0 no sg-cfg como único fix",
+      "Recriar o bucket S3 em outra Região",
+      "Aumentar IOPS do root volume",
+      "Criar instance profile com ConfigReadRole e associar a i-0cfg (IMDS passará a expor credenciais)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O sintoma aponta para falta de identidade na EC2: Profile null, association vazia e IMDS sem security-credentials, apesar da ConfigReadRole existir com trust EC2 e policy S3. Crie o instance profile com essa role e associe a i-0cfg — aí o IMDS passa a entregar credenciais. Insight: AccessDenied S3 na EC2 com Profile null → associate-iam-instance-profile, não “bug do bucket”. Abrir inbound 443 world no sg-cfg não dá IAM; outbound já está allow. Recriar o bucket em outra Região e subir IOPS do root não atribuem role à instance.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 20,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1405: frota batch Spot; jobs falham de madrugada com instances sumindo. Há Server.SpotInstanceTermination e estado só em disco local, sem checkpoint.",
+    "cli_output": "$ aws ec2 describe-instances --filters Name=tag:Fleet,Values=batch-spot \\\n  --query 'Reservations[].Instances[].{Id:InstanceId,State:State.Name,Life:InstanceLifecycle,Reason:StateTransitionReason}'\ni-0b1  State: terminated  Life: spot  Reason: Client.InstanceInitiatedShutdown\ni-0b2  State: terminated  Life: spot  Reason: Server.SpotInstanceTermination\ni-0b3  State: running     Life: spot\n\n$ aws ec2 describe-spot-instance-requests --spot-instance-request-ids sir-0b2\nStatus.Code: instance-terminated-by-price / capacity\nStatus.Message: Spot instance terminated due to interruption\n\n# Job design atual: single worker, state only on local disk, no checkpoint to S3\n# SLA: jobs can retry; max cost is hard constraint",
+    "alternativas": [
+      "Tratar Spot como On-Demand 100% uptime e desabilitar retries",
+      "Mover o único banco primário de produção para a mesma Spot fleet sem réplica",
+      "Aceitar interrupção Spot: checkpoints em S3/EBS snapshot, retries e/ou capacidade On-Demand mista para o coordenador",
+      "Remover todas as IAM roles da fleet"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para interrupção Spot esperada, não para “bug de AMI”: Life spot + Server.SpotInstanceTermination e job com estado só em disco local explicam a perda no meio da noite. Com SLA que aceita retry e teto de custo, o desenho certo é checkpoint em S3 (ou snapshot), retries e, se preciso, On-Demand misto no coordenador. Insight: Spot interrupted → arquitetura tolerante; pretender uptime 100% é o anti-padrão. Desabilitar retries piora; colocar o banco primário de produção só em Spot sem réplica é risco operacional grave; remover IAM roles da fleet só quebra permissões.",
+    "part_id": "aws-1.4",
+    "source": "aws"
+  },
+  {
+    "id": 21,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1501: ALB api-prod devolvendo 502/503 com targets Unhealthy. A app sobe na 8080 via SSM, mas o health check do target group parece desalinhado.",
+    "cli_output": "$ aws elbv2 describe-target-health --target-group-arn arn:aws:elasticloadbalancing:us-east-1:111122223333:targetgroup/api/abc\nTarget i-0a1:8080  State: unhealthy  Reason: Target.FailedHealthChecks\nTarget i-0a2:8080  State: unhealthy  Reason: Target.FailedHealthChecks\n\n$ aws elbv2 describe-target-groups --target-group-arns arn:...:targetgroup/api/abc\nPort: 8080\nHealthCheckPath: /healthz\nHealthCheckPort: traffic-port\nMatcher.HttpCode: 200\n\n# Na instance i-0a1:\n$ curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:8080/healthz\n404\n$ curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:8080/ready\n200\n\n$ aws ec2 describe-security-groups --group-ids sg-app\nInbound: TCP 8080 Source sg-alb\nOutbound: all",
+    "alternativas": [
+      "Abrir 22 0.0.0.0/0 no sg-app",
+      "Corrigir HealthCheckPath para /ready (ou implementar /healthz 200) — path atual retorna 404",
+      "Remover o ALB e usar EIP",
+      "Aumentar max do ASG sem corrigir health"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para path de health errado: SG já libera 8080 do ALB e a app responde localmente, mas /healthz devolve 404 enquanto /ready devolve 200. O matcher exige 200, então o TG marca FailedHealthChecks e o ALB passa 502/503. Ajuste HealthCheckPath para /ready ou implemente /healthz 200. Insight: FailedHealthChecks + 404 no path → alinhe o health path à app antes de culpar rede. Abrir SSH world no sg-app não conserta health HTTP; trocar ALB por EIP esconde o problema; subir max do ASG só multiplica targets ruins.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 22,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1502: clientes pegam 503 no ALB shop-alb mesmo de madrugada, sem pico de tráfego. O target group parece sem backends.",
+    "cli_output": "$ aws elbv2 describe-load-balancers --names shop-alb\nState: active  Scheme: internet-facing\nAvailabilityZones: us-east-1a, us-east-1b\n\n$ aws elbv2 describe-target-health --target-group-arn arn:...:targetgroup/shop/xyz\n(no targets / empty)\n\n$ aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names shop-asg\nMinSize: 0\nDesiredCapacity: 0\nMaxSize: 12\nTargetGroupARNs: [arn:...:targetgroup/shop/xyz]\nVPCZoneIdentifier: subnet-0priva,subnet-0privb\n\n$ aws autoscaling describe-scaling-activities --auto-scaling-group-name shop-asg --max-records 3\nStatusCode: Successful  Description: Setting desired capacity to 0\nCause: scheduled action night-scale-in (stale) left desired at 0 past morning\n\n$ aws elbv2 describe-listeners --load-balancer-arn arn:...:loadbalancer/app/shop-alb/...\nListener 443 default action forward shop TG",
+    "alternativas": [
+      "Recriar o certificado ACM",
+      "Desligar cross-zone load balancing",
+      "Subir DesiredCapacity/MinSize do shop-asg (ex. min=2) — TG vazio com desired 0 explica 503",
+      "Trocar ALB por NAT Gateway"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para ASG zerado: ALB e listener ativos, mas target health vazio e DesiredCapacity/MinSize em 0 após scale-in noturno que ficou stale. Sem targets, o ALB responde 503. Suba DesiredCapacity e MinSize (ex. min=2) para voltar a ter backends. Insight: 503 + empty target health + desired 0 → restore capacity do ASG, não certificado. Recriar ACM não cria instances; desligar cross-zone não popula o TG; trocar ALB por NAT Gateway muda completamente o desenho e não resolve falta de capacity.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 23,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1503: o ASG web-asg não lança instances depois de desired=4; o ALB continua sem backends novos. Scaling activities falham por falta de IP na subnet.",
+    "cli_output": "$ aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names web-asg\nDesiredCapacity: 4\nMinSize: 2\nMaxSize: 8\nInstances: []\nVPCZoneIdentifier: subnet-0fulla\nHealthCheckType: ELB\n\n$ aws autoscaling describe-scaling-activities --auto-scaling-group-name web-asg --max-records 5\nStatusCode: Failed\nStatusMessage: Launching a new EC2 instance. Status Reason: There are not enough free addresses in subnet subnet-0fulla to satisfy the requested number of instances.\nDescription: Launching a new EC2 instance.  Failure...\n\n$ aws ec2 describe-subnets --subnet-ids subnet-0fulla\nAvailabilityZone: us-east-1a\nAvailableIpAddressCount: 0\nCidrBlock: 10.0.10.0/28\n\n$ aws ec2 describe-launch-template-versions --launch-template-id lt-0web --versions '$Latest'\nImageId: ami-0ok  InstanceType: t3.small  SecurityGroupIds: [sg-app]",
+    "alternativas": [
+      "Culpar só a AMI e trocar para Windows sem olhar IPs",
+      "Adicionar subnet(s) com IPs livres ao ASG (multi-AZ) ou expandir CIDR — AvailableIpAddressCount 0 na única subnet",
+      "Remover o target group",
+      "Setar desired=0 para 'limpar o erro'"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O sintoma aponta para esgotamento de IP: desired=4, Instances vazio e scaling Failed com “not enough free addresses”. No CLI, a única subnet é /28 com AvailableIpAddressCount 0 — o launch template e a AMI estão ok. Inclua subnets com IPs livres (idealmente multi-AZ) ou amplie o CIDR. Insight: ASG Failed por free addresses → IP exhaustion na VPCZoneIdentifier, não “AMI ruim”. Trocar AMI para Windows sem olhar IPs não cria endereço; remover o target group só piora o ALB; desired=0 “esconde” o erro sem corrigir a rede.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 24,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1504: usuários em timeout na app; access logs do ALB mostram forward ao target sem resposta. Status checks da EC2 ok, mas o health do TG está Target.Timeout na 8443.",
+    "cli_output": "$ aws elbv2 describe-target-health --target-group-arn arn:...:targetgroup/pay/1\ni-0pay1:8443  State: unhealthy  Reason: Target.Timeout\ni-0pay2:8443  State: unhealthy  Reason: Target.Timeout\n\n$ aws ec2 describe-security-groups --group-ids sg-alb\nInbound: TCP 443 0.0.0.0/0\nOutbound: all\n\n$ aws ec2 describe-security-groups --group-ids sg-pay\nInbound:\n  TCP 22  Source 10.0.0.0/16\n  TCP 8443 Source 10.0.0.0/8\n  (no reference to sg-alb)\nOutbound: all\n\n$ aws ec2 describe-instances --instance-ids i-0pay1\nState: running  Subnet: subnet-0privb (private)\n# SSM: ss -lntp | grep 8443 → LISTEN\n\n$ aws elbv2 describe-target-groups --target-group-arns arn:...:targetgroup/pay/1\nPort: 8443  HealthCheckProtocol: HTTPS  HealthCheckPath: /health",
+    "alternativas": [
+      "Permitir no sg-pay TCP 8443 com Source = sg-alb (e revisar se 10.0.0.0/8 realmente cobre as ENIs do ALB)",
+      "Aumentar o tamanho do volume root",
+      "Desligar o listener 443",
+      "Converter o ASG para single-AZ"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para SG da app bloqueando o ALB: processo LISTEN na 8443 e status checks ok, porém Target.Timeout. No CLI, sg-pay libera 8443 de 10.0.0.0/8 e não referencia sg-alb — ENIs do ALB podem cair fora desse CIDR conforme o desenho da VPC. O fix é inbound TCP 8443 com Source = sg-alb (e validar o CIDR). Insight: Target.Timeout com app LISTEN → quase sempre source do SG, não “disco cheio”. Aumentar root volume não abre path de rede; desligar o listener 443 derruba o front; single-AZ não libera a porta.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 25,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1505: após scale-in noturno, jobs long-running morreram no meio; o post-mortem de falha de AZ mostrou o ASG só em us-east-1a, apesar do ALB multi-AZ.",
+    "cli_output": "$ aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names batch-asg\nMinSize: 1\nDesiredCapacity: 1\nMaxSize: 6\nVPCZoneIdentifier: subnet-0priva\nDefaultCooldown: 60\nTargetGroupARNs: [arn:...:targetgroup/batch/9]\nHealthCheckType: EC2\n\n$ aws elbv2 describe-target-groups --target-group-arns arn:...:targetgroup/batch/9\nDeregistrationDelayTimeoutSeconds: 30\n\n# CloudTrail / ASG activity:\nSuccessful: Terminating EC2 instance i-0job9  Cause: scale-in to desired 1\n# Job logs on i-0job9: killed mid-run; connection reset from ALB after 30s\n\n$ aws elbv2 describe-load-balancers --names batch-alb\nAvailabilityZones: us-east-1a, us-east-1b\n\n$ aws ec2 describe-subnets --subnet-ids subnet-0priva\nAZ: us-east-1a",
+    "alternativas": [
+      "Aumentar deregistration delay e colocar o ASG em subnets multi-AZ (ex. 1a+1b) com min≥2 se HA for requisito",
+      "Setar desired=0 permanentemente",
+      "Remover o ALB multi-AZ",
+      "Desabilitar todos os security groups"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Há duas falhas na evidência: deregistration delay de 30s corta o job longo no scale-in (connection reset após 30s), e o ASG só em subnet-0priva (1a) é SPOF mesmo com ALB em 1a+1b. Aumente o deregistration delay e coloque o ASG em subnets multi-AZ com min≥2 se HA for requisito. Insight: scale-in kill + single AZ no ASG → draining curto e VPCZoneIdentifier incompleto; ALB multi-AZ sozinho não salva targets em uma AZ só. Desired=0 permanente piora disponibilidade; remover o ALB multi-AZ reduz resiliência; desabilitar SGs abre a conta sem corrigir draining nem AZ.",
+    "part_id": "aws-1.5",
+    "source": "aws"
+  },
+  {
+    "id": 26,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1601: a pay-api dá timeout ao abrir JDBC no RDS pay-db (5432). CPU do RDS está baixa e o status é available — cheira a rede, não a carga.",
+    "cli_output": "$ aws rds describe-db-instances --db-instance-identifier pay-db \\\n  --query 'DBInstances[0].{Status:DBInstanceStatus,AZ:AvailabilityZone,MultiAZ:MultiAZ,Public:PubliclyAccessible,SG:VpcSecurityGroups,Endpoint:Endpoint}'\nStatus: available\nAZ: us-east-1a\nMultiAZ: true\nPublic: false\nEndpoint: pay-db.xxxx.us-east-1.rds.amazonaws.com:5432\nSG: [sg-db]\n\n$ aws ec2 describe-security-groups --group-ids sg-db\nInbound:\n  TCP 22 Source sg-bastion\n  (no 5432)\nOutbound: all\n\n$ aws ec2 describe-security-groups --group-ids sg-app\nInbound: TCP 8080 Source sg-alb\nOutbound: all\n\n$ aws ec2 describe-instances --filters Name=tag:App,Values=pay-api\ni-0app1 running  SG: sg-app  Subnet: subnet-0priva\n\n# App log: Connection timed out connecting to pay-db...:5432",
+    "alternativas": [
+      "Adicionar inbound no sg-db TCP 5432 com Source = sg-app",
+      "Habilitar PubliclyAccessible true e 0.0.0.0/0 na 5432",
+      "Desligar Multi-AZ para 'melhorar latência de auth'",
+      "Recriar o ALB listener na 5432"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para SG do RDS: instance available, CPU baixa e log com Connection timed out na 5432. No CLI, sg-db só tem SSH do bastion — não há inbound 5432 do sg-app. Adicione TCP 5432 com Source = sg-app. Insight: timeout JDBC com RDS available → SG/NACL na porta do engine, não “auth lento”. PubliclyAccessible + 0.0.0.0/0 “abre” mal e expõe o banco; desligar Multi-AZ não libera porta e piora HA; listener de ALB na 5432 não é o caminho usual para JDBC entre app e RDS privado.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 27,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1602: após failover Multi-AZ (evento AWS), a app ficou 2–3 min sem writes e depois voltou no mesmo hostname do endpoint. O time quer saber se Multi-AZ “morreu”.",
+    "cli_output": "$ aws rds describe-events --source-type db-instance --source-identifier shop-db --duration 120\nMessage: Multi-AZ instance failover completed\nMessage: DB instance restarted\nMessage: Failover to standby complete\n\n$ aws rds describe-db-instances --db-instance-identifier shop-db\nDBInstanceStatus: available\nMultiAZ: true\nEndpoint.Address: shop-db.xxxx.us-east-1.rds.amazonaws.com  (unchanged)\nAvailabilityZone: us-east-1b   # was us-east-1a before event\n\n$ aws rds describe-db-instances --db-instance-identifier shop-db-rr\nReadReplicaSourceDBInstanceIdentifier: shop-db\nStatus: available\n\n# App errors window 02:14–02:16: communications link failure; then recover with retry",
+    "alternativas": [
+      "É esperado em failover Multi-AZ: breve RTO e reconexão no endpoint; app deve ter retry — não indica perda total de Multi-AZ",
+      "Prova de que Multi-AZ está desligado",
+      "Exige abrir 0.0.0.0/0 no sg-db para o failover funcionar",
+      "Indica que apenas a read replica pode receber writes daqui pra frente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para failover Multi-AZ bem-sucedido, não para perda do recurso: eventos de failover, AZ mudando de 1a para 1b, endpoint DNS inalterado e janela curta de erro com retry. Isso é o RTO típico — a app precisa reconectar/retry no mesmo hostname. Insight: failover Multi-AZ → downtime curto + mesmo endpoint; MultiAZ true no describe confirma que continua ligado. Não é prova de Multi-AZ desligado; abrir 0.0.0.0/0 no SG não é requisito de failover; a read replica não vira writer automático neste cenário clássico de Multi-AZ.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 28,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1603: a instance dev-db foi deletada por engano. Precisam dos dados de ontem, mas o time não encontra snapshot nem backup automático.",
+    "cli_output": "$ aws rds describe-db-instances --db-instance-identifier dev-db\nDBInstanceNotFound fault\n\n$ aws rds describe-db-snapshots --db-instance-identifier dev-db\n[]   # empty\n\n$ aws rds describe-db-instances --filters Name=db-instance-id,Values=dev-db\n(no pending)\n\n# Last known config from CMDB:\nBackupRetentionPeriod: 0\nDeletionProtection: false\nMultiAZ: false\nPreferredBackupWindow: (n/a — backups disabled)\n\n$ aws rds describe-db-cluster-snapshots 2>/dev/null || true\n(no cluster — instance was RDS MySQL single)\n\n# No manual snapshot tickets in the last 30 days",
+    "alternativas": [
+      "Restaurar com PITR de 7 dias mesmo com retention 0",
+      "Multi-AZ recria a instance apagada automaticamente em 24h",
+      "Sem automated backup (retention 0) e sem snapshot manual, não há restore RDS — dados indisponíveis no serviço",
+      "Basta recriar o Security Group com o mesmo nome"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O sintoma aponta para perda sem caminho de restore no RDS: DBInstanceNotFound, lista de snapshots vazia e BackupRetentionPeriod 0 com DeletionProtection false. Sem automated backup e sem snapshot manual, não há PITR nem restore a partir do serviço. Insight: delete RDS sem snapshot/backup = dados indisponíveis; em dados valiosos ligue retention e deletion protection. PITR de 7 dias não existe com retention 0; Multi-AZ não sobrevive a delete da instance nem a “recria em 24h”; recriar SG com o mesmo nome não traz tabelas de volta.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 29,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1604: security review no RDS crm-db de “produção” encontrou exposição pública, SG aberto e subnet group em AZ única pública.",
+    "cli_output": "$ aws rds describe-db-instances --db-instance-identifier crm-db \\\n  --query 'DBInstances[0].{Public:PubliclyAccessible,MultiAZ:MultiAZ,SGs:VpcSecurityGroups,Subnets:DBSubnetGroup.Subnets}'\nPublic: true\nMultiAZ: false\nSGs: [sg-crm-db]\nSubnets:\n  - subnet-0puba  AZ=us-east-1a\n  - (only one subnet in group — also 1a)\n\n$ aws rds describe-db-subnet-groups --db-subnet-group-name crm-subnets\nSubnets: [subnet-0puba]   # single AZ us-east-1a  MapPublicIpOnLaunch related public tier\n\n$ aws ec2 describe-security-groups --group-ids sg-crm-db\nInbound:\n  TCP 3306  0.0.0.0/0\nOutbound: all\n\n$ aws ec2 describe-subnets --subnet-ids subnet-0puba\nMapPublicIpOnLaunch: true\n# Tag: Tier=public",
+    "alternativas": [
+      "Marcar como compliant porque tem endpoint DNS",
+      "Corrigir: PubliclyAccessible false, SG 3306 só de sg-app, subnet group privado em ≥2 AZ e avaliar Multi-AZ se HA for requisito",
+      "Abrir também 5432 0.0.0.0/0 para 'compatibilidade'",
+      "Remover o DB subnet group inteiro e usar EC2 na mesma pública sem SG"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O achado junta três problemas: PubliclyAccessible true, 3306 de 0.0.0.0/0 e subnet group com uma única subnet pública em 1a (exposição + SPOF). O remédio é PubliclyAccessible false, SG 3306 só a partir do sg-app, subnet group privado em ≥2 AZ e Multi-AZ se HA for requisito. Insight: RDS “prod” público com world-open e 1 AZ → private, least privilege no SG e HA multi-AZ. Endpoint DNS não prova compliance; abrir 5432 world só amplia a superfície; migrar para EC2 pública sem SG piora o risco.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  },
+  {
+    "id": 30,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1605: writes no RDS orders-db falhando com “No space left” / storage-full. FreeStorageSpace perto de zero e MaxAllocatedStorage igual ao AllocatedStorage.",
+    "cli_output": "$ aws rds describe-db-instances --db-instance-identifier orders-db \\\n  --query 'DBInstances[0].{Status:DBInstanceStatus,Alloc:AllocatedStorage,MaxAlloc:MaxAllocatedStorage,StorageType:StorageType,StorageEncrypted:StorageEncrypted}'\nStatus: storage-full\nAlloc: 100\nMaxAlloc: 100\nStorageType: gp3\nStorageEncrypted: true\n\n$ aws cloudwatch get-metric-statistics --namespace AWS/RDS --metric-name FreeStorageSpace \\\n  --dimensions Name=DBInstanceIdentifier,Value=orders-db ...\n# Datapoints near 0 bytes free\n\n$ aws rds describe-db-instances --db-instance-identifier orders-db \\\n  --query 'DBInstances[0].{MultiAZ:MultiAZ,BackupRetentionPeriod:BackupRetentionPeriod}'\nMultiAZ: true\nBackupRetentionPeriod: 7\n\n# App: INSERT/UPDATE failing; SELECT still intermittently ok",
+    "alternativas": [
+      "Abrir 0.0.0.0/0 na porta do engine",
+      "Desligar Multi-AZ para liberar disco do standby como se fosse o primary",
+      "Só recriar o ALB",
+      "Aumentar AllocatedStorage e/ou MaxAllocatedStorage (autoscaling) — FreeStorageSpace ~0 explica writes falhando"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O sintoma aponta para disco cheio no RDS: Status storage-full, FreeStorageSpace ~0 e MaxAlloc travado no mesmo valor de Alloc (100). INSERT/UPDATE falham porque não há GiB livres — aumente AllocatedStorage e/ou MaxAllocatedStorage para habilitar autoscaling de storage. Insight: storage-full → modify storage; SG e ALB não criam espaço em disco. Abrir 0.0.0.0/0 na porta do engine não libera storage; desligar Multi-AZ não “doa” o disco do standby ao primary; recriar o ALB não muda FreeStorageSpace.",
+    "part_id": "aws-1.6",
+    "source": "aws"
+  }
+]

@@ -11,7 +11,7 @@
       "48 bits como o MAC"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "IPv6 usa 128 bits. 32 bits é IPv4. 64 bits é tamanho comum de Interface ID/prefixo de LAN, não do endereço inteiro. 48 bits é o MAC, não o IPv6 completo.",
+    "explicacao_profunda": "Um endereço IPv6 completo tem 128 bits, tipicamente escritos em 8 hextetos de 16 bits. 32 bits é o tamanho do IPv4. 64 bits aparece com frequência como tamanho do Interface ID ou do prefixo de LAN (/64), mas não é o endereço inteiro. 48 bits é o comprimento clássico do MAC IEEE, usado como insumo no EUI-64, não o IPv6 em si. Na prova, se perguntarem o tamanho do endereço, a resposta é 128; se perguntarem prefixo de subnet SLAAC, aí sim /64.",
     "part_id": "1.5"
   },
   {
@@ -26,7 +26,7 @@
       "2001::db8::1"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Omite-se zeros à esquerda e o maior bloco contíguo de hextetos zero vira “::” uma única vez → 2001:db8::1. Usar “::” duas vezes ou no fim de forma inválida quebra a notação.",
+    "explicacao_profunda": "A compressão IPv6 permite omitir zeros à esquerda em cada hexteto e substituir o maior bloco contíguo de hextetos zero por “::”, no máximo uma vez. Assim 2001:0db8:0000:0000:0000:0000:0000:0001 vira 2001:db8::1. 2001:db8::1::0 usa “::” duas vezes e torna ambígua a quantidade de zeros. Formas com “::” no fim após já ter todos os hextetos, ou 2001::db8::1 com dois “::”, são inválidas. Valide mentalmente expandindo de volta para 8 hextetos — só uma expansão possível.",
     "part_id": "1.5"
   },
   {
@@ -41,7 +41,7 @@
       "FC00::/7 apenas para GUA pública"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Link-local usa FE80::/10. 2000::/3 é faixa de GUA. FF00::/8 é multicast. FC00::/7 (fd00::/8 na prática) é unique local, não GUA pública nem link-local.",
+    "explicacao_profunda": "Endereços link-local IPv6 usam o prefixo FE80::/10 (na prática FE80::/64 na interface, escopo de enlace). 2000::/3 identifica a faixa ampla de GUA (global unicast). FF00::/8 é multicast. FC00::/7 (com fd00::/8 na alocação prática) é Unique Local Address, endereçamento privado de site — não é GUA pública nem link-local. Sem link-local a interface IPv6 não completa Neighbor Discovery no enlace; GUA/ULA resolvem comunicação além do link.",
     "part_id": "1.5"
   },
   {
@@ -56,7 +56,7 @@
       "Loopback IPv6"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "::1 é loopback. Default é ::/0. All-nodes link-local é FF02::1. Link-local de interface está em FE80::/10, não ::1.",
+    "explicacao_profunda": "::1/128 é o loopback IPv6, análogo a 127.0.0.1: testa a pilha local. A rota default IPv6 é ::/0. Multicast all-nodes no enlace é FF02::1. Link-local obrigatório de interface vive em FE80::/10, não em ::1. Confundir ::1 com default ou com link-local é pegadinha comum; lembre os três “curtos”: ::/0 default, ::1 loopback, :: unspecified.",
     "part_id": "1.5"
   },
   {
@@ -71,7 +71,7 @@
       "/24 como no IPv4 classful"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "/64 é o prefixo típico de sub-rede para SLAAC (64 bits de Interface ID). /128 é endereço de host/loopback específico. /32 e /24 não são o padrão de LAN SLAAC no CCNA.",
+    "explicacao_profunda": "SLAAC no modelo padrão do CCNA assume prefixo de LAN /64: 64 bits de prefixo + 64 bits de Interface ID (EUI-64 ou privacy). /128 identifica um host específico (ou loopback), não o prefixo anunciado para autoconfiguração de rede. /32 pode aparecer em alocações de provedor, mas não é o tamanho de subnet de acesso SLAAC. /24 é mentalidade classful IPv4 e não se aplica a IPv6. Se o RA anunciar algo diferente de /64, muitos stacks simplesmente não fazem SLAAC naquele prefixo.",
     "part_id": "1.5"
   },
   {
@@ -86,7 +86,7 @@
       "Rota default ::/0"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "FF02::1 é multicast all-nodes no link. GUA de doc é 2001:db8::/32. ULA é fc/fd. Default é ::/0 unicast de roteamento, não esse grupo.",
+    "explicacao_profunda": "FF02::1 é o grupo multicast all-nodes no escopo link-local (FF02::/16): alcança todos os nós IPv6 daquele enlace, papel parecido com “broadcast limitado” do IPv4 sem ser broadcast. 2001:db8::/32 é GUA de documentação, unicast. Unique local usa fc00::/7 (fd00::/8). ::/0 é rota default unicast de roteamento, não um grupo multicast. Em laboratório, ping FF02::1 ajuda a ver quem responde no link.",
     "part_id": "1.5"
   },
   {
@@ -101,7 +101,7 @@
       "Do endereço 169.254.0.0/16"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "SLAAC usa o prefixo anunciado no RA (após RS ou periodicamente). DNS A é IPv4 nome→IP. NAT IPv4 e APIPA 169.254 não fornecem prefixo IPv6 de LAN.",
+    "explicacao_profunda": "No SLAAC o host monta o endereço a partir do prefixo anunciado no Router Advertisement (RA), enviado periodicamente ou em resposta a um Router Solicitation (RS). O registro A do DNS só mapeia nome→IPv4; não entrega prefixo de LAN IPv6. NAT overload IPv4 na borda não participa do endereçamento IPv6 do host. 169.254.0.0/16 é APIPA IPv4, outro universo. TShoot: sem RA (roteador IPv6 off ou bloqueado), o PC fica só com FE80:: e não obtém GUA.",
     "part_id": "1.5"
   },
   {
@@ -116,7 +116,7 @@
       "O host deve usar DHCPv6 stateful para obter endereço"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "M (managed) aponta para DHCPv6 stateful para endereço. Não anula por si o IPv4, não transforma ::1 em GUA e a flag A é que fala em autonomia SLAAC no prefixo.",
+    "explicacao_profunda": "A flag M (Managed) no RA indica que o host deve obter endereço via DHCPv6 stateful (servidor entrega o IPv6). Isso não “proíbe SLAAC para sempre” em qualquer cenário — a flag A no prefixo é que controla autonomia SLAAC. Também não manda o host rodar só DORA IPv4, nem transforma ::1 em GUA. Leitura de prova: M=1 → endereço pelo DHCPv6; O=1 → outras opções (DNS etc.) pelo DHCPv6; A=1 → SLAAC no prefixo.",
     "part_id": "1.5"
   },
   {
@@ -131,7 +131,7 @@
       "Gera-se obrigatoriamente um endereço multicast FF02::2"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "EUI-64: MAC 48b + FFFE no meio + flip do bit U/L → IID 64b. Não fixa FE80::1, não cria máscara IPv4 nem força FF02::2.",
+    "explicacao_profunda": "No EUI-64 clássico o MAC de 48 bits é dividido ao meio, insere-se FFFE no centro e inverte-se o bit U/L (7º bit do primeiro byte), gerando Interface ID de 64 bits que se concatena ao prefixo /64. Não se descarta o MAC para fixar FE80::1. Não se “converte” MAC em máscara 255.255.255.0. Tampouco o processo gera obrigatoriamente FF02::2 (all-routers). Hoje muitos SOs preferem privacy extensions, mas o CCNA ainda exige o mecanismo EUI-64.",
     "part_id": "1.5"
   },
   {
@@ -146,7 +146,7 @@
       "Servidor DNS configurado incorretamente ou ausente"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "Ping a IP público OK indica gateway/rota de saída funcionando. Falha de nomes aponta DNS. Half-duplex não é a leitura principal. PTR não é exigência típica no cliente para navegar.",
+    "explicacao_profunda": "Se o PC pinga 8.8.8.8 por IP mas não resolve nomes, a camada 3 de saída e o gateway estão ok; o parâmetro mais suspeito é o servidor DNS ausente ou errado (ou alcance até ele). Half-duplex pode causar lentidão/colisões, mas não explica “IP ok, nome falha” como causa primeira. O default gateway não pode ser o culpado principal se o ping a um IP público já funcionou. PTR no cliente não é requisito típico para navegação — PTR é resolução reversa no DNS. Verifique ipconfig/resolv e teste nslookup.",
     "part_id": "1.5"
   },
   {
@@ -161,7 +161,7 @@
       "Multicast FF00::/8 substitui o default ::/0 automaticamente"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Link-local não serve para comunicação roteada entre redes. É preciso GUA (ou ULA) e encaminhamento/default. FE80 não é GUA. NAT não é pré-requisito IPv6 local. Multicast não instala ::/0.",
+    "explicacao_profunda": "Só FE80::/10 na interface significa que o host tem link-local, suficiente para o enlace local, mas não para alcançar um servidor com GUA em outra rede: falta endereço global (GUA/ULA) e/ou rota default IPv6 (::/0) tipicamente aprendida via RA/SLAAC, DHCPv6 ou config estática. FE80 não é GUA. IPv6 não exige NAT/PAT para ping em cenários nativos. Multicast FF00::/8 não instala rota default. Diagnóstico: show ipv6 interface / route e confirme se há GUA e ::/0.",
     "part_id": "1.5"
   },
   {
@@ -176,7 +176,7 @@
       "DHCP IPv4 DORA fica desabilitado no enlace"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "O (other) pede opções via DHCPv6 sem necessariamente entregar o endereço (M=0); A=1 permite SLAAC. Não define ::1, não força stateful completo nem desliga DHCPv4 por magia.",
+    "explicacao_profunda": "Com A=1 e M=0, o host pode autoconfigurar o endereço via SLAAC. A flag O (Other) pede que opções adicionais (DNS, domain list, etc.) venham de DHCPv6 sem tornar o endereçamento stateful completo. Não força todo mundo a usar ::1, não obriga DHCPv6 stateful para o IID (isso seria M=1) e não desliga magicamente o DHCP IPv4 no enlace. Combinação clássica de prova: SLAAC para IP + DHCPv6 “stateless” para DNS.",
     "part_id": "1.5"
   },
   {
@@ -191,7 +191,7 @@
       "Stateful usa apenas FF02::1 como IP do host"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Stateful ≈ servidor define o IPv6 do host; stateless ≈ SLAAC para IP e DHCPv6 para DNS/etc. Não é ARP/IPv4-only, não proíbe RA e FF02::1 é multicast, não unicast de host.",
+    "explicacao_profunda": "DHCPv6 stateful: o servidor atribui o endereço IPv6 (e em geral opções). Stateless: o endereço vem do SLAAC (RA + IID) e o DHCPv6 só entrega outras opções. Não é “stateless = só IPv4 / stateful = só ARP”. Nenhum dos modos proíbe RA no enlace — o RA ainda informa flags e, no stateless, o prefixo. FF02::1 é multicast all-nodes, nunca o unicast do host. Associe mentalmente: M=1 ≈ stateful; O=1 com A=1 ≈ SLAAC + opções.",
     "part_id": "1.5"
   },
   {
@@ -206,7 +206,7 @@
       "Host solicita (RS) e roteador anuncia (RA) informações de roteador/prefixo no enlace"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "RS/RA fazem parte do Neighbor Discovery para descoberta de roteador e parâmetros. Não são NAT, nem compressão DNS, nem IPsec mandatório.",
+    "explicacao_profunda": "Router Solicitation (RS) é o host pedindo informação; Router Advertisement (RA) é o roteador anunciando prefixo, flags e parâmetros no enlace — base do Neighbor Discovery para descoberta de roteador. Não é sinônimo de IPsec obrigatório, nem tradução NAT de FE80 para 2001:db8, nem a regra de compressão de hextetos no DNS. Sem RA, SLAAC e default IPv6 costumam falhar mesmo com cabo e L2 ok.",
     "part_id": "1.5"
   },
   {
@@ -221,7 +221,7 @@
       "O problema só pode ser half-duplex no DHCP DORA"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Cada pilha tem sua tabela. Sem ::/0 (ou rota adequada) o tráfego IPv6 remoto falha. Dual-stack mantém as duas pilhas. 169.254 é APIPA IPv4. DORA/half-duplex não explicam ausência de default IPv6.",
+    "explicacao_profunda": "Em dual-stack as tabelas são independentes. IPv4 navegando só prova a pilha v4; se show ipv6 route não tem ::/0 (nem rota mais específica), destinos só-IPv6 remotos falham. Não é preciso desligar IPv4 para IPv6 funcionar. 169.254.0.0/16 é APIPA IPv4 e não substitui default IPv6. Half-duplex/DORA não explicam ausência de ::/0. Corrija anúncio de RA, default estático ou DHCPv6 conforme o desenho.",
     "part_id": "1.5"
   },
   {
@@ -236,7 +236,7 @@
       "show interfaces status | include PoE"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "show ipv6 interface brief é o resumo IPv6 por interface. DHCP binding é lease IPv4. VLAN e PoE não listam GUAs/link-locals.",
+    "explicacao_profunda": "show ipv6 interface brief lista de forma compacta interfaces, estados e endereços IPv6 (link-local/GUA). show ip dhcp binding mostra leases IPv4 do servidor DHCP, não o endereçamento IPv6 das interfaces. show vlan brief trata VLANs L2. show interfaces status | include PoE filtra energia/status de porta, sem GUA. Para detalhe use show ipv6 interface <id>; para inventário rápido, o brief é o comando de prova.",
     "part_id": "1.5"
   },
   {
@@ -251,7 +251,7 @@
       "FF00::/8 e 169.254.0.0/16"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "::/128 é unspecified; ::/0 é default. FE80 e FF02::2 são link-local e all-routers. ::1 é loopback; 2000::/3 GUA. FF00 multicast; 169.254 é IPv4 APIPA.",
+    "explicacao_profunda": "O endereço unspecified IPv6 é ::/128 (ainda sem IP); a rota default é ::/0. FE80::/10 é link-local e FF02::2 é all-routers multicast — papéis de enlace, não esse par. ::1/128 é loopback e 2000::/3 é faixa GUA. FF00::/8 é multicast genérico e 169.254/16 é APIPA IPv4. Decore o trio curto: :: (unspecified), ::1 (loopback), ::/0 (default).",
     "part_id": "1.5"
   },
   {
@@ -266,7 +266,7 @@
       "Dual-stack, RA, RS, AAAA"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "DORA = Discover, Offer, Request, Ack. As outras combinações misturam protocolos ou inventam passos que não são o handshake DHCP clássico.",
+    "explicacao_profunda": "DORA no DHCP IPv4 é Discover (cliente procura), Offer (servidor oferece), Request (cliente pede o lease) e Ack (servidor confirma). Não é DNS/OSPF/RIP/ARP, nem Drop/Offer/Reject/Ack, nem Dual-stack/RA/RS/AAAA (mistura IPv6/NDP/DNS). Perder Offer/Ack no Wireshark ou ver APIPA no host aponta falha nesse handshake ou no caminho L2 até o servidor/relay.",
     "part_id": "1.5"
   },
   {
@@ -281,7 +281,7 @@
       "APIPA: falha em obter lease DHCP; não é endereçamento corporativo completo"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "169.254/16 é link-local APIPA quando o DHCP falha. Não é público, não é 127/8 nem multicast 224/4. Gateway vazio reforça a falta de configuração completa de cliente.",
+    "explicacao_profunda": "169.254.10.5/16 com DHCP habilitado e gateway em branco é APIPA: o cliente não obteve lease e autoconfigurou link-local IPv4. Não é IP público, não equivale a 127.0.0.1 e não é multicast 224/4. Sem gateway corporativo e sem DNS típicos, não há acesso à rede empresarial completa. TShoot: confira conectividade L1/L2, servidor DHCP, relay (ip helper-address) e se há IP helper/ACL bloqueando UDP 67/68.",
     "part_id": "1.5"
   },
   {
@@ -296,7 +296,7 @@
       "Com NAT o default gateway do PC deve ser 8.8.8.8"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "NAT/PAT atua no edge; o PC usa gateway da LAN. PAT não vira DNS/DHCP. IPv6 link-local não exige NAT. Gateway 8.8.8.8 no PC está fora da subnet local na maioria dos designs.",
+    "explicacao_profunda": "NAT/PAT na borda traduz privados↔público, mas o PC ainda precisa de IP, máscara e gateway corretos na LAN para chegar ao roteador que faz a tradução. PAT não substitui DNS nem elimina o DORA. NAT não é obrigatório em enlace IPv6 FE80. Colocar 8.8.8.8 como default gateway do PC quase sempre falha: o gateway deve ser um next-hop na mesma subnet. Em falhas “sem Internet”, separe LAN (IP/GW) de tradução na borda (NAT).",
     "part_id": "1.5"
   },
   {
@@ -311,7 +311,7 @@
       "Apenas multicast FF02::1"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "ULA é privado de site (fc/fd). 2001:db8 é documentação GUA. ::/0 é default. FF02::1 é multicast all-nodes. FE80 é link-local de enlace, outro papel.",
+    "explicacao_profunda": "ULA (Unique Local Address) usa FC00::/7, na prática prefixos fd00::/8 gerados localmente: endereçamento privado de site, roteável internamente, sem ser link-local. Não é o mesmo que 2001:db8::/32 (documentação GUA). Não é sinônimo de ::/0. Não é multicast FF02::1. FE80::/10 permanece link-local de enlace — ULA e FE80 resolvem problemas diferentes (site vs link).",
     "part_id": "1.5"
   },
   {
@@ -326,7 +326,7 @@
       "Porque o DNS AAAA impede frames L2"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "IPv6 elimina broadcast; all-nodes e outros grupos são multicast. Ainda há unicast e anycast. Link-local permite comunicação no enlace. DNS não remove frames L2.",
+    "explicacao_profunda": "IPv6 não define broadcast 255.255.255.255; funções de “todos no enlace” ou grupos usam multicast (ex.: FF02::1 all-nodes) e, em outros papéis, anycast. Ainda existe unicast (GUA/ULA/link-local), portanto não é “só unicast GUA”. FE80::/10 não proíbe comunicação local — pelo contrário, é a base do NDP no enlace. DNS AAAA não impede frames L2. Na prova, associe “sem broadcast” → multicast de escopo adequado.",
     "part_id": "1.5"
   },
   {
@@ -341,7 +341,7 @@
       "Apenas compressão “::” na notação"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "ND cobre resolução de vizinhos (papel do ARP) e RS/RA (router discovery), além de outras funções. Não é STP/VTP, NAT nem a regra de notação “::”.",
+    "explicacao_profunda": "Neighbor Discovery Protocol (NDP) cobre, entre outras funções, resolução de endereço de vizinho (papel do ARP no IPv4) e descoberta de roteador via RS/RA. Não substitui Spanning Tree nem VTP (L2 de switches). Não é NAT/PAT. Também não é a regra de notação “::”. Em falhas IPv6 no link, pense em NS/NA e RS/RA como o ARP + router discovery do mundo v6.",
     "part_id": "1.5"
   },
   {
@@ -356,7 +356,7 @@
       "O RA IPv6 corrige automaticamente a máscara IPv4"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Gateway deve estar na mesma sub-rede do host. Máscara errada isola o gateway. DNS bom não salva L3 local. RA não ajusta máscara IPv4. APIPA não é automático com estático válido só por máscara “estranha” no mesmo sentido da opção.",
+    "explicacao_profunda": "Se a máscara faz o default gateway parecer fora da sub-rede do host, o SO trata o gateway como destino remoto e tenta alcançá-lo via… o próprio gateway, ou simplesmente não ARP-a corretamente — falha o alcance local ao GW e, em cascata, redes remotas, mesmo com DNS certo. AAAA não “passa a responder no lugar do A” por máscara IPv4. APIPA não é forçado só porque a máscara está estranha em IP estático válido. RA IPv6 não corrige máscara IPv4. Confira IP ∧ máscara ∧ gateway na mesma subnet.",
     "part_id": "1.5"
   },
   {
@@ -371,7 +371,7 @@
       "2001::db8::1"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "“::” só pode aparecer uma vez. 2001::db8::1 é inválido. As outras formas comprimem um único bloco de zeros de modo aceitável.",
+    "explicacao_profunda": "A regra de compressão permite um único “::” por endereço. 2001::db8::1 tem dois e é inválido — não dá para saber quantos hextetos zero cada um representa. 2001:db8:0:0:1::1, 2001:db8::1 e fe80::1 usam “::” uma vez só e expandem de forma única para 8 hextetos. Na prova, conte hextetos após expandir; se sobrar ambiguidade, a notação está errada.",
     "part_id": "1.5"
   },
   {
@@ -386,7 +386,7 @@
       "All-routers multicast no enlace"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "FF02::2 é all-routers. ::1 loopback, 2000::/3 GUA, ::/0 default unicast de roteamento — papéis diferentes.",
+    "explicacao_profunda": "FF02::2 é o multicast all-routers no escopo link-local: alcança roteadores IPv6 daquele enlace (usado, por exemplo, em RS). ::1 é loopback. 2000::/3 é a faixa ampla de GUA. ::/0 é a rota default unicast. Não misture grupo multicast de roteadores com endereço de loopback ou com default route. Pingar FF02::2 no lab lista quem se anuncia como roteador no link.",
     "part_id": "1.5"
   },
   {
@@ -401,7 +401,7 @@
       "O valor da wildcard mask IPv4 invertida em todo RA"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "A escolha de pilha depende de registros DNS e da política do sistema operacional. Cabo/PoE e wildcard IPv4 no RA não definem preferência AAAA/A.",
+    "explicacao_profunda": "Em dual-stack a preferência IPv6 vs IPv4 depende da resolução DNS (AAAA e/ou A) e da política da pilha no sistema operacional (tabela de precedência Happy Eyeballs etc.). Cor do cabo UTP e PoE na porta não escolhem a pilha. Wildcard mask IPv4 “invertida” em RA não existe como mecanismo de preferência AAAA/A. Para testar, resolva o nome e veja qual família o cliente tenta primeiro.",
     "part_id": "1.5"
   },
   {
@@ -416,7 +416,7 @@
       "show ipv6 route"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "show ipv6 route exibe rotas IPv6. DHCP binding e status de porta não são a RIB IPv6. ipconfig /all é comando de host Windows, não tabela do IOS.",
+    "explicacao_profunda": "show ipv6 route exibe a RIB IPv6, incluindo a default ::/0 quando presente. show ip dhcp binding lista leases IPv4. show interfaces status é L1/L2 de porta. ipconfig /all é comando de host Windows, não a tabela de roteamento do IOS. Sem ::/0 na RIB IPv6, tráfego remoto v6 falha mesmo com IPv4 ok — comece por esse show.",
     "part_id": "1.5"
   },
   {
@@ -431,7 +431,7 @@
       "O SLAAC funcione sem prefixo /64"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "PAT multiplexa conexões internas em IP público via portas. Não converte link-local em GUA, não remove opções DHCP nem redefine a necessidade de prefixo para SLAAC.",
+    "explicacao_profunda": "PAT (NAT overload) mapeia muitos hosts internos para um ou poucos IPs públicos diferenciando traduções pelas portas L4. Não transforma FE80:: em GUA automaticamente. Não faz o DHCP IPv4 parar de enviar máscara/DNS. Não remove a necessidade de prefixo /64 para SLAAC. Em CCNA, associe PAT a conservação de IPv4 público na borda, separado do endereçamento da LAN.",
     "part_id": "1.5"
   },
   {
@@ -446,7 +446,7 @@
       "Somente AAAA → desligar IPv4 sempre"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "O fluxo do content sobe do físico ao aplicativo: link, endereçamento, gateway, DNS, app. Começar só por DNS/NAT ou desligar IPv4 por padrão pula etapas essenciais.",
+    "explicacao_profunda": "A ordem mental do content sobe das camadas inferiores: verifique link L1/L2 (cabo, status, VLAN), depois IP/máscara, em seguida gateway, DNS e só então a aplicação. Começar só por DNS ou NAT pulando endereçamento local atrasa o diagnóstico. PoE/wildcard/EUI-64 fora de contexto ou “desligar IPv4 sempre” não são um método. Se ping ao GW falha, não adianta culpar o site HTTPS ainda.",
     "part_id": "1.5"
   }
 ]

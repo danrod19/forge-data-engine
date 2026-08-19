@@ -1,0 +1,767 @@
+[
+  {
+    "id": 1,
+    "part_id": "v2-1.1",
+    "sintoma": "NOC-1101: servidor de arquivos lento e timeouts. Após hardcode de duplex no switch, o problema piorou. Avalie o link de acesso.",
+    "expl": "Late collisions altos com half no switch e full no servidor são o clássico mismatch de duplex. A config mostra duplex half hardcoded. Alinhar (preferir auto/auto ou full/full) e ob",
+    "alt0": "Problema de default route no core; ignorar contadores",
+    "corr": 1,
+    "cli": "SW-ACC# show interfaces Gi1/0/18 status\nPort      Name           Status       Vlan  Duplex  Speed Type\nGi1/0/18  SRV-FIL"
+  },
+  {
+    "id": 2,
+    "part_id": "v2-1.1",
+    "sintoma": "NOC-1102: perda intermitente no uplink do building. Time de roteamento quer clear ip ospf process. Contadores do uplink:",
+    "expl": "OSPF FULL com CRC/input errors altos indica problema de mídia no link, não de adjacência lógica. clear ip ospf process é escopo errado. Trocar/limpar patch, validar SFP e fibra é o",
+    "alt0": "Executar clear ip ospf process porque FULL ainda pode estar ",
+    "corr": 2,
+    "cli": "EDGE# show ip ospf neighbor\nNeighbor ID     Pri State      Dead Time Address       Interface\n10.0.0.2          1 FULL/BD"
+  },
+  {
+    "id": 3,
+    "part_id": "v2-1.1",
+    "sintoma": "NOC-1103: novo link entre switches não sobe. Patch de cobre foi conectado à porta que espera SFP óptico.",
+    "expl": "notconnect com SFP ausente e mídia desconhecida é falha de transceiver/cabo/tipo. Cobre na gaiola óptica errada não estabelece 1000BaseSX. Instale SFP e fibra corretos ou use porta",
+    "alt0": "Forçar duplex half resolve notconnect óptico",
+    "corr": 3,
+    "cli": "SW-A# show interfaces Gi1/1/1\nGigabitEthernet1/1/1 is down, line protocol is down (notconnect)\n  Hardware is Gigabit Eth"
+  },
+  {
+    "id": 4,
+    "part_id": "v2-1.1",
+    "sintoma": "NOC-1104: link de campus em fibra flapping. DOM do lado local:",
+    "expl": "Rx Power −29 dBm abaixo do alarm low, com CRC, aponta sinal óptico ruim. Limpeza e patch são a primeira linha. BGP e VTY não afetam DOM. Forçar 100 em 10G óptico não é o remédio.",
+    "alt0": "RX power abaixo do limiar com CRC — sujeira/patch/atenuação ",
+    "corr": 0,
+    "cli": "SW-CORE# show interfaces Te1/1/1 transceiver detail\nITU Channel not available (Wavelength not available),\nTransceiver is"
+  },
+  {
+    "id": 5,
+    "part_id": "v2-1.1",
+    "sintoma": "NOC-1105: câmera IP a ~115 m de cabo Cat5e horizontal + patch. Não mantém 1G estável; erros altos.",
+    "expl": "Canal ~115 m em Cat5e com falha a 1G e CRC em 100 é típico de distância/cabeamento inadequados. O status a-100 com erros confirma degradação L1. Encurtar, recabeamento ou fibra/mid",
+    "alt0": "Configurar OSPF multi-area na câmera",
+    "corr": 2,
+    "cli": "SW-ACC# show interfaces Gi1/0/44 status\nPort      Name        Status    Vlan Duplex Speed Type\nGi1/0/44  CAM-PORTAO  con"
+  },
+  {
+    "id": 6,
+    "part_id": "v2-1.5",
+    "sintoma": "NOC-1501: AP-SALA-3 ligado (PoE delivering, porta connected) mas não aparece joined no WLC. SSID campus não sobe nessa sala.",
+    "expl": "PoE e connected ok, mas access vlan 40 (USERS) coloca o AP fora da management 20 onde o WLC e discovery vivem. Sem path CAPWAP correto o AP não junta. RF, NAT e PortFast não movem ",
+    "alt0": "Corrigir switchport access vlan 20 (management do AP) e vali",
+    "corr": 0,
+    "cli": "SW-ACC# show interfaces Gi1/0/24 status\nPort      Name         Status       Vlan  Duplex  Speed Type\nGi1/0/24  AP-SALA-3"
+  },
+  {
+    "id": 7,
+    "part_id": "v2-1.5",
+    "sintoma": "NOC-1502: AP-CORREDOR joined no WLC; SSID CORP anuncia; clientes associam mas não obtêm IP da VLAN 40. Desenho: access management no AP e dados centralizados no WLC.",
+    "expl": "AP joined e porta management 20 ok; o gap é WLAN sem interface/VLAN. Sem bind à VLAN 40 não há path de dados/DHCP de usuário. Cabo, desligar CAPWAP e access vlan 1 não criam o bind",
+    "alt0": "Trocar o cabo Cat5e por fibra monomodo no AP",
+    "corr": 2,
+    "cli": "WLC# show ap summary\nAP Name        State    IP Address\nAP-CORREDOR    Joined   10.20.0.18\n\nWLC# show wlan summary\nWLAN "
+  },
+  {
+    "id": 8,
+    "part_id": "v2-1.5",
+    "sintoma": "NOC-1503: design multi-VLAN no cabo do AP (trunk). AP intermitente no join; management deveria ser VLAN 20 untagged (native). Após mudança de switch, SSID some na ala.",
+    "expl": "Native 1 com management untagged esperando 20 causa CAPWAP na VLAN errada. Allowed já tem 20,40,50; o mismatch é native. Corrija native 20. Remover 40 e ip routing na porta do AP n",
+    "alt0": "Remover VLAN 40 do allowed (piora usuários)",
+    "corr": 3,
+    "cli": "SW-ACC# show run interface Gi1/0/30\ninterface GigabitEthernet1/0/30\n description AP-ALA-B\n switchport trunk encapsulatio"
+  },
+  {
+    "id": 9,
+    "part_id": "v2-1.5",
+    "sintoma": "NOC-1504: AP-SALA-1 joined; WLAN GUEST criado com SSID e PSK, mas não aparece nos clientes e sem contadores de associação. Interface dinâmica do guest não associada.",
+    "expl": "APs joined e CORP ok; GUEST aponta para management em vez da VLAN 60. Crie a interface dinâmica guest e faça o bind. Derrubar APs, forçar native 60 e LAG no access do AP não corrig",
+    "alt0": "Desligar todos os APs e recriar SSIDs CORP",
+    "corr": 1,
+    "cli": "WLC# show ap summary\nAP-SALA-1   Joined   10.20.0.11\nAP-SALA-2   Joined   10.20.0.12\n\nWLC# show wlan summary\nWLAN ID  Pr"
+  },
+  {
+    "id": 10,
+    "part_id": "v2-1.5",
+    "sintoma": "NOC-1505: engenheiro habilitou LAG no WLC e configurou Port-channel no switch de distribuição. Uplinks do WLC não agregam como esperado; APs flapeiam. Config salva no WLC sem reboot ainda.",
+    "expl": "Switch já mostra Po1 bundlado; o WLC indica LAG enabled com mudança pendente de reboot. Aplique o reload do controller e revalide path. Access vlan 1, matar CAPWAP e PortFast no Po",
+    "alt0": "Remover o Port-channel e usar só access vlan 1 no WLC",
+    "corr": 2,
+    "cli": "WLC# show lag summary\nLAG Enabled\n(note: change pending / requires reboot on this platform)\n\nDIST# show etherchannel sum"
+  },
+  {
+    "id": 11,
+    "part_id": "v2-1.6",
+    "sintoma": "HD-1601: estação Windows 'sem rede' após técnico aplicar IP estático manual. Corrija com base no output.",
+    "expl": "Mask /16 e gateway 10.41.0.1 estão fora do desenho 10.40.0.0/24 com SVI 10.40.0.1. Destination host unreachable confirma GW inválido. Configure estático correto no Windows. MX e fo",
+    "alt0": "Corrigir no OS: mask 255.255.255.0 e gateway 10.40.0.1 (está",
+    "corr": 0,
+    "cli": "C:\\> ipconfig /all\nEthernet adapter Ethernet:\n   DHCP Enabled. . . . . . . . . . . : No\n   IPv4 Address. . . . . . . . ."
+  },
+  {
+    "id": 12,
+    "part_id": "v2-1.6",
+    "sintoma": "HD-1602: notebook Windows não navega; DHCP deveria estar ativo na VLAN.",
+    "expl": "169.254 e falha no /renew mostram ausência de DORA. No ângulo 1.6 reconheça APIPA e evite estático inventado; verifique associação Wi-Fi/VLAN e escale DHCP/rede (1.7). DNS público ",
+    "alt0": "Tratar 169.254 como IP de produção e criar rota estática par",
+    "corr": 2,
+    "cli": "C:\\> ipconfig /all\nWireless LAN adapter Wi-Fi:\n   DHCP Enabled. . . . . . . . . . . : Yes\n   Autoconfiguration Enabled ."
+  },
+  {
+    "id": 13,
+    "part_id": "v2-1.6",
+    "sintoma": "HD-1603: VM Linux alcança hosts da mesma subnet via IP antigo residual, mas não sai da LAN.",
+    "expl": "ip route sem default e Network is unreachable para o GW/Internet isolam falta de gateway no Linux. LAN on-link funciona. Adicione default via 10.40.0.1 ou obtenha via DHCP. TLS/DNS",
+    "alt0": "Problema exclusivo de certificado TLS",
+    "corr": 3,
+    "cli": "user@vm:~$ ip addr show eth0\n2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP>\n    inet 10.40.0.77/24 brd 10.40.0.255 scope glo"
+  },
+  {
+    "id": 14,
+    "part_id": "v2-1.6",
+    "sintoma": "HD-1604: Mac/Linux do dev: git clone por IP do servidor ok; por hostname falha. Rede 'parece ok'.",
+    "expl": "Ping IP e GW ok; dig timeout no DNS listado no OS. Configure DNS válido (corporativo alcançável). É o ângulo 1.6/4.4 no host. Não há APIPA nem evidência de duplex.",
+    "alt0": "Trocar a mask para 255.0.0.0",
+    "corr": 2,
+    "cli": "dev@mac:~$ ping -c 2 10.20.5.40\n64 bytes from 10.20.5.40: icmp_seq=0 ttl=62 time=2 ms\n\ndev@mac:~$ ping -c 1 git.empresa."
+  },
+  {
+    "id": 15,
+    "part_id": "v2-1.6",
+    "sintoma": "HD-1605: usuário insiste que 'o PC está errado'. Valide com tracert se a falha é local.",
+    "expl": "ipconfig coerente, ping GW ok, tracert passa hop 1 e 2 e morre depois, DNS interno resolve. O cliente está verificado; o problema está além. Evite reconfigurar o OS sem erro local.",
+    "alt0": "Reconfigurar IP/mask/gateway do PC imediatamente (locais ok)",
+    "corr": 1,
+    "cli": "C:\\> ipconfig\n   IPv4 Address. . . . . . . . . . . : 10.40.0.91\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   "
+  },
+  {
+    "id": 16,
+    "part_id": "v2-1.7",
+    "sintoma": "NOC-1701: notebooks na VLAN 40 ficam em 'Obtendo IP' e caem em 169.254.x.x. Porta access e SVI ok.",
+    "expl": "APIPA com L2 e SVI up, server remoto e zero helper no SVI 40 é o clássico de relay ausente. Broadcast DHCP não cruza L3. Configure ip helper-address 10.10.10.53 em Vlan40. Derrubar",
+    "alt0": "CRC na fibra do ISP causa APIPA local",
+    "corr": 1,
+    "cli": "PC> ipconfig\n   IPv4 Address. . . . . . . . . . . : 169.254.67.12\n   Subnet Mask . . . . . . . . . . . : 255.255.0.0\n   "
+  },
+  {
+    "id": 17,
+    "part_id": "v2-1.7",
+    "sintoma": "NOC-1702: helper existe, mas foi colocado no uplink em vez do SVI de usuários. VLAN 30 em APIPA.",
+    "expl": "O helper precisa estar na interface/SVI onde o Discover é recebido (VLAN 30). No WAN uplink ele não relê o broadcast dos PCs da 30. Evidência: sem Discover no server e APIPA nos ho",
+    "alt0": "Helper no uplink WAN atende automaticamente Vlan30",
+    "corr": 2,
+    "cli": "CORE# show run | include helper-address\n ip helper-address 10.10.10.53\n\nCORE# show run interface GigabitEthernet0/0/1\n d"
+  },
+  {
+    "id": 18,
+    "part_id": "v2-1.7",
+    "sintoma": "NOC-1703: primeiros 50 PCs ok; a partir de hoje novos notebooks não obtêm IP. Server local na VLAN.",
+    "expl": "show ip dhcp pool com 254 leased e free efetivo zero explica por que só novos clientes falham. Hosts antigos mantêm lease. Não é helper (server local, bindings cheios). Expanda o p",
+    "alt0": "Falta de cabo no core de Internet",
+    "corr": 3,
+    "cli": "R1# show ip dhcp pool USERS\nPool USERS :\n Utilization mark (high/low)    : 100 / 0\n Subnet size (first/next)       : 0 /"
+  },
+  {
+    "id": 19,
+    "part_id": "v2-1.7",
+    "sintoma": "NOC-1704: host tem IP na subnet e ping em vizinhos ok, mas não sai da VLAN. DNS também aponta para IP legado.",
+    "expl": "Lease existe, mas default-router 10.40.0.254 não é o SVI real (10.40.0.1) e DNS 192.0.2.53 está legado. Sintoma de options erradas. Ajuste o pool e ipconfig /renew. Desligar DHCP n",
+    "alt0": "Options default-router e dns-server incorretas no pool — cor",
+    "corr": 0,
+    "cli": "PC> ipconfig /all\n   IPv4 Address. . . . . . . . . . . : 10.40.0.88\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0"
+  },
+  {
+    "id": 20,
+    "part_id": "v2-1.7",
+    "sintoma": "NOC-1705: hosts dual-stack na LAN de lab. Política: GUA via DHCPv6 stateful. PCs só mostram link-local.",
+    "expl": "IPv4 DHCP ok; IPv6 só fe80 e zero bindings v6 com server não configurado. Falta o serviço DHCPv6/RA para GUA. Não é MX nem CRC. Ative pool/server (ou SLAAC com prefixo) conforme a ",
+    "alt0": "IPv4 APIPA está causando a falta de GUA",
+    "corr": 3,
+    "cli": "PC> ipconfig\n   IPv6 Address. . . . . . . . . . . : fe80::d1e2:33ff:fe44:5566%12\n   IPv4 Address. . . . . . . . . . . : "
+  },
+  {
+    "id": 21,
+    "part_id": "v2-2.2",
+    "sintoma": "NOC-2201: PC da contabilidade não alcança servidores da VLAN 40. Cabo e NIC ok em outro ponto.",
+    "expl": "Status e running-config mostram access vlan 1; o desenho é VLAN 40. Ajuste access vlan 40. PoE não alimenta PC típico; trunk no endpoint e remover PortFast não movem a VLAN de dado",
+    "alt0": "Problema de PoE fault no PC",
+    "corr": 1,
+    "cli": "SW-ACC# show interfaces Gi1/0/18 status\nPort      Name           Status       Vlan  Duplex  Speed Type\nGi1/0/18  PC-CONT"
+  },
+  {
+    "id": 22,
+    "part_id": "v2-2.2",
+    "sintoma": "NOC-2202: PC atrás do telefone navega; telefone não registra no call control. PoE delivering.",
+    "expl": "PoE ok e Voice VLAN: none com PC na 40 explicam voz falha e dados ok. Configure voice vlan. Não desligue PoE que está delivering; trunk nativo não substitui o desenho voice vlan de",
+    "alt0": "Aumentar a largura do Port-channel do core",
+    "corr": 2,
+    "cli": "SW-ACC# show run interface Gi1/0/7\ninterface GigabitEthernet1/0/7\n description MESA-12-PHONE\n switchport mode access\n sw"
+  },
+  {
+    "id": 23,
+    "part_id": "v2-2.2",
+    "sintoma": "NOC-2203: AP novo não acende LEDs; sem discovery no WLC. Cabo recém-passado.",
+    "expl": "notconnect e power off/absent mostram que L1/PoE não estabeleceram. VLAN 15 e PortFast já estão; sem link o WLC não descobre o AP. Troque cabo/teste outra porta PoE/PD. Voice e OSP",
+    "alt0": "Falta de voice vlan 15 no AP",
+    "corr": 3,
+    "cli": "SW-ACC# show interfaces Gi1/0/24 status\nPort      Name        Status       Vlan  Duplex Speed Type\nGi1/0/24  AP-SALA-3  "
+  },
+  {
+    "id": 24,
+    "part_id": "v2-2.2",
+    "sintoma": "NOC-2204: câmera IoT não obtém IP na VLAN 80; às vezes 'link estranho'. Config encontrada:",
+    "expl": "Câmera/IoT deve ser access na VLAN 80, não trunk. Operational trunk com native 1 explica IP errado/ausente. Corrija mode access + access vlan 80. Voice e IP na L2 port do switch nã",
+    "alt0": "Manter trunk e adicionar voice vlan 80",
+    "corr": 2,
+    "cli": "SW-ACC# show run interface Gi1/0/33\ninterface GigabitEthernet1/0/33\n description CAM-PORTAO\n switchport trunk encapsulat"
+  },
+  {
+    "id": 25,
+    "part_id": "v2-2.2",
+    "sintoma": "NOC-2205: PCs em mesas novas demoram ~40s para pegar DHCP; portas access recém-criadas sem PortFast. Uma porta de sala de reunião vazia ficou up por engano.",
+    "expl": "Learning sem PortFast atrasa o forwarding e o DHCP no boot. Portas vazias devem ficar em shutdown. Edge: PortFast nas mesas + shutdown na 48. Trunk em massa e matar DHCP pioram o s",
+    "alt0": "Habilitar spanning-tree portfast nas access de usuário e shu",
+    "corr": 0,
+    "cli": "SW-ACC# show run interface Gi1/0/40\ninterface GigabitEthernet1/0/40\n description PC-MESA-NOVA\n switchport mode access\n s"
+  },
+  {
+    "id": 26,
+    "part_id": "v2-2.4",
+    "sintoma": "NOC-2401: gateway não alcança o servidor 10.40.0.50. Capture e ARP abaixo.",
+    "expl": "Incomplete + who-has sem is-at + notconnect na porta do server isolam L2/host. Capture confirma ausência de reply. Levante link/VLAN/host; OSPF e MX não geram is-at.",
+    "alt0": "clear ip ospf process no ABR",
+    "corr": 1,
+    "cli": "GW# show ip arp 10.40.0.50\nProtocol  Address          Age (min)  Hardware Addr   Type   Interface\nInternet  10.40.0.50  "
+  },
+  {
+    "id": 27,
+    "part_id": "v2-2.4",
+    "sintoma": "NOC-2402: ping 10.50.0.20 falha. ARP do próximo hop ok. Capture no path:",
+    "expl": "Requests no PCAP e rota presente com ACL deny icmp echo explicam a falta de reply. Não é membership VLAN local nem falta de default no PC. SPAN só observa; não causa o timeout sozi",
+    "alt0": "VLAN access do PC está errada (ARP local ok e echo sai)",
+    "corr": 2,
+    "cli": "PC> ping 10.50.0.20\nRequest timed out.\n\nPC> tracert -d 10.50.0.20\n  1  10.40.0.1\n  2  10.0.0.2\n  3  * * *\n\nWireshark (cl"
+  },
+  {
+    "id": 28,
+    "part_id": "v2-2.4",
+    "sintoma": "NOC-2403: browser em https://app.empresa.local falha. DNS resolve. Capture:",
+    "expl": "DNS ok; SYN retransmit sem SYN-ACK é o padrão de porta filtrada ou serviço morto. ACL deny 443 e nota de maintenance fecham. Não é DHCP nem ARP local.",
+    "alt0": "Problema de ARP Incomplete no gateway do PC (não há evidênci",
+    "corr": 3,
+    "cli": "PC> nslookup app.empresa.local\nAddress: 10.20.5.40\n\nWireshark filter tcp.port==443 && ip.addr==10.20.5.40:\nFrame 1: 10.4"
+  },
+  {
+    "id": 29,
+    "part_id": "v2-2.4",
+    "sintoma": "NOC-2404: técnico diz que 'Wireshark não captura nada' enquanto o PC gera pings. SPAN config:",
+    "expl": "show monitor prova source na porta spare notconnect, não na do PC. Capture vazia é misconfig de SPAN. Aponte source para Gi1/0/10 ou VLAN 40. Destination no sniffer está correto; E",
+    "alt0": "Source SPAN em Gi1/0/2 (spare) — corrigir source para Gi1/0/",
+    "corr": 0,
+    "cli": "SW# show monitor session 1\nSession 1\n---------\nType                   : Local Session\nSource Ports           :\n    Both "
+  },
+  {
+    "id": 30,
+    "part_id": "v2-2.4",
+    "sintoma": "NOC-2405: notebook em APIPA. Capture no access da VLAN 40:",
+    "expl": "Discover retransmitido sem Offer e APIPA, com server em outra subnet e SVI sem helper, é o padrão de relay ausente. A captura prova o Discover no segmento. MAC aprendido só mostra ",
+    "alt0": "DORA completo com Offer oculto (não há Offer no PCAP)",
+    "corr": 2,
+    "cli": "Wireshark (bootp/dhcp):\nFrame 1: DHCP Discover  src MAC aa:bb:cc:dd:ee:01  chaddr=aa:bb:cc:dd:ee:01\nFrame 2: DHCP Discov"
+  },
+  {
+    "id": 31,
+    "part_id": "v2-2.5",
+    "sintoma": "NOC-2501: tráfego da VLAN 40 sobe pelo access do prédio A; path subótimo. Root não é o core.",
+    "expl": "Root ID em ACC-A com priority 24576 explica o root no access. Configure root primary no CORE (priority menor) e remova a priority baixa do access. Não é snooping nem PortFast no co",
+    "alt0": "BPDU Guard no CORE",
+    "corr": 2,
+    "cli": "CORE# show spanning-tree vlan 40 | include Root ID|Bridge ID|Priority\nRoot ID    Priority    32768\n           Address   "
+  },
+  {
+    "id": 32,
+    "part_id": "v2-2.5",
+    "sintoma": "NOC-2502: após 'otimizar' uplinks, tempestade de broadcast intermitente entre SW-A e SW-B.",
+    "expl": "PortFast+BPDU Guard em uplink entre switches é misconfig: BPDUs legítimos do peer disparam err-disable e a topologia fica instável. Tire edge features do inter-switch. Não desligue",
+    "alt0": "Manter PortFast+Guard no uplink — é best practice inter-swit",
+    "corr": 1,
+    "cli": "SW-A# show run interface Gi1/0/48\ninterface GigabitEthernet1/0/48\n description UPLINK-TO-SW-B\n switchport mode trunk\n sp"
+  },
+  {
+    "id": 33,
+    "part_id": "v2-2.5",
+    "sintoma": "NOC-2503: mesa do usuário caiu; porta vermelha. Notebook estava ok; alguém pluggou um switch de 5 portas.",
+    "expl": "Log BPDU Guard + PortFast na access + err-disabled fecham o diagnóstico. Remova o switch de mesa e reative a porta. Helper e root do core não geram esse log.",
+    "alt0": "Root priority errada no core apenas",
+    "corr": 3,
+    "cli": "SW# show interfaces Gi1/0/12 status\nPort      Name      Status         Vlan Duplex Speed\nGi1/0/12  MESA-12   err-disable"
+  },
+  {
+    "id": 34,
+    "part_id": "v2-2.5",
+    "sintoma": "NOC-2504: técnico de campo diz que o segundo uplink 'está morto' e quer trocar o cabo. Evidência:",
+    "expl": "Connected + Altn BLK com Root FWD no outro uplink é topologia STP saudável. O segundo path fica de backup. Trocar cabo ou PortFast no uplink piora. Explique o papel alternate.",
+    "alt0": "Trocar o cabo de Gi1/0/47 imediatamente — BLK significa L1 d",
+    "corr": 2,
+    "cli": "SW-ACC# show interfaces Gi1/0/47 status\nPort      Name         Status    Vlan  Duplex Speed\nGi1/0/47  UPLINK-B     conne"
+  },
+  {
+    "id": 35,
+    "part_id": "v2-2.5",
+    "sintoma": "NOC-2505: após change, CPU alta, MAC flapping VLAN 50, usuários offline. Dois trunks paralelos no access.",
+    "expl": "no spanning-tree vlan 50 com dois uplinks connected cria loop L2 (flapping/storm). A correção é reabilitar STP e aceitar o bloqueio de um path. Mais trunks sem STP piora. BPDU Guar",
+    "alt0": "Reabilitar spanning-tree na VLAN 50 e deixar o STP bloquear ",
+    "corr": 0,
+    "cli": "SW-ACC# show run | include spanning-tree vlan 50\nno spanning-tree vlan 50\n\nSW-ACC# show mac address-table dynamic vlan 5"
+  },
+  {
+    "id": 36,
+    "part_id": "v2-3.2",
+    "sintoma": "NOC-3201: site stub — LAN 10.40.0.0/24 ok; Internet e redes remotas unreachable. Sem IGP.",
+    "expl": "Gateway of last resort is not set e só há C/L: sem S* para Internet. LAN e WAN links estão up. Adicione default via CE 203.0.113.1. PortFast/OSPF não explicam a tabela vazia de rem",
+    "alt0": "Falta PortFast na Vlan40",
+    "corr": 1,
+    "cli": "EDGE# show ip route\nCodes: C - connected, S - static, R - RIP, M - mobile, B - BGP\n       D - EIGRP, O - OSPF, IA - OSPF"
+  },
+  {
+    "id": 37,
+    "part_id": "v2-3.2",
+    "sintoma": "NOC-3202: desenho pedia floating backup; a rota de ‘backup’ nunca fica de reserva — às vezes compete com a primária.",
+    "expl": "Duas statics com AD 1 instalam ambas (ECMP/candidates iguais). Floating exige AD maior no backup. Corrija para ip route ... 10.0.0.6 210. Links estão up.",
+    "alt0": "Next-hop 10.0.0.6 está down",
+    "corr": 3,
+    "cli": "R1# show run | include ip route 10.20.0.0\nip route 10.20.0.0 255.255.0.0 10.0.0.2\nip route 10.20.0.0 255.255.0.0 10.0.0."
+  },
+  {
+    "id": 38,
+    "part_id": "v2-3.2",
+    "sintoma": "NOC-3203: após queda do link WAN primário, a static some e o site fica sem rota; floating configurada não aparece.",
+    "expl": "Config tem primária e floating, mas Gi0/0/1 e Gi0/0/2 down: nenhum next-hop usable. Floating não é mágica sem circuito backup up. OSPF não é requisito. Levante o path 198.51.100.0/",
+    "alt0": "Floating AD 200 é inválida",
+    "corr": 2,
+    "cli": "EDGE# show run | include ip route\nip route 0.0.0.0 0.0.0.0 203.0.113.1\nip route 0.0.0.0 0.0.0.0 198.51.100.1 200\n\nEDGE# "
+  },
+  {
+    "id": 39,
+    "part_id": "v2-3.2",
+    "sintoma": "NOC-3204: rota estática ‘para o DC 10.50.1.0’ não leva ao host 10.50.2.20.",
+    "expl": "Network not in table para 10.50.2.20 com static só de 10.50.1.0/24 prova cobertura insuficiente. Ajuste o prefixo ao desenho /16 ou adicione 10.50.2.0/24. AD/exit-if não expandem a",
+    "alt0": "Next-hop 10.0.0.2 está errado de AD",
+    "corr": 3,
+    "cli": "R1# show run | include ip route 10.50\nip route 10.50.1.0 255.255.255.0 10.0.0.2\n\nR1# show ip route 10.50.2.20\n% Network "
+  },
+  {
+    "id": 40,
+    "part_id": "v2-3.2",
+    "sintoma": "NOC-3205: static via exit-interface Gi0/0/0 sem next-hop; comportamento estranho de ARP e encaminhamento no multiacesso.",
+    "expl": "A rota aparece ‘directly connected’ via Gi0/0/0 sem next-hop — típico de static só com exit-if, com riscos de proxy ARP no multiacesso. O desenho queria 10.0.0.2. Reescreva ip rout",
+    "alt0": "Preferir next-hop 10.0.0.2 (ou exit-if + next-hop) em Ethern",
+    "corr": 0,
+    "cli": "R1# show run | include ip route 172.16\nip route 172.16.0.0 255.255.0.0 GigabitEthernet0/0/0\n\nR1# show ip route 172.16.0."
+  },
+  {
+    "id": 41,
+    "part_id": "v2-3.3",
+    "sintoma": "NOC-3301: R1 e R2 não formam neighbor no link de campus. Hellos não estabelecem FULL.",
+    "expl": "Area 0 no R1 e area 1 no R2 no mesmo link impedem adjacência. Timers e MTU batem. Corrija para a mesma area. Não há evidência de RID duplicado nem de voice na WAN.",
+    "alt0": "Area mismatch (0 vs 1) — alinhar area-id no link para single",
+    "corr": 0,
+    "cli": "R1# show ip ospf interface GigabitEthernet0/0/0 | include Area|Network Type|Hello|Dead|MTU\n  Network Type BROADCAST, Cos"
+  },
+  {
+    "id": 42,
+    "part_id": "v2-3.3",
+    "sintoma": "NOC-3302: neighbor oscila/trava em EXSTART entre R1-R2 no link p2p Ethernet.",
+    "expl": "EXSTART nos dois lados com MTU diferente é o clássico. Area e p2p batem. Ajuste MTU para o mesmo valor. Passive no WAN pioraria; não há mismatch de area.",
+    "alt0": "Area mismatch (ambos area 0)",
+    "corr": 3,
+    "cli": "R1# show ip ospf neighbor\nNeighbor ID     Pri   State           Dead Time   Address         Interface\n2.2.2.2           "
+  },
+  {
+    "id": 43,
+    "part_id": "v2-3.3",
+    "sintoma": "NOC-3303: WAN entre R1-R2 sem neighbor; LANs de usuário estão no OSPF.",
+    "expl": "No Hellos (Passive interface) em Gi0/0/1 com passive default e apenas Gi0/0/0 com no passive explica Nbrs 0/0 no WAN. Adicione no passive-interface Gi0/0/1. RID 1.1.1.1 é válido.",
+    "alt0": "MTU 0 no WAN",
+    "corr": 1,
+    "cli": "R1# show run | section router ospf\nrouter ospf 1\n router-id 1.1.1.1\n passive-interface default\n no passive-interface Gig"
+  },
+  {
+    "id": 44,
+    "part_id": "v2-3.3",
+    "sintoma": "NOC-3304: adjacências instáveis após clone de config; dois routers com o mesmo RID.",
+    "expl": "Log DUP_RTRID e mesmo process ID 10.10.10.10 em R1/R2 são RID duplicado. Use RID alinhado às loopbacks distintas e clear process com cuidado. Não mantenha duplicata.",
+    "alt0": "Manter RID duplicado; FULL com mesmo ID é ideal",
+    "corr": 3,
+    "cli": "R1# show ip ospf\n Routing Process \"ospf 1\" with ID 10.10.10.10\n\nR2# show ip ospf\n Routing Process \"ospf 1\" with ID 10.10"
+  },
+  {
+    "id": 45,
+    "part_id": "v2-3.3",
+    "sintoma": "NOC-3305: IPv4 entre filiais ok via OSPFv2 FULL; hosts IPv6 não roteiam. R1/R2 dual-stack.",
+    "expl": "IPv6 na interface sem ospfv3/ipv6 ospf e neighbor v3 vazio explicam ausência de rotas OIPv6. Habilite OSPFv3 e RID 32-bit válido. Hello v2 e passive v2 não carregam o plano IPv6.",
+    "alt0": "Aumentar Hello do OSPFv2 resolve IPv6",
+    "corr": 2,
+    "cli": "R1# show ip ospf neighbor\nNeighbor ID  State    Address     Interface\n2.2.2.2      FULL/  - 10.0.0.2    Gi0/0/1\n\nR1# sho"
+  },
+  {
+    "id": 46,
+    "part_id": "v2-3.4",
+    "sintoma": "NOC-3401: design pedia R1 como Active do VIP 10.40.0.1; na prática R2 encaminha e R1 está Standby.",
+    "expl": "show standby brief: R2 Active com Pri 100 e R1 Standby com 90. Preempt em R1 não vence priority menor. Ajuste R1 para priority 110+ (e preempt). Grupo e VIP já batem.",
+    "alt0": "Grupo mismatch",
+    "corr": 1,
+    "cli": "R1# show standby brief\n                     P indicates configured to preempt.\nInterface   Grp  Pri P State   Active    "
+  },
+  {
+    "id": 47,
+    "part_id": "v2-3.4",
+    "sintoma": "NOC-3402: após manutenção, R1 (preferido) voltou up mas o tráfego continua no R2; operadores querem R1 Active de novo.",
+    "expl": "R1 tem Pri 120 mas sem P/preempt e fica Standby; R2 Active com 100. Habilite standby 40 preempt no R1 para reconquistar Active. VIP/grupo ok.",
+    "alt0": "VIP precisa mudar para .2",
+    "corr": 3,
+    "cli": "R1# show standby brief\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nVl40        40  120    "
+  },
+  {
+    "id": 48,
+    "part_id": "v2-3.4",
+    "sintoma": "NOC-3403: hosts perdem gateway intermitente; dois routers ‘Active’ reportados na mesma VLAN.",
+    "expl": "Grupo 40 vs 41 com Standby unknown = peers não se veem no mesmo grupo. Corrija standby 40 (ou 41) nos dois com o mesmo VIP. Priority/preempt secundários até o grupo casar.",
+    "alt0": "Alinhar o número do grupo (ex. ambos 40) e o VIP — mismatch ",
+    "corr": 0,
+    "cli": "R1# show standby Vlan40\nVlan40 - Group 40\n  State is Active\n  Virtual IP address is 10.40.0.1\n  Active router is local\n "
+  },
+  {
+    "id": 49,
+    "part_id": "v2-3.4",
+    "sintoma": "NOC-3404: um router de borda caiu e toda a VLAN perdeu Internet; só havia um gateway físico no DHCP.",
+    "expl": "Sem standby e com DHCP apontando ao IP físico do R1, a queda do R1 isola os hosts apesar do R2 up. Configure HSRP e mude o gateway dos hosts para o VIP.",
+    "alt0": "HSRP já está Active em ambos",
+    "corr": 2,
+    "cli": "PC> ipconfig\n   IPv4 Address. . . . . . . . . . . : 10.40.0.55\n   Default Gateway . . . . . . . . . : 10.40.0.2\n\nR1# sho"
+  },
+  {
+    "id": 50,
+    "part_id": "v2-3.4",
+    "sintoma": "NOC-3405: HSRP não estabiliza; show standby fica em Speak/Init; VIP não responde ping.",
+    "expl": "Speak com Active unknown e Vlan40 up/down no R1 mostram falha de interface/L2, não só priority. R2 pode ficar Active sozinho; R1 não forma Standby saudável até o SVI ficar up/up. C",
+    "alt0": "Priority default proíbe Active",
+    "corr": 3,
+    "cli": "R1# show standby Vlan40\nVlan40 - Group 40\n  State is Speak\n  Virtual IP address is 10.40.0.1\n  Active router is unknown\n"
+  },
+  {
+    "id": 51,
+    "part_id": "v2-4.2",
+    "sintoma": "NOC-4201: auditoria de segurança — switch de acesso ainda aceita Telnet. SSH também está configurado.",
+    "expl": "Telnet Open prova cleartext ainda permitido apesar do SSH ok. transport input ssh only fecha o Telnet. Não remova chaves nem o usuário admin.",
+    "alt0": "Remover todas as chaves RSA",
+    "corr": 1,
+    "cli": "SW# show run | section line vty\nline vty 0 4\n login local\n transport input telnet ssh\n!\nline vty 5 15\n login local\n tran"
+  },
+  {
+    "id": 52,
+    "part_id": "v2-4.2",
+    "sintoma": "NOC-4202: SSH Connection refused; Telnet também recusado. Device acessível por console.",
+    "expl": "show ip ssh: not enabled e ausência de domain-name/key explicam refused. transport ssh está correto na intenção; complete RSA. VLAN e path estão ok pelo ping.",
+    "alt0": "Falta domain-name e crypto key generate rsa — SSH not enable",
+    "corr": 0,
+    "cli": "R1# show run | include hostname|domain-name|crypto key|ip ssh\nhostname R1\n (no ip domain-name)\n (no crypto key rsa)\n (no"
+  },
+  {
+    "id": 53,
+    "part_id": "v2-4.2",
+    "sintoma": "NOC-4203: rotina de backup noturno usa TFTP da DMZ para cores com secrets. Time de segurança reprova.",
+    "expl": "TFTP cleartext em path compartilhado expõe a config. Com SSH enabled e usuário backup, SCP/SFTP é o caminho. FTP anônimo e Telnet pioram. Hashes e secrets ainda são sensíveis.",
+    "alt0": "Manter TFTP; hashes nunca são úteis a atacantes",
+    "corr": 2,
+    "cli": "CORE# show run | include tftp|scp|sftp|ftp\nip tftp source-interface Loopback0\n\n! cron/script excerpt:\ncopy running-confi"
+  },
+  {
+    "id": 54,
+    "part_id": "v2-4.2",
+    "sintoma": "NOC-4204: admin legítimo no jump 10.50.1.20 não entra; outro jump 10.255.1.5 ok. SSH server up.",
+    "expl": "Log deny e assimetria entre jumps isolam a ACL da VTY. SSH e chave ok (jump B). Inclua 10.50.1.20/subnet do jump A. Telnet não é a correção de segurança.",
+    "alt0": "Gerar nova chave RSA imediatamente (server já enabled e func",
+    "corr": 3,
+    "cli": "SW# show ip ssh\nSSH Enabled - version 2.0\n\nSW# show run | section line vty\nline vty 0 4\n login local\n transport input ss"
+  },
+  {
+    "id": 55,
+    "part_id": "v2-4.2",
+    "sintoma": "NOC-4205: estagiário propõe FTP para enviar running-config com senhas ao servidor de backup interno. Compare com SCP.",
+    "expl": "A captura de lab e a natureza do FTP mostram cleartext. SCP usa SSH já enabled. Não desligue SSH nem normalize FTP para secrets.",
+    "alt0": "FTP é preferível porque mostra a senha no comando para audit",
+    "corr": 2,
+    "cli": "Proposed:\n  copy running-config ftp://user:Passw0rd@10.20.5.10/edge.cfg\n\nAlternative available:\n  copy running-config sc"
+  },
+  {
+    "id": 56,
+    "part_id": "v2-4.3",
+    "sintoma": "NOC-4301: hosts 10.40.0.0/24 sem Internet; default route ok; NAT configurado mas translations vazia.",
+    "expl": "ACL e overload existem, default route existe, mas LAN está outside e WAN inside. Invertendo a direção, o tráfego dos hosts não gera translations. Corrija: LAN inside, WAN outside.",
+    "alt0": "ACL 1 está errada para /24",
+    "corr": 3,
+    "cli": "EDGE# show run | section nat|include access-list 1|ip nat\naccess-list 1 permit 10.40.0.0 0.0.0.255\nip nat inside source "
+  },
+  {
+    "id": 57,
+    "part_id": "v2-4.3",
+    "sintoma": "NOC-4302: só a VLAN 10 navega; VLAN 40 (nova) não cria NAT.",
+    "expl": "Vlan40 já é inside e WAN outside; translations só de 10.10.x. A list 10 não permite 10.40.0.0/24. Adicione permit 10.40.0.0 0.0.0.255 (ou ACL dedicada).",
+    "alt0": "Vlan40 não tem ip nat inside",
+    "corr": 1,
+    "cli": "EDGE# show run | include access-list 10|nat inside source\naccess-list 10 permit 10.10.0.0 0.0.0.255\nip nat inside source"
+  },
+  {
+    "id": 58,
+    "part_id": "v2-4.3",
+    "sintoma": "NOC-4303: primeiros hosts ok; a partir do 6º usuário simultâneo a Internet falha. Sem overload.",
+    "expl": "5 globais, 5 translations, misses altos e host novo falha: dynamic sem overload esgotou. Habilite overload no list/pool ou use interface overload. Direção e ACL estão coerentes com",
+    "alt0": "inside/outside invertidos",
+    "corr": 3,
+    "cli": "EDGE# show run | section nat\nip nat pool PUBLIC 203.0.113.10 203.0.113.14 netmask 255.255.255.0\naccess-list 1 permit 10."
+  },
+  {
+    "id": 59,
+    "part_id": "v2-4.3",
+    "sintoma": "NOC-4304: server 10.40.0.10 tem static e é alcançável de fora; usuários da mesma VLAN não navegam.",
+    "expl": "Só há static do .10; usuários não têm inside source list/overload. Default route existe (server inbound path ok o suficiente). Adicione PAT para 10.40.0.0/24.",
+    "alt0": "Ampliar a static para any any",
+    "corr": 2,
+    "cli": "EDGE# show run | include nat|access-list 1\nip nat inside source static 10.40.0.10 203.0.113.10\naccess-list 1 permit 10.4"
+  },
+  {
+    "id": 60,
+    "part_id": "v2-4.3",
+    "sintoma": "NOC-4305: usuário faz ping 8.8.8.8 a partir do PC; edge encaminha mas show ip nat translations permanece vazio.",
+    "expl": "Inside/outside e overload existem, mas a list casa 10.50, não 10.40. O PC em 10.40 sai sem translation (source ainda privado). Corrija a ACL. ICMP é suportado em PAT; o problema é ",
+    "alt0": "Interesting traffic ACL permite 10.50/24, não 10.40/24 — pac",
+    "corr": 0,
+    "cli": "EDGE# show run | include nat|access-list\naccess-list 1 permit 10.50.0.0 0.0.0.255\nip nat inside source list 1 interface "
+  },
+  {
+    "id": 61,
+    "part_id": "v2-4.4",
+    "sintoma": "NOC-4401: usuários abrem o portal pelo IP 10.20.5.40, mas o atalho https://portal.empresa.local falha. Avalie a evidência de resolução.",
+    "expl": "Ping por IP ok e NXDOMAIN no nome isolam DNS: falta o A/AAAA de portal. O resolvedor 10.10.10.53 está alcançável e responde. Não é OSPF nem duplex. Crie/corrija o registro forward ",
+    "alt0": "Problema de duplex no uplink do core",
+    "corr": 2,
+    "cli": "PC-USER> ping 10.20.5.40\nReply from 10.20.5.40: bytes=32 time=1ms TTL=64\n\nPC-USER> ping portal.empresa.local\nPing reques"
+  },
+  {
+    "id": 62,
+    "part_id": "v2-4.4",
+    "sintoma": "NOC-4402: www.app.local não abre. A equipe diz que 'o CNAME está criado'. Verifique a cadeia.",
+    "expl": "O CNAME existe, mas o nome canônico não tem A/AAAA (NXDOMAIN). O IP do servidor responde se digitado, confirmando que o buraco é o registro do alvo. Complete a cadeia ou aponte o C",
+    "alt0": "Cadeia CNAME quebrada: alias ok, alvo app-prod.app.local sem",
+    "corr": 0,
+    "cli": "PC> nslookup www.app.local 10.10.10.53\nServer:  dns-int.empresa.local\nAddress:  10.10.10.53\n\nName:    www.app.local\nCano"
+  },
+  {
+    "id": 63,
+    "part_id": "v2-4.4",
+    "sintoma": "NOC-4403: parceiros não conseguem enviar e-mail para @empresa.com. Web da empresa por nome está ok.",
+    "expl": "MX existe, mas mail.empresa.com não resolve. www tem A, então a zona e NS básicos funcionam. Mail exige A/AAAA no hostname do MX. Corrija o host do exchanger.",
+    "alt0": "Problema de CRC na fibra do parceiro apenas",
+    "corr": 3,
+    "cli": "EXT> nslookup -type=MX empresa.com 8.8.8.8\nNon-authoritative answer:\nempresa.com     MX preference = 10, mail exchanger "
+  },
+  {
+    "id": 64,
+    "part_id": "v2-4.4",
+    "sintoma": "NOC-4404: servidor de e-mail envia com HELO mail.empresa.com (A=203.0.113.25). Alguns destinos rejeitam por reverse DNS.",
+    "expl": "Forward A e MX estão corretos; o reverse do IP de saída não existe. Destinos que exigem PTR rejeitam. Crie/ajuste PTR para 203.0.113.25 alinhado ao hostname de mail. Não apague o A",
+    "alt0": "Apagar o registro A de mail para 'forçar' PTR",
+    "corr": 1,
+    "cli": "OPS> nslookup mail.empresa.com 8.8.8.8\nName:    mail.empresa.com\nAddress: 203.0.113.25\n\nOPS> nslookup 203.0.113.25 8.8.8"
+  },
+  {
+    "id": 65,
+    "part_id": "v2-4.4",
+    "sintoma": "NOC-4405: após mudança de DHCP, PCs da VLAN 40 não resolvem nomes internos. A zona em 10.50.0.53 está saudável (teste do jump host).",
+    "expl": "A zona responde em 10.50.0.53; os PCs apontam para 192.0.2.53 morto e dão timeout. É problema de resolvedor do cliente (option 6), não de registro A. Atualize o DHCP e renove os le",
+    "alt0": "Registro A de intranet nunca existiu (jump host prova o cont",
+    "corr": 2,
+    "cli": "PC-VLAN40> ipconfig /all\n   IPv4 Address. . . . . . . . . . . : 10.40.0.88\n   Subnet Mask . . . . . . . . . . . : 255.25"
+  },
+  {
+    "id": 66,
+    "part_id": "v2-4.6",
+    "sintoma": "NOC-4601: política deveria bloquear a subnet de convidados 10.50.0.0/24 ao sair para a Internet, mas usuários guest ainda navegam.",
+    "expl": "A ACE e o wildcard /24 estão ok, mas a aplicação in em Gi0/0/0 não vê o fluxo de saída guest→Internet no desenho. Coloque a ACL out na WAN (ou no ponto onde o source 10.50 realment",
+    "alt0": "Implicit deny está desligado",
+    "corr": 2,
+    "cli": "EDGE# show run | section access-list|access-group\nip access-list extended BLOCK-GUEST\n deny ip 10.50.0.0 0.0.0.255 any\n "
+  },
+  {
+    "id": 67,
+    "part_id": "v2-4.6",
+    "sintoma": "NOC-4602: após ‘endurecer’ ACL, o jump host 10.255.1.10 perdeu SSH ao roteador; ping também morre de qualquer origem.",
+    "expl": "First match: deny any na linha 10 engole SSH e ICMP antes dos permits. Hits só na 10 confirmam. Mova o deny genérico para o final (ou remova-o se 40 já libera o resto).",
+    "alt0": "Falta de crypto key SSH",
+    "corr": 1,
+    "cli": "R1# show access-lists MGMT\nExtended IP access list MGMT\n    10 deny ip any any\n    20 permit tcp 10.255.0.0 0.0.255.255 "
+  },
+  {
+    "id": 68,
+    "part_id": "v2-4.6",
+    "sintoma": "NOC-4603: ACL deveria liberar só a subnet 10.40.0.0/24, mas hosts 10.40.5.x e até 10.41.x parecem casar demais / comportamento estranho de match.",
+    "expl": "255.255.255.0 no campo wildcard não é /24: a lógica de bits fica invertida em relação à subnet mask. Para 10.40.0.0/24 use 0.0.0.255 (ou reescreva a ACE). Standard com a mesma mask",
+    "alt0": "Trocar 255.255.255.0 por wildcard 0.0.0.255 para representar",
+    "corr": 0,
+    "cli": "SW-L3# show run | section NOC-LAN\nip access-list extended NOC-LAN\n permit ip 10.40.0.0 255.255.255.0 any\n deny ip any an"
+  },
+  {
+    "id": 69,
+    "part_id": "v2-4.6",
+    "sintoma": "NOC-4604: ACL BLOCK-SCAN só tem denies de subnets suspeitas; depois disso, hosts legítimos da 10.10.0.0/16 também param de acessar o server.",
+    "expl": "Só há denies; o tráfego legítimo não casa e cai no implicit deny. Adicione permits para a LAN legítima antes do fim (ou permit residual). Os denies de scan podem permanecer no topo",
+    "alt0": "Falta PortFast na interface do server",
+    "corr": 3,
+    "cli": "R1# show access-lists BLOCK-SCAN\nExtended IP access list BLOCK-SCAN\n    10 deny ip 198.51.100.0 0.0.0.255 host 10.20.5.1"
+  },
+  {
+    "id": 70,
+    "part_id": "v2-4.6",
+    "sintoma": "NOC-4605: pedido era ‘bloquear só HTTP ao server 10.20.5.10 a partir de 10.40.0.0/24’. Implementaram standard perto da origem.",
+    "expl": "Standard deny da 10.40.0.0/24 in no SVI nega a origem para qualquer destino/protocolo no path — daí ping/ssh/http morrem. Precisa extended com destination e eq 80. Standard não imp",
+    "alt0": "Manter standard 50 — está perfeita para filtrar só HTTP",
+    "corr": 1,
+    "cli": "R-ACCESS# show run | section BAD-HTTP\naccess-list 50 deny 10.40.0.0 0.0.0.255\naccess-list 50 permit any\ninterface Vlan40"
+  },
+  {
+    "id": 71,
+    "part_id": "v2-4.7",
+    "sintoma": "NOC-4701: mesa Gi1/0/12 caiu; usuário ligou um hub com 2 notebooks. Porta vermelha no painel.",
+    "expl": "Secure-shutdown, psecure-violation e max 1 com sticky do primeiro MAC explicam o err-disabled ao aparecer o segundo. Remova o hub, limpe sticky se precisar e reative a porta. Não é",
+    "alt0": "Falta de OSPF area 0",
+    "corr": 2,
+    "cli": "SW# show interfaces Gi1/0/12 status\nPort      Name       Status         Vlan Duplex Speed\nGi1/0/12  MESA-12    err-disab"
+  },
+  {
+    "id": 72,
+    "part_id": "v2-4.7",
+    "sintoma": "NOC-4702: após habilitar DHCP snooping, VLAN 40 inteira em APIPA. Server em VLAN 10 via uplink Gi1/0/1.",
+    "expl": "Snooping on com Trusted no no uplink é o erro clássico: clientes sem IP. Configure trust em Gi1/0/1. Port-sec e voice não explicam APIPA em massa pós-snooping.",
+    "alt0": "Port-security max 1 em todas as mesas",
+    "corr": 1,
+    "cli": "SW# show ip dhcp snooping\nSwitch DHCP snooping is enabled\nDHCP snooping is configured on following VLANs: 40\nDHCP snoopi"
+  },
+  {
+    "id": 73,
+    "part_id": "v2-4.7",
+    "sintoma": "NOC-4703: host com IP estático 10.40.0.88 não comunica na VLAN; DAI e snooping ligados. DHCP clients ok.",
+    "expl": "Drops altos e binding sem .88 com host estático explicam ARP dropado pelo DAI. DHCP clients com binding funcionam. Adicione binding estático ou mude para DHCP. Não confie a access ",
+    "alt0": "Porta do host deveria ser dhcp snooping trust (incorreto par",
+    "corr": 3,
+    "cli": "SW# show ip dhcp snooping binding\nMacAddress          IpAddress        Lease(sec)  Type           VLAN  Interface\nAA:BB:"
+  },
+  {
+    "id": 74,
+    "part_id": "v2-4.7",
+    "sintoma": "NOC-4704: hosts dual-stack perderam default IPv6 após 'hardening'. Router legítimo em Gi1/0/1.",
+    "expl": "RA Guard HOST no uplink do router dropa o RA legítimo e quebra SLAAC, embora também bloqueie rogue (bom no access). Mova ROUTER policy para Gi1/0/1. Port-sec e DAI não substituem o",
+    "alt0": "Policy HOST no uplink do router bloqueia RA legítimo — usar ",
+    "corr": 0,
+    "cli": "SW# show run | section raguard|nd raguard\nipv6 nd raguard policy HOST\n device-role host\nipv6 nd raguard policy ROUTER\n d"
+  },
+  {
+    "id": 75,
+    "part_id": "v2-4.7",
+    "sintoma": "NOC-4705: após violação, porta err-disabled. Hub removido; precisa voltar ao ar com max 2 e sticky limpo.",
+    "expl": "Recovery exige corrigir a política (max 2 para phone+PC), limpar sticky obsoleto e reativar a interface. Reload do core e trust na mesa são incorretos. OSPF na access não substitui",
+    "alt0": "Apenas reload do core",
+    "corr": 1,
+    "cli": "SW# show interfaces Gi1/0/12 status\nGi1/0/12  MESA-12  err-disabled  40  auto auto\n\nSW# show port-security interface Gi1"
+  },
+  {
+    "id": 76,
+    "part_id": "v2-5.1",
+    "sintoma": "NOC-8841: flapping de MAC no building A e lentidão intermitente. O digital network assistant recomenda shutdown imediato do uplink Port-channel1 'para limpar a tabela MAC'. Avalie se deve seguir a AI.",
+    "expl": "A evidência mostra err-disable por BPDU Guard na porta de acesso Gi1/0/24 e Port-channel1 saudável (SU). A sugestão da AI de derrubar o uplink é destrutiva e desalinhada. O operado",
+    "alt0": "Aplicar shutdown em Port-channel1 conforme a AI, pois flappi",
+    "corr": 2,
+    "cli": "AI-Assistant suggestion:\n  Action: interface Port-channel1 ; shutdown\n  Reason: MAC flapping detected — clear path via u"
+  },
+  {
+    "id": 77,
+    "part_id": "v2-5.1",
+    "sintoma": "NOC-9012: rota estática sumiu após manutenção. O assistente agentic cola um comando de diagnóstico; o roteador rejeita a syntax. Qual a postura correta?",
+    "expl": "O IOS rejeita o comando sugerido: alucinação de CLI. Comandos válidos mostram que a rota estática simplesmente não está configurada. O operador descarta a syntax inválida e segue T",
+    "alt0": "Rejeitar a CLI inventada e diagnosticar com comandos válidos",
+    "corr": 0,
+    "cli": "AI-Assistant suggestion:\n  Run: show ip route-map-fast-diagnostic detail all-vrf deep\n  Then: repair-static-route auto-h"
+  },
+  {
+    "id": 78,
+    "part_id": "v2-5.1",
+    "sintoma": "NOC-9120: alarme de erros na WAN edge. O assistente resume o syslog e aponta Gi0/0/1. Você deve decidir se a hipótese confere com o estado atual.",
+    "expl": "CRC/input errors elevados, reliability degradada e perda no ping confirmam a hipótese do assistente sobre o link WAN. Aqui a agentic AI acertou a correlação; o operador aceita a hi",
+    "alt0": "Descartar a AI e recarregar o edge sem backup",
+    "corr": 1,
+    "cli": "AI-Assistant suggestion:\n  Hypothesis: physical/link degradation on Gi0/0/1 (CRC/input errors rising)\n  Next checks: sho"
+  },
+  {
+    "id": 79,
+    "part_id": "v2-5.1",
+    "sintoma": "NOC-9305: um notebook na VLAN 40 não abre a intranet. Horário de fechamento financeiro. A AI recomenda clear ip ospf process no ABR do campus.",
+    "expl": "OSPF está FULL e o prefixo da VLAN 40 existe. O sintoma é de um host com falha ao gateway. clear ip ospf process no ABR em horário crítico tem blast radius enorme e não é suportado",
+    "alt0": "Executar clear ip ospf process agora; o horário crítico exig",
+    "corr": 3,
+    "cli": "AI-Assistant suggestion:\n  Action: clear ip ospf process\n  Target: ABR-CAMPUS-1\n  Reason: force reconvergence to fix sin"
+  },
+  {
+    "id": 80,
+    "part_id": "v2-5.1",
+    "sintoma": "NOC-9450: equipe de NOC não consegue SSH no roteador de borda a partir da estação de gestão. Usuários reportam aplicação OK. A AI culpa 'ACL de data plane no caminho dos usuários' e pede remoção de ac",
+    "expl": "Aplicação de usuários ok e SSH de gestão negado pela access-class MGMT-ONLY (log mostra deny do IP da OPS-PC). A AI com contexto incompleto misturou planos. Ação correta: ajustar o",
+    "alt0": "Remover todas as ACLs de LAN do data plane como a AI pediu",
+    "corr": 2,
+    "cli": "AI-Assistant suggestion:\n  Root cause: data-plane ACL blocking traffic\n  Action: no ip access-group USER-IN in  (all LAN"
+  },
+  {
+    "id": 81,
+    "part_id": "v2-5.2",
+    "sintoma": "NOC-9521: porta de usuário em err-disable; equipe quer ajuda de IA generativa. Escolha o prompt mais seguro e útil entre os candidatos.",
+    "expl": "Prompt A cobre persona, instructions de leitura, dados de logging e formato acionável, alinhado ao err-disable na borda. Prompt B pede write erase/reload/shutdown de uplink sem evi",
+    "alt0": "Selecionar Prompt A (persona NOC + só shows + dados de log) ",
+    "corr": 0,
+    "cli": "Candidate prompts:\n\nPrompt A:\n  Persona: analista de NOC L2 (STP/switching).\n  Instructions: com o log e o status abaixo"
+  },
+  {
+    "id": 82,
+    "part_id": "v2-5.2",
+    "sintoma": "NOC-9602: engenheiro júnior montou um prompt com 'contexto completo' do roteador. Avalie se pode enviar à IA generativa corporativa.",
+    "expl": "Enable secret, community SNMP e senha de usuário são dados classificados como sensíveis. Mesmo com persona e instructions ok, o prompt viola data classification. O correto é rejeit",
+    "alt0": "Enviar o prompt inteiro: secrets em hash são sempre públicos",
+    "corr": 1,
+    "cli": "Prompt usado (trecho):\n  Persona: engenheiro sênior\n  Instructions: explique a config de gestão\n  Data pasted:\n    enabl"
+  },
+  {
+    "id": 83,
+    "part_id": "v2-5.2",
+    "sintoma": "NOC-9710: WAN com CRC. Compare dois pedidos de output format para o mesmo conjunto de dados.",
+    "expl": "Output format é componente oficial do 5.2. Tabela de hipóteses e lista curta de shows é acionável no NOC; ensaio longo atrasa a ação. Os dados de CRC/perda sustentam o uso de um fo",
+    "alt0": "Preferir Prompt D porque texto longo impressiona o gestor",
+    "corr": 2,
+    "cli": "Candidate prompts (mesmo dados de show interfaces Gi0/0/1):\n\nPrompt C — Output format:\n  1) Tabela: Hipótese | Confiança"
+  },
+  {
+    "id": 84,
+    "part_id": "v2-5.2",
+    "sintoma": "NOC-9803: reclamação vaga de 'rede lenta'. Dois prompts candidatos — um sem contexto de device.",
+    "expl": "Prompt F inclui persona, instructions, dados de show/topologia e format — a evidência aponta erro na porta de acesso, não no edge limpo. Prompt E sem contexto gera conselho genéric",
+    "alt0": "Usar Prompt E: menos tokens, melhor modelo",
+    "corr": 3,
+    "cli": "Candidate prompts:\n\nPrompt E:\n  \"A rede está lenta. O que faço?\"\n  (sem persona, sem dados, sem format)\n\nPrompt F:\n  Per"
+  },
+  {
+    "id": 85,
+    "part_id": "v2-5.2",
+    "sintoma": "NOC-9901: 'sem internet' aberto há 4 minutos. Gestor pede para a IA 'aplicar a melhor ACL agora'. Evidência ainda incompleta.",
+    "expl": "Com sintoma vago e coleta incompleta, o prompt correto pede checklist de leitura e proíbe write/ACL ampla. Prompt G é change destrutivo potencial sem causa. Classification também i",
+    "alt0": "Selecionar Prompt G e aplicar ACL ampla no core",
+    "corr": 1,
+    "cli": "Candidate prompts:\n\nPrompt G:\n  Persona: NOC.\n  Instructions: APLIQUE a melhor ACL em todas as interfaces LAN do core ag"
+  }
+]

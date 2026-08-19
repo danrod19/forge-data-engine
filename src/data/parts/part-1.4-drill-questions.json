@@ -11,7 +11,7 @@
       "192.168.0.0"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "/24 → máscara 255.255.255.0. AND zera o último octeto: rede 192.168.5.0. .100 é host; .255 é broadcast.",
+    "explicacao_profunda": "Com prefixo /24 a máscara é 255.255.255.0: o AND bit a bit zera o último octeto, então a rede de 192.168.5.100/24 é 192.168.5.0. 192.168.5.100 é o endereço de host, não o ID de rede. 192.168.5.255 é o broadcast dessa /24. 192.168.0.0 seria outra rede (/16 ou /24 diferente), não o resultado do AND em 192.168.5.100/24. Dica de prova: rede = bits de host todos 0; broadcast = bits de host todos 1; o IP dado no enunciado quase nunca é a própria rede se ainda houver host bits.",
     "part_id": "1.4-drill"
   },
   {
@@ -26,7 +26,7 @@
       "10.0.0.4"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "/30 bloco 4: rede .0, hosts .1–.2, broadcast .3.",
+    "explicacao_profunda": "Em /30 o bloco tem 4 endereços (32−30=2 bits de host → 2^2=4): para 10.0.0.0/30 a rede é .0, hosts utilizáveis .1 e .2, broadcast .3. Portanto o broadcast é 10.0.0.3. 10.0.0.1 é o primeiro host, não o broadcast. 10.0.0.0 é o endereço de rede. 10.0.0.4 já cai no próximo bloco /30 (.4/.5/.6/.7). /30 é clássico em links ponto a ponto — memorize a sequência rede, host, host, broadcast.",
     "part_id": "1.4-drill"
   },
   {
@@ -41,7 +41,7 @@
       "30"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "2^(32−28)=16 endereços; utilizáveis 16−2=14.",
+    "explicacao_profunda": "Hosts utilizáveis em /28: 32−28=4 bits de host → 2^4=16 endereços totais; desconte rede e broadcast → 16−2=14 hosts. 16 é o tamanho do bloco (incluindo rede/broadcast), não a quantidade utilizável. 32 seria bloco de /27. 30 seria hosts de /27 (32−2). Erro frequente na prova é marcar o tamanho do bloco em vez de bloco−2. Sempre: hosts úteis = 2^(32−prefixo) − 2 (exceto casos especiais /31-/32 fora do escopo típico).",
     "part_id": "1.4-drill"
   },
   {
@@ -56,7 +56,7 @@
       "255.255.255.192"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "/26 = 255.255.255.192 (2 bits de host no 4º octeto além dos 6? 32−26=6 bits host; 256−64=192). .128=/25, .224=/27, .240=/28.",
+    "explicacao_profunda": "Máscara de /26 em decimal: 32−26=6 bits de host no último octeto → tamanho de bloco 64 → 256−64=192, logo 255.255.255.192. 255.255.255.128 corresponde a /25 (bloco 128). 255.255.255.224 é /27 (bloco 32). 255.255.255.240 é /28 (bloco 16). Atalho útil: memorize a tabela /24→.0, /25→.128, /26→.192, /27→.224, /28→.240, /29→.248, /30→.252 no quarto octeto.",
     "part_id": "1.4-drill"
   },
   {
@@ -71,7 +71,7 @@
       "172.16.4.96"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "/27 bloco 32: .0 .32 .64 .96… .77 ∈ [.64–.95] → rede .64.",
+    "explicacao_profunda": "Rede de 172.16.4.77/27: /27 tem bloco 32 no último octeto (.0, .32, .64, .96…). 77 cai no intervalo [.64–.95], portanto a rede é 172.16.4.64. 172.16.4.0 é o início do primeiro bloco, mas não contém .77. 172.16.4.32 cobre [.32–.63], abaixo de .77. 172.16.4.96 começa o bloco seguinte [.96–.127]. Método: encontre o múltiplo do bloco imediatamente ≤ ao host.",
     "part_id": "1.4-drill"
   },
   {
@@ -86,7 +86,7 @@
       "172.16.4.255"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Rede .64 + bloco 32 − 1 = broadcast .95.",
+    "explicacao_profunda": "Broadcast de 172.16.4.64/27: bloco 32, então o último endereço do bloco é rede + 32 − 1 = .95 → 172.16.4.95. 172.16.4.64 é a própria rede, não o broadcast. 172.16.4.127 seria broadcast de .96/27 (ou de uma /25 começando em .0 no segundo half, conforme o caso — aqui não). 172.16.4.255 é broadcast de /24, máscara diferente. Sempre: broadcast = próximo múltiplo do bloco − 1.",
     "part_id": "1.4-drill"
   },
   {
@@ -101,7 +101,7 @@
       "Não; /25 só permite 2 hosts"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "/25: .0–.127 e .128–.255. .20 e .200 em metades diferentes. Hosts úteis 126, não 2.",
+    "explicacao_profunda": "10.1.1.20/25 e 10.1.1.200/25 não estão na mesma subnet: /25 divide o /24 em [.0–.127] e [.128–.255]. .20 fica em 10.1.1.0/25; .200 fica em 10.1.1.128/25. “Sim, ambas em 10.1.1.0/25” ignora que .200 ≥ .128. “/25 cobre todo o /24” é falso — /25 é metade de um /24. “/25 só permite 2 hosts” confunde com /30; /25 tem 126 hosts úteis. Dica: bit mais significativo do último octeto (128) define a metade.",
     "part_id": "1.4-drill"
   },
   {
@@ -116,7 +116,7 @@
       "8"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "256−248=8 → /29.",
+    "explicacao_profunda": "Bloco (incremento) de 255.255.255.248: 256−248=8, portanto o incremento é 8 (equivalente a /29). 16 seria de .240 (/28). 4 seria de .252 (/30). 32 seria de .224 (/27). Use sempre 256 − último octeto interessante da máscara para achar o block size e listar as redes (.0, .8, .16…). É o mesmo número que aparece como “magic number” nas tabelas de subnetting do CCNA.",
     "part_id": "1.4-drill"
   },
   {
@@ -131,7 +131,7 @@
       "10.10.10.64"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": ".192=/26 bloco 64: .0 .64 .128 .192. .130 → .128.",
+    "explicacao_profunda": "Rede de 10.10.10.130 com máscara 255.255.255.192: .192 = /26, bloco 64 → fronteiras .0, .64, .128, .192. 130 está em [.128–.191], logo a rede é 10.10.10.128. 10.10.10.0 é o primeiro bloco, sem .130. 10.10.10.192 é o início do próximo bloco (e também broadcast de /24 se confundido). 10.10.10.64 cobre [.64–.127], abaixo de .130. Confirme com AND: 130 & 192 = 128.",
     "part_id": "1.4-drill"
   },
   {
@@ -146,7 +146,7 @@
       "192.168.0.2 e 192.168.0.3"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "/30: .0 rede, .1–.2 hosts, .3 broadcast.",
+    "explicacao_profunda": "Primeiro e último host de 192.168.0.0/30: bloco de 4 → rede .0, hosts .1 e .2, broadcast .3. Portanto primeiro e último host são 192.168.0.1 e 192.168.0.2. “.0 e .3” mistura rede e broadcast. “.1 e .3” inclui o broadcast como se fosse host. “.2 e .3” pega o segundo host com o broadcast. Em links /30 de WAN, esses dois hosts são tipicamente os dois roteadores do enlace.",
     "part_id": "1.4-drill"
   },
   {
@@ -161,7 +161,7 @@
       "62"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "2^7=128; úteis 126. 254 é /24; 62 é /26.",
+    "explicacao_profunda": "Hosts utilizáveis em /25: 32−25=7 bits → 2^7=128 endereços; úteis 128−2=126. 128 é o tamanho do bloco, não os hosts. 254 são os hosts de uma /24 (256−2). 62 são os hosts de /26 (64−2). O erro mais comum é responder com 2^n sem subtrair rede e broadcast. Decore: bloco vs hosts úteis antes de marcar.",
     "part_id": "1.4-drill"
   },
   {
@@ -176,7 +176,7 @@
       "192.168.1.64/26"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "/26 ocupa 64 IPs: .0–.63. Próximo: .64/26. .32 e .16 sobrepõem.",
+    "explicacao_profunda": "Após 192.168.1.0/26, o próximo /26 alinhado sem sobrepor é 192.168.1.64/26: /26 ocupa 64 IPs (.0–.63), então o próximo múltiplo é .64. 192.168.1.32/26 não é alinhado e ainda invade .0–.63. 192.168.1.16/26 também sobrepõe e não cai em fronteira de 64. 192.168.1.0/26 é a própria subnet já usada, não a “próxima”. VLSM exige prefixos alinhados ao block size para não sobrepor.",
     "part_id": "1.4-drill"
   },
   {
@@ -191,7 +191,7 @@
       "200.1.1.56"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "/29 bloco 8: … .48 .56 … .50 ∈ .48–.55 → rede .48.",
+    "explicacao_profunda": "Rede de 200.1.1.50/29: /29 tem bloco 8 (.0, .8, …, .48, .56…). 50 ∈ [.48–.55], portanto a rede é 200.1.1.48. 200.1.1.0 seria só se estivesse no primeiro bloco. 200.1.1.32 é múltiplo de 32, não a fronteira /29 correta para .50. 200.1.1.56 já é o início do bloco seguinte. Atalho: último octeto − (último octeto mod 8) = ID de rede em /29.",
     "part_id": "1.4-drill"
   },
   {
@@ -206,7 +206,7 @@
       "200.1.1.255"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": ".48 + 8 − 1 = .55.",
+    "explicacao_profunda": "Broadcast de 200.1.1.48/29: bloco 8 → .48 + 8 − 1 = .55, logo 200.1.1.55. 200.1.1.48 é a rede. 200.1.1.63 seria broadcast de uma /27 começando em .32 ou de .56/29? Na verdade .63 é broadcast de .56/29? .56+8-1=.63 sim, mas isso é o bloco seguinte, não o de .48. 200.1.1.255 é broadcast /24. Não marque a rede nem o broadcast do bloco vizinho.",
     "part_id": "1.4-drill"
   },
   {
@@ -221,7 +221,7 @@
       "Sim; qualquer 10/8 é a mesma subnet"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "/23 (255.255.254.0) une dois /24: 10.0.0.0–10.0.1.255. Ambos os IPs caem dentro.",
+    "explicacao_profunda": "10.0.0.100/23 e 10.0.1.50/23 estão na mesma subnet: /23 (máscara 255.255.254.0) cobre um par de /24 consecutivos alinhados — aqui 10.0.0.0–10.0.1.255. Ambos os IPs caem nesse intervalo. “/23 separa por /24” é o oposto do efeito do /23. “.100 é broadcast” é falso (.255 do segundo /24 seria o broadcast da /23). “Qualquer 10/8 é a mesma subnet” exagera: 10.0.0.0/8 contém muitas subnets distintas. Verifique o bit emprestado no terceiro octeto (254).",
     "part_id": "1.4-drill"
   },
   {
@@ -236,7 +236,7 @@
       "/28"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": ".240 = 4 bits host → /28.",
+    "explicacao_profunda": "Prefixo de 255.255.255.240: no último octeto, .240 deixa 4 bits de host (256−240=16=2^4) → prefixo /28 (32−4). /27 seria .224 (bloco 32). /26 seria .192 (bloco 64). /29 seria .248 (bloco 8). Confirme contando bits 1 na máscara: 24 bits dos três primeiros octetos + 4 uns em 240 (11110000) = 28. Tabela mental: .240 ↔ /28 é uma das mais cobradas.",
     "part_id": "1.4-drill"
   },
   {
@@ -251,7 +251,7 @@
       "10.0.0.192/25"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "/25 .0–.127 ocupado. Livre .128–.255; /26 alinhado: .128/26.",
+    "explicacao_profunda": "Usou-se 10.0.0.0/25, que ocupa .0–.127. O espaço livre alinhado em /26 dentro do restante (.128–.255) é 10.0.0.128/26 (cobre .128–.191); .192/26 também estaria livre, mas entre as opções alinhadas e livres a correta marcada é .128/26. 10.0.0.0/26 e 10.0.0.64/26 estão dentro do /25 já usado (sobreposição). 10.0.0.192/25 nem é /26 e ainda assim parte do segundo half — a pergunta pede /26 livre alinhado. Sempre desenhe o intervalo ocupado antes de recortar VLSM.",
     "part_id": "1.4-drill"
   },
   {
@@ -266,7 +266,7 @@
       "16"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "Bits 24→28 = 4 → 2^4 = 16 sub-redes.",
+    "explicacao_profunda": "Quantas /28 cabem em um /24: a diferença de prefixo é 4 bits (28−24), então 2^4=16 sub-redes /28. 4 seria quantas /26 cabem no /24 (2 bits). 8 seria quantas /27. 32 seria quantas /29. Fórmula geral: 2^(prefixo_novo − prefixo_pai). Cada /28 tem 16 endereços; 256/16=16 confirma. Não confunda número de subnets com hosts por subnet.",
     "part_id": "1.4-drill"
   },
   {
@@ -281,7 +281,7 @@
       "192.168.10.62"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "/26: rede .0, hosts .1–.62, broadcast .63.",
+    "explicacao_profunda": "Em 192.168.10.0/26 a faixa é rede .0, hosts .1–.62, broadcast .63. Logo 192.168.10.63 NÃO é host válido — é o broadcast. .1, .50 e .62 são hosts utilizáveis dentro do bloco. Pegadinha clássica: marcar o último número “bonito” (.63) como host. Sempre reserve o primeiro e o último endereço do bloco para rede e broadcast quando o prefixo for ≤ /30 no uso tradicional de hosts.",
     "part_id": "1.4-drill"
   },
   {
@@ -296,7 +296,7 @@
       "Broadcast igual a .0"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": ".0/26 consome .0–.63; .32/26 invade o mesmo intervalo.",
+    "explicacao_profunda": "192.168.0.0/26 e 192.168.0.32/26 apresentam sobreposição VLSM: .0/26 já consome .0–.63, e .32/26 tenta começar no meio desse intervalo (além de não estar alinhada a bloco 64). As máscaras não são diferentes — ambas /26. Falta de /30 não é o problema descrito. Broadcast igual a .0 também não. Antes de alocar a próxima subnet, verifique alinhamento e se o intervalo ainda está livre.",
     "part_id": "1.4-drill"
   }
 ]

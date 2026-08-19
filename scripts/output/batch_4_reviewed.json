@@ -1,0 +1,274 @@
+[
+  {
+    "id": 69,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4604: a ACL BLOCK-SCAN foi criada só com denies das subnets de scan; depois disso, hosts legítimos da 10.10.0.0/16 também perderam acesso ao server 10.20.5.10.",
+    "cli_output": "R1# show access-lists BLOCK-SCAN\nExtended IP access list BLOCK-SCAN\n    10 deny ip 198.51.100.0 0.0.0.255 host 10.20.5.10\n    20 deny ip 203.0.113.0 0.0.0.255 host 10.20.5.10\n    30 deny tcp any host 10.20.5.10 eq 23\n    (no further lines)\n\nR1# show run interface Gi0/0/1\n description TO-SERVER-FARM\n ip access-group BLOCK-SCAN out\n\nPC-LEGIT 10.10.8.20: ping 10.20.5.10 FAIL; https FAIL\nPC-ATTACK 198.51.100.50: also FAIL (expected)\n\nR1# show access-lists BLOCK-SCAN\n    10 deny ... (matches)\n    20 deny ... (matches)\n    30 deny ... (matches)\n (legitimate traffic produces no permit hits — none exist)",
+    "alternativas": [
+      "Falta PortFast na interface do server",
+      "Direção deveria ser in na mesma interface apenas",
+      "Wildcard das linhas 10–20 está invertida",
+      "Implicit deny no final derruba 10.10.0.0/16 — falta permit ip 10.10.0.0 0.0.255.255 host 10.20.5.10 (e/ou permit ip any any consciente)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O sintoma aponta para implicit deny no fim da ACL: só existem linhas deny (scans e telnet), então o tráfego da 10.10.0.0/16 não casa com nada e é descartado. No CLI, show access-lists confirma matches só nos denies e nenhum permit — o ping/HTTPS do PC legítimo falha por isso. A correção é incluir permit da LAN (ex.: permit ip 10.10.0.0 0.0.255.255 host 10.20.5.10) e/ou um permit residual consciente antes do fim, mantendo os denies de scan no topo. PortFast na interface do server não tem relação com filtragem IP. Inverter a direção para in na mesma interface não cria permits que faltam. As wildcards 0.0.0.255 das linhas 10–20 estão corretas para /24; o problema não é máscara invertida.",
+    "part_id": "v2-4.6"
+  },
+  {
+    "id": 70,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4605: o pedido era bloquear só HTTP ao server 10.20.5.10 a partir da 10.40.0.0/24. Alguém aplicou uma ACL standard perto da origem e a VLAN 40 perdeu ping, SSH e HTTP.",
+    "cli_output": "R-ACCESS# show run | section BAD-HTTP\naccess-list 50 deny 10.40.0.0 0.0.0.255\naccess-list 50 permit any\ninterface Vlan40\n ip address 10.40.0.1 255.255.255.0\n ip access-group 50 in\n\nR-ACCESS# show access-lists 50\nStandard IP access list 50\n    10 deny   10.40.0.0, wildcard bits 0.0.0.255 (120 matches)\n    20 permit any (5 matches)\n\nPC 10.40.0.55: ping 10.20.5.10 FAIL; ssh FAIL; http FAIL\nPC 10.40.0.55: ping 8.8.8.8 FAIL (everything from VLAN40 dying toward R-ACCESS)\n\nRequirement: block only tcp/80 to 10.20.5.10, allow other traffic",
+    "alternativas": [
+      "Manter standard 50 — está perfeita para filtrar só HTTP",
+      "Trocar para extended com deny tcp 10.40.0.0 0.0.0.255 host 10.20.5.10 eq 80 e permits do restante; standard só source derruba tudo da subnet",
+      "Colocar a mesma standard out na Internet resolve a porta 80",
+      "Implicit deny não se aplica a standard"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Standard ACL filtra só origem: deny 10.40.0.0/24 in no SVI corta qualquer protocolo/destino no path — por isso ping, SSH e HTTP morrem juntos, inclusive para a Internet. O requisito pede extended: deny tcp 10.40.0.0 0.0.0.255 host 10.20.5.10 eq 80 com permits do restante. Manter a 50 “como está” não atende “só HTTP”. Colocar a mesma standard out na Internet também não seleciona porta 80. E implicit deny vale tanto para standard quanto para extended; dizer que não se aplica a standard é falso.",
+    "part_id": "v2-4.6"
+  },
+  {
+    "id": 71,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4701: a mesa Gi1/0/12 caiu depois que o usuário ligou um hub com dois notebooks. A porta ficou vermelha no painel e a interface entrou em err-disabled.",
+    "cli_output": "SW# show interfaces Gi1/0/12 status\nPort      Name       Status         Vlan Duplex Speed\nGi1/0/12  MESA-12    err-disabled   40   auto   auto\n\nSW# show port-security interface Gi1/0/12\nPort Security              : Enabled\nPort Status                : Secure-shutdown\nViolation Mode             : Shutdown\nMaximum MAC Addresses      : 1\nTotal MAC Addresses        : 1\nConfigured MAC Addresses   : 0\nSticky MAC Addresses       : 1\nLast Source Address:Vlan   : aabb.cc00.0202:40\nSecurity Violation Count   : 1\n\nSW# show port-security address | include Gi1/0/12\nAABB.CC00.0101   1   Gi1/0/12   Sticky\n\nLog: %PM-4-ERR_DISABLE: psecure-violation error detected on Gi1/0/12",
+    "alternativas": [
+      "Falta de OSPF area 0",
+      "RA Guard no uplink",
+      "Port-security violation (max 1 / sticky) — hub com MAC extra → err-disabled",
+      "DHCP snooping trust ausente no core fiber"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "No CLI, port-security mostra Secure-shutdown, violation shutdown, maximum 1 e sticky do primeiro MAC; o log traz psecure-violation. O hub introduziu um segundo MAC e a porta foi derrubada — exatamente o comportamento esperado. Remova o hub, limpe sticky se precisar e reative a interface. OSPF area 0 não explica err-disable de mesa. RA Guard age em RA IPv6, não em violação de MAC. DHCP snooping trust no core fiber também não casa com %PM-4-ERR_DISABLE: psecure-violation nesta access.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 72,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4702: depois de habilitar DHCP snooping na VLAN 40, a VLAN inteira caiu em APIPA. O server DHCP fica na VLAN 10, alcançável via uplink Gi1/0/1.",
+    "cli_output": "SW# show ip dhcp snooping\nSwitch DHCP snooping is enabled\nDHCP snooping is configured on following VLANs: 40\nDHCP snooping is operational on following VLANs: 40\n\nSW# show ip dhcp snooping | begin Interface\nInterface        Trusted    Rate limit (pps)\n----------------  -------    ----------------\nGigabitEthernet1/0/1   no         unlimited\nGigabitEthernet1/0/10  no         unlimited\nGigabitEthernet1/0/11  no         unlimited\n\nSW# show run interface Gi1/0/1\n description UPLINK-DIST\n switchport mode trunk\n (no ip dhcp snooping trust)\n\nPC> ipconfig → 169.254.x.x\nDHCP server 10.10.10.53 reachable from Dist (offers generated)",
+    "alternativas": [
+      "Port-security max 1 em todas as mesas",
+      "Uplink sem ip dhcp snooping trust — Offers legítimos tratados como untrusted/drop",
+      "DAI rate-limit apenas",
+      "Voice vlan ausente"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Snooping operacional na VLAN 40 com Trusted = no no uplink é o erro clássico: Offers/Acks do server legítimo chegam por porta untrusted e são dropados, logo os PCs ficam em 169.254.x.x. Configure ip dhcp snooping trust em Gi1/0/1 (caminho até o server). Port-security max 1 nas mesas não explica APIPA em massa logo após ligar snooping. DAI rate-limit sozinho não é a causa aqui. Voice VLAN ausente também não impede DHCP unicast/broadcast na VLAN de dados.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 73,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4703: host com IP estático 10.40.0.88 não comunica na VLAN 40; DAI e DHCP snooping estão ligados. Clientes DHCP na mesma VLAN funcionam.",
+    "cli_output": "SW# show ip dhcp snooping binding\nMacAddress          IpAddress        Lease(sec)  Type           VLAN  Interface\nAA:BB:CC:00:11:01   10.40.0.50       84200       dhcp-snooping  40    Gi1/0/20\n(no entry for 10.40.0.88)\n\nSW# show ip arp inspection vlan 40\nSource Mac Validation      : Disabled\nDestination Mac Validation : Disabled\nIP Address Validation      : Disabled\nVlan     Configuration    Operation   ACL Match    Static ACL\n----     -------------    ---------   ---------    ----------\n40       Enabled          Active\n\nSW# show ip arp inspection statistics vlan 40\nVlan      Forwarded        Dropped\n----      ---------        -------\n40        120              340\n\nSW# show run interface Gi1/0/22\n switchport mode access\n switchport access vlan 40\n (host static .88 — no dhcp)\n\nSW# show run | include arp inspection trust\nip arp inspection trust  (only on Gi1/0/1 uplink)",
+    "alternativas": [
+      "Porta do host deveria ser dhcp snooping trust (incorreto para access tipicamente)",
+      "Remover DAI do uplink trust",
+      "Problema de CRC na fibra do ISP",
+      "DAI dropa ARP do estático sem binding — criar static binding ou usar DHCP / ajustar inspeção"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "O binding não tem entrada para .88 e as estatísticas do DAI mostram muitos drops: ARP do estático não encontra binding dhcp-snooping e é descartado. Clientes DHCP ok porque geraram binding. Crie static binding (ou use DHCP) / ajuste a inspeção; trust só no uplink (Gi1/0/1) está coerente. Marcar a access do host como dhcp snooping trust é má prática típica e abre caminho a servidor DHCP falso. Remover trust do uplink piora o cenário. CRC na fibra do ISP não explica falha local só do estático com DAI ativo.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 74,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4704: hosts dual-stack perderam o default IPv6 depois do 'hardening'. O router legítimo está no uplink Gi1/0/1; RA de rogue na access continua bloqueado.",
+    "cli_output": "SW# show run | section raguard|nd raguard\nipv6 nd raguard policy HOST\n device-role host\nipv6 nd raguard policy ROUTER\n device-role router\n\nSW# show run interface Gi1/0/10\n description PC-USER\n switchport mode access\n ipv6 nd raguard attach-policy HOST\n\nSW# show run interface Gi1/0/1\n description UPLINK-TO-ROUTER\n switchport mode trunk\n ipv6 nd raguard attach-policy HOST\n\nBefore: hosts had GUA via SLAAC from FE80::1 on router\nAfter: no RA seen by hosts; Fe80 default missing\nPCAP on access: no RA from router; RA from rogue laptop on Gi1/0/15 dropped (good)",
+    "alternativas": [
+      "Policy HOST no uplink do router bloqueia RA legítimo — usar policy ROUTER/trusted no Gi1/0/1; HOST só no access",
+      "Port-security max 1 causa perda de RA",
+      "DHCP snooping trust no PC resolve SLAAC",
+      "DAI desliga IPv6 automaticamente"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A policy HOST (device-role host) foi aplicada no uplink Gi1/0/1: RA Guard trata o router como host e dropa o RA legítimo — SLAAC e default FE80 somem. No access, HOST está certo (rogue no Gi1/0/15 cai). Mova a policy ROUTER para Gi1/0/1. Port-security max 1 não remove RA de uplink. DHCP snooping trust no PC não restaura SLAAC. DAI opera em ARP IPv4 e não “desliga IPv6” automaticamente.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 75,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4705: porta em err-disabled após violação de port-security. Hub já foi removido; o usuário agora tem PC + IP phone (dois MACs) e a mesa precisa voltar com max 2 e sticky limpo.",
+    "cli_output": "SW# show interfaces Gi1/0/12 status\nGi1/0/12  MESA-12  err-disabled  40  auto auto\n\nSW# show port-security interface Gi1/0/12 | include Status|Maximum|Sticky|Violation\nPort Status                : Secure-shutdown\nViolation Mode             : Shutdown\nMaximum MAC Addresses      : 1\nSticky MAC Addresses       : 1\n\nSW# show run interface Gi1/0/12\ninterface GigabitEthernet1/0/12\n switchport mode access\n switchport access vlan 40\n switchport port-security\n switchport port-security mac-address sticky\n switchport port-security mac-address sticky aabb.cc00.0101\n switchport port-security maximum 1\n switchport port-security violation shutdown\n\nOps: user now has PC + IP phone (two MACs expected)",
+    "alternativas": [
+      "Apenas reload do core",
+      "Aumentar maximum para 2, limpar sticky antigo se necessário, no shutdown (ou recovery) na porta",
+      "Remover port-security e configurar OSPF na access",
+      "ip dhcp snooping trust na mesa do usuário"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "A porta ainda está Secure-shutdown com maximum 1 e sticky antigo aabb.cc00.0101. Para recovery: subir maximum para 2 (phone+PC), limpar sticky obsoleto se necessário e dar no shutdown / recovery na interface. Só reload do core não corrige a política errada. Remover port-security e pôr OSPF na access mistura planos e não é a correção pedida. ip dhcp snooping trust na mesa do usuário não tira err-disable de psecure-violation.",
+    "part_id": "v2-4.7"
+  },
+  {
+    "id": 76,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-8841: flapping de MAC no building A e lentidão intermitente. O digital network assistant recomenda shutdown imediato do uplink Port-channel1 'para limpar a tabela MAC'. Avalie se deve seguir a AI.",
+    "cli_output": "AI-Assistant suggestion:\n  Action: interface Port-channel1 ; shutdown\n  Reason: MAC flapping detected — clear path via uplink bounce\n\nSW-ACCESS-A# show logging | include ERR_DISABLE|FLAP|BPDU\n%PM-4-ERR_DISABLE: bpduguard error detected on Gi1/0/24, putting Gi1/0/24 in err-disable state\n%ETHCNTR-3-LOOP_BACK_DETECTED: Keepalive packet loop-back detected on Gi1/0/24\n\nSW-ACCESS-A# show interfaces status err-disabled\nPort      Name               Status       Reason\nGi1/0/24  User-PC-Finance    err-disabled bpduguard\n\nSW-ACCESS-A# show spanning-tree interface Gi1/0/24\nVlan Role Sts Cost  Prio.Nbr Type\n---- ---- --- ----- -------- ----\nVLAN0030                    (interface err-disabled)\n\nSW-CORE# show etherchannel 1 summary | include Po1|P\nGroup  Port-channel  Protocol    Ports\n------+-------------+-----------+-------------------\n1      Po1(SU)         LACP      Gi1/0/1(P) Gi1/0/2(P)",
+    "alternativas": [
+      "Aplicar shutdown em Port-channel1 conforme a AI, pois flapping sempre se resolve no core",
+      "Recarregar o core switch para reconstruir todas as tabelas MAC do campus",
+      "Rejeitar o shutdown do uplink; tratar Gi1/0/24 err-disabled por BPDU Guard (causa na borda)",
+      "Desabilitar Spanning Tree globalmente e manter o Port-channel up"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "O logging mostra bpduguard e loop-back em Gi1/0/24 (access do usuário) em err-disabled; o Po1 no core está SU com membros LACP em P — uplink saudável. Derrubar Port-channel1 seria blast radius no building sem atacar a causa na borda. Recarregar o core para 'reconstruir MAC' também é desproporcional. Desabilitar STP globalmente agrava risco de loop. A postura correta é rejeitar o shutdown do uplink e tratar a porta de acesso em err-disable por BPDU Guard — validação clássica de sugestão agentic contra show/logging.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 77,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-9012: rota estática sumiu após manutenção. O assistente agentic cola um comando de diagnóstico; o roteador rejeita a syntax com Invalid input. Qual a postura correta?",
+    "cli_output": "AI-Assistant suggestion:\n  Run: show ip route-map-fast-diagnostic detail all-vrf deep\n  Then: repair-static-route auto-heal 10.20.0.0/16\n\nR1# show ip route-map-fast-diagnostic detail all-vrf deep\n           ^\n% Invalid input detected at '^' marker.\n\nR1# show ip route 10.20.0.0 255.255.0.0\n% Network not in table\n\nR1# show run | include ip route 10.20\n(no output)\n\nR1# show ip route static | include 10.20\n(no static matches)\n\nR1# show version | include Cisco IOS\nCisco IOS XE Software, Version 17.09.04a",
+    "alternativas": [
+      "Rejeitar a CLI inventada e diagnosticar com comandos válidos (show run/route); a estática não está na config",
+      "Insistir no comando da AI três vezes — alucinação se corrige com retry",
+      "Executar write erase para o auto-heal funcionar",
+      "Ativar BGP em todos os switches de acesso para substituir a estática"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "show ip route-map-fast-diagnostic… não existe no IOS XE — alucinação de CLI. Comandos válidos (show ip route / show run | include ip route) mostram que a estática 10.20.0.0/16 simplesmente não está na config. Insistir no comando inventado não 'corrige' alucinação. write erase é destrutivo e não restaura rota. Ativar BGP em switches de acesso para substituir a estática é fora de escopo e não diagnostica a ausência. Rejeite a syntax inválida e faça TShoot real: repor a estática se desejado e validar next-hop.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 78,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-9120: alarme de erros na WAN edge. O assistente resume o syslog e aponta Gi0/0/1. Você precisa decidir se a hipótese confere com o estado atual.",
+    "cli_output": "AI-Assistant suggestion:\n  Hypothesis: physical/link degradation on Gi0/0/1 (CRC/input errors rising)\n  Next checks: show interfaces Gi0/0/1 ; verify SFP/cable ; avoid core reload\n\nEDGE# show logging | include Gi0/0/1|CRC|LINK\n%LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/0/1, changed state to up\n%LINK-3-UPDOWN: Interface GigabitEthernet0/0/1, changed state to up\n%SYS-5-CONFIG_I: (unrelated) Configured from console\n%LINEPROTO-5-UPDOWN: (earlier flaps on Gi0/0/1 overnight)\n\nEDGE# show interfaces Gi0/0/1 | include error|CRC|packets input|reliability\n  1542213344 packets input, 0 no buffer, 18220 input errors, 17901 CRC, 0 frame\n  reliability 240/255, txload 12/255, rxload 40/255\n\nEDGE# show interfaces Gi0/0/1 status\nPort      Name     Status    Vlan  Duplex Speed Type\nGi0/0/1   WAN-ISP  connected routed a-full a-1000 1000BaseSX SFP\n\nEDGE# ping 203.0.113.1 repeat 20\nSuccess rate is 85 percent (17/20)",
+    "alternativas": [
+      "Descartar a AI e recarregar o edge sem backup",
+      "Aceitar a hipótese de problema no link Gi0/0/1 e seguir checklist L1 (erros/CRC/perda) antes de mudanças amplas",
+      "Remover a default route porque a AI falou em CRC",
+      "Desligar OSPF no edge para limpar os contadores"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "No CLI, Gi0/0/1 tem milhares de input errors/CRC, reliability 240/255 e ping ao peer com ~15% de perda — a hipótese de degradação L1 no link WAN fecha com a evidência. Aqui a AI acertou a correlação; o próximo passo é checklist de cabo/SFP/provedor, sem mudanças amplas. Descartar e recarregar o edge sem backup é imprudente. Remover a default route por causa de CRC não trata o meio físico. Desligar OSPF para 'limpar contadores' mistura planos e não zera CRC de interface.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 79,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-9305: um notebook na VLAN 40 não abre a intranet no horário de fechamento financeiro. A AI recomenda clear ip ospf process no ABR do campus.",
+    "cli_output": "AI-Assistant suggestion:\n  Action: clear ip ospf process\n  Target: ABR-CAMPUS-1\n  Reason: force reconvergence to fix single host path\n\nABR-CAMPUS-1# show ip ospf neighbor\nNeighbor ID     Pri State       Dead Time Address         Interface\n10.0.0.1          1 FULL/DR     00:00:38  10.0.0.1        Gi0/0/0\n10.0.0.2          1 FULL/BDR    00:00:35  10.0.0.2        Gi0/0/0\n10.0.0.5          1 FULL/DROTHER 00:00:31 10.0.0.5        Gi0/0/1\n\nABR-CAMPUS-1# show ip route 10.40.0.0\nO    10.40.0.0/24 [110/2] via 10.0.0.5, 05:12:01, GigabitEthernet0/0/1\n\nSW-ACC# show mac address-table interface Gi1/0/18\n   40    0050.56ab.1234    DYNAMIC     Gi1/0/18\n\nSW-ACC# show interfaces Gi1/0/18 status\nPort      Name        Status    Vlan Duplex Speed\nGi1/0/18  NB-FINANCE  connected 40   a-full a-1000\n\nPC: ipconfig → 10.40.0.88/24 gw 10.40.0.1 (gw ping FAIL from PC)",
+    "alternativas": [
+      "Executar clear ip ospf process agora; o horário crítico exige reconvergência total",
+      "Desligar todos os uplinks do building para forçar novo SPF",
+      "Aplicar default route estática apontando para o notebook",
+      "Recusar o clear OSPF (adjacências FULL e rota da VLAN ok); isolar host/porta/gateway na VLAN 40"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Adjacências OSPF estão FULL e o prefixo 10.40.0.0/24 existe na tabela; a porta do NB está connected na VLAN 40, mas o PC não pinga o gateway — sintoma de host/SVI/porta na borda, não de reconvergência do domínio. clear ip ospf process no ABR em horário crítico tem blast radius enorme e não é suportado pela evidência. Derrubar uplinks do building ou cravar default estática para o notebook são ainda piores. Recuse o clear e isole gateway, porta e IP do cliente na VLAN 40.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 80,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-9450: o NOC não consegue SSH no roteador de borda a partir da estação de gestão; usuários reportam aplicação OK. A AI culpa ACL de data plane nas LAN e pede remoção de access-group.",
+    "cli_output": "AI-Assistant suggestion:\n  Root cause: data-plane ACL blocking traffic\n  Action: no ip access-group USER-IN in  (all LAN interfaces)\n\nOPS-PC: ping 10.50.1.10 (app VIP) → success 0% loss\nOPS-PC: ssh admin@203.0.113.10 → Connection timed out\n\nEDGE# show ip interface brief | include 203.0.113.10|Gi0/0/0\nGigabitEthernet0/0/0   203.0.113.10  YES NVRAM  up    up\n\nEDGE# show run | section line vty\nline vty 0 4\n access-class MGMT-ONLY in\n transport input ssh\n login local\n\nEDGE# show access-lists MGMT-ONLY\nStandard IP access list MGMT-ONLY\n 10 permit 10.255.0.0 0.0.255.255\n 20 deny   any log\n\nEDGE# show vrf brief\n  Name                        Default RD\n  MGMT                        65000:99\n\nEDGE# show logging | include MGMT-ONLY|VTY|login\n%SEC-6-IPACCESSLOGS: list MGMT-ONLY denied 10.10.8.44\n(OPS-PC source 10.10.8.44 not in 10.255.0.0/16)",
+    "alternativas": [
+      "Remover todas as ACLs de LAN do data plane como a AI pediu",
+      "Desabilitar SSH e liberar telnet sem ACL",
+      "Manter data plane; corrigir acesso de gestão (OPS-PC fora de MGMT-ONLY / VRF-MGMT) em vez de culpar usuários",
+      "Apagar a VRF MGMT para simplificar o roteamento de produção"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Ping no VIP da app funciona; SSH no edge dá timeout. line vty usa access-class MGMT-ONLY (permit só 10.255.0.0/16) e o log nega 10.10.8.44 da OPS-PC — plano de gestão, não data plane de usuários. Remover ACLs de LAN como a AI pediu abre produção sem resolver VTY. Desabilitar SSH/liberar telnet sem ACL piora a postura. Apagar a VRF MGMT não é o ajuste fino necessário. Mantenha data plane e corrija origem de gestão / ACL de VTY (e contexto VRF-MGMT) para o IP da OPS-PC.",
+    "part_id": "v2-5.1"
+  },
+  {
+    "id": 81,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-9521: porta de usuário em err-disable; a equipe quer ajuda de IA generativa. Escolha o prompt mais seguro e útil entre os candidatos.",
+    "cli_output": "Candidate prompts:\n\nPrompt A:\n  Persona: analista de NOC L2 (STP/switching).\n  Instructions: com o log e o status abaixo, liste hipóteses e APENAS comandos show;\n  proibido shutdown de uplink, write erase ou reload.\n  Output format: tabela Hipótese|Evidência + lista de 3 shows.\n  Data: logging + err-disabled (sem senhas).\n\nPrompt B:\n  Instructions: interface Port-channel1 ; shutdown ; write erase ; reload\n  (sem persona, sem dados, sem format)\n\nSW-ACC# show logging | include ERR_DISABLE|BPDU\n%PM-4-ERR_DISABLE: bpduguard error detected on Gi1/0/24, putting Gi1/0/24 in err-disable state\n\nSW-ACC# show interfaces status err-disabled\nPort      Name            Status       Reason\nGi1/0/24  User-Finance    err-disabled bpduguard\n\nSW-CORE# show etherchannel 1 summary | include Po1\n1      Po1(SU)         LACP      Gi1/0/1(P) Gi1/0/2(P)",
+    "alternativas": [
+      "Selecionar Prompt A (persona NOC + só shows + dados de log) e rejeitar Prompt B destrutivo",
+      "Selecionar Prompt B e derrubar o Port-channel1 imediatamente",
+      "Misturar A e B: primeiro write erase, depois pedir shows",
+      "Ignorar ambos e colar enable secret no chat para 'melhor contexto'"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Prompt A define persona de NOC L2, restringe a comandos show, traz logging/err-disabled e pede formato acionável — alinhado ao bpduguard em Gi1/0/24 com Po1 saudável. Prompt B manda shutdown de uplink, write erase e reload sem evidência: inaceitável. Misturar A com write erase primeiro anula a segurança do prompt. Colar enable secret no chat viola classificação de dados e não melhora o diagnóstico. A escolha correta é A e rejeitar B.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 82,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-9602: engenheiro júnior montou um prompt com 'contexto completo' do roteador, incluindo secrets. Avalie se pode enviar à IA generativa corporativa (serviço externo multi-tenant).",
+    "cli_output": "Prompt usado (trecho):\n  Persona: engenheiro sênior\n  Instructions: explique a config de gestão\n  Data pasted:\n    enable secret 5 $1$mERr$9cTjWIMyG/FQqKz1x2AbC\n    snmp-server community NetMonRW RW\n    username netops secret 5 $1$xxxx$yyyyyyyy\n    ip route 0.0.0.0 0.0.0.0 203.0.113.1\n\nEDGE# show ip interface brief | include GigabitEthernet0/0/0\nGigabitEthernet0/0/0   203.0.113.10  YES NVRAM  up    up\n\nEDGE# show run | section line vty\nline vty 0 4\n transport input ssh\n login local\n\nPolicy note: generative AI system is external multi-tenant service.",
+    "alternativas": [
+      "Enviar o prompt inteiro: secrets em hash são sempre públicos",
+      "Rejeitar o envio por data classification; redigir secrets/community e reenviar só shows/seções sem senha",
+      "Trocar apenas a persona para 'estagiário' e enviar igual",
+      "Pedir à IA que publique as communities em formato de tabela"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "O trecho cola enable secret (hash), community SNMP RW e senha de usuário — dados sensíveis. Mesmo com persona e instructions ok, o envio viola data classification num serviço externo. Hash de enable secret e community não são 'sempre públicos'. Trocar só a persona para estagiário não remove o vazamento. Pedir à IA que publique communities em tabela agrava a exposição. Rejeite o envio, redija secrets/community e reenvie apenas shows/seções operacionais sem senha.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 83,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-9710: WAN com CRC elevados. Compare dois pedidos de output format para o mesmo conjunto de dados de show interfaces.",
+    "cli_output": "Candidate prompts (mesmo dados de show interfaces Gi0/0/1):\n\nPrompt C — Output format:\n  1) Tabela: Hipótese | Confiança (alta/média/baixa) | Evidência no show\n  2) Próximos 3 comandos show apenas\n  3) Proibido reload/write\n\nPrompt D — Output format:\n  Escreva um ensaio corrido de no mínimo 1500 palavras, sem listas,\n  sem tabelas, misturando teoria de física de cabos e opiniões pessoais.\n\nEDGE# show interfaces Gi0/0/1 | include error|CRC|reliability\n  18220 input errors, 17901 CRC\n  reliability 240/255, txload 12/255, rxload 40/255\n\nEDGE# ping 203.0.113.1 repeat 20\nSuccess rate is 85 percent (17/20)\n\nAI dry-run note: Prompt D returns long prose; Prompt C returns ranked table.",
+    "alternativas": [
+      "Preferir Prompt D porque texto longo impressiona o gestor",
+      "Tanto faz: output format não é componente do blueprint 5.2",
+      "Selecionar Prompt C: formato acionável (tabela + 3 shows) adequado ao plantão",
+      "Selecionar Prompt D e ainda colar a community SNMP no ensaio"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Output format faz parte do blueprint 5.2. Prompt C pede tabela hipótese/confiança/evidência, três shows e proíbe reload/write — formato acionável no plantão com CRC e perda já visíveis. Prompt D exige ensaio longo sem listas; atrasa isolamento L1 e não ajuda o turno. Preferir texto longo para impressionar gestor é anti-padrão operacional. Colar community SNMP no ensaio ainda mistura classificação de dados. Selecione C.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 84,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-9803: reclamação vaga de 'rede lenta'. Há dois prompts candidatos — um sem qualquer contexto de device. Qual selecionar?",
+    "cli_output": "Candidate prompts:\n\nPrompt E:\n  \"A rede está lenta. O que faço?\"\n  (sem persona, sem dados, sem format)\n\nPrompt F:\n  Persona: analista NOC.\n  Instructions: com os dados abaixo, priorize se o problema parece L1 no edge,\n  saturação ou caminho; liste 4 shows seguintes. Sem mudanças write.\n  Output format: bullets numerados.\n  Data:\n    Topologia: PC-VLAN30 — SW-ACC — EDGE — ISP\n    EDGE# show interfaces Gi0/0/1 | include CRC|errors\n      0 input errors, 0 CRC (clean)\n    SW-ACC# show interfaces Gi1/0/10 | include errors|CRC\n      9400 input errors, 9200 CRC\n    PC ping gateway: 40% loss\n\nTicket note: only one access port shows errors.",
+    "alternativas": [
+      "Usar Prompt E: menos tokens, melhor modelo",
+      "Usar Prompt E e pedir write erase no core",
+      "Enviar os dois e aplicar a média das respostas",
+      "Selecionar Prompt F: persona + evidência de interface/topologia + format; E é genérico demais"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Prompt F traz persona, instructions, topologia e shows: edge limpo (0 CRC) e Gi1/0/10 da access com milhares de erros + perda no ping ao gateway — prioriza L1 na porta do usuário. Prompt E ('rede lenta, o que faço?') sem dados gera conselho genérico; menos tokens não significa melhor seleção. Pedir write erase no core a partir de E é destrutivo. Enviar os dois e 'fazer média' dilui a evidência. No critério 5.2, F é a escolha correta.",
+    "part_id": "v2-5.2"
+  },
+  {
+    "id": 85,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-9901: ticket 'sem internet' aberto há quatro minutos. O gestor pede para a IA 'aplicar a melhor ACL agora', mas a evidência ainda é incompleta.",
+    "cli_output": "Candidate prompts:\n\nPrompt G:\n  Persona: NOC.\n  Instructions: APLIQUE a melhor ACL em todas as interfaces LAN do core agora;\n  depois write memory. Não peça mais dados.\n\nPrompt H:\n  Persona: analista NOC.\n  Instructions: evidência incompleta — proponha checklist de coleta mínima\n  (ping gateway, DNS, SVI, show ip route, logging). Proibido aplicar ACL\n  ou qualquer write até haver causa provável. Output: checklist 1-6.\n\nCurrent evidence only:\n  User: \"internet down\"\n  SW-ACC# show ip interface brief | include Vlan30\n  Vlan30   10.30.0.1   YES NVRAM  up   up\n  (no host IP, no ping result, no DNS test, no WAN show yet)\n\nChange window: none declared.",
+    "alternativas": [
+      "Selecionar Prompt G e aplicar ACL ampla no core",
+      "Selecionar Prompt H: coleta/leitura primeiro; rejeitar apply ACL sem evidência",
+      "Selecionar Prompt G mas só em horário comercial",
+      "Colar enable secret e community no Prompt G para a ACL ficar 'melhor'"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Só há SVI Vlan30 up/up; faltam IP do host, ping, DNS, rota e WAN. Prompt H pede checklist de coleta e proíbe ACL/write até haver causa provável — postura certa sem janela de change. Prompt G manda aplicar ACL em todas as LAN do core e write memory sem dados: mudança ampla e potencialmente destrutiva. Restringir G a horário comercial não cria evidência. Colar enable secret/community no prompt ainda viola classificação. Selecione H.",
+    "part_id": "v2-5.2"
+  }
+]

@@ -1,0 +1,274 @@
+[
+  {
+    "id": 35,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-2505: após change, CPU alta, MAC flapping VLAN 50, usuários offline. Dois trunks paralelos no access.",
+    "cli_output": "SW-ACC# show run | include spanning-tree vlan 50\nno spanning-tree vlan 50\n\nSW-ACC# show mac address-table dynamic vlan 50 | count\n% high move count / flapping between Gi1/0/47 and Gi1/0/48 (ops note)\n\nSW-ACC# show interfaces Gi1/0/47 status\nGi1/0/47  UPLINK-A  connected  trunk a-full a-1000\nSW-ACC# show interfaces Gi1/0/48 status\nGi1/0/48  UPLINK-B  connected  trunk a-full a-1000\n\nSW-DIST# show spanning-tree vlan 50\n% Spanning tree instance(s) for vlan does not exist. / or STP off on peer for vlan 50\n\nLog users: broadcast storm / network slow\nChange ticket: 'disabled STP on vlan 50 to fix blocked port complaints'",
+    "alternativas": [
+      "Reabilitar spanning-tree na VLAN 50 e deixar o STP bloquear um path — loops com dois trunks ativos",
+      "Manter STP off e adicionar mais um trunk",
+      "Só aumentar a priority para 61440 em todos",
+      "Só configurar BPDU Guard nos uplinks e manter STP off"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "no spanning-tree vlan 50 com dois uplinks connected cria loop L2 (flapping/storm). A correção é reabilitar STP e aceitar o bloqueio de um path. Mais trunks sem STP piora. BPDU Guard nos uplinks não substitui a árvore.",
+    "part_id": "v2-2.5"
+  },
+  {
+    "id": 36,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3201: site stub — LAN 10.40.0.0/24 ok; Internet e redes remotas unreachable. Sem IGP.",
+    "cli_output": "EDGE# show ip route\nCodes: C - connected, S - static, R - RIP, M - mobile, B - BGP\n       D - EIGRP, O - OSPF, IA - OSPF inter area\nGateway of last resort is not set\n\n      10.0.0.0/8 is variably subnetted, 2 subnets, 2 masks\nC        10.40.0.0/24 is directly connected, Vlan40\nL        10.40.0.1/32 is directly connected, Vlan40\nC        203.0.113.0/30 is directly connected, GigabitEthernet0/0/1\nL        203.0.113.2/32 is directly connected, GigabitEthernet0/0/1\n\nEDGE# show run | include ip route\n (no ip route commands)\n\nEDGE# show ip interface brief | include Vlan40|Gi0/0/1\nVlan40                 10.40.0.1       YES NVRAM  up    up\nGigabitEthernet0/0/1   203.0.113.2     YES NVRAM  up    up\n\nPC 10.40.0.50: ping 10.40.0.1 OK; ping 8.8.8.8 FAIL (network unreachable on EDGE traceroute)",
+    "alternativas": [
+      "Falta PortFast na Vlan40",
+      "Falta default route (ou statics remotas) — configurar ip route 0.0.0.0 0.0.0.0 203.0.113.1",
+      "OSPF area mismatch",
+      "Máscara da LAN está errada no SVI"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Gateway of last resort is not set e só há C/L: sem S* para Internet. LAN e WAN links estão up. Adicione default via CE 203.0.113.1. PortFast/OSPF não explicam a tabela vazia de remotas.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 37,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3202: desenho pedia floating backup; a rota de ‘backup’ nunca fica de reserva — às vezes compete com a primária.",
+    "cli_output": "R1# show run | include ip route 10.20.0.0\nip route 10.20.0.0 255.255.0.0 10.0.0.2\nip route 10.20.0.0 255.255.0.0 10.0.0.6 1\n\nR1# show ip route 10.20.0.0\nS        10.20.0.0/16 [1/0] via 10.0.0.2\n                      [1/0] via 10.0.0.6\n\nR1# show ip interface brief | include 10.0.0.\nGigabitEthernet0/0/0   10.0.0.1    YES NVRAM  up  up\nGigabitEthernet0/0/1   10.0.0.5    YES NVRAM  up  up\n\nDesign intent: primary via 10.0.0.2 AD1; backup via 10.0.0.6 only if primary fails",
+    "alternativas": [
+      "Next-hop 10.0.0.6 está down",
+      "Máscara /16 está errada",
+      "Falta default route",
+      "Backup também com AD 1 — não é floating; subir AD do backup (ex. 210) para só assumir se a primária cair"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Duas statics com AD 1 instalam ambas (ECMP/candidates iguais). Floating exige AD maior no backup. Corrija para ip route ... 10.0.0.6 210. Links estão up.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 38,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3203: após queda do link WAN primário, a static some e o site fica sem rota; floating configurada não aparece.",
+    "cli_output": "EDGE# show run | include ip route\nip route 0.0.0.0 0.0.0.0 203.0.113.1\nip route 0.0.0.0 0.0.0.0 198.51.100.1 200\n\nEDGE# show ip interface brief | include Gi0/0/1|Gi0/0/2\nGigabitEthernet0/0/1   203.0.113.2     YES NVRAM  down  down\nGigabitEthernet0/0/2   198.51.100.2    YES NVRAM  down  down\n\nEDGE# show ip route static\n (empty / no S*)\n\nEDGE# show ip route\nGateway of last resort is not set\nC    10.40.0.0/24 is directly connected, Vlan40\n\nOps: secondary circuit also down (fiber cut both); floating next-hop 198.51.100.1 not reachable",
+    "alternativas": [
+      "Floating AD 200 é inválida",
+      "Default route não existe no running-config",
+      "Ambos next-hops/interfaces down — rotas static não instalam; floating só assume se o backup path estiver up",
+      "Precisa de OSPF para floating funcionar"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Config tem primária e floating, mas Gi0/0/1 e Gi0/0/2 down: nenhum next-hop usable. Floating não é mágica sem circuito backup up. OSPF não é requisito. Levante o path 198.51.100.0/30.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 39,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3204: rota estática ‘para o DC 10.50.1.0’ não leva ao host 10.50.2.20.",
+    "cli_output": "R1# show run | include ip route 10.50\nip route 10.50.1.0 255.255.255.0 10.0.0.2\n\nR1# show ip route 10.50.2.20\n% Network not in table\n\nR1# show ip route 10.50.1.0\nS        10.50.1.0/24 [1/0] via 10.0.0.2\n\nR1# show ip route static\nS        10.50.1.0/24 [1/0] via 10.0.0.2\n\nPC: ping 10.50.2.20 FAIL; traceroute stops at R1 (no route)\nDesign doc: DC servers live in 10.50.0.0/16 (includes .1 and .2 subnets)",
+    "alternativas": [
+      "Next-hop 10.0.0.2 está errado de AD",
+      "Floating AD faltando",
+      "Exit-interface obrigatória",
+      "Máscara/prefixo errado — /24 10.50.1.0 não cobre 10.50.2.20; usar 10.50.0.0 255.255.0.0 ou rota específica /24 de .2"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Network not in table para 10.50.2.20 com static só de 10.50.1.0/24 prova cobertura insuficiente. Ajuste o prefixo ao desenho /16 ou adicione 10.50.2.0/24. AD/exit-if não expandem a máscara.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 40,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3205: static via exit-interface Gi0/0/0 sem next-hop; comportamento estranho de ARP e encaminhamento no multiacesso.",
+    "cli_output": "R1# show run | include ip route 172.16\nip route 172.16.0.0 255.255.0.0 GigabitEthernet0/0/0\n\nR1# show ip route 172.16.0.0\nS        172.16.0.0/16 is directly connected, GigabitEthernet0/0/0\n\nR1# show ip interface brief | include Gi0/0/0\nGigabitEthernet0/0/0   10.0.0.1   YES NVRAM  up  up\n\nR1# show run interface Gi0/0/0\n ip address 10.0.0.1 255.255.255.0\n description LAN-SEGMENT-MULTIACCESS\n\nR2 (same LAN) is 10.0.0.2 — intended next-hop to reach 172.16.0.0/16\nOps note: proxy-ARP load / incomplete ARPs for remote destinations observed",
+    "alternativas": [
+      "Preferir next-hop 10.0.0.2 (ou exit-if + next-hop) em Ethernet multiacesso em vez de só exit-interface",
+      "Remover a static e usar só MAC table",
+      "Mudar AD para 255",
+      "Converter Gi0/0/0 em switchport access"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A rota aparece ‘directly connected’ via Gi0/0/0 sem next-hop — típico de static só com exit-if, com riscos de proxy ARP no multiacesso. O desenho queria 10.0.0.2. Reescreva ip route 172.16.0.0 255.255.0.0 10.0.0.2.",
+    "part_id": "v2-3.2"
+  },
+  {
+    "id": 41,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3301: R1 e R2 não formam neighbor no link de campus. Hellos não estabelecem FULL.",
+    "cli_output": "R1# show ip ospf interface GigabitEthernet0/0/0 | include Area|Network Type|Hello|Dead|MTU\n  Network Type BROADCAST, Cost: 1\n  Topology-MTID    Cost    Disabled    Shutdown      Topology Name\n  Transmit Delay is 1 sec, State DR, Priority 1\n  Hello 10, Dead 40\n  Area 0\n  MTU is 1500\n\nR2# show ip ospf interface GigabitEthernet0/0/0 | include Area|Network Type|Hello|Dead|MTU\n  Network Type BROADCAST, Cost: 1\n  Hello 10, Dead 40\n  Area 1\n  MTU is 1500\n\nR1# show ip ospf neighbor\n(no neighbors)\n\nR2# show run interface Gi0/0/0 | include ospf\n ip ospf 1 area 1\n\nR1# show run interface Gi0/0/0 | include ospf\n ip ospf 1 area 0",
+    "alternativas": [
+      "Area mismatch (0 vs 1) — alinhar area-id no link para single-area/adjacência",
+      "MTU mismatch (ambos 1500)",
+      "RID duplicado explícito nos outputs",
+      "Falta de voice vlan no WAN"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Area 0 no R1 e area 1 no R2 no mesmo link impedem adjacência. Timers e MTU batem. Corrija para a mesma area. Não há evidência de RID duplicado nem de voice na WAN.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 42,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3302: neighbor oscila/trava em EXSTART entre R1-R2 no link p2p Ethernet.",
+    "cli_output": "R1# show ip ospf neighbor\nNeighbor ID     Pri   State           Dead Time   Address         Interface\n2.2.2.2           0   EXSTART/  -     00:00:35    10.0.0.2        Gi0/0/1\n\nR2# show ip ospf neighbor\nNeighbor ID     Pri   State           Dead Time   Address         Interface\n1.1.1.1           0   EXSTART/  -     00:00:32    10.0.0.1        Gi0/0/1\n\nR1# show interfaces Gi0/0/1 | include MTU\n  MTU 1500 bytes, BW 1000000 Kbit/sec\n\nR2# show interfaces Gi0/0/1 | include MTU\n  MTU 1400 bytes, BW 1000000 Kbit/sec\n\nR1# show ip ospf interface Gi0/0/1 | include Network Type|Area\n  Network Type POINT_TO_POINT, Area 0\nR2# show ip ospf interface Gi0/0/1 | include Network Type|Area\n  Network Type POINT_TO_POINT, Area 0",
+    "alternativas": [
+      "Area mismatch (ambos area 0)",
+      "Falta de passive-interface no WAN",
+      "Hello 10 vs 30 (não mostrado)",
+      "Stuck EXSTART por MTU 1500 vs 1400 — alinhar MTU (ou política mtu-ignore)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "EXSTART nos dois lados com MTU diferente é o clássico. Area e p2p batem. Ajuste MTU para o mesmo valor. Passive no WAN pioraria; não há mismatch de area.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 43,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3303: WAN entre R1-R2 sem neighbor; LANs de usuário estão no OSPF.",
+    "cli_output": "R1# show run | section router ospf\nrouter ospf 1\n router-id 1.1.1.1\n passive-interface default\n no passive-interface GigabitEthernet0/0/0\n network 10.0.0.0 0.0.0.3 area 0\n network 10.40.0.0 0.0.0.255 area 0\n\nR1# show run interface Gi0/0/1\ninterface GigabitEthernet0/0/1\n description WAN-TO-R2\n ip address 10.0.0.1 255.255.255.252\n ip ospf 1 area 0\n\nR1# show ip ospf interface brief\nInterface    PID   Area   IP Address/Mask    Cost  State Nbrs F/C\nGi0/0/0      1     0      10.10.10.1/30      1     P2P   1/1\nGi0/0/1      1     0      10.0.0.1/30        1     P2P   0/0\nLo0          1     0      1.1.1.1/32         1     LOOP  0/0\nVl40         1     0      10.40.0.1/24       1     DR    0/0\n\nR1# show ip ospf interface Gi0/0/1 | include passive|Hello|suppress\n  No Hellos (Passive interface)",
+    "alternativas": [
+      "MTU 0 no WAN",
+      "passive-interface default mantém Gi0/0/1 passiva — falta no passive-interface Gi0/0/1 no WAN-TO-R2",
+      "Area 1 vs 0 no R2 apenas (não mostrado no R1)",
+      "RID 1.1.1.1 inválido"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "No Hellos (Passive interface) em Gi0/0/1 com passive default e apenas Gi0/0/0 com no passive explica Nbrs 0/0 no WAN. Adicione no passive-interface Gi0/0/1. RID 1.1.1.1 é válido.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 44,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3304: adjacências instáveis após clone de config; dois routers com o mesmo RID.",
+    "cli_output": "R1# show ip ospf\n Routing Process \"ospf 1\" with ID 10.10.10.10\n\nR2# show ip ospf\n Routing Process \"ospf 1\" with ID 10.10.10.10\n\nR3# show ip ospf neighbor\nNeighbor ID     Pri State   Dead Time Address       Interface\n10.10.10.10       1 FULL/DR 00:00:35  10.0.0.1      Gi0/0/0\n10.10.10.10       1 FULL/BDR 00:00:33 10.0.0.2      Gi0/0/0\n%OSPF-4-DUP_RTRID_AREA: Detected router with duplicate router ID\n\nR1# show run | include router-id\n router-id 10.10.10.10\nR2# show run | include router-id\n router-id 10.10.10.10\n\nR1 Lo0 is 1.1.1.1/32; R2 Lo0 is 2.2.2.2/32 (not used as RID)",
+    "alternativas": [
+      "Manter RID duplicado; FULL com mesmo ID é ideal",
+      "Desligar OSPF só no R3",
+      "Apagar as loopbacks",
+      "Corrigir RID único (ex. R1 1.1.1.1, R2 2.2.2.2) e reconvergir o processo"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Log DUP_RTRID e mesmo process ID 10.10.10.10 em R1/R2 são RID duplicado. Use RID alinhado às loopbacks distintas e clear process com cuidado. Não mantenha duplicata.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 45,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3305: IPv4 entre filiais ok via OSPFv2 FULL; hosts IPv6 não roteiam. R1/R2 dual-stack.",
+    "cli_output": "R1# show ip ospf neighbor\nNeighbor ID  State    Address     Interface\n2.2.2.2      FULL/  - 10.0.0.2    Gi0/0/1\n\nR1# show ipv6 ospf neighbor\n% OSPFv3 is not running ou empty table\n\nR1# show run interface Gi0/0/1\ninterface GigabitEthernet0/0/1\n ip address 10.0.0.1 255.255.255.252\n ip ospf 1 area 0\n ipv6 address 2001:db8:0:12::1/64\n (no ipv6 ospf / ospfv3 command)\n\nR1# show ipv6 route ospf\n(no OSPF routes)\n\nR1# show run | include ipv6 unicast|ipv6 router ospf|router ospfv3\nipv6 unicast-routing\n (no ospfv3 process enabled on interfaces)",
+    "alternativas": [
+      "Aumentar Hello do OSPFv2 resolve IPv6",
+      "passive-interface default no v2 anuncia GUA automaticamente",
+      "Falta OSPFv3 na interface/processo — FULL v2 não cria neighbor/rotas IPv6; configurar ipv6 ospf/ospfv3 area e verify neighbor v3",
+      "RID IPv6 /128 obrigatório no lugar do 32-bit"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "IPv6 na interface sem ospfv3/ipv6 ospf e neighbor v3 vazio explicam ausência de rotas OIPv6. Habilite OSPFv3 e RID 32-bit válido. Hello v2 e passive v2 não carregam o plano IPv6.",
+    "part_id": "v2-3.3"
+  },
+  {
+    "id": 46,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3401: design pedia R1 como Active do VIP 10.40.0.1; na prática R2 encaminha e R1 está Standby.",
+    "cli_output": "R1# show standby brief\n                     P indicates configured to preempt.\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nVl40        40   90    Standby 10.40.0.3       local           10.40.0.1\n\nR2# show standby brief\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nVl40        40  100    Active  local           10.40.0.2       10.40.0.1\n\nR1# show run interface Vlan40 | include standby\n standby 40 ip 10.40.0.1\n standby 40 priority 90\n standby 40 preempt\n\nR2# show run interface Vlan40 | include standby\n standby 40 ip 10.40.0.1\n standby 40 priority 100\n\nDesign: R1 should be preferred Active",
+    "alternativas": [
+      "Grupo mismatch",
+      "Priority de R1 (90) menor que R2 (100) — Active no router ‘errado’; subir priority em R1",
+      "VIP diferente",
+      "Falta de PortFast no SVI"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show standby brief: R2 Active com Pri 100 e R1 Standby com 90. Preempt em R1 não vence priority menor. Ajuste R1 para priority 110+ (e preempt). Grupo e VIP já batem.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 47,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3402: após manutenção, R1 (preferido) voltou up mas o tráfego continua no R2; operadores querem R1 Active de novo.",
+    "cli_output": "R1# show standby brief\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nVl40        40  120    Standby 10.40.0.3       local           10.40.0.1\n\nR2# show standby brief\nInterface   Grp  Pri P State   Active          Standby         Virtual IP\nVl40        40  100    Active  local           10.40.0.2       10.40.0.1\n\nR1# show run interface Vlan40 | include standby\n standby 40 ip 10.40.0.1\n standby 40 priority 120\n (no preempt)\n\nR2# show run interface Vlan40 | include standby\n standby 40 ip 10.40.0.1\n standby 40 priority 100\n\nTimeline: R1 was reloaded; R2 became Active; R1 is back with higher priority",
+    "alternativas": [
+      "VIP precisa mudar para .2",
+      "Priority 120 é inválida",
+      "Trocar o grupo para 0",
+      "Falta standby preempt em R1 — sem preempt o Active atual (R2) permanece apesar da priority maior em R1"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "R1 tem Pri 120 mas sem P/preempt e fica Standby; R2 Active com 100. Habilite standby 40 preempt no R1 para reconquistar Active. VIP/grupo ok.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 48,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3403: hosts perdem gateway intermitente; dois routers ‘Active’ reportados na mesma VLAN.",
+    "cli_output": "R1# show standby Vlan40\nVlan40 - Group 40\n  State is Active\n  Virtual IP address is 10.40.0.1\n  Active router is local\n  Standby router is unknown\n\nR2# show standby Vlan40\nVlan40 - Group 41\n  State is Active\n  Virtual IP address is 10.40.0.1\n  Active router is local\n  Standby router is unknown\n\nR1# show run interface Vlan40 | include standby\n standby 40 ip 10.40.0.1\n standby 40 priority 110\n standby 40 preempt\n\nR2# show run interface Vlan40 | include standby\n standby 41 ip 10.40.0.1\n standby 41 priority 100\n standby 41 preempt\n\nBoth SVIs up/up; L2 between cores OK per ops",
+    "alternativas": [
+      "Alinhar o número do grupo (ex. ambos 40) e o VIP — mismatch de grupo impede par Active/Standby",
+      "Desligar preempt nos dois",
+      "Baixar priority de ambos para 50",
+      "Remover IPs reais dos SVIs"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Grupo 40 vs 41 com Standby unknown = peers não se veem no mesmo grupo. Corrija standby 40 (ou 41) nos dois com o mesmo VIP. Priority/preempt secundários até o grupo casar.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 49,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3404: um router de borda caiu e toda a VLAN perdeu Internet; só havia um gateway físico no DHCP.",
+    "cli_output": "PC> ipconfig\n   IPv4 Address. . . . . . . . . . . : 10.40.0.55\n   Default Gateway . . . . . . . . . : 10.40.0.2\n\nR1# show run interface Vlan40\ninterface Vlan40\n ip address 10.40.0.2 255.255.255.0\n (no standby commands)\n\nR2# show run interface Vlan40\ninterface Vlan40\n ip address 10.40.0.3 255.255.255.0\n (no standby commands)\n\nR1# show standby brief\n% No Hot Standby groups configured\n\nR1 down during incident → PC gateway 10.40.0.2 unreachable\nR2 was up but hosts do not use 10.40.0.3",
+    "alternativas": [
+      "HSRP já está Active em ambos",
+      "Basta PortFast no R2",
+      "Sem FHRP: gateway único 10.40.0.2 = SPOF — configurar HSRP VIP (ex. .1) nos dois e DHCP default-router = VIP",
+      "VRRP está implícito sem config"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Sem standby e com DHCP apontando ao IP físico do R1, a queda do R1 isola os hosts apesar do R2 up. Configure HSRP e mude o gateway dos hosts para o VIP.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 50,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-3405: HSRP não estabiliza; show standby fica em Speak/Init; VIP não responde ping.",
+    "cli_output": "R1# show standby Vlan40\nVlan40 - Group 40\n  State is Speak\n  Virtual IP address is 10.40.0.1\n  Active router is unknown\n  Standby router is unknown\n  Priority 100 (default)\n\nR1# show ip interface brief | include Vlan40\nVlan40   10.40.0.2   YES NVRAM  up   down\n\nR1# show run interface Vlan40 | include standby|ip address\n ip address 10.40.0.2 255.255.255.0\n standby 40 ip 10.40.0.1\n\nR2# show standby brief\nVl40  40  100  Active  local  unknown  10.40.0.1\n\nR2 Vlan40 is up/up; R1 Vlan40 line protocol down (L2/VLAN issue on R1 side)\nLog R1: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan40, changed state to down",
+    "alternativas": [
+      "Priority default proíbe Active",
+      "VIP .1 é inválido em /24",
+      "Grupo 40 só funciona com preempt",
+      "SVI R1 up/down (line protocol down) — HSRP não completa; corrigir L2/VLAN no R1 para o grupo estabilizar"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Speak com Active unknown e Vlan40 up/down no R1 mostram falha de interface/L2, não só priority. R2 pode ficar Active sozinho; R1 não forma Standby saudável até o SVI ficar up/up. Corrija VLAN/trunk no lado R1.",
+    "part_id": "v2-3.4"
+  },
+  {
+    "id": 51,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-4201: auditoria de segurança — switch de acesso ainda aceita Telnet. SSH também está configurado.",
+    "cli_output": "SW# show run | section line vty\nline vty 0 4\n login local\n transport input telnet ssh\n!\nline vty 5 15\n login local\n transport input telnet ssh\n\nSW# show ip ssh\nSSH Enabled - version 2.0\nAuthentication methods:publickey,keyboard-interactive,password\nAuthentication timeout: 120 secs; Authentication retries: 3\n\nSW# show run | include username\nusername admin privilege 15 secret 9 $9$...\n\nPC> telnet 10.40.0.2\nTrying 10.40.0.2 ... Open\nUser Access Verification\nUsername:\n\nPC> ssh -l admin 10.40.0.2\n(admin@10.40.0.2) Password:  [works]",
+    "alternativas": [
+      "Remover todas as chaves RSA",
+      "Alterar para transport input ssh (somente) nas VTY — fechar Telnet cleartext",
+      "Desabilitar username admin",
+      "Manter transport input telnet ssh — Telnet open é aceitável em produção"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Telnet Open prova cleartext ainda permitido apesar do SSH ok. transport input ssh only fecha o Telnet. Não remova chaves nem o usuário admin.",
+    "part_id": "v2-4.2"
+  }
+]

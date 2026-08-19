@@ -28,13 +28,13 @@ import {
   pickSimuladoQuestionsForTrack,
   getSimuladoTimerMinutes,
   getSimuladoPool,
-  getSimuladoPoolByTrack,
+  getSimuladoPoolByTrackAndLang,
   defaultSimuladoSourceForTrack,
   countTicketsInSession,
   V2_SIMULADO_TICKET_RATIO,
   TOTAL_SIMULADO_V2,
-  // counts used in config UI
   TOTAL_SIMULADO_AWS,
+  type SimuladoLangMode,
   TOTAL_SIMULADO_MODULE1,
   TOTAL_SIMULADO_MODULE2,
   TOTAL_SIMULADO_MODULE3,
@@ -51,7 +51,8 @@ import { SimuladoReview } from "@/components/simulado/SimuladoReview";
 import { Explicacao } from "@/components/ticket/Explicacao";
 import { TerminalCLI } from "@/components/ticket/TerminalCLI";
 import { useTrack } from "@/lib/track-context";
-import { simuladoConfigCopy } from "@/data/copy";
+import { simuladoConfigCopy, simuladoLangModeCopy } from "@/data/copy";
+import { filterQuestionsByLangMode } from "@/lib/question-lang";
 
 type Phase = "config" | "quiz" | "result" | "review";
 
@@ -86,6 +87,7 @@ export function SimuladoMode({
   const { track } = useTrack();
   const [phase, setPhase] = useState<Phase>("config");
   const [countOption, setCountOption] = useState<SimuladoCountOption>(20);
+  const [langMode, setLangMode] = useState<SimuladoLangMode>("pt");
   const [source, setSource] = useState<SimuladoSource>(() =>
     defaultSimuladoSourceForTrack(track)
   );
@@ -151,23 +153,26 @@ export function SimuladoMode({
   // Sync bank when track changes (never mix mid-quiz — parent remounts with key)
   useEffect(() => {
     setSource(defaultSimuladoSourceForTrack(track));
+    setLangMode("pt");
     setPhase("config");
   }, [track]);
 
   const activePool = useMemo(() => {
-    if (track === "aws") return getSimuladoPoolByTrack("aws");
-    return getSimuladoPool(source);
-  }, [track, source]);
+    if (track === "ccna-v2" || track === "aws") {
+      return getSimuladoPoolByTrackAndLang(track, langMode);
+    }
+    return filterQuestionsByLangMode(getSimuladoPool(source), langMode);
+  }, [track, source, langMode]);
   const poolTotal = activePool.length;
 
   const startSimulado = useCallback(() => {
-    // ccna-v2: mix ~30% tickets (posture diagnóstico). V1/AWS: pure traditional.
+    // ccna-v2: mix ~30% tickets. V1/AWS: traditional. Todos filtrados por langMode.
     const picked =
       track === "ccna-v2"
-        ? pickSimuladoQuestionsForTrack(countOption, "ccna-v2")
+        ? pickSimuladoQuestionsForTrack(countOption, "ccna-v2", langMode)
         : track === "aws"
-          ? pickSimuladoQuestionsForTrack(countOption, "aws")
-          : pickSimuladoQuestions(countOption, source);
+          ? pickSimuladoQuestionsForTrack(countOption, "aws", langMode)
+          : pickSimuladoQuestions(countOption, source, langMode);
     setSessionQuestions(picked);
     setCurrentIndex(0);
     setSelected(null);
@@ -178,7 +183,7 @@ export function SimuladoMode({
     setReviewIndex(0);
 
     if (timerEnabled) {
-      const mins = getSimuladoTimerMinutes(picked.length, poolTotal);
+      const mins = getSimuladoTimerMinutes(picked.length, Math.max(poolTotal, 1));
       const budget = mins * 60;
       setTimerBudgetSeconds(budget);
       setSecondsLeft(budget);
@@ -188,7 +193,7 @@ export function SimuladoMode({
     }
 
     setPhase("quiz");
-  }, [countOption, timerEnabled, source, poolTotal, track]);
+  }, [countOption, timerEnabled, source, poolTotal, track, langMode]);
 
   const sessionTicketCount = useMemo(
     () => countTicketsInSession(sessionQuestions),
@@ -294,6 +299,44 @@ export function SimuladoMode({
                 </p>
               )}
             </div>
+          </div>
+
+          {/* Modo Conhecimento (PT) | Prova (EN) */}
+          <div className="mb-5">
+            <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+              {simuladoLangModeCopy.sectionLabel}
+            </p>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {(
+                [
+                  simuladoLangModeCopy.conhecimento,
+                  simuladoLangModeCopy.prova,
+                ] as const
+              ).map((mode) => (
+                <button
+                  key={mode.id}
+                  type="button"
+                  onClick={() => setLangMode(mode.id)}
+                  className={cn(
+                    "rounded-xl border px-3 py-3 text-left text-sm font-bold transition-all",
+                    langMode === mode.id
+                      ? mode.id === "pt"
+                        ? "border-neon-cyan bg-neon-cyan/15 text-neon-cyan shadow-[0_0_16px_rgba(34,211,238,0.2)]"
+                        : "border-amber-400/60 bg-amber-400/15 text-amber-300 shadow-[0_0_16px_rgba(251,191,36,0.2)]"
+                      : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-600 hover:text-slate-200"
+                  )}
+                >
+                  {mode.title}
+                  <span className="mt-0.5 block text-[10px] font-normal opacity-80">
+                    {mode.desc}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-[10px] leading-relaxed text-slate-600">
+              {simuladoLangModeCopy.mixedNote} · pool filtrado: {poolTotal}{" "}
+              questões
+            </p>
           </div>
 
           {/* Source selector — only ccna-v1; AWS and V2 use fixed pools */}

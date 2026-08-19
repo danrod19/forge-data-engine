@@ -33,8 +33,8 @@ export function homeHeroCopy(track: TrackId): HomeHeroCopy {
       titleLead: "AWS",
       titleAccent: "Forge",
       subtitle: "preparação prática para SAA-C03 (Foundations)",
-      body: "Treine decisões de arquitetura com cenários reais: IAM, VPC, S3, compute, dados e serverless. Simulado, tickets de diagnóstico e estudo por domínio — no seu ritmo.",
-      ctaPrimary: "Começar Trilha",
+      body: "Treine decisões de arquitetura: IAM, VPC, S3, compute, dados e serverless. Estudo por domínio, Simulado e Trilha de cenários (sem terminal) — no seu ritmo.",
+      ctaPrimary: "Abrir Estudo",
       ctaSecondary: "Fazer Simulado",
     };
   }
@@ -71,7 +71,7 @@ export function homeHowToCopy(
       title: "Trilha",
       desc:
         track === "aws"
-          ? `Tickets AWS (policy, logs, TShoot) — ${counts.tickets} no banco do piloto SAA.`
+          ? `Cenários de arquitetura — ${counts.tickets} no banco SAA (sem terminal).`
           : track === "ccna-v2"
             ? `Só tickets de troubleshooting — ${counts.tickets} no banco v2.0.`
             : `Tickets com sintoma + CLI — ${counts.tickets} no banco.`,
@@ -81,20 +81,20 @@ export function homeHowToCopy(
       title: "Simulado",
       desc:
         track === "ccna-v2"
-          ? `${counts.simulado} questões traditional + mix ~${ticketPct}% troubleshooting na sessão.`
+          ? `${counts.simulado} traditional + mix ~${ticketPct}% troubleshooting · modos PT e EN.`
           : track === "aws"
-            ? `${counts.simulado} questões scenario-based · SAA-C03 Foundations.`
-            : `${counts.simulado} questões traditional · escolha o módulo ou o banco completo.`,
+            ? `${counts.simulado} questões · modos Conhecimento (PT) e Prova (EN).`
+            : `${counts.simulado} no banco · revise em PT e treine em EN.`,
     },
     {
       step: "03",
       title: "Estudo",
       desc:
         track === "aws"
-          ? "Leia o conteúdo do domínio, marque como lido e pratique até 30 questões."
+          ? "Leia o domínio, marque como lido e pratique até 30 questões (preferência PT)."
           : track === "ccna-v2"
-            ? "Leia a part v2.0, depois pratique. Progresso separado do V1."
-            : "Leia a apostila da parte, marque como lido e pratique o tópico.",
+            ? "Leia a part, pratique o tópico. Progresso separado do V1."
+            : "Leia a apostila, marque como lido e pratique o tópico.",
     },
     {
       step: "04",
@@ -108,6 +108,112 @@ export function homeHowToCopy(
     },
   ];
 }
+
+/** Ordem recomendada de estudo (bloco Home). */
+export function studyJourneyCopy(track: TrackId): {
+  title: string;
+  intro: string;
+  steps: { n: string; title: string; desc: string }[];
+} {
+  if (track === "aws") {
+    return {
+      title: "Como estudar",
+      intro: "Ordem sugerida para o piloto SAA Foundations:",
+      steps: [
+        {
+          n: "1",
+          title: "Estudo",
+          desc: "Leia o domínio e pratique ali — confira se entendeu.",
+        },
+        {
+          n: "2",
+          title: "Simulado",
+          desc: "Conhecimento (PT) e Prova (EN) — ritmo de exame.",
+        },
+        {
+          n: "3",
+          title: "Trilha · Cenários",
+          desc: "Arquitetura em sessões curtas (enunciado + 4 opções, sem terminal).",
+        },
+        {
+          n: "4",
+          title: "Sobre a Prova",
+          desc: "SAA-C03: o que o piloto cobre (1.1–1.12) e o que fica de fora.",
+        },
+      ],
+    };
+  }
+  if (track === "ccna-v2") {
+    return {
+      title: "Como estudar",
+      intro: "Ordem que funciona bem com a posture de troubleshooting do v2.0:",
+      steps: [
+        {
+          n: "1",
+          title: "Estudo",
+          desc: "Leia a part e pratique o tópico (teste se entendeu).",
+        },
+        {
+          n: "2",
+          title: "Trilha",
+          desc: "Tickets com sintoma + CLI — o coração do treino v2.",
+        },
+        {
+          n: "3",
+          title: "Simulado Conhecimento (PT)",
+          desc: "Revise em português (com mix de diagnóstico na sessão).",
+        },
+        {
+          n: "4",
+          title: "Simulado Prova (EN)",
+          desc: "Treine no formato/idioma mais próximo da prova.",
+        },
+      ],
+    };
+  }
+  return {
+    title: "Como estudar",
+    intro: "Sugestão de jornada no Forge:",
+    steps: [
+      {
+        n: "1",
+        title: "Estudo",
+        desc: "Leia o tópico e pratique ali — teste se entendeu.",
+      },
+      {
+        n: "2",
+        title: "Trilha",
+        desc: "Tickets com CLI depois que já estudou o tema.",
+      },
+      {
+        n: "3",
+        title: "Simulado Conhecimento (PT)",
+        desc: "Revise o conteúdo em português.",
+      },
+      {
+        n: "4",
+        title: "Simulado Prova (EN)",
+        desc: "Treine no formato e no idioma do exame.",
+      },
+    ],
+  };
+}
+
+export const simuladoLangModeCopy = {
+  sectionLabel: "Modo do simulado",
+  conhecimento: {
+    id: "pt" as const,
+    title: "Conhecimento (PT)",
+    desc: "Revisar em português — bom depois do Estudo.",
+  },
+  prova: {
+    id: "en" as const,
+    title: "Prova (EN)",
+    desc: "Treinar no idioma do exame.",
+  },
+  mixedNote:
+    "Itens classificados como mixed entram nos dois modos (PT e EN).",
+};
 
 export const freeVsProCopy = {
   freeTitle: "Free",
@@ -171,12 +277,16 @@ export const estudoUiCopy = {
     "Ainda não há apostila para este tópico neste piloto. Você pode praticar as questões disponíveis.",
   practiceCta: "Praticar",
   practiceCtaLocked: "Leia o conteúdo (ou marque como lido) para praticar com foco",
-  practiceHint: "Até 30 questões deste tópico (ou todas, se houver menos).",
+  practiceHint:
+    "Aqui você testa o tópico enquanto estuda — até 30 questões (preferência em português).",
+  practiceEnFallback:
+    "Neste tópico o drill está em inglês (poucas ou nenhuma questão PT no pool).",
   backToList: "Todos os tópicos",
   topicsHeading: "Tópicos",
   mustKnowHeading: "Precisa saber",
   commandsHeading: "Comandos / referências",
   examTip: "Dica de prova",
+  journeyLine: "Aqui você testa o tópico enquanto estuda.",
 };
 
 export function simuladoConfigCopy(track: TrackId): {

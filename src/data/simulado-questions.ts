@@ -18,12 +18,18 @@ import { module4TraditionalQuestions } from "@/data/module4-traditional";
 import { module5TraditionalQuestions } from "@/data/module5-traditional";
 import { module6TraditionalQuestions } from "@/data/module6-traditional";
 import type { TrackId } from "@/lib/track-context";
+import {
+  filterQuestionsByLangMode,
+  type SimuladoLangMode,
+} from "@/lib/question-lang";
 
 /**
  * Fração de tickets (troubleshooting) na sessão do Simulado track ccna-v2.
  * Ajustável 0.25–0.35; só afeta pick/sessão — não reescreve bancos.
  */
 export const V2_SIMULADO_TICKET_RATIO = 0.3;
+
+export type { SimuladoLangMode };
 
 function normalizeSimuladoPool(raw: Question[]): Question[] {
   return raw.map((q, index) => ({
@@ -220,15 +226,31 @@ export function computeV2MixCounts(
 }
 
 /**
+ * Pool traditional (+ tickets só na montagem V2) filtrado por modo de idioma.
+ * Regra mixed: pt+mixed no modo Conhecimento; en+mixed no modo Prova.
+ */
+export function getSimuladoPoolByTrackAndLang(
+  track: TrackId,
+  lang: SimuladoLangMode
+): Question[] {
+  return filterQuestionsByLangMode(getSimuladoPoolByTrack(track), lang);
+}
+
+/**
  * Sessão Simulado CCNA V2 com bias de posture (~30% tickets).
  * IDs renumerados 1..N (trad e tickets v2 colidem no JSON).
  * Não altera pools de ccna-v1 / aws.
  */
 export function pickSimuladoV2MixedSession(
-  count: SimuladoCountOption
+  count: SimuladoCountOption,
+  lang: SimuladoLangMode = "pt"
 ): Question[] {
-  const tradPool = shuffleQuestions(v2TraditionalQuestions);
-  const ticketPool = shuffleQuestions(v2Tickets);
+  const tradPool = shuffleQuestions(
+    filterQuestionsByLangMode(v2TraditionalQuestions, lang)
+  );
+  const ticketPool = shuffleQuestions(
+    filterQuestionsByLangMode(v2Tickets, lang)
+  );
 
   let takeTrad: number;
   let takeTickets: number;
@@ -277,9 +299,10 @@ export function pickSimuladoV2MixedSession(
 /** Alias pedido no contrato */
 export function createSimuladoSession(
   count: SimuladoCountOption,
-  track: TrackId
+  track: TrackId,
+  lang: SimuladoLangMode = "pt"
 ): Question[] {
-  return pickSimuladoQuestionsForTrack(count, track);
+  return pickSimuladoQuestionsForTrack(count, track, lang);
 }
 
 /** Pool por fonte legada (seletor interno do Simulado em tracks CCNA). */
@@ -320,25 +343,30 @@ export function getSimuladoPool(source: SimuladoSource = "v2"): Question[] {
  */
 export function pickSimuladoQuestions(
   count: SimuladoCountOption,
-  source: SimuladoSource = "v2"
+  source: SimuladoSource = "v2",
+  lang: SimuladoLangMode = "pt"
 ): Question[] {
-  const pool = shuffleQuestions(getSimuladoPool(source));
+  const pool = shuffleQuestions(
+    filterQuestionsByLangMode(getSimuladoPool(source), lang)
+  );
   if (count === "all") return pool;
   return pool.slice(0, Math.min(count, pool.length));
 }
 
 /**
- * Pick por track. ccna-v2 aplica mix ~30% tickets (posture diagnóstico).
- * ccna-v1 e aws: traditional only (pools atuais).
+ * Pick por track + idioma.
+ * ccna-v2 aplica mix ~30% tickets (posture diagnóstico) no pool já filtrado.
+ * ccna-v1 e aws: traditional only.
  */
 export function pickSimuladoQuestionsForTrack(
   count: SimuladoCountOption,
-  track: TrackId
+  track: TrackId,
+  lang: SimuladoLangMode = "pt"
 ): Question[] {
   if (track === "ccna-v2") {
-    return pickSimuladoV2MixedSession(count);
+    return pickSimuladoV2MixedSession(count, lang);
   }
-  const pool = shuffleQuestions(getSimuladoPoolByTrack(track));
+  const pool = shuffleQuestions(getSimuladoPoolByTrackAndLang(track, lang));
   if (count === "all") return pool;
   return pool.slice(0, Math.min(count, pool.length));
 }

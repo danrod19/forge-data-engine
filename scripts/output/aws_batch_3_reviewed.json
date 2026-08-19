@@ -1,0 +1,257 @@
+[
+  {
+    "id": 46,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1101: a Lambda report-gen cai com Task timed out. O job de PDF no staging leva cerca de 2 minutos no mesmo código — alguém cortou o timeout em produção?",
+    "cli_output": "$ aws lambda get-function-configuration --function-name report-gen\nTimeout: 30\nMemorySize: 512\nRole: arn:aws:iam::111122223333:role/report-gen-role\nVpcConfig: null\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/report-gen --filter-pattern \"Task timed out\"\n... Task timed out after 30.00 seconds\n... REPORT Duration: 30000.12 ms ... Status: timeout\n\n# Business: PDF generation p50=90s p99=110s on same code path in staging with Timeout 120",
+    "alternativas": [
+      "Aumentar Timeout para ≥120s (e monitorar) ou mover o job para assíncrono (SQS) se o client não pode esperar",
+      "Remover a execution role",
+      "Só criar um CNAME no apex",
+      "Desabilitar CloudWatch Logs"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para timeout curto demais: no CLI, Timeout: 30 e o log mostra Task timed out after 30.00 seconds, enquanto o mesmo path em staging (Timeout 120) tem p50≈90s e p99≈110s. Ajuste o Timeout para ≥120s e monitore duração, ou tire o PDF do caminho síncrono (SQS + worker) se o client HTTP não pode esperar. Remover a execution role quebra a function de vez (sem permissão para rodar). CNAME no apex não tem relação com duração de Lambda. Desabilitar CloudWatch Logs só esconde o REPORT de timeout — não alonga o limite de execução. Insight: Duration no REPORT batendo exatamente no Timeout configurado quase sempre é config, não “rede misteriosa”.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 47,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1102: a Lambda order-writer não grava no DynamoDB — PutItem volta AccessDenied. Time de app jura que a tabela Orders está ok.",
+    "cli_output": "$ aws sts get-caller-identity\n# from inside function simulation\nArn: arn:aws:sts::111122223333:assumed-role/order-writer-role/...\n\n$ aws lambda get-function-configuration --function-name order-writer\nRole: arn:aws:iam::111122223333:role/order-writer-role\n\n$ aws iam list-attached-role-policies --role-name order-writer-role\nAttached: AWSLambdaBasicExecutionRole\n# only logs\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/order-writer --filter-pattern \"AccessDenied\"\n... User is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:us-east-1:111122223333:table/Orders\n\nTimeout: 10  MemorySize: 256  # not the failing axis",
+    "alternativas": [
+      "Anexar policy com dynamodb:PutItem no ARN da tabela Orders à execution role",
+      "Só aumentar o timeout para 900",
+      "Só habilitar reserved concurrency 100",
+      "Só colocar a function em VPC sem endpoints"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "No CLI, a role order-writer-role só tem AWSLambdaBasicExecutionRole (logs) e o log deixa claro: not authorized to perform dynamodb:PutItem na tabela Orders. Anexe uma policy com PutItem (e o ARN da tabela) à execution role — o caller assume exatamente essa role. Aumentar timeout para 900 não muda AccessDenied; o comentário no output já marca Timeout/Memory como fora do eixo. Reserved concurrency 100 trata throttling, não IAM. Colocar a function em VPC sem endpoints só adiciona risco de falta de rota ao DynamoDB e não concede PutItem. Insight: AccessDenied no log da Lambda + role só com BasicExecution = buraco clássico de least privilege incompleto.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 48,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1103: no Black Friday a checkout-fn explode em 429. Reserved concurrency está em 5 e o API Gateway sincroniza direto na Lambda — fila SQS na frente? Não tem.",
+    "cli_output": "$ aws lambda get-function-concurrency --function-name checkout-fn\nReservedConcurrentExecutions: 5\n\n$ aws cloudwatch get-metric-statistics --namespace AWS/Lambda --metric-name Throttles \\\n  --dimensions Name=FunctionName,Value=checkout-fn ...\n# Throttles spike 10:00–11:00\n\n$ aws cloudwatch get-metric-statistics ... ConcurrentExecutions\n# plateaus at 5\n\n# API Gateway integration sync → user-facing 429/5xx\n# SQS buffer not in front of checkout-fn",
+    "alternativas": [
+      "Aumentar reserved concurrency (com base na conta) e/ou colocar SQS buffer + async para absorver picos",
+      "Apagar o log group",
+      "Remover a policy de logs para 'ir mais rápido'",
+      "Trocar o runtime sem mudar concurrency"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para teto de concorrência: ReservedConcurrentExecutions=5, ConcurrentExecutions platô em 5 e Throttles sobem no pico — o sync do API Gateway devolve 429/5xx ao usuário. Suba reserved concurrency com folga da conta e/ou coloque SQS + invocação async na frente para absorver burst. Apagar o log group não libera concorrência. Remover policy de logs não acelera execução nem aumenta o limite. Trocar o runtime sem mexer em concurrency deixa o mesmo teto de 5. Insight: Throttles + ConcurrentExecutions colado no reserved = capacidade reservada insuficiente, não bug de código necessariamente.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 49,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1104: a Lambda pay-fn em VPC não consegue Secrets Manager. IAM com GetSecretValue parece certo, mas a chamada trava e estoura timeout.",
+    "cli_output": "$ aws lambda get-function-configuration --function-name pay-fn\nVpcConfig:\n  SubnetIds: [subnet-0priva, subnet-0privb]\n  SecurityGroupIds: [sg-lambda]\nTimeout: 10\n\n$ aws iam get-role-policy --role-name pay-fn-role --policy-name secrets\n# Allow secretsmanager:GetSecretValue on arn:...:secret:prod/db-*\n# Allow kms:Decrypt on cmk-sec\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/pay-fn --filter-pattern \"timeout\"\n... Task timed out after 10.00 seconds\n# stack shows hang on GetSecretValue HTTP client\n\n$ aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=vpc-0app\nNatGateways: []\n\n$ aws ec2 describe-vpc-endpoints --filters Name=vpc-id,Values=vpc-0app\n# no secretsmanager or kms interface endpoints\n\n$ aws ec2 describe-route-tables --filters Name=association.subnet-id,Values=subnet-0priva\nRoutes: 10.0.0.0/16 local   # no 0.0.0.0/0 to nat",
+    "alternativas": [
+      "Criar VPC endpoints (secretsmanager/kms) ou NAT + rota 0.0.0.0/0 nas subnets da Lambda — IAM já está ok",
+      "Remover GetSecretValue da role",
+      "Desabilitar a CMK",
+      "Só aumentar memory para 10 GB"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "IAM já permite GetSecretValue e kms:Decrypt — o hang no HTTP client + timeout é falta de caminho de rede. Subnets privadas sem NAT (NatGateways: []) e sem interface endpoints de secretsmanager/kms, com rota só local: a Lambda não alcança o plano de controle. Crie endpoints (e SG liberando 443) ou NAT + 0.0.0.0/0. Remover GetSecretValue da role piora o IAM. Desabilitar a CMK quebra decrypt do secret. Aumentar memory para 10 GB não cria rota de saída. Insight: em Lambda-in-VPC, AccessDenied vs timeout no GetSecretValue separa IAM de connectivity — aqui o stack congela no client HTTP.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 50,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1105: a fila orders-q acumula ~2k mensagens e a Lambda orders-worker praticamente não processa. Mapping está Enabled, mas LastProcessingResult grita PROBLEM.",
+    "cli_output": "$ aws sqs get-queue-attributes --queue-url .../orders-q --attribute-names ApproximateNumberOfMessagesVisible\nApproximateNumberOfMessagesVisible: 2044\n\n$ aws lambda list-event-source-mappings --function-name orders-worker\n[\n  {\n    \"UUID\": \"1111-2222\",\n    \"EventSourceArn\": \"arn:aws:sqs:us-east-1:111122223333:orders-q\",\n    \"State\": \"Enabled\",\n    \"LastProcessingResult\": \"PROBLEM: Function call failed\",\n    \"BatchSize\": 10\n  }\n]\n\n$ aws iam list-attached-role-policies --role-name orders-worker-role\nAWSLambdaBasicExecutionRole\n# missing sqs:ReceiveMessage, DeleteMessage, GetQueueAttributes on orders-q\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/orders-worker --filter-pattern \"AccessDenied\"\n... not authorized to perform: sqs:ReceiveMessage ...",
+    "alternativas": [
+      "Permitir sqs:ReceiveMessage/DeleteMessage/GetQueueAttributes na role e corrigir o mapping até LastProcessingResult OK",
+      "Apagar todas as mensagens da fila sem fix de IAM",
+      "Desabilitar o event source mapping e esperar",
+      "Trocar a fila para FIFO sem policy SQS na role"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Mapping Enabled não basta: LastProcessingResult = PROBLEM e o log mostra AccessDenied em sqs:ReceiveMessage. A role só tem BasicExecution — falta ReceiveMessage, DeleteMessage e GetQueueAttributes no ARN da orders-q. Corrija o IAM e confira até LastProcessingResult ficar OK. Apagar as mensagens zera o backlog sem liberar o poller. Desabilitar o mapping só para o consumo. Trocar para FIFO sem policy SQS na role muda o tipo de fila e mantém o mesmo AccessDenied. Insight: SQS cheia + Lambda “idle” + AccessDenied ReceiveMessage = gap clássico na execution role do event source.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 51,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1111: PutItem na tabela Orders estoura ProvisionedThroughputExceeded nos picos. WCU está em 5 e o tráfego parece concentrar num tenant.",
+    "cli_output": "$ aws dynamodb describe-table --table-name Orders\nBillingModeSummary.BillingMode: PROVISIONED\nProvisionedThroughput:\n  ReadCapacityUnits: 5\n  WriteCapacityUnits: 5\n\n$ aws cloudwatch get-metric-statistics --namespace AWS/DynamoDB \\\n  --metric-name WriteThrottleEvents --dimensions Name=TableName,Value=Orders ...\n# spikes matching traffic peaks\n\n$ aws cloudwatch get-metric-statistics ... ConsumedWriteCapacityUnits\n# saturates near 5\n\n# App errors:\nProvisionedThroughputExceededException: The level of configured write capacity...\n\n# Hot key analysis (sample): 70% of writes PK=TENANT#1",
+    "alternativas": [
+      "Aumentar WCU (e/ou auto scaling) e/ou redesenhar PK para reduzir hot tenant — 5 WCU satura e TENANT#1 concentra writes",
+      "Abrir 443 no SG da tabela (N/A)",
+      "Trocar só o runtime da Lambda",
+      "Criar CNAME no apex"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "No CLI, BillingMode PROVISIONED com 5 WCU, ConsumedWriteCapacityUnits saturando perto de 5 e WriteThrottleEvents nos picos batem com ProvisionedThroughputExceededException. Além disso, ~70% dos writes em PK=TENANT#1 é hot partition. Suba WCU (ou auto scaling / on-demand) e/ou espalhe a chave. Abrir 443 no SG da tabela não se aplica — DynamoDB não usa SG de EC2 assim. Trocar runtime da Lambda não aumenta capacidade da tabela. CNAME no apex é DNS, irrelevante aqui. Insight: throttle + consumed colado no provisioned + hot key = capacidade e desenho de PK, não “rede da tabela”.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 52,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1112: a Lambda order-api toma AccessDenied em GetItem na Orders. A tabela está ACTIVE e sobra RCU — cheira a IAM, não a throughput.",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:sts::111122223333:assumed-role/order-api-role/...\n\n$ aws iam list-attached-role-policies --role-name order-api-role\nAWSLambdaBasicExecutionRole\n# logs only\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/order-api --filter-pattern \"AccessDenied\"\n... not authorized to perform: dynamodb:GetItem\non resource: arn:aws:dynamodb:us-east-1:111122223333:table/Orders\n\n$ aws dynamodb describe-table --table-name Orders\nTableStatus: ACTIVE\n# table healthy; RCU plenty",
+    "alternativas": [
+      "Anexar policy com dynamodb:GetItem no ARN da tabela Orders à role order-api-role",
+      "Só aumentar RCU para 1000",
+      "Só mudar para on-demand",
+      "Só habilitar TTL"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O log é explícito: not authorized to perform dynamodb:GetItem na Orders, e order-api-role só tem AWSLambdaBasicExecutionRole. Anexe GetItem (no ARN da tabela) à role — a tabela ACTIVE com RCU sobrando só confirma que não é capacidade. Aumentar RCU para 1000 não remove AccessDenied. Migrar para on-demand muda billing, não permissão. Habilitar TTL afeta expiração de itens, não autorização de leitura. Insight: se a tabela está saudável e o erro é AccessDenied, feche IAM antes de mexer em capacidade ou TTL.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 53,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1113: listar pedidos por customerId está lento e caro. O código faz Scan com FilterExpression numa tabela de 12M+ itens — sem GSI nesse atributo.",
+    "cli_output": "$ # App code path (review):\n# Scan Orders with FilterExpression customerId = :c\n\n$ aws dynamodb describe-table --table-name Orders\nKeySchema: HASH userId, RANGE orderId\n# no GSI on customerId\nBillingMode: PAY_PER_REQUEST\n\n$ aws cloudwatch get-metric-statistics --metric-name ConsumedReadCapacityUnits \\\n  --dimensions Name=TableName,Value=Orders\n# high read consumption correlated with list-by-customer API\n\n$ aws xray / logs: Scan latency multi-second as table grows\n# Table item count: 12M+",
+    "alternativas": [
+      "Introduzir access pattern com PK=customerId (tabela ou GSI) e trocar Scan por Query",
+      "Manter Scan e reduzir timeout da API para 100ms",
+      "Desligar encryption",
+      "Remover a sort key apenas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O sintoma aponta para access pattern errado: PK/SK são userId/orderId, sem GSI em customerId, e o app faz Scan + Filter — latência multi-segundo e ConsumedReadCapacityUnits altos conforme a tabela cresce (12M+). Modele PK=customerId (tabela ou GSI) e use Query. Manter Scan e cortar timeout da API para 100ms só gera mais falha sem baratear a leitura. Desligar encryption não acelera Scan e piora segurança. Remover só a sort key não cria caminho eficiente por customerId. Insight: FilterExpression depois de Scan ainda lê a tabela inteira — Query em chave/GSI é o padrão SAA.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 54,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1114: produto quer login por email com Query <20ms, mas a tabela Users só tem PK=userId — hoje é Scan + Filter e o p99 está em segundos.",
+    "cli_output": "$ aws dynamodb describe-table --table-name Users\nKeySchema: HASH userId\nAttributeDefinitions: userId S, email S\nGlobalSecondaryIndexes: []\nLocalSecondaryIndexes: []\n\n$ # Product request: login lookup by email must be Query under 20ms\n# Current code: Scan + FilterExpression email = :e  (p99 multi-second)\n\n$ aws cloudwatch ... UserErrors / successful requests\n# functional but not scalable",
+    "alternativas": [
+      "Criar GSI com PK=email (projection adequada) e passar o login a Query no índice",
+      "Criar LSI com PK=email (LSI não pode mudar a PK da base)",
+      "Só aumentar memory da Lambda",
+      "Só abrir 0.0.0.0/0 no SG"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "describe-table mostra só HASH userId, sem GSI/LSI — email existe como atributo, mas não como chave de Query. Crie GSI com PK=email (projection que o login precisa) e troque o Scan por Query no índice. LSI com PK=email não funciona: LSI herda a mesma partition key da tabela base e só adiciona outra sort key. Aumentar memory da Lambda não cria índice. Abrir 0.0.0.0/0 no SG não resolve access pattern do DynamoDB. Insight: para Query por atributo que não é a PK base, GSI (ou tabela satélite) — LSI não “troca” a PK.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 55,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1115: AnalyticsEvents fica quase ociosa a semana toda e só explode no batch de fim de mês — ainda assim está PROVISIONED 2000/2000 queimando custo o mês inteiro.",
+    "cli_output": "$ aws dynamodb describe-table --table-name AnalyticsEvents\nBillingModeSummary.BillingMode: PROVISIONED\nProvisionedThroughput: RCU 2000 WCU 2000\n\n$ aws cloudwatch get-metric-statistics --metric-name ConsumedWriteCapacityUnits ...\n# most days near 0; one day month-end spike to ~1500 WCU for 3 hours\n\n$ aws ce / cost explorer note:\n# DynamoDB cost dominated by provisioned capacity idle time\n\n# Team rejects multi-hour capacity planning meetings",
+    "alternativas": [
+      "Migrar para on-demand (ou auto scaling agressivo) — provisioned 2000 ocioso a maior parte do mês é desperdício com pico curto",
+      "Manter 2000/2000 e fazer Scan diário para 'esquentar'",
+      "Apagar a tabela toda segunda",
+      "Trocar PK para status"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "No CLI, PROVISIONED 2000/2000 com ConsumedWrite perto de zero na maior parte do mês e um pico ~1500 WCU por poucas horas no month-end — Cost Explorer aponta idle provisioned como vilão. On-demand (ou auto scaling agressivo) casa com workload esporádico sem reunião eterna de capacity. Scan diário para “esquentar” gasta read sem necessidade e não reduz a conta de capacidade ociosa. Apagar a tabela toda segunda destrói dados. Trocar PK para status não resolve o modelo de billing. Insight: tráfego spiky e rare → on-demand costuma vencer provisioned alto parado.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 56,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1121: a EC2 live está com CPU ~92% há 15 min e o alarme HighCPU continua OK. Suspeita: InstanceId do alarme ficou apontando para uma instance já terminated.",
+    "cli_output": "$ aws cloudwatch describe-alarms --alarm-names HighCPU\nStateValue: OK\nMetricName: CPUUtilization\nNamespace: AWS/EC2\nStatistic: Average\nPeriod: 300\nEvaluationPeriods: 3\nDatapointsToAlarm: 3\nThreshold: 95.0\nComparisonOperator: GreaterThanThreshold\nDimensions: [{Name: InstanceId, Value: i-0deadbeef}]\nTreatMissingData: missing\n\n$ aws cloudwatch get-metric-statistics --namespace AWS/EC2 --metric-name CPUUtilization \\\n  --dimensions Name=InstanceId,Value=i-0LIVE123 ...\n# Average ~92% last 15 min on LIVE instance\n\n$ aws ec2 describe-instances --instance-ids i-0deadbeef\nState: terminated\n# Alarm still points to old InstanceId after replace",
+    "alternativas": [
+      "Corrigir dimensão InstanceId para a instance atual (ou métrica de ASG) e reavaliar threshold 95 vs 90 — alarme olha série morta em OK",
+      "Só criar invalidation CloudFront",
+      "Só abrir 22 0.0.0.0/0",
+      "Apagar o log group da Lambda"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "O alarme HighCPU ainda dimensiona i-0deadbeef (terminated) e fica OK; a carga real está em i-0LIVE123 (~92%). Corrija a dimensão para a instance atual (ou use métrica/ASG após replace) e revise se threshold 95 com 3 períodos de 5 min cobre o SLA de 90%. Invalidation CloudFront não monitora CPU de EC2. Abrir SSH 0.0.0.0/0 é risco de segurança sem ligar o alarme. Apagar log group de Lambda não atualiza dimensão de alarme EC2. Insight: depois de replace de instance, alarme com InstanceId fixo vira “série morta” — prefira dimensão de ASG quando a frota gira.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 57,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1122: o alarme DiskFree (CWAgent disk_used_percent em /data) está INSUFFICIENT_DATA há dias. A instance i-0app1 parece stopped — sem PutMetricData.",
+    "cli_output": "$ aws cloudwatch describe-alarms --alarm-names DiskFree\nStateValue: INSUFFICIENT_DATA\nNamespace: CWAgent\nMetricName: disk_used_percent\nDimensions: [{Name: InstanceId, Value: i-0app1}, {Name: path, Value: /data}, {Name: device, Value: xvdf}]\nPeriod: 60\nEvaluationPeriods: 5\n\n$ aws ec2 describe-instances --instance-ids i-0app1\nState: stopped\n\n$ aws cloudwatch list-metrics --namespace CWAgent --metric-name disk_used_percent\n# no recent metrics for i-0app1\n\n# Agent not running while stopped; no PutMetricData",
+    "alternativas": [
+      "Instance stopped → sem datapoints do agent; inicie a instance/agent ou trate missing data / alarme em outro recurso — INSUFFICIENT_DATA não é OK",
+      "Subir o threshold para 1000%",
+      "Trocar o alarme para Sum de CPU de outra conta",
+      "Desligar o SNS topic de prod"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "i-0app1 está stopped: CWAgent não publica disk_used_percent, list-metrics sem dados recentes e o alarme fica INSUFFICIENT_DATA — isso não é “disco ok”. Suba a instance/agent, ajuste TreatMissingData ou mire o alarme no recurso certo. Threshold 1000% é absurdo e não cria datapoints. Apontar Sum de CPU de outra conta muda o objeto monitorado sem resolver disco. Desligar SNS de prod só silencia notificações. Insight: INSUFFICIENT_DATA em métrica de agent quase sempre é host parado, agent morto ou dimensão errada — não confunda com estado OK.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 58,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1123: a fatura de CloudWatch Logs sobe todo mês. Log groups /aws/lambda/dev-* estão com retentionInDays null (keep forever) e multi-GB stored — prod já tem 30 dias.",
+    "cli_output": "$ aws logs describe-log-groups --log-group-name-prefix /aws/lambda/dev\nlogGroupName: /aws/lambda/dev-api    retentionInDays: null\nlogGroupName: /aws/lambda/dev-worker retentionInDays: null\nstoredBytes: multi-GB each\n\n$ aws ce get-cost-and-usage ... \n# CloudWatch Logs storage trending up MoM\n\n# Prod groups correctly set retentionInDays: 30",
+    "alternativas": [
+      "put-retention-policy nos groups dev (ex. 7–14 dias) e reduzir log verbosity — null retention = keep forever",
+      "Aumentar reserved concurrency de todas as Lambdas",
+      "Criar mais dashboards high-resolution",
+      "Desabilitar alarmes de prod"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "retentionInDays null nos groups dev = retenção infinita; storedBytes multi-GB e Cost Explorer batem com storage MoM. Aplique put-retention-policy (7–14 dias em dev) e corte verbosity. Aumentar reserved concurrency de todas as Lambdas aumenta custo de compute, não limpa logs antigos. Mais dashboards high-resolution encarecem métricas custom. Desabilitar alarmes de prod remove observabilidade sem reduzir storedBytes. Insight: em conta compartilhada, null retention em /aws/lambda/dev-* é um dos vilões mais comuns de fatura de Logs.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 59,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1124: o ASG web-asg está com CPU ~85% e não escala, embora a policy scale-out-cpu exista. O alarme cpu-high-web continua OK — dimensão parece apontar para web-asg-OLD.",
+    "cli_output": "$ aws autoscaling describe-policies --auto-scaling-group-name web-asg\nPolicyName: scale-out-cpu\nAdjustment: +2\nMetricAggregationType: Average\n# Alarms: [cpu-high-web]\n\n$ aws cloudwatch describe-alarms --alarm-names cpu-high-web\nStateValue: OK\nMetricName: CPUUtilization\nNamespace: AWS/EC2\nDimensions: [{Name: AutoScalingGroupName, Value: web-asg-OLD}]\nThreshold: 60\nComparisonOperator: GreaterThanThreshold\nAlarmActions: [arn:aws:autoscaling:...:scalingPolicy:...:policyName/scale-out-cpu]\n\n$ aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names web-asg\nAutoScalingGroupName: web-asg\nDesiredCapacity: 2\n# CPU on current instances ~85% (from instance metrics)",
+    "alternativas": [
+      "Corrigir a dimensão AutoScalingGroupName do alarme para web-asg (não web-asg-OLD) para o estado ir a ALARM e acionar a policy",
+      "Apagar a scaling policy",
+      "Só aumentar o MaxSize sem alarme",
+      "Mudar o health check R53 do site"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A policy scale-out-cpu está ligada ao alarme cpu-high-web, mas o alarme dimensiona AutoScalingGroupName=web-asg-OLD e fica OK enquanto o ASG real (web-asg) roda a ~85%. Corrija a dimensão para web-asg para o alarme ir a ALARM e disparar o +2. Apagar a scaling policy remove o mecanismo de scale-out. Só aumentar MaxSize sem alarme em ALARM não sobe DesiredCapacity sozinho. Health check do Route 53 não aciona essa policy de CPU. Insight: policy “existe” mas alarme em ASG renomeado/antigo = scaling morto com StateValue OK enganoso.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 60,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1125: a Lambda checkout passa de 50 Errors a cada 5 min e o on-call não recebeu page. Métrica existe, SNS oncall tem subscription ACTIVE — mas não há alarme checkout.",
+    "cli_output": "$ aws cloudwatch get-metric-statistics --namespace AWS/Lambda --metric-name Errors \\\n  --dimensions Name=FunctionName,Value=checkout --period 300 --statistics Sum\n# Sum Errors: 62, 71, 55 over last windows\n\n$ aws cloudwatch describe-alarms --alarm-name-prefix checkout\n# empty — no alarms\n\n$ aws sns list-topics\n# topic arn:aws:sns:us-east-1:111122223333:oncall exists with email sub ACTIVE\n\n# On-call: zero emails about checkout",
+    "alternativas": [
+      "Criar alarme Errors Sum com threshold/period adequados e AlarmActions = SNS oncall — métrica existe, falta alarme→SNS",
+      "Só aumentar memory da function",
+      "Só apagar o log group",
+      "Só desabilitar a function"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Errors Sum já está alto (62/71/55), o tópico SNS oncall existe com sub ACTIVE, e describe-alarms com prefix checkout vem vazio — falta o elo alarme → AlarmActions. Crie alarme de Errors (Sum, period/threshold alinhados ao SLO) apontando para o SNS. Aumentar memory pode ajudar latência/OOM pontual, mas não pagina o time. Apagar o log group esconde evidência sem alertar. Desabilitar a function para o incidente e o negócio. Insight: métrica + SNS sem CloudWatch Alarm = silêncio garantido no on-call.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  }
+]

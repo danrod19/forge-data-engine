@@ -1,0 +1,560 @@
+[
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8202 — Syslog do switch “piscando” MAC move. Impressora some e reaparece na rede a cada poucos segundos.",
+    "cli_output": "Access2# show logging | include FLAP|flap|0050.56bb.print\n%SW_MATM-4-MACFLAP_NOTIF: Host 0050.56bb.print in vlan 1 is flapping between port Gi1/0/14 and port Gi1/0/15\n%SW_MATM-4-MACFLAP_NOTIF: Host 0050.56bb.print in vlan 1 is flapping between port Gi1/0/15 and port Gi1/0/14\n\nAccess2# show mac address-table dynamic address 0050.56bb.print\n   Mac Address Table\n-------------------------------------------\nVlan    Mac Address       Type        Ports\n----    -----------       --------    -----\n   1    0050.56bb.print   DYNAMIC     Gi1/0/15\n\nAccess2# show interfaces status | include Gi1/0/14|Gi1/0/15\nGi1/0/14  PRINT-DROP1   connected  1  a-full  a-1000  10/100/1000BaseTX\nGi1/0/15  PRINT-DROP2   connected  1  a-full  a-1000  10/100/1000BaseTX\n\n# campo: cabo Y / dois patchs no mesmo switch ligados ao mini-switch da impressora",
+    "alternativas": [
+      "Aging de 300s explica flaps a cada 2–3 segundos entre portas",
+      "Forward seletivo de known unicast gera log MACFLAP_NOTIF por padrão",
+      "MAC flapping: 0050.56bb.print alterna Gi1/0/14↔Gi1/0/15 nos logs com ambas connected — loop/cabo duplo no segmento da impressora",
+      "notconnect em ambas as portas no status prova L1 down"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "MACFLAP_NOTIF e a mesma MAC vista em duas portas connected indicam flapping, não aging normal. Known unicast forward não gera esse log. Status mostra connected, não notconnect.",
+    "part_id": "2.1",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 1
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8203 — “O switch esqueceu o PC do RH”. Usuário jura que o cabo está “bem encaixado”.",
+    "cli_output": "Access3# show interfaces status | include Gi1/0/6\nGi1/0/6   PC-RH   notconnect   1   auto   auto   10/100/1000BaseTX\n\nAccess3# show interfaces Gi1/0/6\nGigabitEthernet1/0/6 is down, line protocol is down (notconnect)\n  0 input packets, 0 output packets\n  0 CRC, 0 input errors\n\nAccess3# show mac address-table dynamic interface Gi1/0/6\n  Mac Address Table\n-------------------------------------------\nVlan    Mac Address       Type        Ports\n----    -----------       --------    -----\n\nAccess3# show mac address-table dynamic | include 00a1.b2c3.rh01\n  (no matches)\n\n# patch panel label diz Gi1/0/6 → mesa RH; cabo no wall jack frouxo ao retestar",
+    "alternativas": [
+      "Tabela vazia com 0 packets e Gi1/0/6 up/up prova flood excessivo de broadcast",
+      "clear mac address-table dynamic é a única correção sem olhar o cabo",
+      "MAC 00a1.b2c3.rh01 está em aging mas a porta está full-duplex no status",
+      "Gi1/0/6 notconnect, line protocol down, 0 packets e MAC ausente: L1 impede aprendizado — não é “esquecimento” por aging sozinho"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "notconnect + 0 packets explicam ausência de MAC: sem enlace não há frames de origem. Não há up/up. clear sem cabo não resolve. Status não mostra full-duplex connected com aging do host.",
+    "part_id": "2.1",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 2
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8204 — Em lab, o analista rodou clear mac address-table dynamic “para limpar o switch” e o uplink disparou alarme de broadcast/unknown por alguns segundos.",
+    "cli_output": "LabSW# show mac address-table dynamic count\n  Total dynamic entries before clear: 184\n\nLabSW# clear mac address-table dynamic\nLabSW# show mac address-table dynamic count\n  Total dynamic entries: 0\n\nLabSW# show interfaces GigabitEthernet1/0/48 | include rate|packets|broadcast\n  30 second input rate 820000 bits/sec, 940 packets/sec\n     12044 broadcasts received in last interval (elevated)\n  30 second output rate 790000 bits/sec, 910 packets/sec\n\n# captura resumida no analisador (texto):\n# many unknown unicast frames flooded until hosts spoke again\nLabSW# show mac address-table dynamic count\n  Total dynamic entries: 37   (rebuilding after traffic)\nLabSW# show mac address-table dynamic | include 0050.56aa.pc01\n    1    0050.56aa.pc01    DYNAMIC     Gi1/0/3",
+    "alternativas": [
+      "clear não altera a tabela; o count 0 é cosmético",
+      "Após clear (0 entradas), tráfego sobe com flood de unknown unicast até reaprendizado — esperado, não falha permanente de VLAN",
+      "Broadcast elevado prova que known unicast nunca faz forward de novo",
+      "Gi1/0/3 com PC01 após rebuild indica MAC flapping 14↔15"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Count 184→0 após clear e rebuild com taxa alta batem com flood até reaprender. A tabela voltou a popular (ex.: PC01 em Gi1/0/3). Não é cosmético nem flapping entre 14/15. Known unicast volta a forward quando o MAC está na tabela.",
+    "part_id": "2.1",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 3
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8205 — NOC esperava ver “flood em todas as portas” em todo unicast do servidor de vídeo. SPAN mostrou o contrário após o fluxo estabilizar.",
+    "cli_output": "CoreAccess# show mac address-table dynamic address 00aa.bbcc.srv1\nVlan    Mac Address       Type        Ports\n----    -----------       --------    -----\n   1    00aa.bbcc.srv1    DYNAMIC     Gi1/0/20\n\nCoreAccess# show mac address-table dynamic address 00aa.bbcc.cam1\nVlan    Mac Address       Type        Ports\n----    -----------       --------    -----\n   1    00aa.bbcc.cam1    DYNAMIC     Gi1/0/5\n\n# SPAN note (texto do analisador):\n# Unicast cam1 -> srv1 observed ONLY on path toward Gi1/0/20 after learning\n# NOT replicated to Gi1/0/6..Gi1/0/19 idle access ports\n\nCoreAccess# show interfaces status | include Gi1/0/5|Gi1/0/20\nGi1/0/5   CAM-RECEP    connected  1  a-full  a-1000  10/100/1000BaseTX\nGi1/0/20  SRV-VIDEO    connected  1  a-full  a-1000  10/100/1000BaseTX",
+    "alternativas": [
+      "Sem entrada MAC o switch faria filter na porta de origem do servidor",
+      "Broadcast FFFF.FFFF.FFFF é o único frame que usa a tabela MAC",
+      "Aging remove known unicast da CAM a cada frame forward",
+      "MACs de cam1 e srv1 aprendidos em Gi1/0/5 e Gi1/0/20: unicast conhecido faz forward seletivo, não flood em todas as portas idle"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Tabela com ambos os MACs em portas distintas e SPAN só no caminho do destino mostram forward seletivo de known unicast. Filter na origem do servidor não é o caso. Broadcast não é o único uso da CAM. Aging não apaga a cada frame encaminhado.",
+    "part_id": "2.1",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 4
+  },
+  {
+    "id": 6,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8301 — Notebook do financeiro “não abre o sistema”. IP está em 10.10.10.x mas o usuário não alcança o gateway 10.10.10.1. Helpdesk jura que o cabo está certo.",
+    "cli_output": "PC-FIN> ipconfig\n   IPv4 Address. . . . . . . . . . . : 10.10.10.44\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.10.10.1\n\nPC-FIN> ping 10.10.10.1\nEsgotado o tempo limite do pedido.\n\nAccessA# show vlan brief\n\nVLAN Name                             Status    Ports\n---- -------------------------------- --------- -------------------------------\n1    default                          active    Gi1/0/1, Gi1/0/2, Gi1/0/3\n10   USERS                            active    Gi1/0/5, Gi1/0/6, Gi1/0/7\n20   FINANCE                          active    Gi1/0/10, Gi1/0/11\n30   PRINT                            active    Gi1/0/15\n\nAccessA# show interfaces Gi1/0/12 switchport\nName: Gi1/0/12\nSwitchport: Enabled\nAdministrative Mode: static access\nOperational Mode: static access\nAccess Mode VLAN: 20 (FINANCE)\nTrunking Native Mode VLAN: 1 (default)\n\nAccessA# show interfaces status | include Gi1/0/12\nGi1/0/12  PC-FIN   connected  20  a-full  a-1000  10/100/1000BaseTX\n\nDist# show ip interface brief | include Vlan10|Vlan20\nVlan10   10.10.10.1   YES manual  up  up\nVlan20   10.10.20.1   YES manual  up  up",
+    "alternativas": [
+      "Gi1/0/12 está access VLAN 20 (FINANCE) com status connected, mas o IP/gateway do PC são da lógica 10.10.10.0/24 (SVI Vlan10) — membership VLAN errada em relação ao endereçamento",
+      "show vlan brief lista Gi1/0/12 na VLAN 10 USERS, logo o access está correto",
+      "Operational Mode trunk com native 20 explica o IP 10.10.10.44",
+      "Vlan10 down no Dist prova que o problema é só allowed no PC"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "switchport e status mostram access VLAN 20; o PC usa 10.10.10.x/gateway .1 da SVI VLAN 10. show vlan brief não coloca Gi1/0/12 em USERS. Mode é access, não trunk. Vlan10 está up/up — o desalinhamento é access VLAN vs IP.",
+    "part_id": "2.2",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 5
+  },
+  {
+    "id": 7,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8302 — Após troca de switch de agregação, CDP e alguns serviços “misturam” VLANs no uplink. Dados tagged parecem ok; untagged confunde o NOC.",
+    "cli_output": "SW-Access# show interfaces trunk\nPort        Mode         Encapsulation  Status        Native vlan\nGi1/0/48    on           802.1q         trunking      1\nPort        Vlans allowed on trunk\nGi1/0/48    1,10,20,30\nPort        Vlans allowed and active in management domain\nGi1/0/48    1,10,20,30\n\nSW-Dist# show interfaces trunk\nPort        Mode         Encapsulation  Status        Native vlan\nGi1/0/1     on           802.1q         trunking      99\nPort        Vlans allowed on trunk\nGi1/0/1     1,10,20,30\nPort        Vlans allowed and active in management domain\nGi1/0/1     1,10,20,30\n\nSW-Access# show interfaces Gi1/0/48 switchport | include Native|Operational|Administrative\nAdministrative Mode: trunk\nOperational Mode: trunk\nTrunking Native Mode VLAN: 1 (default)\n\nSW-Dist# show interfaces Gi1/0/1 switchport | include Native|Operational\nOperational Mode: trunk\nTrunking Native Mode VLAN: 99 (MGMT)",
+    "alternativas": [
+      "Allowed diferente nos dois lados: Access tem 1,10,20,30 e Dist não lista 10",
+      "Operational Mode access em ambos explica o untagged",
+      "Native mismatch: Access native 1 vs Dist native 99 no mesmo trunk 802.1Q — untagged cai em VLANs distintas",
+      "Encapsulamento 802.1q ausente no Access prova ISL obrigatório"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "show interfaces trunk mostra native 1 de um lado e 99 do outro, com allowed alinhado. Isso é native mismatch. Allowed não diverge. Mode é trunk nos dois. 802.1q está presente.",
+    "part_id": "2.2",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 6
+  },
+  {
+    "id": 8,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8303 — Câmeras na VLAN 40 falam entre si no mesmo switch de acesso, mas o NVR no prédio B (mesma VLAN 40) não grava. Cabos e IPs conferidos.",
+    "cli_output": "SW-A# show vlan brief | include 40|Gi1/0/7\n40   CAMERAS   active    Gi1/0/7, Gi1/0/8, Gi1/0/9\n\nSW-B# show vlan brief | include 40|Gi1/0/3\n40   CAMERAS   active    Gi1/0/3\n\nSW-A# show interfaces trunk\nPort        Mode   Encapsulation  Status     Native vlan\nGi1/0/48    on     802.1q         trunking   1\nPort        Vlans allowed on trunk\nGi1/0/48    1,10,20,30\nPort        Vlans allowed and active in management domain\nGi1/0/48    1,10,20,30\n\nSW-B# show interfaces trunk\nPort        Mode   Encapsulation  Status     Native vlan\nGi1/0/1     on     802.1q         trunking   1\nPort        Vlans allowed on trunk\nGi1/0/1     1,10,20,30\nPort        Vlans allowed and active in management domain\nGi1/0/1     1,10,20,30\n\n# câmeras e NVR com access vlan 40 OK localmente em cada prédio",
+    "alternativas": [
+      "Native 1 diferente entre A e B no output",
+      "VLAN 40 não está no allowed do trunk (só 1,10,20,30) — por isso não cruza o uplink entre prédios",
+      "show vlan brief prova que a VLAN 40 não existe em SW-A",
+      "Operational trunk ausente: Status notconnect no uplink"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "VLAN 40 existe e tem portas access, mas allowed do trunk omite 40 nos dois lados. Native está 1=1. Trunking status ok no recorte. Falta allowed 40 no uplink.",
+    "part_id": "2.2",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 7
+  },
+  {
+    "id": 9,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8304 — “O trunk novo só deixa passar a VLAN nativa”. VLANs 10 e 20 morrem no enlace entre Access e um mini-switch de mesa mal configurado.",
+    "cli_output": "AccessCore# show interfaces Gi1/0/24 switchport\nAdministrative Mode: trunk\nOperational Mode: trunk\nTrunking Native Mode VLAN: 10 (USERS)\nTrunking VLANs Enabled: 10,20,30\n\nAccessCore# show interfaces trunk | begin Gi1/0/24\nPort        Mode         Encapsulation  Status        Native vlan\nGi1/0/24    on           802.1q         trunking      10\nPort        Vlans allowed on trunk\nGi1/0/24    10,20,30\n\nDeskSW# show interfaces Gi0/1 switchport\nAdministrative Mode: static access\nOperational Mode: static access\nAccess Mode VLAN: 10 (USERS)\nTrunking Native Mode VLAN: 1 (default)\n\nDeskSW# show interfaces Gi0/1 status\nPort      Name       Status       Vlan  Duplex  Speed  Type\nGi0/1     uplink     connected    10    a-full  a-1000 10/100/1000BaseTX\n\nDeskSW# show interfaces trunk\n\nAccessCore# (nota) only untagged/VLAN10 traffic observed toward DeskSW",
+    "alternativas": [
+      "DeskSW em static access VLAN 10 enquanto AccessCore está operational trunk — só a VLAN 10 (access/untagged) comporta-se de forma consistente; 20/30 não multiplexam",
+      "Ambos os lados estão em Operational Mode trunk com allowed 10,20,30",
+      "Native mismatch 10 vs 99 é a linha dominante no DeskSW",
+      "show interfaces trunk no DeskSW lista Gi0/1 com 20 e 30 active"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "AccessCore trunk vs DeskSW access VLAN 10 explica o sintoma “só a nativa/access passa”. DeskSW não mostra trunk. Não há native 99 no recorte. show interfaces trunk no DeskSW está vazio.",
+    "part_id": "2.2",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 8
+  },
+  {
+    "id": 10,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8305 — Time de rede “liberou a VLAN 50 no trunk”, mas o servidor no switch remoto continua isolado. Allowed já foi alterado nos dois uplinks.",
+    "cli_output": "SW1# show interfaces trunk\nPort        Mode   Encapsulation  Status     Native vlan\nGi1/0/48    on     802.1q         trunking   1\nPort        Vlans allowed on trunk\nGi1/0/48    1,10,20,50\nPort        Vlans allowed and active in management domain\nGi1/0/48    1,10,20\n\nSW1# show vlan brief | include 50\n50   APP-DMZ   active    Gi1/0/5\n\nSW2# show interfaces trunk\nPort        Mode   Encapsulation  Status     Native vlan\nGi1/0/1     on     802.1q         trunking   1\nPort        Vlans allowed on trunk\nGi1/0/1     1,10,20,50\nPort        Vlans allowed and active in management domain\nGi1/0/1     1,10,20\n\nSW2# show vlan brief | include 50\n\nSW2# show interfaces Gi1/0/8 switchport | include Access Mode|Operational\nOperational Mode: static access\nAccess Mode VLAN: 50 (Inactive)\n\n# SW2 nunca teve o comando vlan 50 / a VLAN não aparece no brief",
+    "alternativas": [
+      "Native 1 vs 1 nos trunks prova mismatch de untagged",
+      "Allowed em SW1 não contém 50 no output",
+      "Operational Mode access no uplink Gi1/0/48 de SW1",
+      "VLAN 50 está allowed mas não active no trunk: em SW2 a VLAN 50 não existe (brief vazio, access Inactive) — allowed não cria a VLAN no switch remoto"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Allowed lista 50, mas allowed-and-active omite 50; SW2 não tem VLAN 50 no brief e a access está Inactive. Native está alinhada. Uplink SW1 é trunk. Falta criar/ativar a VLAN no remoto.",
+    "part_id": "2.2",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 9
+  },
+  {
+    "id": 11,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8401 — Após rack de access novo, o tráfego inter-prédio “escolheu o caminho pior”. NOC esperava o core como Root da VLAN 10.",
+    "cli_output": "Core-SW# show spanning-tree vlan 10 root\n                                       Root    Hello Max Fwd\nVlan                   Root ID         Cost    Time  Age Dly  Root Port\n---------------- -------------------- ------- ----- --- ---  ------------\nVLAN0010         32768 0050.56aa.core1 0       2    20  15\n\nAccess-New# show spanning-tree vlan 10\nVLAN0010\n  Spanning tree enabled protocol rstp\n  Root ID    Priority    24576\n             Address     0050.56bb.acc9\n             This bridge is the root\n  Bridge ID  Priority    24576  (priority 24576 sys-id-ext 10)\n             Address     0050.56bb.acc9\n\nCore-SW# show spanning-tree vlan 10 | include Root ID|Bridge ID|Priority\n  Root ID    Priority    24576\n             Address     0050.56bb.acc9\n  Bridge ID  Priority    32768  (priority 32768 sys-id-ext 10)\n             Address     0050.56aa.core1\n\n# nota NOC: Access-New recebeu \"spanning-tree vlan 10 priority 24576\" por engano no baseline",
+    "alternativas": [
+      "Core-SW é Root porque priority 32768 é sempre menor que 24576",
+      "Root inesperado: Access-New com priority 24576 e This bridge is the root; Core tem 32768 e aponta Root ID 0050.56bb.acc9",
+      "show spanning-tree root no Core prova que o core é root com Root Cost 0 local e Address core1 como Root ID no recorte de Access",
+      "RSTP desabilitado no Access-New (protocol rstp no output é cosmético)"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Access-New declara This bridge is the root com priority 24576; o Core lista Root ID desse access e BID local 32768. Menor priority vence — o access virou root. 32768 não é menor que 24576. Protocol rstp está enabled.",
+    "part_id": "2.3",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 10
+  },
+  {
+    "id": 12,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8402 — Analista júnior quer “desbloquear” Gi1/0/48 porque está BLK e acha que o cabo está ruim. O uplink Gi1/0/47 está OK.",
+    "cli_output": "Access1# show spanning-tree vlan 20\nVLAN0020\n  Root ID    Priority    24576\n             Address     0050.56aa.dist1\n             Cost        4\n             Port        47 (GigabitEthernet1/0/47)\n  Bridge ID  Priority    32768\n             Address     0050.56cc.acc1\n\nInterface           Role Sts Cost      Prio.Nbr Type\n------------------- ---- --- --------- -------- --------------------------------\nGi1/0/47            Root FWD 4         128.47   P2p\nGi1/0/48            Altn BLK 4         128.48   P2p\n\nAccess1# show interfaces status | include Gi1/0/47|Gi1/0/48\nGi1/0/47  upl-dist-a   connected  trunk  a-full  a-1000  10/100/1000BaseTX\nGi1/0/48  upl-dist-b   connected  trunk  a-full  a-1000  10/100/1000BaseTX\n\nAccess1# show spanning-tree interface Gi1/0/48 detail | include role|status|cost\n  Port role is Alternate\n  Port state is Discarding\n  Port path cost 4",
+    "alternativas": [
+      "Gi1/0/48 notconnect no status prova falha L1 exclusiva",
+      "Root Port é Gi1/0/48 porque está BLK",
+      "Ambas as portas em Designated FWD no output",
+      "Gi1/0/47 Root FWD e Gi1/0/48 Altn BLK/Discarding com ambas connected: bloqueio STP legítimo no caminho redundante, não cabo morto"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Roles Root/Altn e status connected nos dois uplinks mostram redundância STP. BLK não é notconnect. RP é 47, não 48. Não há duas Designated FWD no recorte.",
+    "part_id": "2.3",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 11
+  },
+  {
+    "id": 13,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8403 — Estagiário aplicou “otimização de boot” no uplink e, ao plugar um switch de lab no Gi1/0/48, a rede “quase caiu” com loop momentâneo.",
+    "cli_output": "Access2# show running-config interface Gi1/0/48\ninterface GigabitEthernet1/0/48\n description UPLINK-TO-DIST\n switchport mode trunk\n spanning-tree portfast\n spanning-tree portfast trunk\n\nAccess2# show spanning-tree interface Gi1/0/48 detail | include portfast|Bpdu|role|status\n  Portfast is enabled\n  Link type is point-to-point by default\n  Bpdu guard is disabled\n  Port role is Designated\n  Port state is Forwarding\n\nAccess2# show interfaces Gi1/0/48 switchport | include Operational|Administrative\nAdministrative Mode: trunk\nOperational Mode: trunk\n\n# incidente: switch de lab plugado em Gi1/0/48 durante janela; broadcast storm curto até desconectar",
+    "alternativas": [
+      "PortFast (inclusive trunk) no uplink Gi1/0/48 com BPDU Guard disabled: edge indevida em link entre switches — risco de loop ao conectar outro switch",
+      "PortFast em trunk uplink é a proteção padrão recomendada com Guard disabled",
+      "Operational Mode access no output elimina qualquer risco de loop",
+      "Port role Alternate Discarding no detalhe prova que o link já estava bloqueado"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Config e detail mostram PortFast enabled no trunk de uplink e Guard disabled, role Designated Forwarding. Isso é anti-padrão. Mode é trunk, não access. Não está Alternate Discarding.",
+    "part_id": "2.3",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 12
+  },
+  {
+    "id": 14,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8404 — Porta do PC do RH ficou laranja/errada e sumiu da rede. Usuário jura que só “ligou um switch pequenininho” para mais tomadas.",
+    "cli_output": "Access3# show interfaces status | include Gi1/0/12\nGi1/0/12  PC-RH   err-disabled  10  auto   auto   10/100/1000BaseTX\n\nAccess3# show interfaces Gi1/0/12\nGigabitEthernet1/0/12 is down, line protocol is down (err-disabled)\n\nAccess3# show running-config interface Gi1/0/12\ninterface GigabitEthernet1/0/12\n switchport access vlan 10\n switchport mode access\n spanning-tree portfast\n spanning-tree bpduguard enable\n\nAccess3# show logging | include BPDU|GUARD|Gi1/0/12\n%SPANTREE-2-BLOCK_BPDUGUARD: Received BPDU on port Gi1/0/12 with BPDU Guard enabled. Disabling port.\n%PM-4-ERR_DISABLE: bpduguard error detected on Gi1/0/12, putting Gi1/0/12 in err-disable state\n\nAccess3# show spanning-tree interface Gi1/0/12 detail | include portfast|Bpdu guard\n  Portfast is enabled\n  Bpdu guard is enabled",
+    "alternativas": [
+      "err-disabled por duplex mismatch CRC no show logging de BPDU",
+      "PortFast disabled e por isso a porta foi para learning eterno",
+      "BPDU Guard: log BLOCK_BPDUGUARD e err-disabled em Gi1/0/12 com PortFast+Guard na access — BPDU de switch indevido na porta do usuário",
+      "Root Bridge perdeu a eleição e derrubou todas as access ports do switch"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Status err-disabled e log bpduguard com PortFast+Guard na access batem com BPDU na edge. Não é CRC duplex no log. PortFast está enabled. Não há evidência de derrubar todas as access por root.",
+    "part_id": "2.3",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 13
+  },
+  {
+    "id": 15,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8405 — NOC esperava Root Port no uplink de 10G (Gi1/1/1), mas o switch insiste em Gi1/0/1 (1G) como RP. Redundância “estranha”.",
+    "cli_output": "Agg1# show spanning-tree vlan 30\nVLAN0030\n  Root ID    Priority    24576\n             Address     0050.56aa.core1\n             Cost        19\n             Port        1 (GigabitEthernet1/0/1)\n  Bridge ID  Priority    32768\n             Address     0050.56dd.agg1\n\nInterface           Role Sts Cost      Prio.Nbr Type\n------------------- ---- --- --------- -------- --------------------------------\nGi1/0/1             Root FWD 19        128.1    P2p\nGi1/1/1             Altn BLK 2         128.65   P2p\n\nAgg1# show spanning-tree interface Gi1/0/1 detail | include cost|role|Root\n  Port path cost 19\n  Port role is Root\n  Designated root has priority 24576 address 0050.56aa.core1\n\nAgg1# show spanning-tree interface Gi1/1/1 detail | include cost|role\n  Port path cost 2\n  Port role is Alternate\n\nAgg1# show running-config | include pathcost|Gi1/0/1|Gi1/1/1\ninterface GigabitEthernet1/0/1\n spanning-tree vlan 30 cost 2\ninterface GigabitEthernet1/1/1\n spanning-tree vlan 30 cost 100\n\n# nota: custos manuais invertidos em relação à velocidade real",
+    "alternativas": [
+      "Root Port é Gi1/0/1 (cost 19 na tabela de interface / root port) enquanto Gi1/1/1 está Altn com cost efetivo piorado pela config manual — path cost configura a eleição, não só a velocidade “no olho”",
+      "Gi1/1/1 Root FWD no output de roles",
+      "Menor cost listado em Gi1/1/1 detail (2) sem config manual prova que 10G sempre vence mesmo com cost 100",
+      "Alternate BLK em Gi1/0/1 indica que o cabo 1G está notconnect"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A árvore mostra RP Gi1/0/1 e Altn Gi1/1/1; o running-config impõe costs manuais (2 no 1G e 100 no 10G), distorcendo a expectativa do NOC. Gi1/1/1 não é Root FWD. Status não mostra notconnect no 1G.",
+    "part_id": "2.3",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 14
+  },
+  {
+    "id": 16,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8501 — EtherChannel entre Access e Dist “não forma”. Cabos novos, LEDs acesos. Time culpou o patch panel.",
+    "cli_output": "Access# show running-config | section GigabitEthernet1/0/47|GigabitEthernet1/0/48|Port-channel1\ninterface Port-channel1\n switchport mode trunk\ninterface GigabitEthernet1/0/47\n channel-group 1 mode desirable\ninterface GigabitEthernet1/0/48\n channel-group 1 mode desirable\n\nDist# show running-config | section GigabitEthernet1/0/1|GigabitEthernet1/0/2|Port-channel1\ninterface Port-channel1\n switchport mode trunk\ninterface GigabitEthernet1/0/1\n channel-group 1 mode passive\ninterface GigabitEthernet1/0/2\n channel-group 1 mode passive\n\nAccess# show etherchannel summary\nFlags:  D - down        P - bundled in port-channel\n        I - stand-alone\nNumber of channel-groups in use: 1\nGroup  Port-channel  Protocol    Ports\n------+-------------+-----------+-----------------------------------------------\n1      Po1(SD)         PAgP        Gi1/0/47(I)   Gi1/0/48(I)\n\nDist# show etherchannel summary\n1      Po1(SD)         LACP        Gi1/0/1(I)    Gi1/0/2(I)",
+    "alternativas": [
+      "Speed 100M vs 1G é a única linha do summary",
+      "Modes incompatíveis: Access PAgP desirable vs Dist LACP passive — Po1 SD e membros stand-alone (I)",
+      "Ambos os lados mostram Protocol LACP e ports em P",
+      "Po1(P) com todos bundled no Access"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "desirable/PAgP de um lado e passive/LACP do outro; summary com Protocol diferente e flags I/SD. Não há P bundled. Speed não aparece como causa no recorte.",
+    "part_id": "2.4",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 15
+  },
+  {
+    "id": 17,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8502 — Um lado foi “forçado on” no baseline e o outro ficou em LACP active. Bundle morto após migração.",
+    "cli_output": "SW-A# show run | include channel-group\n channel-group 2 mode on\n channel-group 2 mode on\n\nSW-B# show run | include channel-group\n channel-group 2 mode active\n channel-group 2 mode active\n\nSW-A# show etherchannel summary\n2      Po2(SD)         -           Gi1/0/1(I)  Gi1/0/2(I)\n\nSW-B# show etherchannel summary\n2      Po2(SD)         LACP        Gi1/0/1(I)  Gi1/0/2(I)\n\nSW-A# show interfaces Gi1/0/1 etherchannel\n                 Age of the Port in the current state: 00:12:01\n                 Port-channel not enabled / not bundled",
+    "alternativas": [
+      "on no SW-A e LACP active no SW-B: estático vs negociação — Po2 SD e membros I; alinhar on+on ou active+active/passive",
+      "Protocol LACP nos dois summaries com ports P",
+      "mode on + mode active é o par LACP recomendado multi-vendor",
+      "Port-channel not enabled só indica native mismatch 99"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "on vs active, Protocol “-” vs LACP, membros I e Po SD. Não há ports P. on+active não é o par recomendado. A saída não aponta native 99.",
+    "part_id": "2.4",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 16
+  },
+  {
+    "id": 18,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8503 — LACP active/active configurado, mas só um uplink entra no Po. O segundo fica “sozinho”.",
+    "cli_output": "Agg# show etherchannel summary\n1      Po1(SU)         LACP        Gi1/0/1(P)  Gi1/0/2(I)\n\nAgg# show interfaces status | include Gi1/0/1|Gi1/0/2\nGi1/0/1  member-a   connected  trunk  a-full  a-1000  10/100/1000BaseTX\nGi1/0/2  member-b   connected  trunk  a-full   a-100  10/100/1000BaseTX\n\nAgg# show interfaces Gi1/0/1 switchport | include Administrative|Operational|Native|Trunking VLANs\nAdministrative Mode: trunk\nOperational Mode: trunk\nTrunking Native Mode VLAN: 1\nTrunking VLANs Enabled: 1,10,20,30\n\nAgg# show interfaces Gi1/0/2 switchport | include Administrative|Operational|Native|Trunking VLANs|Speed\nAdministrative Mode: trunk\nOperational Mode: trunk\nTrunking Native Mode VLAN: 1\nTrunking VLANs Enabled: 1,10,20,30\n\nAgg# show interfaces Gi1/0/2 | include BW|duplex|Speed\n  Full-duplex, 100Mb/s, media type is 10/100/1000BaseTX\n\nAgg# show interfaces Gi1/0/1 | include BW|duplex|Speed\n  Full-duplex, 1000Mb/s, media type is 10/100/1000BaseTX",
+    "alternativas": [
+      "Native 99 vs 1 entre membros no output",
+      "Gi1/0/2 em mode access vlan 10",
+      "Protocol PAgP no summary com Po down",
+      "Mismatch de speed: Gi1/0/1 a-1000/1000Mb e Gi1/0/2 a-100/100Mb — Gi1/0/1 em P e Gi1/0/2 stand-alone (I) no summary"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Summary Po1 SU LACP com um P e um I; status/speed 1G vs 100M. Native e allowed iguais no recorte. Não é access nem PAgP down.",
+    "part_id": "2.4",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 17
+  },
+  {
+    "id": 19,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8504 — “O Port-Channel está up”, mas a capacidade parece de um único cabo. Redundância falhou no teste de puxar um link.",
+    "cli_output": "Core# show etherchannel summary\nFlags:  D - down        P - bundled in port-channel\n        s - suspended   H - Hot-standby (LACP only)\n        I - stand-alone\nNumber of channel-groups in use: 1\nGroup  Port-channel  Protocol    Ports\n------+-------------+-----------+-----------------------------------------------\n3      Po3(SU)         LACP        Gi1/0/10(P)  Gi1/0/11(s)  Gi1/0/12(I)  Gi1/0/13(I)\n\nCore# show etherchannel port-channel\n                Channel-group listing:\n                ----------------------\nGroup: 3\n----------\n                Port-channels in the group:\n                ---------------------------\nPort-channel: Po3    (Primary Aggregator)\nAge of the Port-channel   = 0d:04h:12m:01s\nLogical slot/port   = 10/3          Number of ports = 1\nGC                  = 0x00020001      HotStandBy port = null\nPort state          = Port-channel Ag-Inuse\nProtocol            =   LACP\nPorts in the Port-channel:\nIndex   Load   Port     EC state\n------+------+------+------------\n  0     00     Gi1/0/10  Active\n\nCore# show interfaces port-channel 3 | include line protocol|BW|Members\nPort-channel3 is up, line protocol is up (connected)\n  BW 1000000 Kbit/sec",
+    "alternativas": [
+      "Quatro ports em P no summary com Number of ports = 4",
+      "Bundle parcial: Po3 SU com Number of ports = 1, só Gi1/0/10 Active/P; demais s/I — HA e banda limitadas a um link",
+      "Po3 down (SD) no summary",
+      "LACP ausente: Protocol - no port-channel"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Summary e port-channel mostram 1 membro ativo no Po apesar de 4 candidatos. Não são 4 em P, nem Po SD, e Protocol é LACP.",
+    "part_id": "2.4",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 18
+  },
+  {
+    "id": 20,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8505 — Backup noturno satura Gi1/0/1 do EtherChannel enquanto Gi1/0/2 fica quase idle. NOC acha que o bundle “está quebrado”.",
+    "cli_output": "Edge# show etherchannel summary\n1      Po1(SU)         LACP        Gi1/0/1(P)  Gi1/0/2(P)\n\nEdge# show etherchannel load-balance\nEtherChannel Load-Balancing Configuration:\n        src-dst-ip\n\nEdge# show interfaces Gi1/0/1 | include rate\n  30 second input rate 820000000 bits/sec, 72000 packets/sec\n  30 second output rate 15000000 bits/sec, 1200 packets/sec\n\nEdge# show interfaces Gi1/0/2 | include rate\n  30 second input rate 8000000 bits/sec, 900 packets/sec\n  30 second output rate 6000000 bits/sec, 700 packets/sec\n\nEdge# show spanning-tree vlan 10 | include Po1|Root\n  Root ID    Priority    24576\n  ...\n  Po1                 Root FWD 3         128.65   P2p\n\n# job de backup: poucos fluxos TCP grandes server→storage (mesmo par IP)",
+    "alternativas": [
+      "Gi1/0/2 em I (stand-alone) no summary",
+      "Po1 não existe para o STP (sem linha Po1)",
+      "load-balance src-dst-ip com ambos P no Po1: fluxos iguais hasheiam no mesmo membro — assimetria de rate não prova bundle down",
+      "LACP passive+passive explícito no summary Protocol"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Dois membros P, Po1 SU, hash src-dst-ip e rates desiguais batem com elephant flows no mesmo hash. Gi1/0/2 não está I. Po1 aparece no STP. Protocol é LACP, não passive+passive escrito.",
+    "part_id": "2.4",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 19
+  },
+  {
+    "id": 21,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8601 — APs novos no 4º andar não publicam o SSID corporativo. LEDs “estranhos”; PoE ok segundo o júnior.",
+    "cli_output": "WLC# show ap summary\nNumber of APs: 42\nAP Name       Slots  AP Model   Ethernet MAC   Location   Country  IP Address    State\nAP-3A         2      2802I      00a1.b200.0001  Floor3     BR       10.50.2.11    Registered\nAP-4A         2      2802I      00a1.b200.004a  Floor4     BR       10.50.40.12   Not Joined\nAP-4B         2      2802I      00a1.b200.004b  Floor4     BR       10.50.40.13   Not Joined\n\nWLC# show ap join stats summary AP-4A\nDiscovery phase .............. Failed / incomplete\nJoin phase ................... Not started\nLast failure ............... CAPWAP discovery timeout / no WLC response path\n\nSwitch-F4# show vlan brief | include 40|2\n2    AP-MGMT   active    Gi1/0/1-4\n40   USERS     active    Gi1/0/10-24\n\nSwitch-F4# show interfaces status | include Gi1/0/20|Gi1/0/21\nGi1/0/20  AP-4A   connected  40  a-full  a-1000  10/100/1000BaseTX\nGi1/0/21  AP-4B   connected  40  a-full  a-1000  10/100/1000BaseTX\n\n# APs receberam DHCP 10.50.40.x (USERS); WLC management em 10.50.2.1; ACL inter-VLAN bloqueia CAPWAP de USERS→MGMT",
+    "alternativas": [
+      "APs Registered no 4º andar com Join phase complete no stats",
+      "State Not Joined + discovery failed: APs na VLAN 40 (USERS) com IP 10.50.40.x — management/caminho CAPWAP até a WLC incorreto",
+      "PoE down em Gi1/0/20-21 (notconnect no status)",
+      "SSID CORP disabled é a única linha do show ap summary"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Not Joined e discovery failed com portas na VLAN 40 e IPs de usuários batem com falha de join/CAPWAP. Status connected, não notconnect. Summary não lista SSID disabled como causa.",
+    "part_id": "2.5",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 20
+  },
+  {
+    "id": 22,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8602 — Visitantes no SSID GUEST associam, mas caem na rede interna e alcançam file servers. Segurança em pânico.",
+    "cli_output": "WLC# show wlan summary\nWLAN ID  WLAN Profile Name / SSID   Status    Interface Name\n1        CORP / CORP-WIFI           Enabled   vlan10-users\n2        GUEST / GUEST-WIFI         Enabled   vlan10-users\n\nWLC# show wireless interface summary\nInterface Name   VLAN ID   IP Address     Type\nvlan10-users     10        10.10.10.5     Dynamic\nvlan99-guest     99        10.99.0.5      Dynamic\n\nWLC# (WLAN 2 detail)\n  Interface ................ vlan10-users\n  Security ................. open / webauth disabled\n\nSwitch-Core# show vlan brief | include 10|99\n10   USERS    active\n99   GUEST    active    (SVI 10.99.0.1 up)\n\nClient-GUEST> ipconfig\n   IPv4: 10.10.10.88  Mask: 255.255.255.0  Gateway: 10.10.10.1",
+    "alternativas": [
+      "GUEST-WIFI Enabled em interface vlan99-guest no show wlan summary",
+      "Cliente com IP 10.99.0.0/24 prova binding correto",
+      "WLAN 2 GUEST mapeada para vlan10-users (mesma de CORP) — binding SSID→VLAN errado; deveria ser vlan99-guest",
+      "Status Disabled na WLAN 2 no summary"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Summary e detail mostram GUEST na interface vlan10-users; cliente pega 10.10.10.x. Interface guest 99 existe mas não está na WLAN 2. WLAN está Enabled, não Disabled.",
+    "part_id": "2.5",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 21
+  },
+  {
+    "id": 23,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8603 — Notebooks não veem/associam ao SSID CORP-WIFI após “manutenção de WLANs”. APs joined normalmente.",
+    "cli_output": "WLC# show ap summary | include Registered|Number\nNumber of APs: 40\n... all listed State = Registered\n\nWLC# show wlan summary\nWLAN ID  WLAN Profile Name / SSID   Status     Interface Name\n1        CORP / CORP-WIFI           Disabled   vlan10-users\n2        GUEST / GUEST-WIFI         Enabled    vlan99-guest\n\nWLC# show wlan 1\nWLAN Identifier...................... 1\nProfile Name......................... CORP\nNetwork Name (SSID).................. CORP-WIFI\nStatus............................... Disabled\nSecurity............................. WPA2 PSK\n\nClient# netsh wlan show networks | findstr CORP\n  (no CORP-WIFI listed)\n\nWLC# show client summary\nNumber of Clients................ 12  (all on GUEST-WIFI)",
+    "alternativas": [
+      "APs Not Joined impedem qualquer SSID",
+      "Security open no wlan 1 detail",
+      "SSID typo: Network Name é GUEST-WIFI no profile CORP",
+      "WLAN 1 CORP-WIFI Status Disabled com APs Registered — SSID corporativo fora do ar; clientes não associam"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "wlan summary/detail: CORP Disabled; APs Registered; redes do cliente sem CORP. Não é join fail nem open security no detail (WPA2 PSK).",
+    "part_id": "2.5",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 22
+  },
+  {
+    "id": 24,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8604 — Open space lento no Wi-Fi no horário de almoço. Survey mostra três APs “gritando” no mesmo canal.",
+    "cli_output": "WLC# show ap config general AP-Hall-1 | include Channel|Power|Oper\n  AP Primary SSID............... CORP-WIFI\n  2.4GHz Channel................ 6\n  2.4GHz Tx Power............... 1 (Highest / 8 of 8)\n  5GHz Channel.................. 36\n\nWLC# show ap config general AP-Hall-2 | include Channel|Power\n  2.4GHz Channel................ 6\n  2.4GHz Tx Power............... 1 (Highest)\n  5GHz Channel.................. 36\n\nWLC# show ap config general AP-Hall-3 | include Channel|Power\n  2.4GHz Channel................ 6\n  2.4GHz Tx Power............... 2\n  5GHz Channel.................. 36\n\n# planta: AP-Hall-1/2/3 cobrem o mesmo open space com forte sobreposição\n# reclamação concentrada em clientes 2.4GHz; 5GHz também co-channel 36",
+    "alternativas": [
+      "Canais 1, 6 e 11 distribuídos nos três APs no output",
+      "Tx Power Lowest em todos com canais non-overlapping",
+      "RF: três APs no canal 6 (2,4) e canal 36 (5) com potência alta — co-channel interference no open space",
+      "CAPWAP Not Joined em Hall-2 no config general"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Configs mostram canal 6 e 36 repetidos com Tx alto. Não há 1/6/11 distribuídos nem power low. Join não aparece como Not Joined nesse recorte de config general de canal/power.",
+    "part_id": "2.5",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 23
+  },
+  {
+    "id": 25,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #8605 — Filial perdeu o link WAN para a WLC central. Usuários locais no SSID FILIAL-DATA sumiram; o desenho era para continuar imprimindo localmente.",
+    "cli_output": "WLC-HQ# show ap config general AP-Filial-01 | include Mode|Flex|Group\n  AP Mode......................... Local\n  FlexConnect VLAN Enable......... Disabled\n  AP Group Name................... default-group\n\nWLC-HQ# show ap summary | include AP-Filial-01\nAP-Filial-01   ...  State: Registered (CAPWAP up via WAN before outage)\n\n# durante a queda WAN (relato NOC + captura local):\nAP-Filial-01  CAPWAP .............. Down (WLC unreachable)\nSSID FILIAL-DATA ............... Down / not serving (central dependency)\n\nDESIGN-DOC (trecho)\n  \"Branch should use FlexConnect local switching for FILIAL-DATA VLAN 50\"\n\nSwitch-Filial# show vlan brief | include 50\n50   FILIAL-DATA   active    Gi1/0/10-20\n\n# após reconfig pilot em lab:\nAP Mode......................... FlexConnect\nFlexConnect VLAN mapping SSID FILIAL-DATA -> VLAN 50 local = OK when CAPWAP down",
+    "alternativas": [
+      "AP em Local mode (FlexConnect disabled): com CAPWAP down na WAN o SSID centralizado cai — design pedia FlexConnect local switching para VLAN 50",
+      "AP já estava FlexConnect com VLAN mapping 50 no primeiro show",
+      "LAG da WLC-HQ é a causa direta do SSID na filial no output do AP Mode",
+      "show vlan 50 down no switch filial prova ausência de VLAN local"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Config mostra Local mode e FlexConnect disabled; na queda CAPWAP o SSID para. Doc pedia FlexConnect. VLAN 50 está active no switch. LAG da HQ não aparece como Mode do AP.",
+    "part_id": "2.5",
+    "_sourceFile": "src/data/tickets_module2.json",
+    "_sourceIndex": 24
+  },
+  {
+    "id": 1,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9101 — Link primário “caiu” no monitoramento, mas a floating static da filial não assumiu. NOC jura que a AD 200 está correta.",
+    "cli_output": "Edge# show ip route 10.50.0.0\nRouting entry for 10.50.0.0/16\n  Known via \"ospf 1\", distance 110, metric 20\n  Last update from 10.9.0.2 on GigabitEthernet0/0/0, 00:02:11 ago\n  * 10.9.0.2, from 10.9.0.2, 00:02:11 ago, via GigabitEthernet0/0/0\n\nEdge# show ip route | include 10.50.0.0\nO        10.50.0.0/16 [110/20] via 10.9.0.2, 00:02:11, GigabitEthernet0/0/0\n\nEdge# show running-config | include ip route 10.50\nip route 10.50.0.0 255.255.0.0 10.8.0.2 200\n\nEdge# show ip interface brief | include GigabitEthernet0/0/0|GigabitEthernet0/0/1\nGigabitEthernet0/0/0   10.9.0.1   YES manual up   up\nGigabitEthernet0/0/1   10.8.0.1   YES manual up   up\n\n# alarme de “primário” era só perda de SNMP no switch de acesso remoto; o link Gi0/0/0 OSPF ainda está up",
+    "alternativas": [
+      "A floating AD 200 vence OSPF 110 no mesmo /16",
+      "Floating configurada AD 200, mas O 10.50.0.0/16 [110/20] ainda instalada via Gi0/0/0 up/up — a primária OSPF impede a floating de assumir",
+      "Não há ip route floating na running-config",
+      "Gi0/0/0 down força a O a sumir no output"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "show ip route mantém a OSPF AD 110; a floating 200 só entra se a O sair. Running tem a floating. Gi0/0/0 está up/up. AD maior não vence 110.",
+    "part_id": "3.1",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 0
+  },
+  {
+    "id": 2,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9102 — Filial não navega na Internet. LAN e servidor interno ok. “Falta default”, diz o analista sênior.",
+    "cli_output": "BR1# show ip route\nCodes: C - connected, S - static, R - RIP, O - OSPF\nGateway of last resort is not set\n\n      10.0.0.0/8 is variably subnetted\nC        10.10.10.0/24 is directly connected, Vlan10\nL        10.10.10.1/32 is directly connected, Vlan10\nC        10.20.20.0/30 is directly connected, GigabitEthernet0/0/0\nL        10.20.20.1/32 is directly connected, GigabitEthernet0/0/0\nO        10.50.0.0/16 [110/20] via 10.20.20.2, 00:40:00, GigabitEthernet0/0/0\n\nBR1# show ip route static\n\nBR1# show running-config | include ip route\n\nBR1# show ip interface brief | include Vlan10|GigabitEthernet0/0/0\nVlan10                 10.10.10.1   YES manual up  up\nGigabitEthernet0/0/0   10.20.20.1   YES manual up  up\n\nPC-LAN> ping 8.8.8.8\nEsgotado o tempo limite do pedido.",
+    "alternativas": [
+      "Gateway of last resort is not set e show ip route static/vazio e sem ip route na running: falta default 0.0.0.0/0 — LAN C/L e OSPF internas não cobrem a Internet",
+      "S* 0.0.0.0/0 está listada no início do show ip route",
+      "Vlan10 down impede qualquer default",
+      "Código O para 10.50.0.0/16 já é default route global"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "“Gateway of last resort is not set” e ausência de static/default na running explicam falha a 8.8.8.8. Não há S*. Interfaces up. O /16 não é default global.",
+    "part_id": "3.1",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 1
+  },
+  {
+    "id": 3,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9103 — Após queda do link WAN, a rota estática para o datacenter sumiu e não voltou com o cabo “reconectado frouxo”.",
+    "cli_output": "HQ# show running-config | include ip route 172.16.0.0\nip route 172.16.0.0 255.255.0.0 203.0.113.2\n\nHQ# show ip interface brief | include GigabitEthernet0/0/1\nGigabitEthernet0/0/1   203.0.113.1   YES manual down down\n\nHQ# show ip route 172.16.0.0\n% Network not in table\n\nHQ# show ip route static\n\n# cabo reinserido parcialmente — interface ainda down/down no brief\n# next-hop 203.0.113.2 pertence à subnet da Gi0/0/1",
+    "alternativas": [
+      "A rota S 172.16.0.0/16 permanece com Gi0/0/1 down no output",
+      "ip route foi removido da running-config",
+      "Gi0/0/1 down/down e Network not in table: next-hop 203.0.113.2 fica unreachable — a estática não instala até a interface/next-hop voltarem",
+      "AD 110 da estática perdeu para OSPF no mesmo prefixo no show"
+    ],
+    "resposta_correta": 2,
+    "explicacao_profunda": "Running ainda tem ip route; brief mostra Gi0/0/1 down/down; tabela sem 172.16/16. Next-hop na subnet da interface down → rota some. Não há S instalada nem AD 110 de estática no recorte.",
+    "part_id": "3.1",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 2
+  },
+  {
+    "id": 4,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9104 — NOC esperava que todo 10.0.0.0/8 saísse pelo firewall de borda, mas hosts 10.1.1.x usam o link do DC. “A estática /8 está lá!”",
+    "cli_output": "R1# show ip route 10.1.1.50\nRouting entry for 10.1.1.0/24\n  Known via \"static\", distance 1, metric 0\n  Routing Descriptor Blocks:\n  * 10.9.9.2, from 0.0.0.0, 01:12:00 ago\n      Route metric is 0, traffic share count is 1\n\nR1# show ip route | include 10.0.0.0|10.1.1.0\nS        10.0.0.0/8 [1/0] via 203.0.113.1\nS        10.1.1.0/24 [1/0] via 10.9.9.2\n\nR1# show running-config | include ip route 10\nip route 10.0.0.0 255.0.0.0 203.0.113.1\nip route 10.1.1.0 255.255.255.0 10.9.9.2\n\n# destino de teste: 10.1.1.50 (servidor DC)",
+    "alternativas": [
+      "show ip route 10.1.1.50 casa com 10.1.1.0/24 via 10.9.9.2 — longest match vence o /8 via firewall; não é “bug” da /8",
+      "Apenas 10.0.0.0/8 aparece para 10.1.1.50 no output",
+      "AD do /24 é 110 e por isso perde",
+      "Não existe ip route 10.1.1.0/24 na running"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "A entry para 10.1.1.50 usa /24 static via 10.9.9.2; /8 existe mas é menos específica. Ambas AD 1. Running tem as duas rotas.",
+    "part_id": "3.1",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 3
+  },
+  {
+    "id": 5,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9105 — Time de WAN queria backup OSPF, mas a estática “roubou” o caminho e o OSPF não aparece para 192.168.100.0/24.",
+    "cli_output": "R2# show ip route 192.168.100.0\nRouting entry for 192.168.100.0/24\n  Known via \"static\", distance 1, metric 0\n  * 10.0.0.2, via GigabitEthernet0/0\n\nR2# show ip route ospf | include 192.168.100\n\nR2# show ip ospf database | include 192.168.100\n  (entrada de rede presente no LSDB — omitida)\n\nR2# show running-config | include ip route 192.168.100\nip route 192.168.100.0 255.255.255.0 10.0.0.2\n\nR2# show ip protocols | include ospf|Distance\nRouting Protocol is \"ospf 1\"\n  Distance: (default is 110)\n\n# intenção: estática só como backup com AD 200",
+    "alternativas": [
+      "OSPF AD 110 vence static 1 no mesmo /24 no output atual",
+      "Não há ip route na running-config",
+      "A rota ativa é O IA com distance 110",
+      "Estática AD 1 instala e oculta a OSPF (110) para o mesmo /24 — AD “errada” para backup; floating deveria ser AD > 110 (ex.: 200)"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Known via static distance 1; OSPF default 110 e sem linha O para o prefixo na tabela. Running tem a estática sem AD extra. Para backup, a estática precisa de AD maior que 110.",
+    "part_id": "3.1",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 4
+  },
+  {
+    "id": 6,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9201 — VLANs 10 e 20 não se falam via ROAS. O switch trunk “parece ok”. Subinterface .20 tem IP.",
+    "cli_output": "R1# show running-config | section interface GigabitEthernet0/0\ninterface GigabitEthernet0/0\n no ip address\n!\ninterface GigabitEthernet0/0.10\n encapsulation dot1Q 10\n ip address 192.168.10.1 255.255.255.0\n!\ninterface GigabitEthernet0/0.20\n ip address 192.168.20.1 255.255.255.0\n\nR1# show ip interface brief | include GigabitEthernet0/0\nGigabitEthernet0/0      unassigned      YES unset  up    up\nGigabitEthernet0/0.10   192.168.10.1    YES manual up    up\nGigabitEthernet0/0.20   192.168.20.1    YES manual up    up\n\nSW1# show interfaces trunk\nPort        Mode   Encapsulation  Status     Native vlan\nGi1/0/48    on     802.1q         trunking   1\nPort        Vlans allowed on trunk\nGi1/0/48    1,10,20\n\nPC-20> ping 192.168.10.10\nEsgotado o tempo limite do pedido.",
+    "alternativas": [
+      "Allowed no trunk omite a VLAN 20",
+      "Gi0/0.20 up/up com IP mas sem encapsulation dot1Q 20 — ROAS da VLAN 20 incompleto; .10 tem encap e a 20 não",
+      "Ambas subinterfaces sem IP no brief",
+      "Native 99 vs 1 no trunk é a única falha listada"
+    ],
+    "resposta_correta": 1,
+    "explicacao_profunda": "Running mostra .10 com encapsulation e .20 só com IP. Brief up/up não dispensa encap. Allowed tem 10,20. Native é 1, não mismatch 99 no recorte.",
+    "part_id": "3.2",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 5
+  },
+  {
+    "id": 7,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "Chamado #9202 — Gateway 10.10.30.1 (SVI 30) não responde. Nenhum host na VLAN 30 ainda; só config “preparada”.",
+    "cli_output": "Dist1# show ip interface brief | include Vlan30\nVlan30   10.10.30.1   YES manual up   down\n\nDist1# show running-config interface Vlan30\ninterface Vlan30\n ip address 10.10.30.1 255.255.255.0\n\nDist1# show vlan brief | include 30\n30   SERVERS   active\n\nDist1# show vlan brief\n... (nenhuma porta listada em SERVERS)\n\nDist1# show interfaces status | include 30\n (no access ports in VLAN 30)\n\nDist1# show ip route | include 10.10.30\n",
+    "alternativas": [
+      "Vlan30 up/up com rota C 10.10.30.0/24 no output",
+      "interface Vlan30 está shutdown na running",
+      "VLAN 30 não existe no show vlan brief",
+      "Vlan30 up/down, VLAN 30 active sem portas: SVI sem L2 ativo na VLAN — line protocol down até haver porta/trunk up na 30"
+    ],
+    "resposta_correta": 3,
+    "explicacao_profunda": "Brief up/down e VLAN sem membros explicam SVI down de protocolo. Running não tem shutdown. VLAN existe active. Sem rota C no recorte.",
+    "part_id": "3.2",
+    "_sourceFile": "src/data/tickets_module3.json",
+    "_sourceIndex": 6
+  }
+]

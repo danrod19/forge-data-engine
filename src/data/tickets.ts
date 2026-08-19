@@ -8,7 +8,9 @@ import {
 } from "@/data/v2-banks";
 import {
   awsTickets,
+  awsTraditionalQuestions,
   TOTAL_AWS_TICKETS,
+  TOTAL_AWS_TRADITIONAL,
   getAwsTicketsByPart,
 } from "@/data/aws-banks";
 import {
@@ -113,12 +115,42 @@ export const v2ModuleTickets: Question[] = v2Tickets.map((t) =>
   asTicket(t, "v2")
 );
 
-/** Tickets AWS SAA foundations. */
+/**
+ * Tickets AWS com CLI (legado / banco preservado em tickets_aws.json).
+ * NÃO é mais a fonte principal da Trilha AWS — permanece disponível
+ * via getAwsTicketsByPart / awsModuleTickets se precisar no futuro.
+ */
 export const awsModuleTickets: Question[] = awsTickets.map((t) =>
   asTicket(t, "aws")
 );
 
-/** Tickets curados v1 módulos 1–6 (backup). */
+/**
+ * Trilha AWS = cenários de arquitetura (traditional SAA), sem terminal.
+ * Fonte: questions_aws_traditional.json via aws-banks.
+ */
+export const awsTrilhaScenarios: Question[] = awsTraditionalQuestions.map(
+  (q, index) => ({
+    ...q,
+    id: typeof q.id === "number" ? q.id : index + 1,
+    question_type: "scenario" as const,
+    isPremium: q.isPremium ?? true,
+    enunciado: q.enunciado ?? "",
+    sintoma: q.sintoma,
+    cli_output: undefined,
+    alternativas: Array.isArray(q.alternativas) ? q.alternativas : [],
+    resposta_correta:
+      typeof q.resposta_correta === "number" ? q.resposta_correta : 0,
+    explicacao_profunda: q.explicacao_profunda ?? "",
+    part_id: q.part_id,
+    source: q.source ?? "aws",
+  })
+);
+
+/**
+ * Tickets curados v1 módulos 1–6 — pool da Trilha track `ccna-v1`.
+ * Fontes: parts/part-1.1…1.6-tickets.json + tickets_module2…6.json
+ * (não usa tickets_all_merged / unique / bulk).
+ */
 export const curatedModuleTickets: Question[] = (() => {
   const seen = new Set<string>();
   const out: Question[] = [];
@@ -170,7 +202,11 @@ export const tickets: Question[] =
 
 export const TOTAL_TICKETS = tickets.length;
 export const TOTAL_V2_TICKETS_BANK = TOTAL_V2_TICKETS;
+/** Banco CLI legado (JSON tickets_aws) — não é o hub da Trilha. */
 export const TOTAL_AWS_TICKETS_BANK = TOTAL_AWS_TICKETS;
+/** Pool da Trilha AWS (cenários traditional). */
+export const TOTAL_AWS_TRILHA_SCENARIOS =
+  awsTrilhaScenarios.length || TOTAL_AWS_TRADITIONAL;
 export const TOTAL_LEGACY_TICKETS = legacyTickets.length;
 export const TOTAL_MODULE1_TICKETS = MODULE1_TOTAL_TICKETS;
 export const TOTAL_MODULE2_TICKETS = MODULE2_TOTAL_TICKETS;
@@ -191,15 +227,17 @@ export function shuffleArray<T>(items: readonly T[]): T[] {
 }
 
 /**
- * Pool de tickets por track de certificação.
- * - ccna-v1: módulos curados (fallback legacy)
- * - ccna-v2: tickets v2 (troubleshooting)
- * - aws: tickets SAA foundations
+ * Pool da Trilha por track.
+ * - ccna-v1: tickets módulos curados (fallback legacy)
+ * - ccna-v2: tickets v2 (troubleshooting + CLI)
+ * - aws: cenários traditional SAA (sem CLI) — tickets_aws.json permanece no disco
  */
 export function getTicketsPool(track: TrackId): Question[] {
   switch (track) {
     case "aws":
-      return awsModuleTickets.length > 0 ? awsModuleTickets : [];
+      return awsTrilhaScenarios.length > 0
+        ? awsTrilhaScenarios
+        : awsModuleTickets;
     case "ccna-v1":
       return curatedModuleTickets.length > 0
         ? curatedModuleTickets
@@ -241,8 +279,8 @@ export function trilhaSessionCopy(track: TrackId): {
   const bankSize = getTicketsPool(track).length;
   if (track === "aws") {
     return {
-      title: "Trilha · AWS SAA",
-      subtitle: `${bankSize} tickets de diagnóstico (policy, logs, CLI)`,
+      title: "Cenário · Arquitetura",
+      subtitle: `${bankSize} cenários SAA Foundations (sem terminal)`,
       bankSize,
     };
   }

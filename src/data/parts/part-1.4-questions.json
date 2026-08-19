@@ -11,7 +11,7 @@
       "192.168.10.96"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "/27 → máscara 255.255.255.224 → bloco 256−224=32. Redes: .0, .32, .64, .96… O IP .70 cai no bloco que começa em .64. .0 seria /24; .70 é host; .96 é a próxima rede.",
+    "explicacao_profunda": "Máscara /27 = 255.255.255.224; tamanho do bloco = 256−224 = 32. As redes caem em .0, .32, .64, .96… O host 192.168.10.70 está entre .64 e .95, logo a rede é 192.168.10.64. 192.168.10.0 seria a rede de um /24 (ou do primeiro /27), não deste host. .70 é endereço de host, não de rede. .96 é o início da próxima sub-rede /27. Tip: AND do IP com a máscara ou 'em qual bloco de 32 o host cai?'.",
     "part_id": "1.4"
   },
   {
@@ -26,7 +26,7 @@
       "192.168.10.255"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Bloco /27 = 32 endereços. Broadcast = rede + 32 − 1 = .64+31 = .95. .64 é a rede; .127 seria fim de /25 a partir de .0 em outro recorte; .255 é broadcast de /24.",
+    "explicacao_profunda": "Na sub-rede 192.168.10.64/27 o bloco tem 32 endereços: rede .64, hosts .65–.94, broadcast = .64 + 31 = .95. .64 é o endereço de rede, não broadcast. .127 seria broadcast de outro recorte (ex.: /25 a partir de .0 no segundo half). .255 é broadcast de um /24. Tip: broadcast = rede + tamanho_do_bloco − 1.",
     "part_id": "1.4"
   },
   {
@@ -41,7 +41,7 @@
       "62"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "Bits de host = 32−26 = 6 → 2^6 = 64 endereços brutos; utilizáveis = 64−2 = 62 (tira rede e broadcast). 30 é /27; 126 é /25; 64 conta o total bruto, não só hosts.",
+    "explicacao_profunda": "Prefixo /26 deixa 32−26 = 6 bits de host → 2^6 = 64 endereços no total; hosts utilizáveis = 64 − 2 = 62 (remove rede e broadcast). 64 é o total bruto, não só hosts. 30 hosts utilizáveis correspondem a /27. 126 hosts utilizáveis correspondem a /25. Tip: hosts úteis = 2^(32−prefixo) − 2.",
     "part_id": "1.4"
   },
   {
@@ -56,7 +56,7 @@
       "/29"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "240 no último octeto = 11110000 → 4 bits de host → prefixo /28. /26=.192, /27=.224, /29=.248.",
+    "explicacao_profunda": "Máscara 255.255.255.240 no último octeto é 11110000 em binário: 4 bits de host, portanto prefixo /28 (32−4). /26 corresponde a .192; /27 a .224; /29 a .248. Tip: memorize .192=/26, .224=/27, .240=/28, .248=/29 — conte os bits 1 no último octeto para achar o prefixo.",
     "part_id": "1.4"
   },
   {
@@ -71,7 +71,7 @@
       "Não; /28 não permite mais de 4 hosts"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "/28 → bloco 16. Redes: .0, .16, .32… .17 e .30 ficam em 10.1.4.16 (broadcast .31). Não estão em .0 nem .32. Broadcast da subnet é .31, não .255. Hosts úteis = 14, não 4.",
+    "explicacao_profunda": "/28 tem blocos de 16 endereços: .0, .16, .32… Os hosts 10.1.4.17 e 10.1.4.30 caem ambos em 10.1.4.16/28 (broadcast .31) — mesma sub-rede. Não estão um em .0/28 e outro em .32/28. Broadcast dessa subnet é .31, não 10.1.4.255 (isso seria /24). /28 oferece 14 hosts utilizáveis (16−2), não 'no máximo 4'. Tip: calcule a rede com AND ou liste múltiplos de 16.",
     "part_id": "1.4"
   },
   {
@@ -86,7 +86,7 @@
       "172.16.5.2 e 172.16.5.3"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "/30 tem 4 endereços: rede .0, hosts .1 e .2, broadcast .3. Usar .0 ou .3 como host é erro clássico. .1–.3 incluiria o broadcast.",
+    "explicacao_profunda": "Sub-rede /30 tem 4 endereços: rede .0, hosts utilizáveis .1 e .2, broadcast .3. Logo primeiro e último host de 172.16.5.0/30 são 172.16.5.1 e 172.16.5.2. Usar .0 e .3 como hosts é o erro clássico (rede/broadcast). .1 e .3 inclui o broadcast. .2 e .3 mistura último host com broadcast. Tip: /30 = link ponto a ponto com exatamente dois hosts úteis.",
     "part_id": "1.4"
   },
   {
@@ -101,7 +101,7 @@
       "Loopback da pilha IP do sistema"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "169.254.0.0/16 é APIPA/link-local de autoconfiguração. Não é público, não é 224/4 multicast nem 127/8 loopback. Costuma sinalizar falha de DHCP/acesso.",
+    "explicacao_profunda": "169.254.0.0/16 com máscara 255.255.0.0 é endereço link-local APIPA: o host autoconfigurou porque tipicamente não obteve lease DHCP. Não é IP público roteável na Internet. Não é multicast de roteamento (224.0.0.0/4). Não é loopback (127.0.0.0/8). Tip TShoot: ver 169.254 → cheque cabo/VLAN/helper/servidor DHCP antes de culpar aplicação.",
     "part_id": "1.4"
   },
   {
@@ -116,7 +116,7 @@
       "10.0.0.0/8"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "Privados: 10/8, 172.16/12, 192.168/16. 127/8 é loopback; 224/4 multicast; 169.254/16 APIPA. 10.0.0.0/8 é o bloco privado clássico de “Classe A”.",
+    "explicacao_profunda": "RFC 1918 define privados 10.0.0.0/8, 172.16.0.0/12 e 192.168.0.0/16 — logo 10.0.0.0/8 é bloco privado válido. 127.0.0.0/8 é loopback. 224.0.0.0/4 é multicast. 169.254.0.0/16 é APIPA/link-local, não RFC 1918. Tip: na prova, separe privado (1918) × APIPA × loopback × multicast.",
     "part_id": "1.4"
   },
   {
@@ -131,7 +131,7 @@
       "IP + wildcard"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Rede = IP AND máscara (bit a bit). OR/XOR não produzem o prefixo de rede. Somar wildcard não é o método padrão de obtenção da rede.",
+    "explicacao_profunda": "O endereço de rede obtém-se com IP AND máscara bit a bit: zeros da máscara zeram os bits de host. IP OR máscara não produz a rede. IP XOR 255.255.255.255 inverte bits (útil em outros contextos), não calcula o prefixo de rede. Somar wildcard também não é o método padrão de obtenção da rede (wildcard aparece em ACLs). Tip: rede = IP ∧ máscara.",
     "part_id": "1.4"
   },
   {
@@ -146,7 +146,7 @@
       "0 bits de host e 2 hosts utilizáveis"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "/24 deixa 8 bits de host → 256 endereços; utilizáveis 254 (menos rede e broadcast). 256 conta o total bruto. 24 bits de host seria /8.",
+    "explicacao_profunda": "Em um /24 restam 32−24 = 8 bits de host → 2^8 = 256 endereços no total; hosts utilizáveis = 256 − 2 = 254 (menos rede e broadcast). Afirmar 256 hosts utilizáveis conta o total bruto. 24 bits de host seria um /8, não /24. 0 bits de host seria /32. Tip: /24 = 254 hosts úteis — decorar esse par evita pegadinhas de '256'.",
     "part_id": "1.4"
   },
   {
@@ -161,7 +161,7 @@
       "Rede 10.20.30.32 / broadcast 10.20.30.63"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "/29 → bloco 8. Múltiplos: .0, .8, .16, .24, .32, .40, .48… .45 está em .40; broadcast .47. /24 daria .0–.255; usar o próprio host como rede está errado; .32/.63 é bloco /27.",
+    "explicacao_profunda": "Com máscara /29 o bloco tem 8 endereços (256−248=8). As redes alinhadas no último octeto avançam de 8 em 8: .0, .8, .16, .24, .32, .40, .48… O host 10.20.30.45 cai no bloco que começa em .40; o último endereço desse bloco é o broadcast .47. Por isso o par correto é rede 10.20.30.40 / broadcast 10.20.30.47. Tratar como /24 (rede .0 e broadcast .255) ignora a máscara dada. Usar o próprio host (.45) como “rede” e .46 como broadcast não calcula o múltiplo do bloco. O par .32/.63 corresponde a um /27 (bloco 32), não a /29. Dica de prova: calcule o incremento (256 − último octeto da máscara) e encontre o maior múltiplo ≤ host.",
     "part_id": "1.4"
   },
   {
@@ -176,7 +176,7 @@
       "Porque o único gateway válido seria 192.168.5.0/24"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "/27 bloco 32 → rede de .33 é .32; hosts .33–.62; broadcast .63. Gateway = .32 usa o endereço de rede. Broadcast .63 também é inválido como gateway. /24 não é a máscara do host.",
+    "explicacao_profunda": "Em /27 o incremento é 32. A sub-rede do host 192.168.5.33 começa em 192.168.5.32 (rede), hosts úteis .33–.62 e broadcast .63. Configurar o gateway como .32 aponta para o endereço de rede, que não é atribuível a interface de host/roteador no modelo clássico — daí a falha. A ideia de que “/27 não admite gateway” é falsa: o gateway deve ser um host utilizável da mesma subnet (ex.: .33 ou .62). Usar o broadcast .63 como gateway também é inválido. Exigir 192.168.5.0/24 ignora a máscara real do host e mistura redes diferentes. Em TShoot, confirme rede/broadcast antes de colocar IP no default-gateway.",
     "part_id": "1.4"
   },
   {
@@ -191,7 +191,7 @@
       "0.0.0.31"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "Wildcard ≈ 255.255.255.255 − máscara → 0.0.0.31 para /27 (.224). 0.0.0.63 é /26; repetir a máscara ou 0.0.0.224 não é a wildcard correta.",
+    "explicacao_profunda": "Wildcard mask é o complemento bit a bit da máscara de sub-rede: 255.255.255.255 − 255.255.255.224 resulta em 0.0.0.31, que casa com /27. Esse valor aparece em ACLs e em OSPF network statements para definir o “match” de hosts. 0.0.0.63 é a wildcard de /26 (.192), bloco maior. Repetir 255.255.255.224 não é wildcard — é a própria máscara. 0.0.0.224 também não é o complemento correto de .224. Atalho de exame: para máscaras no 4º octeto, wildcard = 255 − esse octeto (255−224=31).",
     "part_id": "1.4"
   },
   {
@@ -206,7 +206,7 @@
       "/30 (2 hosts)"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "/26 oferece 62 < 100. /25 oferece 126 ≥ 100 e é mais específico que /24. /30 só tem 2 hosts. “Apenas /24” ignora que /25 já cobre 100 hosts.",
+    "explicacao_profunda": "Hosts utilizáveis ≈ 2^(bits de host) − 2. /26 deixa 6 bits de host → 62 hosts, insuficiente para ≥100. /25 deixa 7 bits → 126 hosts, cobre 100 e é o menor prefixo (mais longo) que atende entre as opções viáveis. /24 oferece 254, mas “gasta” mais endereços do que o necessário; a afirmação de que “apenas /24 basta” está errada porque /25 já serve. /30 só tem 2 hosts (link ponto a ponto) e não chega perto de 100. Na prova, peça o menor bloco que ainda cumpra o requisito de hosts, não o maior bloco “por segurança”.",
     "part_id": "1.4"
   },
   {
@@ -221,7 +221,7 @@
       "192.168.1.0/26 e 192.168.1.0/26 novamente"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "/26 ocupa 64 endereços. Primeiro: .0–.63. Próximo alinhado: .64/26 (.64–.127). .32/26 e .16/26 sobrepõem o primeiro bloco. Repetir .0/26 é sobreposição total.",
+    "explicacao_profunda": "Um /26 consome 64 endereços alinhados. Partindo de 192.168.1.0/24, o primeiro /26 é 192.168.1.0/26 (.0–.63). O próximo contíguo alinhado é 192.168.1.64/26 (.64–.127), sem sobreposições. 192.168.1.32/26 começaria no meio do primeiro bloco e colidiria com .0–.63. 192.168.1.16/26 também não está alinhado ao tamanho 64 e invade o mesmo espaço. Repetir 192.168.1.0/26 duas vezes é sobreposição total. Em VLSM, o próximo bloco começa no primeiro endereço livre após o fim do bloco anterior, sempre no múltiplo do tamanho da nova máscara.",
     "part_id": "1.4"
   },
   {
@@ -236,7 +236,7 @@
       "Loopback, para testar a pilha IP local (faixa 127.0.0.0/8)"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "127/8 é loopback. Multicast começa em 224; APIPA é 169.254/16; broadcast limitado é 255.255.255.255.",
+    "explicacao_profunda": "127.0.0.1 faz parte de 127.0.0.0/8, reservada para loopback: tráfego destinado a ela volta para a própria pilha IP do host, útil para testar se TCP/IP local está saudável. Multicast de “todos os hosts” na LAN usa a faixa 224.0.0.0/4 (ex.: 224.0.0.1), não 127. APIPA/link-local IPv4 é 169.254.0.0/16 quando o DHCP falha. O broadcast limitado é 255.255.255.255, outro papel. Não confunda loopback com APIPA: um é teste local intencional; o outro é autoconfiguração de emergência sem gateway corporativo.",
     "part_id": "1.4"
   },
   {
@@ -251,7 +251,7 @@
       "Não; 10.0.1.200 é broadcast de 10.0.0.0/23"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "/23 → máscara 255.255.254.0; redes em passos de 2 no 3º octeto. 10.0.0.0/23 cobre 10.0.0.0–10.0.1.255. A e B caem dentro. Não são /24 separados. /8 privado ≠ mesma subnet. Broadcast de 10.0.0.0/23 é 10.0.1.255, não .200.",
+    "explicacao_profunda": "Máscara /23 = 255.255.254.0: o 3º octeto avança de 2 em 2 nas fronteiras de rede. Assim 10.0.0.0/23 cobre 10.0.0.0 até 10.0.1.255. Tanto 10.0.0.50 quanto 10.0.1.200 estão dentro desse intervalo — mesma sub-rede. Separar automaticamente em dois /24 (10.0.0.0/24 e 10.0.1.0/24) só valeria se a máscara fosse /24, não /23. Ser RFC1918 10/8 não implica mesma subnet: privado ≠ mesmo prefixo. O broadcast de 10.0.0.0/23 é 10.0.1.255, não .200. Dica: faça o AND bit a bit host∧máscara nos dois IPs; se a rede resultante for igual, estão juntos.",
     "part_id": "1.4"
   },
   {
@@ -266,7 +266,7 @@
       "Classe B proíbe o uso de /20 ou /22"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Operação moderna é CIDR: o /n manda. Classes são default histórico. 192.0.2.0/24 de documentação não é RFC1918; privados 192.168/16. Prefixos longos/curtos existem em qualquer range.",
+    "explicacao_profunda": "No CCNA atual a Internet e as redes empresariais operam com CIDR: a máscara efetiva é o prefixo /n configurado ou anunciado, não a “classe” do primeiro octeto. Classes A/B/C permanecem só como legado de defaults históricos. A classe do 1º octeto não define sozinha a máscara real na Internet moderna. Nem todo 192.x.x.x é /24 nem privado — 192.168.0.0/16 é RFC1918, mas 192.0.2.0/24 é documentação. Classe B nunca “proibiu” /20 ou /22; com CIDR esses prefixos são rotineiros. Memorize: leia sempre o /n, não a classe.",
     "part_id": "1.4"
   },
   {
@@ -281,7 +281,7 @@
       "10.10.10.0 e 10.10.10.3"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Em /30: .0 rede, .1 e .2 hosts, .3 broadcast. Pares com .0 ou .3 como “host” de interface estão errados no modelo clássico de hosts utilizáveis.",
+    "explicacao_profunda": "Em 10.10.10.0/30 há quatro endereços: .0 = rede, .1 e .2 = hosts utilizáveis, .3 = broadcast. Nos dois roteadores do link ponto a ponto os IPs válidos de interface são 10.10.10.1 e 10.10.10.2. Colocar .0 numa interface usa o endereço de rede. O par .2 e .3 inclui o broadcast como se fosse host. .0 e .3 juntos são exatamente rede+broadcast, ambos inválidos como IP de interface no modelo clássico. Em seriais /30, confira sempre quem ficou com .1 e .2 e documente o lado A/B para evitar conflito.",
     "part_id": "1.4"
   },
   {
@@ -296,7 +296,7 @@
       "Multicast IPv4 (224.0.0.0/4)"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "224/4 é multicast. Privados são 10/8, 172.16/12, 192.168/16. Loopback 127/8. APIPA 169.254/16.",
+    "explicacao_profunda": "A faixa 224.0.0.0–239.255.255.255 é 224.0.0.0/4, classificada como multicast IPv4 (entrega a um grupo). Unicast privados RFC1918 são 10/8, 172.16/12 e 192.168/16 — nenhum começa em 224. Loopback é 127.0.0.0/8. Link-local APIPA é 169.254.0.0/16. Na prova, prefixos “especiais” caem em quatro gavetas mentais: privado, loopback, APIPA e multicast; 224/4 fecha a última.",
     "part_id": "1.4"
   },
   {
@@ -311,7 +311,7 @@
       "172.16.100.130"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": ".192 → /26 → bloco 64. Redes .0, .64, .128, .192. .130 está em .128. .0 e .192 são outros blocos; .130 é o host, não a rede.",
+    "explicacao_profunda": "Máscara 255.255.255.192 = /26, bloco de 64 no último octeto. Redes: .0, .64, .128, .192… O host 172.16.100.130 fica entre .128 e .191, portanto a rede é 172.16.100.128. 172.16.100.0 é outro bloco /26. 172.16.100.192 é o início do bloco seguinte, não a rede deste host. 172.16.100.130 é o próprio endereço do host, não o identificador de rede. Atalho: 130 ÷ 64 = 2 resto 2 → segundo bloco a partir de .128 (0-indexado: bloco 2).",
     "part_id": "1.4"
   },
   {
@@ -326,7 +326,7 @@
       "10.0.0.192/25"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "10.0.0.0/25 consome .0–.127. Livres: .128–.255. Um /26 alinhado livre é 10.0.0.128/26 (.128–.191). .0/26 e .64/26 sobrepõem o /25. .192/25 não é /26 e mudaria o tamanho.",
+    "explicacao_profunda": "10.0.0.0/25 já ocupa .0–.127. O espaço ainda livre dentro do /24 pai é .128–.255. O primeiro /26 alinhado livre é 10.0.0.128/26 (.128–.191). 10.0.0.0/26 e 10.0.0.64/26 estão ambos dentro do /25 já usado e sobrepõem endereços. 10.0.0.192/25 não é um /26: muda o tamanho do prefixo e não responde ao pedido de “próximo bloco /26”. Em VLSM, marque o intervalo consumido e só então escolha o próximo prefixo alinhado ao novo tamanho.",
     "part_id": "1.4"
   },
   {
@@ -341,7 +341,7 @@
       "192.168.9.1 é loopback e por isso inválido"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "AND com /24: redes 192.168.8.0 e 192.168.9.0 são distintas. Gateway precisa ser host da mesma subnet. Wildcard no host não une subnets. 192.168.9.1 não é loopback (127/8).",
+    "explicacao_profunda": "Com /24, o 3º octeto define a rede: 192.168.8.1 está em 192.168.8.0/24 e 192.168.9.1 em 192.168.9.0/24. São subnets distintas; o default gateway precisa ser um host da mesma sub-rede do PC. Octetos “sequenciais” não unem redes /24 diferentes. Wildcard no host não altera o cálculo de subnet do stack IP do SO. 192.168.9.1 não é loopback — loopback IPv4 é 127/8. Sintoma típico: ARP/ping para o gateway falha porque o host acha o destino remoto e tenta um gateway que… é o próprio alvo fora da máscara.",
     "part_id": "1.4"
   },
   {
@@ -356,7 +356,7 @@
       "8"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "Bloco = 256 − 248 = 8 → /29. 16 é /28 (.240); 4 é /30 (.252); 32 é /27 (.224).",
+    "explicacao_profunda": "Para máscara 255.255.255.248 o incremento no último octeto é 256 − 248 = 8, equivalente a /29. Esse valor define as fronteiras de rede (.0, .8, .16…). Incremento 16 corresponde a /28 (.240). Incremento 4 é /30 (.252), típico de links /30. Incremento 32 é /27 (.224). Errar o bloco desloca rede e broadcast em toda a questão seguinte. Memorize a tabela 224/27→32, 240/28→16, 248/29→8, 252/30→4.",
     "part_id": "1.4"
   },
   {
@@ -371,7 +371,7 @@
       "Multicast obrigatório de todos os roteadores"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "0.0.0.0/0 é a default route. Não é classful A operacional, nem broadcast 255.255.255.255, nem faixa multicast 224/4.",
+    "explicacao_profunda": "0.0.0.0/0 na tabela de roteamento é a rota default: casa qualquer destino que não tenha rota mais específica (longest match). Não representa a rede classful 0.0.0.0/8 em operação moderna, nem o broadcast 255.255.255.255, nem multicast (224/4). Em TShoot, se o ping para fora da LAN falha mas a subnet local responde, o próximo passo costuma ser verificar se existe 0.0.0.0/0 (ou rota adequada) apontando para o next-hop correto.",
     "part_id": "1.4"
   },
   {
@@ -386,7 +386,7 @@
       "32"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Bits emprestados de /24 para /28 = 4 → 2^4 = 16 sub-redes de 16 endereços. 4 e 8 subestimam; 32 seria passo de /29 (8 endereços) em outro cálculo.",
+    "explicacao_profunda": "De /24 para /28 empresta-se 4 bits (28−24=4). Número de sub-redes = 2^4 = 16, cada uma com 16 endereços (bloco 16). Cabem exatamente 16×/28 em um /24 sem sobra. Responder 4 ou 8 subestima os bits emprestados. 32 seria o resultado se alguém usasse 5 bits (passo de /29 em outro cenário) ou confundisse hosts com subnets. Fórmula rápida: 2^(novo_prefixo − prefixo_pai).",
     "part_id": "1.4"
   },
   {
@@ -401,7 +401,7 @@
       "10.1.1.127"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "/25 de 10.1.1.0: rede .0, hosts .1–.126, broadcast .127. .127 é broadcast e inválido como host. Os demais estão na faixa útil.",
+    "explicacao_profunda": "Em 10.1.1.0/25: rede = .0, hosts = .1–.126, broadcast = .127. Portanto 10.1.1.127 não pode ser IP de host. 10.1.1.1, .100 e .126 estão na faixa utilizável. Confundir .127 com “último host” é pegadinha clássica — o último host útil é .126. Sempre derive rede e broadcast antes de validar candidatos a endereço de interface.",
     "part_id": "1.4"
   },
   {
@@ -416,7 +416,7 @@
       "173.16.0.1"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "172.16.0.0/12 cobre 172.16.0.0–172.31.255.255. 172.31.255.1 está dentro. 172.15 e 172.32 ficam fora; 173.16 também.",
+    "explicacao_profunda": "172.16.0.0/12 cobre do 172.16.0.0 ao 172.31.255.255 (12 bits de rede fixos no início de 172.x). 172.31.255.1 está no limite superior interno do bloco. 172.15.255.1 fica abaixo de .16 e está fora. 172.32.0.1 já passou de .31 e também está fora. 173.16.0.1 muda o primeiro octeto — não é 172.16/12. Para memorizar RFC1918: 10/8, 172.16–31, 192.168/16.",
     "part_id": "1.4"
   },
   {
@@ -431,7 +431,7 @@
       "200.10.5.128"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "/25 → bloco 128. Redes .0 e .128. .100 está em .0; broadcast .127. .255 seria /24; .128 é a outra rede; .100 é o host.",
+    "explicacao_profunda": "255.255.255.128 = /25, blocos de 128: redes .0 e .128 no último octeto. O host .100 pertence ao bloco .0–.127; o broadcast dessa sub-rede é 200.10.5.127. 200.10.5.255 seria broadcast de um /24, não deste /25. .100 é o próprio host. .128 é o endereço de rede da outra metade (/25 superior), não o broadcast do host em questão. Calcule o bloco e some (tamanho−1) à rede para achar o broadcast.",
     "part_id": "1.4"
   },
   {
@@ -446,7 +446,7 @@
       "Se converte máscara .252 para prefixo /30"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "192.168.0.0/26 usa .0–.63; 192.168.0.32/26 não é alinhado/livre e colide com o primeiro. /30 em serial, gateway válido e .252=/30 são práticas corretas, não sobreposição.",
+    "explicacao_profunda": "Sobreposição em VLSM é reivindicar o mesmo endereço em dois blocos. Exemplo: 192.168.0.0/26 usa .0–.63; 192.168.0.32/26 não está alinhado/livre e invade esse intervalo. Usar /30 em links seriais é prática correta e econômica, não erro de overlap. Documentar gateway em host utilizável é exatamente o que se deve fazer. Converter máscara .252 para /30 é equivalência válida. Em planejamento, desenhe intervalos [início, fim] e rejeite qualquer novo prefixo cujo range intersecte um já alocado.",
     "part_id": "1.4"
   }
 ]

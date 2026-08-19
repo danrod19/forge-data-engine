@@ -1,0 +1,257 @@
+[
+  {
+    "id": 46,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1101: Lambda report-gen termina com Task timed out; job de PDF leva ~2 min.",
+    "cli_output": "$ aws lambda get-function-configuration --function-name report-gen\nTimeout: 30\nMemorySize: 512\nRole: arn:aws:iam::111122223333:role/report-gen-role\nVpcConfig: null\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/report-gen --filter-pattern \"Task timed out\"\n... Task timed out after 30.00 seconds\n... REPORT Duration: 30000.12 ms ... Status: timeout\n\n# Business: PDF generation p50=90s p99=110s on same code path in staging with Timeout 120",
+    "alternativas": [
+      "Aumentar Timeout para ≥120s (e monitorar) ou mover o job para assíncrono (SQS) se o client não pode esperar",
+      "Remover a execution role",
+      "Só criar um CNAME no apex",
+      "Desabilitar CloudWatch Logs"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1101: Lambda report-gen termina com Task timed out; job de PDF leva ~2 min.…), a ação correta é: Aumentar Timeout para ≥120s (e monitorar) ou mover o job para assíncrono (SQS) se o client não pode esperar. «Remover a execution role» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.10.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 47,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1102: Lambda order-writer falha ao PutItem no DynamoDB com AccessDenied.",
+    "cli_output": "$ aws sts get-caller-identity\n# from inside function simulation\nArn: arn:aws:sts::111122223333:assumed-role/order-writer-role/...\n\n$ aws lambda get-function-configuration --function-name order-writer\nRole: arn:aws:iam::111122223333:role/order-writer-role\n\n$ aws iam list-attached-role-policies --role-name order-writer-role\nAttached: AWSLambdaBasicExecutionRole\n# only logs\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/order-writer --filter-pattern \"AccessDenied\"\n... User is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:us-east-1:111122223333:table/Orders\n\nTimeout: 10  MemorySize: 256  # not the failing axis",
+    "alternativas": [
+      "Anexar policy com dynamodb:PutItem no ARN da tabela Orders à execution role",
+      "Só aumentar o timeout para 900",
+      "Só habilitar reserved concurrency 100",
+      "Só colocar a function em VPC sem endpoints"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1102: Lambda order-writer falha ao PutItem no DynamoDB com AccessDenied.…), a ação correta é: Anexar policy com dynamodb:PutItem no ARN da tabela Orders à execution role. «Só aumentar o timeout para 900» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.10.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 48,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1103: Function checkout-fn com reserved concurrency 5; Black Friday gera milhares de 429.",
+    "cli_output": "$ aws lambda get-function-concurrency --function-name checkout-fn\nReservedConcurrentExecutions: 5\n\n$ aws cloudwatch get-metric-statistics --namespace AWS/Lambda --metric-name Throttles \\\n  --dimensions Name=FunctionName,Value=checkout-fn ...\n# Throttles spike 10:00–11:00\n\n$ aws cloudwatch get-metric-statistics ... ConcurrentExecutions\n# plateaus at 5\n\n# API Gateway integration sync → user-facing 429/5xx\n# SQS buffer not in front of checkout-fn",
+    "alternativas": [
+      "Aumentar reserved concurrency (com base na conta) e/ou colocar SQS buffer + async para absorver picos",
+      "Apagar o log group",
+      "Remover a policy de logs para 'ir mais rápido'",
+      "Trocar o runtime sem mudar concurrency"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1103: Function checkout-fn com reserved concurrency 5; Black Friday gera milhares de 429.…), a ação correta é: Aumentar reserved concurrency (com base na conta) e/ou colocar SQS buffer + async para absorver picos. «Apagar o log group» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.10.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 49,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1104: Lambda em VPC não alcança Secrets Manager; IAM GetSecretValue ok.",
+    "cli_output": "$ aws lambda get-function-configuration --function-name pay-fn\nVpcConfig:\n  SubnetIds: [subnet-0priva, subnet-0privb]\n  SecurityGroupIds: [sg-lambda]\nTimeout: 10\n\n$ aws iam get-role-policy --role-name pay-fn-role --policy-name secrets\n# Allow secretsmanager:GetSecretValue on arn:...:secret:prod/db-*\n# Allow kms:Decrypt on cmk-sec\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/pay-fn --filter-pattern \"timeout\"\n... Task timed out after 10.00 seconds\n# stack shows hang on GetSecretValue HTTP client\n\n$ aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=vpc-0app\nNatGateways: []\n\n$ aws ec2 describe-vpc-endpoints --filters Name=vpc-id,Values=vpc-0app\n# no secretsmanager or kms interface endpoints\n\n$ aws ec2 describe-route-tables --filters Name=association.subnet-id,Values=subnet-0priva\nRoutes: 10.0.0.0/16 local   # no 0.0.0.0/0 to nat",
+    "alternativas": [
+      "Criar VPC endpoints (secretsmanager/kms) ou NAT + rota 0.0.0.0/0 nas subnets da Lambda — IAM já está ok",
+      "Remover GetSecretValue da role",
+      "Desabilitar a CMK",
+      "Só aumentar memory para 10 GB"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1104: Lambda em VPC não alcança Secrets Manager; IAM GetSecretValue ok.…), a ação correta é: Criar VPC endpoints (secretsmanager/kms) ou NAT + rota 0.0.0.0/0 nas subnets da Lambda — IAM já está ok. «Remover GetSecretValue da role» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.10.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 50,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1105: Fila orders-q tem 2k msgs; Lambda orders-worker não é invocada.",
+    "cli_output": "$ aws sqs get-queue-attributes --queue-url .../orders-q --attribute-names ApproximateNumberOfMessagesVisible\nApproximateNumberOfMessagesVisible: 2044\n\n$ aws lambda list-event-source-mappings --function-name orders-worker\n[\n  {\n    \"UUID\": \"1111-2222\",\n    \"EventSourceArn\": \"arn:aws:sqs:us-east-1:111122223333:orders-q\",\n    \"State\": \"Enabled\",\n    \"LastProcessingResult\": \"PROBLEM: Function call failed\",\n    \"BatchSize\": 10\n  }\n]\n\n$ aws iam list-attached-role-policies --role-name orders-worker-role\nAWSLambdaBasicExecutionRole\n# missing sqs:ReceiveMessage, DeleteMessage, GetQueueAttributes on orders-q\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/orders-worker --filter-pattern \"AccessDenied\"\n... not authorized to perform: sqs:ReceiveMessage ...",
+    "alternativas": [
+      "Permitir sqs:ReceiveMessage/DeleteMessage/GetQueueAttributes na role e corrigir o mapping até LastProcessingResult OK",
+      "Apagar todas as mensagens da fila sem fix de IAM",
+      "Desabilitar o event source mapping e esperar",
+      "Trocar a fila para FIFO sem policy SQS na role"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Mapping enabled mas AccessDenied ReceiveMessage impede o poller. Apagar msgs esconde o backlog sem corrigir IAM. Tip de prova: SQS cheia + Lambda idle + AccessDenied ReceiveMessage → IAM SQS na execution role.",
+    "part_id": "aws-1.10",
+    "source": "aws"
+  },
+  {
+    "id": 51,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1111: API PutItem falha com ProvisionedThroughputExceeded em horários de pico.",
+    "cli_output": "$ aws dynamodb describe-table --table-name Orders\nBillingModeSummary.BillingMode: PROVISIONED\nProvisionedThroughput:\n  ReadCapacityUnits: 5\n  WriteCapacityUnits: 5\n\n$ aws cloudwatch get-metric-statistics --namespace AWS/DynamoDB \\\n  --metric-name WriteThrottleEvents --dimensions Name=TableName,Value=Orders ...\n# spikes matching traffic peaks\n\n$ aws cloudwatch get-metric-statistics ... ConsumedWriteCapacityUnits\n# saturates near 5\n\n# App errors:\nProvisionedThroughputExceededException: The level of configured write capacity...\n\n# Hot key analysis (sample): 70% of writes PK=TENANT#1",
+    "alternativas": [
+      "Aumentar WCU (e/ou auto scaling) e/ou redesenhar PK para reduzir hot tenant — 5 WCU satura e TENANT#1 concentra writes",
+      "Abrir 443 no SG da tabela (N/A)",
+      "Trocar só o runtime da Lambda",
+      "Criar CNAME no apex"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1111: API PutItem falha com ProvisionedThroughputExceeded em horários de pico.…), a ação correta é: Aumentar WCU (e/ou auto scaling) e/ou redesenhar PK para reduzir hot tenant — 5 WCU satura e TENANT#1 concentra writes. «Abrir 443 no SG da tabela (N/A)» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.11.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 52,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1112: Lambda order-api AccessDenied em GetItem.",
+    "cli_output": "$ aws sts get-caller-identity\nArn: arn:aws:sts::111122223333:assumed-role/order-api-role/...\n\n$ aws iam list-attached-role-policies --role-name order-api-role\nAWSLambdaBasicExecutionRole\n# logs only\n\n$ aws logs filter-log-events --log-group-name /aws/lambda/order-api --filter-pattern \"AccessDenied\"\n... not authorized to perform: dynamodb:GetItem\non resource: arn:aws:dynamodb:us-east-1:111122223333:table/Orders\n\n$ aws dynamodb describe-table --table-name Orders\nTableStatus: ACTIVE\n# table healthy; RCU plenty",
+    "alternativas": [
+      "Anexar policy com dynamodb:GetItem no ARN da tabela Orders à role order-api-role",
+      "Só aumentar RCU para 1000",
+      "Só mudar para on-demand",
+      "Só habilitar TTL"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1112: Lambda order-api AccessDenied em GetItem.…), a ação correta é: Anexar policy com dynamodb:GetItem no ARN da tabela Orders à role order-api-role. «Só aumentar RCU para 1000» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.11.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 53,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1113: Endpoint de listagem de pedidos por customer está lento e caro; código usa Scan.",
+    "cli_output": "$ # App code path (review):\n# Scan Orders with FilterExpression customerId = :c\n\n$ aws dynamodb describe-table --table-name Orders\nKeySchema: HASH userId, RANGE orderId\n# no GSI on customerId\nBillingMode: PAY_PER_REQUEST\n\n$ aws cloudwatch get-metric-statistics --metric-name ConsumedReadCapacityUnits \\\n  --dimensions Name=TableName,Value=Orders\n# high read consumption correlated with list-by-customer API\n\n$ aws xray / logs: Scan latency multi-second as table grows\n# Table item count: 12M+",
+    "alternativas": [
+      "Introduzir access pattern com PK=customerId (tabela ou GSI) e trocar Scan por Query",
+      "Manter Scan e reduzir timeout da API para 100ms",
+      "Desligar encryption",
+      "Remover a sort key apenas"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1113: Endpoint de listagem de pedidos por customer está lento e caro; código usa Scan.…), a ação correta é: Introduzir access pattern com PK=customerId (tabela ou GSI) e trocar Scan por Query. «Manter Scan e reduzir timeout da API para 100ms» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.11.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 54,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1114: Novo requisito Query por email; só existe PK=userId.",
+    "cli_output": "$ aws dynamodb describe-table --table-name Users\nKeySchema: HASH userId\nAttributeDefinitions: userId S, email S\nGlobalSecondaryIndexes: []\nLocalSecondaryIndexes: []\n\n$ # Product request: login lookup by email must be Query under 20ms\n# Current code: Scan + FilterExpression email = :e  (p99 multi-second)\n\n$ aws cloudwatch ... UserErrors / successful requests\n# functional but not scalable",
+    "alternativas": [
+      "Criar GSI com PK=email (projection adequada) e passar o login a Query no índice",
+      "Criar LSI com PK=email (LSI não pode mudar a PK da base)",
+      "Só aumentar memory da Lambda",
+      "Só abrir 0.0.0.0/0 no SG"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1114: Novo requisito Query por email; só existe PK=userId.…), a ação correta é: Criar GSI com PK=email (projection adequada) e passar o login a Query no índice. «Criar LSI com PK=email (LSI não pode mudar a PK da base)» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.11.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 55,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1115: Tabela analytics com tráfego quase zero a semana e picos de batch mensal; está PROVISIONED 2000/2000 ociosa.",
+    "cli_output": "$ aws dynamodb describe-table --table-name AnalyticsEvents\nBillingModeSummary.BillingMode: PROVISIONED\nProvisionedThroughput: RCU 2000 WCU 2000\n\n$ aws cloudwatch get-metric-statistics --metric-name ConsumedWriteCapacityUnits ...\n# most days near 0; one day month-end spike to ~1500 WCU for 3 hours\n\n$ aws ce / cost explorer note:\n# DynamoDB cost dominated by provisioned capacity idle time\n\n# Team rejects multi-hour capacity planning meetings",
+    "alternativas": [
+      "Migrar para on-demand (ou auto scaling agressivo) — provisioned 2000 ocioso a maior parte do mês é desperdício com pico curto",
+      "Manter 2000/2000 e fazer Scan diário para 'esquentar'",
+      "Apagar a tabela toda segunda",
+      "Trocar PK para status"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1115: Tabela analytics com tráfego quase zero a semana e picos de batch mensal; está PROVISI…), a ação correta é: Migrar para on-demand (ou auto scaling agressivo) — provisioned 2000 ocioso a maior parte do mês é desperdício com pico curto. «Manter 2000/2000 e fazer Scan diário para 'esquentar'» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.11.",
+    "part_id": "aws-1.11",
+    "source": "aws"
+  },
+  {
+    "id": 56,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1121: CPU da EC2 > 90% por 15 min; alarme HighCPU nunca entrou em ALARM.",
+    "cli_output": "$ aws cloudwatch describe-alarms --alarm-names HighCPU\nStateValue: OK\nMetricName: CPUUtilization\nNamespace: AWS/EC2\nStatistic: Average\nPeriod: 300\nEvaluationPeriods: 3\nDatapointsToAlarm: 3\nThreshold: 95.0\nComparisonOperator: GreaterThanThreshold\nDimensions: [{Name: InstanceId, Value: i-0deadbeef}]\nTreatMissingData: missing\n\n$ aws cloudwatch get-metric-statistics --namespace AWS/EC2 --metric-name CPUUtilization \\\n  --dimensions Name=InstanceId,Value=i-0LIVE123 ...\n# Average ~92% last 15 min on LIVE instance\n\n$ aws ec2 describe-instances --instance-ids i-0deadbeef\nState: terminated\n# Alarm still points to old InstanceId after replace",
+    "alternativas": [
+      "Corrigir dimensão InstanceId para a instance atual (ou métrica de ASG) e reavaliar threshold 95 vs 90 — alarme olha série morta em OK",
+      "Só criar invalidation CloudFront",
+      "Só abrir 22 0.0.0.0/0",
+      "Apagar o log group da Lambda"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1121: CPU da EC2 > 90% por 15 min; alarme HighCPU nunca entrou em ALARM.…), a ação correta é: Corrigir dimensão InstanceId para a instance atual (ou métrica de ASG) e reavaliar threshold 95 vs 90 — alarme olha série morta em OK. «Só criar invalidation CloudFront» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.12.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 57,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1122: Alarme DiskFree fica INSUFFICIENT_DATA há dias.",
+    "cli_output": "$ aws cloudwatch describe-alarms --alarm-names DiskFree\nStateValue: INSUFFICIENT_DATA\nNamespace: CWAgent\nMetricName: disk_used_percent\nDimensions: [{Name: InstanceId, Value: i-0app1}, {Name: path, Value: /data}, {Name: device, Value: xvdf}]\nPeriod: 60\nEvaluationPeriods: 5\n\n$ aws ec2 describe-instances --instance-ids i-0app1\nState: stopped\n\n$ aws cloudwatch list-metrics --namespace CWAgent --metric-name disk_used_percent\n# no recent metrics for i-0app1\n\n# Agent not running while stopped; no PutMetricData",
+    "alternativas": [
+      "Instance stopped → sem datapoints do agent; inicie a instance/agent ou trate missing data / alarme em outro recurso — INSUFFICIENT_DATA não é OK",
+      "Subir o threshold para 1000%",
+      "Trocar o alarme para Sum de CPU de outra conta",
+      "Desligar o SNS topic de prod"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1122: Alarme DiskFree fica INSUFFICIENT_DATA há dias.…), a ação correta é: Instance stopped → sem datapoints do agent; inicie a instance/agent ou trate missing data / alarme em outro recurso — INSUFFICIENT_DATA não é OK. «Subir o threshold para 1000%» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.12.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 58,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1123: Fatura CloudWatch Logs em alta; dev log groups sem retention.",
+    "cli_output": "$ aws logs describe-log-groups --log-group-name-prefix /aws/lambda/dev\nlogGroupName: /aws/lambda/dev-api    retentionInDays: null\nlogGroupName: /aws/lambda/dev-worker retentionInDays: null\nstoredBytes: multi-GB each\n\n$ aws ce get-cost-and-usage ... \n# CloudWatch Logs storage trending up MoM\n\n# Prod groups correctly set retentionInDays: 30",
+    "alternativas": [
+      "put-retention-policy nos groups dev (ex. 7–14 dias) e reduzir log verbosity — null retention = keep forever",
+      "Aumentar reserved concurrency de todas as Lambdas",
+      "Criar mais dashboards high-resolution",
+      "Desabilitar alarmes de prod"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1123: Fatura CloudWatch Logs em alta; dev log groups sem retention.…), a ação correta é: put-retention-policy nos groups dev (ex. 7–14 dias) e reduzir log verbosity — null retention = keep forever. «Aumentar reserved concurrency de todas as Lambdas» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.12.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 59,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1124: ASG web-asg não sobe com CPU 85%; policy existe.",
+    "cli_output": "$ aws autoscaling describe-policies --auto-scaling-group-name web-asg\nPolicyName: scale-out-cpu\nAdjustment: +2\nMetricAggregationType: Average\n# Alarms: [cpu-high-web]\n\n$ aws cloudwatch describe-alarms --alarm-names cpu-high-web\nStateValue: OK\nMetricName: CPUUtilization\nNamespace: AWS/EC2\nDimensions: [{Name: AutoScalingGroupName, Value: web-asg-OLD}]\nThreshold: 60\nComparisonOperator: GreaterThanThreshold\nAlarmActions: [arn:aws:autoscaling:...:scalingPolicy:...:policyName/scale-out-cpu]\n\n$ aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names web-asg\nAutoScalingGroupName: web-asg\nDesiredCapacity: 2\n# CPU on current instances ~85% (from instance metrics)",
+    "alternativas": [
+      "Corrigir a dimensão AutoScalingGroupName do alarme para web-asg (não web-asg-OLD) para o estado ir a ALARM e acionar a policy",
+      "Apagar a scaling policy",
+      "Só aumentar o MaxSize sem alarme",
+      "Mudar o health check R53 do site"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1124: ASG web-asg não sobe com CPU 85%; policy existe.…), a ação correta é: Corrigir a dimensão AutoScalingGroupName do alarme para web-asg (não web-asg-OLD) para o estado ir a ALARM e acionar a policy. «Apagar a scaling policy» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.12.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  },
+  {
+    "id": 60,
+    "question_type": "ticket",
+    "isPremium": true,
+    "sintoma": "NOC-AWS-1125: Lambda checkout Errors > 50/5min; time não recebeu page.",
+    "cli_output": "$ aws cloudwatch get-metric-statistics --namespace AWS/Lambda --metric-name Errors \\\n  --dimensions Name=FunctionName,Value=checkout --period 300 --statistics Sum\n# Sum Errors: 62, 71, 55 over last windows\n\n$ aws cloudwatch describe-alarms --alarm-name-prefix checkout\n# empty — no alarms\n\n$ aws sns list-topics\n# topic arn:aws:sns:us-east-1:111122223333:oncall exists with email sub ACTIVE\n\n# On-call: zero emails about checkout",
+    "alternativas": [
+      "Criar alarme Errors Sum com threshold/period adequados e AlarmActions = SNS oncall — métrica existe, falta alarme→SNS",
+      "Só aumentar memory da function",
+      "Só apagar o log group",
+      "Só desabilitar a function"
+    ],
+    "resposta_correta": 0,
+    "explicacao_profunda": "Pela evidência do chamado (NOC-AWS-1125: Lambda checkout Errors > 50/5min; time não recebeu page.…), a ação correta é: Criar alarme Errors Sum com threshold/period adequados e AlarmActions = SNS oncall — métrica existe, falta alarme→SNS. «Só aumentar memory da function» não se deduz do cli_output e não corrige a causa raiz. Tip de prova: use uma linha do output (erro, estado ou policy) deste ticket aws-1.12.",
+    "part_id": "aws-1.12",
+    "source": "aws"
+  }
+]

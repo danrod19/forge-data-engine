@@ -1,0 +1,46 @@
+[
+  {
+    "file": "src/data/parts/part-1.1-tickets.json",
+    "n": 5
+  },
+  {
+    "file": "src/data/parts/part-1.2-tickets.json",
+    "n": 5
+  },
+  {
+    "file": "src/data/parts/part-1.3-tickets.json",
+    "n": 5
+  },
+  {
+    "file": "src/data/parts/part-1.4-tickets.json",
+    "n": 5
+  },
+  {
+    "file": "src/data/parts/part-1.5-tickets.json",
+    "n": 5
+  },
+  {
+    "file": "src/data/parts/part-1.6-tickets.json",
+    "n": 5
+  },
+  {
+    "file": "src/data/tickets_module2.json",
+    "n": 25
+  },
+  {
+    "file": "src/data/tickets_module3.json",
+    "n": 25
+  },
+  {
+    "file": "src/data/tickets_module4.json",
+    "n": 25
+  },
+  {
+    "file": "src/data/tickets_module5.json",
+    "n": 25
+  },
+  {
+    "file": "src/data/tickets_module6.json",
+    "n": 25
+  }
+]

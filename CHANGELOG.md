@@ -4,6 +4,48 @@
 
 ## Entradas Recentes
 
+- **2026-08-18** — Decisão B + bloco curadoria de texto fechado (DECISIONS.md)
+  - Opção A (explicações PT / enunciados EN) e Opção B (Trilha AWS = cenários) gravadas como lei
+  - Tabela de escopo: tickets V1/V2/AWS + traditional V1/V2/AWS OK; próximo foco ≠ reescrita em massa
+
+- **2026-08-18** — Trilha AWS = cenários de arquitetura (sem terminal)
+  - `getTicketsPool("aws")` → `awsTrilhaScenarios` (questions_aws_traditional)
+  - UI: “Cenário · Arquitetura”; TerminalCLI só em tickets CCNA
+  - `tickets_aws.json` preservado (não é mais o hub da Trilha)
+
+- **2026-08-18** — Traditional V1 UI pool: 949 explicações reescritas em PT
+  - Fontes: `parts/part-1.*-questions.json` (+ drill) + `questions_module2…6_traditional.json`
+  - UI: `simuladoQuestionsCurated` / `getPartQuestions` — sem `questions_traditional_FINAL.json`
+  - bad=0; 2 enunciados só OCR; report `scripts/output/questions_v1_traditional_review_report.md`
+
+- **2026-08-18** — Traditional AWS: 360 explicações reescritas em PT (Simulado/Estudo)
+  - Fonte: `src/data/questions_aws_traditional.json` via `aws-banks.ts`
+  - Gabarito/alternativas/enunciados intactos (bad=0); report `scripts/output/questions_aws_traditional_review_report.md`
+
+- **2026-08-18** — Traditional V2: 506 explicações reescritas em PT (Simulado/Estudo)
+  - Fonte: `src/data/questions_v2_traditional.json` via `v2-banks.ts`
+  - Gabarito/alternativas/enunciados intactos (bad=0); report `scripts/output/questions_v2_traditional_review_report.md`
+
+- **2026-08-18** — Trilha V1: 155 tickets do pool curated revisados (PT humano)
+  - Fontes: `parts/part-1.1…1.6-tickets.json` + `tickets_module2…6.json`
+  - UI: `getTicketsPool("ccna-v1")` → `curatedModuleTickets` (sem merge/unique/bulk)
+  - bad gabarito=0; report `scripts/output/tickets_v1_trilha_review_report.md`
+
+- **2026-08-17** — Trilha AWS: 60 tickets revisados (sintoma + explicação em PT humano)
+  - Fonte: `src/data/tickets_aws.json` (UI via `getTicketsPool("aws")`)
+  - Gabarito/alternativas/CLI intactos (bad=0); report `scripts/output/tickets_aws_review_report.md`
+
+- **2026-08-17** — Trilha V2: 85 tickets revisados (sintoma + explicação em PT humano)
+  - Fonte: `src/data/tickets_v2.json` (UI via `getTicketsPool("ccna-v2")`)
+  - Gabarito/alternativas/CLI intactos; report em `scripts/output/tickets_v2_review_report.md`
+
+- **2026-08-17** — Jornada de estudo + Simulado Conhecimento (PT) / Prova (EN)
+  - Home: bloco “Como estudar” (Estudo → Trilha → Simulado PT → Simulado EN)
+  - `question-lang.ts` + `npm run report:lang` (totais pt/en/mixed por track)
+  - Simulado: 2 modos; pool filtrado; mixed entra nos dois
+  - Estudo: preferência PT na prática; aviso se fallback EN
+  - Sem reescrita de explicações / sem mudança de gabarito
+
 - **2026-08-17** — Estudo com leitura + copy multi-track
   - Fluxo Estudo: Conteúdo (`study_notes`) → Marcar como lido → Praticar até 30
   - `estudo-content.ts` + bank (V1 31 · V2 17 · AWS 12); progresso `contentRead`/`lastReadAt` por track

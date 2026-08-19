@@ -21,62 +21,68 @@
   ],
   "study_notes": [
     {
-      "heading": "Por que NAT no edge",
+      "heading": "O que é NAT IPv4 no edge",
       "bullets": [
-        "Redes internas usam RFC1918; a Internet pública exige endereços roteáveis.",
-        "NAT traduz source (inside source) na borda: hosts saem com IP global; topologia interna fica oculta.",
-        "No CCNA: static, dynamic pool e PAT (overload) — configure, verify e diagnose."
+        "NAT traduz endereços na borda: hosts RFC1918 saem para a Internet com IP global; a topologia interna fica oculta e economiza-se IPv4 público.",
+        "No CCNA 200-301 v2.0 (módulo 4 · 4.3) o verbo é Configure: static 1:1, pool dinâmico e PAT (overload), com Verify (translations/statistics) e Diagnose de zero translations / pool esgotado.",
+        "Foco usual: ip nat inside source (traduz o source do tráfego originating inside).",
+        "Sem ip nat inside e ip nat outside corretos, não há tradução — mesmo com ACL e pool ‘certos’ no papel."
       ],
       "exam_tips": [
-        "Sem ip nat inside e ip nat outside corretos, não há tradução even with ACL/pool."
+        "Primeiro confira inside/outside nas interfaces; depois ACL e static/pool/overload."
+      ]
+    },
+    {
+      "heading": "Quando usar / quando NÃO (prova e TShoot)",
+      "bullets": [
+        "Use PAT/overload (list + interface WAN overload) para saída de muitos usuários com um (ou poucos) público(s).",
+        "Use static 1:1 para servidor interno que precisa de global fixo (publicação ou dispositivo dedicado).",
+        "Use pool dinâmico sem overload só quando há públicos suficientes para sessões 1:1 sob demanda.",
+        "NÃO inverta inside/outside — tráfego pode rotear sem criar translations.",
+        "NÃO espere que static sozinho dê Internet a toda a LAN — complete com PAT para o resto.",
+        "NÃO use pool pequeno sem overload e culpe ‘DNS’ quando novos hosts falham (pool esgotado).",
+        "NÃO trate a ACL da NAT como firewall deny genérico: ela marca interesting traffic (quem pode traduzir)."
+      ],
+      "exam_tips": [
+        "Static ok + resto da LAN sem net → falta list + overload; pool misses → esgotamento sem PAT."
+      ]
+    },
+    {
+      "heading": "Exemplo concreto (lab Configure)",
+      "bullets": [
+        "LAN 10.40.0.0/24 (inside) → edge → WAN com IP público no Gi0/0 (outside).",
+        "Gi0/1: ip nat inside; Gi0/0: ip nat outside.",
+        "Usuários: access-list 1 permit 10.40.0.0 0.0.0.255; ip nat inside source list 1 interface GigabitEthernet0/0 overload.",
+        "Servidor 10.40.0.10 publicado: ip nat inside source static 10.40.0.10 203.0.113.10 (global dedicado).",
+        "Verify: host navega → show ip nat translations (local↔global); show ip nat statistics; teste de Internet do PC."
+      ],
+      "exam_tips": [
+        "PAT com IP da WAN: list + interface <wan> overload é o padrão de saída de usuários no exame."
       ]
     },
     {
       "heading": "Termos inside local / inside global",
       "bullets": [
         "Inside local: IP real do host na LAN (ex. 10.40.0.50).",
-        "Inside global: IP como o host aparece na Internet (ex. 203.0.113.10).",
-        "Outside global: IP do destino na Internet (ideia).",
-        "show ip nat translations lista o mapeamento local ↔ global."
+        "Inside global: IP como o host aparece ‘de fora’ / na Internet (ex. 203.0.113.10).",
+        "Outside global: IP do destino na Internet (ideia); outside local raramente é o foco do CCNA.",
+        "show ip nat translations lista o mapeamento local ↔ global — leia as colunas antes de chutar."
       ],
       "exam_tips": [
-        "Leia a tabela: Inside global é o que o mundo vê; Inside local é o da LAN."
+        "Inside global = o que o mundo vê; Inside local = o da LAN. Não inverta na leitura da tabela."
       ]
     },
     {
-      "heading": "Static NAT 1:1",
+      "heading": "Static, pool dinâmico e PAT overload",
       "bullets": [
-        "ip nat inside source static <local> <global> — sempre o mesmo par.",
-        "Útil para servidor interno publicado com IP fixo ou dispositivo que precisa de global dedicado.",
-        "Não escala sozinho para centenas de hosts de usuário (aí entra pool/PAT).",
-        "Conflito: mesmo global em static e no pool."
-      ],
-      "exam_tips": [
-        "Static não substitui PAT para a LAN inteira — só o host mapeado."
-      ]
-    },
-    {
-      "heading": "Dynamic pool e PAT overload",
-      "bullets": [
-        "ip nat pool + ACL (access-list) define quem pode traduzir e para quais globais.",
-        "Sem overload: 1 host ativo ≈ 1 IP do pool; pool pequeno esgota (hosts novos falham).",
-        "overload (PAT): muitos locais compartilham um global (interface ou pool) usando portas L4.",
-        "ip nat inside source list <acl> interface <wan> overload é o padrão de saída de usuários."
-      ],
-      "exam_tips": [
-        "ACL da NAT é ‘interessante traffic’ (quem traduz), não a mesma lógica de firewall deny genérico."
-      ]
-    },
-    {
-      "heading": "Inside / outside e ordem mental",
-      "bullets": [
-        "Interface para a LAN/stub: ip nat inside.",
-        "Interface para a Internet/provider: ip nat outside.",
-        "Invertidos → tráfego pode rotear sem criar translations.",
+        "Static: ip nat inside source static <local> <global> — par fixo 1:1; não escala sozinho para centenas de PCs.",
+        "Dynamic pool: ip nat pool + ACL; sem overload ≈ 1 host ativo por IP do pool — pool pequeno esgota.",
+        "PAT/overload: muitos locais compartilham um global (interface ou pool) com portas L4.",
+        "Conflito clássico: mesmo global em static e no pool.",
         "Fluxo: host inside → edge traduz source → outside → Internet."
       ],
       "exam_tips": [
-        "show run | include nat e show ip interface | include NAT fecham o verify de direção."
+        "ACL da NAT = quem traduz (permit da LAN); subnet errada = esses IPs nunca entram na tabela NAT."
       ]
     },
     {
@@ -93,16 +99,29 @@
       ]
     },
     {
-      "heading": "Configure e Verify",
+      "heading": "Armadilhas comuns da prova",
       "bullets": [
-        "1) Marcar inside/outside.",
-        "2) Static e/ou list+pool/interface overload.",
-        "3) ACL de quem sai (permit da LAN).",
-        "4) show ip nat translations; show ip nat statistics; teste de Internet do host.",
-        "5) clear ip nat translation * só com consciência (derruba sessões)."
+        "Marcar ‘falta rota default’ quando show ip nat translations está vazio e inside/outside estão invertidos.",
+        "Static para o server e esquecer overload para os usuários.",
+        "Pool /24 de públicos ‘sobrando’ no enunciado vs pool /30 sem overload — esgotamento.",
+        "ACL deny/permit copiada de firewall sem casar a LAN interesting traffic.",
+        "clear ip nat translation * como primeiro passo sem ler statistics (derruba sessões).",
+        "Confundir inside local com inside global na leitura do output."
       ],
       "exam_tips": [
-        "PAT usa a interface outside com overload quando o público é o IP da WAN."
+        "Checklist: inside/outside → ACL → static e/ou overload → translations/statistics."
+      ]
+    },
+    {
+      "heading": "Ligação com Simulado e Trilha CLI",
+      "bullets": [
+        "No Estudo, fixe termos local/global + inside/outside + static vs PAT overload.",
+        "No Simulado V2, espere outputs de show ip nat translations/statistics e stems de ‘LAN sem Internet’ / ‘pool esgotado’.",
+        "Na Trilha CCNA V2 (tickets CLI), confira section nat e flags inside/outside antes de reescrever o pool inteiro.",
+        "Pratique: ‘inside/outside invertido’, ‘falta overload’, ‘ACL fora da subnet’, ‘static ≠ PAT da LAN’."
+      ],
+      "exam_tips": [
+        "Ordem sugerida: notas → marcar lido → questões da part → tickets NAT na Trilha → Simulado."
       ]
     }
   ],

@@ -21,38 +21,57 @@
   ],
   "study_notes": [
     {
-      "heading": "Acesso remoto seguro no device",
+      "heading": "O que é acesso remoto e cópia segura",
       "bullets": [
-        "No CCNA 4.2 o foco é Configure e Verify de gestão remota e cópia de arquivos com segurança adequada ao ambiente.",
-        "SSH (preferencialmente v2) cifra o canal de administração; Telnet envia tudo em claro (usuário, senha, comandos).",
-        "Produção: SSH only nas VTYs; lab isolado pode ainda ver Telnet/TFTP por legado."
+        "Gestão remota do device e transferência de arquivos (config/IOS) precisam de canal adequado ao risco da rede.",
+        "SSH (preferencialmente v2) cifra a sessão de administração; Telnet manda usuário, senha e comandos em claro.",
+        "SCP/SFTP reutilizam SSH para cópia cifrada; TFTP/FTP são inseguros ou só aceitáveis em lab/isolado.",
+        "No CCNA 200-301 v2.0 (módulo 4 · 4.2) o verbo é Configure: habilitar SSH, endurecer VTY e escolher protocolo de copy certo — com Verify/TShoot básico."
       ],
       "exam_tips": [
         "transport input ssh (sem telnet) é a resposta típica quando pedem endurecer o VTY."
       ]
     },
     {
-      "heading": "Habilitar SSH no IOS (ideia de fluxo)",
+      "heading": "Quando usar / quando NÃO (prova e TShoot)",
       "bullets": [
-        "1) hostname e ip domain-name (FQDN lógico do device).",
-        "2) crypto key generate rsa [modulus 2048] — gera o par de chaves do servidor SSH.",
-        "3) ip ssh version 2 (quando suportado/desejado).",
-        "4) username ... privilege/secret; line vty 0 4 → login local; transport input ssh.",
-        "Sem chave RSA (ou sem domain-name/hostname adequados) o SSH frequentemente falha ao iniciar."
+        "Use SSH v2 + login local nas VTYs em qualquer gestão que possa ser snifada (produção, lab compartilhado).",
+        "Use SCP ou SFTP para backup/restore de running-config sensível em caminho não confiável.",
+        "Use TFTP só em lab isolado, bootstrap ou rede controlada — UDP 69, sem auth/cifra.",
+        "NÃO deixe transport input telnet (ou all) em cenário de produção/segurança.",
+        "NÃO espere SSH subir sem hostname, ip domain-name e crypto key generate rsa.",
+        "NÃO use FTP/TFTP para segredos em link exposto; NÃO confunda falha de SSH com ‘ping down’ sem checar access-class.",
+        "NÃO traga AnyConnect/IPsec full, TACACS profundo ou NETCONF como substituto deste tópico."
       ],
       "exam_tips": [
-        "show ip ssh confirma versão e se o servidor SSH está enabled."
+        "Produção sensível + file transfer → SCP/SFTP; lab bootstrap → TFTP ainda aparece como distractor aceitável só se o enunciado for isolado."
       ]
     },
     {
-      "heading": "line vty e access-class",
+      "heading": "Exemplo concreto (lab Configure)",
       "bullets": [
-        "As linhas VTY aceitam sessões remotas (SSH/Telnet conforme transport input).",
-        "login local usa a base de usuários locais; AAA corporativo existe, mas o CCNA cobre o modelo local com leveza.",
-        "access-class <acl> in limita de quais IPs/subnets o admin pode conectar — ACL errada = admin legítimo bloqueado."
+        "hostname R-EDGE; ip domain-name lab.local; crypto key generate rsa general-keys modulus 2048; ip ssh version 2.",
+        "username admin privilege 15 secret <senha>; line vty 0 4 → login local; transport input ssh; (opcional) access-class MGMT in.",
+        "Verify: show ip ssh (enabled, v2); do PC: ssh -l admin <ip> deve entrar; telnet deve falhar se só ssh estiver no transport.",
+        "Backup: copy running-config scp: (ou sftp:) para o servidor de gestão — mesma base de usuário/SSH.",
+        "TShoot rápido: ping ok + SSH timeout → access-class/ACL; Telnet sobe e SSH não → transport ou chave ausente."
       ],
       "exam_tips": [
-        "SSH timeout com ping ok: confira transport, chave, usuário e access-class/ACL."
+        "show ip ssh confirma se o servidor SSH está enabled antes de culpar o cliente."
+      ]
+    },
+    {
+      "heading": "Fluxo SSH no IOS + VTY",
+      "bullets": [
+        "1) hostname e ip domain-name (FQDN lógico do device).",
+        "2) crypto key generate rsa [modulus 2048] — par de chaves do servidor SSH.",
+        "3) ip ssh version 2 (quando suportado/desejado).",
+        "4) username ... secret; line vty 0 4 → login local; transport input ssh.",
+        "access-class <acl> in limita origem do admin — ACL errada = admin legítimo bloqueado.",
+        "Sem chave (ou sem domain-name/hostname adequados) o SSH frequentemente falha ao iniciar."
+      ],
+      "exam_tips": [
+        "SSH timeout com ping ok: confira transport, chave, usuário e access-class/ACL — nessa ordem."
       ]
     },
     {
@@ -62,46 +81,37 @@
         "FTP — TCP — user/senha e dados em claro — evitar em links não confiáveis.",
         "SCP — sobre SSH — cifrado — backup/restore de config em produção.",
         "SFTP — sobre SSH — cifrado — file transfer seguro interativo/script.",
-        "Regra: se o caminho pode ser snifado, não use Telnet/FTP/TFTP para segredos."
+        "Regra: se o caminho pode ser snifado, não use Telnet/FTP/TFTP para segredos.",
+        "copy scp:/sftp: exige SSH funcional (mesma base de chaves/usuário); falha também por privilege, path ou espaço em flash."
       ],
       "exam_tips": [
-        "Pergunta de produção sensível → SCP ou SFTP, não TFTP."
+        "SSH sobe mas copy scp falha: usuário/privilege, path ou ACL de gestão — não ‘regenerar chave’ como primeiro reflexo."
       ]
     },
     {
-      "heading": "copy e operações típicas",
+      "heading": "Armadilhas comuns da prova",
       "bullets": [
-        "copy running-config tftp: / ftp: / scp: / sftp: (sintaxe varia; ideia: origem → destino).",
-        "copy tftp: running-config ou flash: para carregar IOS/config em lab.",
-        "SCP/SFTP exigem SSH funcional no device (mesma base de chaves/usuário).",
-        "Falha de copy: reachability, credenciais, protocolo permitido, espaço em flash."
+        "Deixar Telnet habilitado ‘porque ainda funciona no lab’ em pergunta de hardenização.",
+        "Esquecer crypto key generate rsa e culpar só o username.",
+        "access-class que nega a subnet do jump host — ping à interface ok, SSH timeout.",
+        "Escolher TFTP para backup de produção com senhas na config.",
+        "Marcar VPN client full / TACACS enterprise quando o stem pede só VTY + SSH/SCP.",
+        "Telnet conecta e SSH não: transport input telnet ou chave ausente — evidência clássica."
       ],
       "exam_tips": [
-        "SSH sobe mas copy scp falha: usuário/privilege, path, ou ACL de gestão."
-      ]
-    },
-    {
-      "heading": "Verify e TShoot rápido",
-      "bullets": [
-        "show ip ssh — versão, autenticação, status.",
-        "show run | section vty / include username|ssh|domain-name.",
-        "Do PC: ssh -l admin <ip> vs telnet <ip> para ver o que o VTY aceita.",
         "Sintomas: Connection refused (serviço/transporte), Authentication failed (user), Timed out (ACL/path)."
-      ],
-      "exam_tips": [
-        "Telnet conecta e SSH não: muitas vezes transport input telnet ou chave ausente."
       ]
     },
     {
-      "heading": "Fora de escopo (não estudar aqui)",
+      "heading": "Ligação com Simulado e Trilha CLI",
       "bullets": [
-        "AnyConnect/VPN remote-access completa, IPsec site detalhado.",
-        "TACACS+/RADIUS lab profundo e authorization granular.",
-        "NETCONF/RESTCONF e GUI HTTPS como substituto do tópico.",
-        "Foque CLI de device: SSH, VTY e cópia segura de arquivo."
+        "No Estudo, fixe o fluxo SSH (hostname → domain → key → VTY ssh) e a tabela TFTP/FTP vs SCP/SFTP.",
+        "No Simulado V2, espere stems de endurecer VTY, protocolo de backup e outputs de show ip ssh / section vty.",
+        "Na Trilha CCNA V2 (tickets CLI), leia transport input, presença de chave e access-class antes de propor a correção.",
+        "Pratique: ‘falta RSA key’, ‘transport telnet’, ‘SCP não TFTP’, ‘ACL de gestão’."
       ],
       "exam_tips": [
-        "Se a opção citar só VPN client full, provavelmente está fora do 4.2 puro."
+        "Ordem sugerida: notas → marcar lido → questões da part → tickets de gestão remota na Trilha → Simulado."
       ]
     }
   ],

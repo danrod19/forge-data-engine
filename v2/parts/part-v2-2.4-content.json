@@ -21,81 +21,91 @@
   ],
   "study_notes": [
     {
-      "heading": "Diagnose com captura no CCNA",
+      "heading": "O que é Diagnose com captura (2.4)",
       "bullets": [
-        "O foco é usar ferramentas de troubleshooting e, quando útil, uma captura simples para ver o que realmente sai/chega no fio.",
-        "Não é curso de forense PCAP: é reconhecer padrões (ARP sem reply, SYN sem SYN-ACK, Discover sem Offer).",
-        "Sempre combine com ping, traceroute, show mac e show arp — a captura confirma hipóteses, não substitui isolamento básico."
+        "Usar ping, traceroute, show e, quando útil, uma captura pontual para ver o que realmente sai/chega no fio.",
+        "No CCNA o verbo é Diagnose: reconhecer padrões (ARP sem reply, SYN sem SYN-ACK, Discover sem Offer) — não forense PCAP avançado.",
+        "A captura confirma hipóteses; não substitui isolamento com show interfaces, show mac e show arp."
       ],
       "exam_tips": [
-        "Se o show já prova interface down, não comece pelo Wireshark."
+        "Se o show já prova interface down ou VLAN óbvia, Wireshark não é o primeiro passo."
       ]
     },
     {
-      "heading": "Quando capturar (e quando não)",
+      "heading": "Quando capturar / quando NÃO (prova e TShoot)",
       "bullets": [
-        "Capture ajuda: dúvida se o frame/pacote sai, se há reply, se há retransmissão TCP, se o DHCP Offer existe no segmento.",
-        "Show/ping bastam: link down, VLAN errada óbvia no status, rota ausente clara, contadores CRC massivos (1.1).",
-        "Capture pontual: janela curta, filtro estreito, objetivo claro — evita PCAP gigante sem leitura."
+        "Capture quando a dúvida é: o frame/pacote sai? há reply? há retransmissão TCP? o DHCP Offer existe neste segmento?",
+        "Show/ping bastam quando: link down, VLAN errada clara no status, rota ausente, CRC massivo (1.1).",
+        "Capture pontual: janela curta, filtro estreito, pergunta clara ('que pacote eu espero e não vejo?').",
+        "Na prova: trecho textual de PCAP + causa mais coerente com ARP/ICMP/TCP/DHCP — não expert display filter.",
+        "NÃO abra PCAP gigante sem objetivo; NÃO use captura para 'substituir' ACL fix sem leitura do padrão."
       ],
       "exam_tips": [
-        "Pergunte: 'que pacote eu espero ver e não estou vendo?'"
+        "Pergunta-guia do NOC: 'o que deveria aparecer no fio e não aparece?'"
       ]
     },
     {
-      "heading": "SPAN / monitor session (ideia)",
+      "heading": "Exemplo concreto",
       "bullets": [
-        "monitor session: copia tráfego de source (interface ou VLAN) para um destination port onde fica o analisador.",
-        "Source incompleta ou destination errada/uplink errado → capture vazia ou lixo irrelevante.",
-        "Verify: show monitor session — confira sources, destination e se a sessão está ativa."
+        "Sintoma: host 10.1.1.10 não alcança o server 10.2.2.20; ping falha; gateway local responde.",
+        "1) show interfaces status + show mac + show ip arp no path  2) ainda ambíguo → SPAN da access do host para um port com Wireshark.",
+        "Filtro: arp or icmp or ip.addr==10.1.1.10. Vê ARP who-has do gateway ok (is-at), depois ICMP echo sem reply.",
+        "Conclusão: L2 local ok; problema acima (ACL/firewall/path/host). Próximo hop de correção não é 'trocar cabo da mesa'.",
+        "Variante DHCP: Discover no fio sem Offer → amarra ao fluxo 1.7 (server/relay/L2 broadcast)."
       ],
       "exam_tips": [
-        "Capture vazia com host gerando tráfego: suspeite do SPAN antes de culpar o Wireshark."
+        "ARP ok + ICMP falha isola acima de L2 local; ARP falha mantém o foco em VLAN/host/MAC."
       ]
     },
     {
-      "heading": "Filtros e leitura básica de PCAP",
+      "heading": "SPAN e leitura de PCAP",
       "bullets": [
-        "Filtros úteis: arp, icmp, ip.addr==x.x.x.x, tcp.port==80|443|22, bootp/dhcp (udp 67/68).",
-        "Leia: Ethernet src/dst MAC, IP src/dst, flags TCP (SYN, SYN-ACK, ACK, RST).",
-        "Padrão: muitos Request iguais sem Reply/Response = algo no path ou no destino não responde."
+        "monitor session: source (interface ou VLAN) → destination port do analisador; show monitor session para verify.",
+        "Source/destination errados → capture vazia mesmo com host gerando tráfego — suspeite do SPAN antes do Wireshark.",
+        "Filtros úteis (ideia): arp, icmp, ip.addr==x.x.x.x, tcp.port==80|443|22, bootp/dhcp (udp 67/68).",
+        "Leia: MAC src/dst, IP src/dst, flags TCP (SYN, SYN-ACK, RST). Muitos requests sem reply = destino/path não responde."
       ],
       "exam_tips": [
-        "TCP SYN retransmitido várias vezes sem SYN-ACK ≠ 'DNS errado' se o IP destino já está correto."
+        "TCP SYN retransmitido sem SYN-ACK ≠ 'DNS errado' se o IP destino já está correto no pacote."
       ]
     },
     {
-      "heading": "Padrões clássicos de captura",
+      "heading": "Sintoma → causa (padrões clássicos)",
       "bullets": [
-        "ARP who-has X tell Y sem is-at → destino ausente, VLAN errada, L2 bloqueando, ou host off.",
-        "ICMP echo request sem echo reply → ACL/firewall, host down, unicast RPF, path assimétrico (ideia).",
-        "TCP SYN → (silence/retrans) → porta fechada filtrada, serviço down, path drop.",
-        "DHCP Discover (broadcast) sem Offer → server/relay/L2 (1.7) com prova no fio."
-      ],
-      "exam_tips": [
-        "ARP ok + ICMP falha isola acima de L2 local; ARP falha mantém o foco em L2/VLAN/host."
-      ]
-    },
-    {
-      "heading": "show mac / show arp + capture",
-      "bullets": [
-        "show mac address-table: o switch aprendeu o MAC na porta/VLAN esperada?",
-        "show ip arp / show arp: o gateway resolve o host? incompleto casa com ARP sem reply.",
-        "Capture no segmento confirma se o ARP saiu e se alguém respondeu — fecha o ciclo."
+        "ARP who-has sem is-at → host off, VLAN errada, L2 bloqueando, MAC não aprendido — case com show mac / show arp incompleto.",
+        "ICMP echo sem reply (L2 ok) → ACL, firewall, host down, path drop (ideia).",
+        "TCP SYN → silence/retrans → serviço down, filtro na porta, path drop até o socket.",
+        "DHCP Discover sem Offer → server/relay/L2 (1.7) com prova no fio.",
+        "Fluxo NOC: sintoma → ping/traceroute → show interfaces/mac/arp → SPAN+filtro se ambíguo → conclusão."
       ],
       "exam_tips": [
         "ARP incompleto no gateway + who-has sem reply na captura = L2/host, não OSPF no core."
       ]
     },
     {
-      "heading": "Fluxo de trabalho NOC",
+      "heading": "Armadilhas comuns",
       "bullets": [
-        "1) Sintoma e topologia  2) ping/traceroute  3) show interfaces/mac/arp  4) se ainda ambíguo, SPAN+filtro  5) conclusão e próximo hop de correção.",
-        "A captura prova presença/ausência de frames; não corrige ACL sozinha — só orienta onde aplicar o fix.",
-        "Fora de escopo: ERSPAN multi-hop complexo, expert Wireshark, NetFlow como substituto total de PCAP."
+        "Começar no Wireshark com interface down ou CRC óbvio no show.",
+        "PCAP vazio e culpar a app — SPAN source/destination mal feitos.",
+        "Ver SYN retransmit e marcar 'problema de DNS' sem olhar IP/MAC do destino.",
+        "Achar que a captura 'conserta' ACL — ela só prova presença/ausência de frames.",
+        "Ignorar show mac/arp e tentar explicar tudo só com IP na captura.",
+        "Fora de escopo: ERSPAN multi-hop complexo, NetFlow como substituto total de PCAP, expert Wireshark."
       ],
       "exam_tips": [
-        "No exame: interprete o trecho textual do PCAP e escolha a causa mais coerente com ARP/ICMP/TCP/DHCP."
+        "Antes do gabarito: o que o show prova? o que o PCAP adiciona? a causa casa com ARP/ICMP/TCP/DHCP?"
+      ]
+    },
+    {
+      "heading": "Ligação com Simulado e Trilha (CLI)",
+      "bullets": [
+        "No Estudo, memorize os quatro padrões (ARP/ICMP/TCP/DHCP) e o papel do SPAN — isso é o coração do 2.4.",
+        "No Simulado V2, espere stems com trecho de captura ou sequência ping→show→conclusão; elimine distractors de L3 cedo demais.",
+        "Na Trilha (tickets CLI), use o cli_output: combine contadores/MAC/ARP com a lógica de 'o que faltou no fio'.",
+        "Comandos âncora: ping, traceroute, show mac, show arp, monitor session, show monitor session."
+      ],
+      "exam_tips": [
+        "Ordem: notas → marcar lido → praticar a part → cruzar com 1.1 (L1) e 1.7 (DHCP) na Trilha."
       ]
     }
   ],

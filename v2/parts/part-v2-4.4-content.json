@@ -21,92 +21,89 @@
   ],
   "study_notes": [
     {
-      "heading": "DNS no caminho do usuário e do app",
+      "heading": "O que é o diagnóstico DNS (registros e resolução)",
       "bullets": [
-        "Quase todo acesso 'por nome' depende de resolução: browser, API, mail client e muitos agentes de app.",
-        "Se o IP direto funciona e o FQDN não, o problema tende a ser DNS (registro, servidor ou cliente) — não necessariamente firewall de app.",
-        "No CCNA 4.4 o verbo é Diagnose: identificar qual elo e qual tipo de registro falha, não administrar zona BIND completa."
+        "É o hábito de Diagnose do CCNA 4.4: a partir do sintoma (app/web/mail falha por nome) isolar se o problema é registro (A/AAAA/CNAME/MX/NS/PTR), resolvedor do cliente ou caminho até o DNS.",
+        "DNS traduz FQDN ↔ endereço; quase todo acesso 'por nome' depende disso — browser, API, mail e muitos agentes.",
+        "Verbo = Diagnose: ler saída de nslookup/ping e dizer o elo quebrado — não administrar zona BIND completa."
       ],
       "exam_tips": [
-        "Sempre separe: conectividade IP vs resolução de nome."
+        "IP ok + FQDN falha → foque DNS antes de culpar firewall de app ou rota genérica."
       ]
     },
     {
-      "heading": "Registros que o exame cita",
+      "heading": "Quando cai na prova / no TShoot",
       "bullets": [
-        "A — nome → IPv4. Ausente/errado: web/host não resolve em IPv4.",
-        "AAAA — nome → IPv6. Ausente com stack preferindo v6: falha 'só por nome' em ambientes dual-stack.",
-        "CNAME — alias → outro nome. O alvo final precisa ter A/AAAA; CNAME órfão quebra a cadeia.",
-        "MX — domínio → host(s) de mail + preferência (menor número = mais preferido). O host do MX precisa resolver (A/AAAA).",
-        "NS — delega/autoriza name servers da zona. NS errado impede resolução consistente.",
-        "PTR — IP → nome (reverse). Falta ou erro afeta checks de mail e ferramentas de reverse lookup."
+        "Cai quando o enunciado diz 'funciona por IP, falha por nome' ou entrega saída de nslookup com tipo errado/ausente.",
+        "Cai no TShoot de mail quando MX existe mas o hostname do MX não tem A/AAAA — ou quando PTR do IP de origem falha validação.",
+        "NÃO trate timeout de nslookup como 'A errado' sem checar se o DNS do cliente está alcançável.",
+        "NÃO abra lab de DHCP (option 6) além de explicar de onde veio o DNS errado do PC."
       ],
       "exam_tips": [
-        "Memorize: sintoma de mail → MX (+ A do hostname MX); reverse → PTR; alias → CNAME + alvo."
+        "Pergunta clássica: dado o sintoma + output, qual registro ou elo está errado — não a definição isolada."
       ]
     },
     {
-      "heading": "Tabela mental: sintoma → registro / foco",
+      "heading": "Exemplo concreto",
       "bullets": [
-        "Web/host: IP ok, nome falha → A/AAAA ou DNS do cliente/servidor.",
-        "Só IPv6 falha por nome / AAAA ausente → AAAA (ou desabilitar preferência v6 no teste).",
-        "www.exemplo.com é alias e quebra → CNAME e depois A/AAAA do canônico.",
-        "E-mail não entrega ao domínio → MX; depois A/AAAA do host retornado no MX.",
-        "Servidor rejeita ou falha heurística de reverse → PTR do IP de origem SMTP.",
-        "Ninguém resolve a zona de forma estável → NS / servidor autoritativo / conectividade ao DNS."
+        "Usuário: 'o portal abre pelo IP 10.10.10.50, mas https://intranet.corp.local não resolve'.",
+        "ipconfig /all: DNS 10.255.255.1; nslookup intranet.corp.local → Non-existent domain; nslookup no autoritativo interno retorna A 10.10.10.50.",
+        "Causa: cliente apontando para DNS errado/offline (ou cache sujo), não o A da zona. Ação: corrigir DNS do cliente/DHCP option 6 e retestar.",
+        "Variante mail: MX aponta para mail1.corp.local sem A → MX 'existe' mas entrega falha; corrija A/AAAA do host do MX."
       ],
       "exam_tips": [
-        "Questões adoram 'funciona por IP' para afastar L3 genérico e apontar DNS."
+        "Teste o mesmo FQDN contra outro DNS: separa 'zona errada' de 'cliente com resolvedor morto'."
       ]
     },
     {
-      "heading": "Cadeia de Diagnose (ordem prática)",
+      "heading": "Registros A/AAAA/CNAME/MX/NS/PTR (núcleo técnico)",
       "bullets": [
-        "1) Cliente: quais DNS servers (ipconfig /all, settings) e se alcança o DNS (ping/porta lógica).",
-        "2) Resolver o FQDN (nslookup/dig) e anotar o tipo de resposta (A, AAAA, MX…).",
-        "3) Se for CNAME, seguir a cadeia até o A/AAAA final.",
-        "4) Se mail, consultar MX e depois o A do hostname MX.",
-        "5) Se reverse/mail, consultar PTR do IP relevante.",
-        "6) Confirmar se o problema é registro na zona ou apenas o resolvedor do cliente (outro DNS funciona?)."
+        "A = nome → IPv4; AAAA = nome → IPv6 (AAAA ausente + cliente preferindo v6 = falha 'só por nome' em dual-stack).",
+        "CNAME = alias → outro nome; o canônico final precisa de A/AAAA — CNAME órfão ou loop quebra a cadeia.",
+        "MX = domínio → host(s) de mail + preferência (menor número = mais preferido); o host do MX precisa resolver.",
+        "NS = name servers autorizativos da zona; NS/servidor morto quebra resolução ampla.",
+        "PTR = reverse (IP → nome); crítico em mail/validações e ferramentas de reverse lookup."
       ],
       "exam_tips": [
-        "Testar o mesmo nome com outro DNS (ou servidor autoritativo) separa 'zona errada' de 'cliente com DNS morto'."
+        "Mail → MX + A do hostname MX; reverse → PTR; alias → CNAME + alvo final."
       ]
     },
     {
-      "heading": "Problemas clássicos de registro",
+      "heading": "Cadeia de Diagnose (sintoma → causa → comando)",
       "bullets": [
-        "A apontando para IP antigo após migração de servidor.",
-        "CNAME para nome que não tem A/AAAA (ou loop de CNAMEs mal feitos).",
-        "MX com hostname inexistente ou sem A — o MX 'existe' mas o mail não entrega.",
-        "PTR ausente/errado no bloco público usado para enviar e-mail.",
-        "NS apontando para servidores offline ou fora da delegação correta."
+        "1) Cliente: quais DNS (ipconfig /all) e se alcança o servidor.",
+        "2) nslookup/dig do FQDN — anote tipo (A, AAAA, MX…) e se há timeout vs NXDOMAIN.",
+        "3) CNAME → seguir até A/AAAA; mail → MX depois A do host; reverse → PTR do IP.",
+        "4) ping FQDN vs ping IP separa resolução de reachability L3.",
+        "5) Mesmo nome em DNS alternativo/autoritativo isola cliente vs zona."
       ],
       "exam_tips": [
-        "MX sozinho não basta: o host do MX precisa resolver."
+        "Leia a saída: timed out, Non-existent domain, CNAME+A final contam a história."
       ]
     },
     {
-      "heading": "Cliente e caminho até o DNS",
+      "heading": "Armadilhas comuns",
       "bullets": [
-        "DHCP costuma entregar servidores DNS (option 6) e às vezes domínio (option 15) — no 4.4 isso explica 'de onde veio o DNS errado', sem virar lab de DHCP (1.7).",
-        "Router IOS pode ter ip name-server; útil para o próprio device, não substitui o DNS do PC do usuário.",
-        "DNS server inacessível (rede, ACL, IP errado): nslookup timeout; apps 'sem internet por nome' com IP ainda ok."
+        "Culpar ACL/rota quando ping IP já prova L3 e só o nome falha.",
+        "Assumir que MX sozinho basta — sem A/AAAA do hostname do MX a entrega quebra.",
+        "Ignorar DNS do cliente (option 6 errada, servidor offline) e caçar registro público à toa.",
+        "Confundir AAAA ausente com 'site fora do ar' em ambiente dual-stack.",
+        "Trocar ip name-server do IOS e achar que isso corrige o DNS do PC do usuário."
       ],
       "exam_tips": [
-        "ipconfig /all mostrando 10.255.255.255 ou DNS offline é pista de cliente, não de registro A da zona pública."
+        "ip name-server no router ≠ DNS do host do usuário."
       ]
     },
     {
-      "heading": "Ferramentas no nível CCNA",
+      "heading": "Ligação com Simulado e Trilha",
       "bullets": [
-        "ping FQDN vs ping IP: separa resolução de reachability.",
-        "nslookup nome [servidor] / set type=MX|AAAA|PTR|NS — prova o tipo de registro.",
-        "dig (ideia): respostas section Answer com tipo e dados.",
-        "Não é necessário editar zone files no exame; é necessário ler o resultado e dizer o que está errado."
+        "No Estudo, fixe: IP ok/nome falha → cliente → tipo de registro → servidor → conectividade.",
+        "No Simulado, espere stems com nslookup/MX/AAAA e a pergunta 'causa mais provável'.",
+        "Na Trilha (ticket + CLI), use ping FQDN vs IP e shows de name-server/hosts no IOS só como apoio — o núcleo continua a leitura do registro/cliente.",
+        "Depois desta part: marcar lido → praticar questões 4.4 → misturar tickets de 'só por nome'."
       ],
       "exam_tips": [
-        "Leia a saída: Non-existent domain, timed out, e CNAME + A final contam a história."
+        "Checklist de plantão: IP vs nome → DNS do cliente → tipo de registro → outro resolvedor."
       ]
     }
   ],

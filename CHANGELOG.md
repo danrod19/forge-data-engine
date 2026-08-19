@@ -4,6 +4,12 @@
 
 ## Entradas Recentes
 
+- **2026-08-18** — Estudo V2 study_notes polish — 18/08/2026
+  - Polidas as 17 `v2/parts/part-v2-*-content.json` (O que é · Quando usar/NÃO ou prova/TShoot · Exemplo · tech · Armadilhas · Ligação Simulado+Trilha CLI)
+  - Regen: `node scripts/gen-estudo-content.mjs` → `src/data/estudo-content-bank/v2-*.json` + `estudo-content.ts`
+  - Backup: `scripts/output/estudo_v2_content_before_polish/` (17 arquivos)
+  - part_id estáveis; questions_v2_traditional / tickets_v2 / Trilha wiring intocados
+
 - **2026-08-18** — Estudo AWS study_notes polish — 18/08/2026
   - Polidos os 12 `aws/parts/part-aws-1.1…1.12-content.json` (O que é · Quando usar/NÃO · exemplo arquitetura · armadilhas · ligação Simulado/Trilha)
   - Regen: `node scripts/gen-estudo-content.mjs` → `src/data/estudo-content-bank/aws-*.json` + `estudo-content.ts`

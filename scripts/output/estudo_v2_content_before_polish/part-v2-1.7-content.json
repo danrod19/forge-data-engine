@@ -1,0 +1,128 @@
+{
+  "part_id": "v2-1.7",
+  "title": "Diagnóstico de atribuição de IP (DHCPv4 e DHCPv6)",
+  "blueprint_module": "1.0",
+  "blueprint_topics": ["1.7"],
+  "verb": "Diagnose",
+  "weight_percent": 25,
+  "topic_list": [
+    "DHCPv4 handshake: Discover → Offer → Request → Ack",
+    "Cliente sem IP, APIPA 169.254.x.x, lease incorreto ou rede errada",
+    "Router como DHCP server: pool, network, default-router, dns-server, excluded-address",
+    "Router como DHCP relay: ip helper-address no SVI/interface do cliente",
+    "Pool esgotado, escopo/network errada, interface do server down",
+    "ACL ou filtragem bloqueando UDP 67/68 no caminho do DHCP",
+    "Options: gateway e DNS errados com IP aparentemente 'ok'",
+    "DHCPv6 stateful vs SLAAC/stateless; papel do RA e flags M/O (nível CCNA)",
+    "Cliente DHCPv6 só com link-local quando esperava GUA",
+    "show ip dhcp binding, pool, conflict; ideia de show ipv6 dhcp",
+    "Ordem de Diagnose: cliente → L2 → helper → server/pool → options",
+    "Ligação leve a DNS (option 6 legada) sem substituir o tópico 4.4"
+  ],
+  "study_notes": [
+    {
+      "heading": "Diagnose de atribuição de IP — visão geral",
+      "bullets": [
+        "O tópico 1.7 pede Diagnose do ponto de vista do cliente e do router: por que o host não obteve (ou obteve mal) um endereço IPv4/IPv6 via DHCP.",
+        "Separe: (1) não há lease algum; (2) há lease mas options erradas; (3) IPv6 só link-local sem GUA esperada.",
+        "Não comece pelo core OSPF se o host está em 169.254.x.x — o L3 útil ainda não existiu."
+      ],
+      "exam_tips": [
+        "APIPA/169.254 = falha em obter DHCPv4 (ou política que impede), não 'IP normal de produção'."
+      ]
+    },
+    {
+      "heading": "DHCPv4: DORA e sintomas de cliente",
+      "bullets": [
+        "Discover (broadcast) → Offer → Request → Ack: se o Discover não chega ao server/relay, o cliente fica sem Offer e cai em APIPA ou 'obtendo IP…'.",
+        "Cliente precisa de L2 no segmento (VLAN/porta up, membership correta) para o broadcast DHCP funcionar.",
+        "Lease de rede errada (VLAN/pool trocado) gera IP que não combina com o gateway do segmento."
+      ],
+      "exam_tips": [
+        "ipconfig: 169.254.x.x + mask 255.255.0.0 é a pista clássica de DHCPv4 falho."
+      ]
+    },
+    {
+      "heading": "Router como server e como relay",
+      "bullets": [
+        "Server: service dhcp, pool com network, default-router, dns-server; excluded-address para SVI/reservas; interface do server (ou reachability) up.",
+        "Relay: quando o server está em outra subnet, o SVI/interface do cliente precisa de ip helper-address apontando ao server — sem helper o Discover não cruza L3.",
+        "Helper no interface errado (ex.: só no uplink, não no SVI da VLAN do usuário) = clientes daquela VLAN sem Offer."
+      ],
+      "exam_tips": [
+        "Server em VLAN 10 e PCs em VLAN 40 sem helper no SVI 40 = APIPA na 40."
+      ]
+    },
+    {
+      "heading": "Pool esgotado, excluded e conflitos",
+      "bullets": [
+        "show ip dhcp pool: current bindings próximos do limite / sem endereços livres → novos clientes falham.",
+        "excluded-address demais ou network muito pequena esgotam o espaço utilizável.",
+        "show ip dhcp conflict e bindings ajudam a ver IPs já tomados ou em conflito; corrija escopo e reservas."
+      ],
+      "exam_tips": [
+        "Pool 0 free com muitos excluded é causa frequente em lab e em produção mal dimensionada."
+      ]
+    },
+    {
+      "heading": "Options erradas: gateway e DNS",
+      "bullets": [
+        "Host pode ter IP válido na subnet e ainda assim não navegar se default-router estiver errado ou inacessível.",
+        "dns-server (option 6) legado/morto: resolve mal por nome — liga ao 4.4, mas a raiz da atribuição é a option no pool/DHCP.",
+        "Corrigir o pool e renovar o lease (ipconfig /release /renew) aplica as options novas."
+      ],
+      "exam_tips": [
+        "IP ok + gateway errado no ipconfig = option default-router, não falta de cabo."
+      ]
+    },
+    {
+      "heading": "DHCPv6 e SLAAC (nível CCNA)",
+      "bullets": [
+        "SLAAC: host forma endereço a partir do RA (prefixo); pode usar options via stateless DHCPv6 (flag O) para DNS etc.",
+        "Stateful DHCPv6: servidor entrega endereço (IA_NA) quando a política/RA indica necessidade de DHCP (flag M no modelo conceitual do exame).",
+        "Sintoma: só fe80::/10 (link-local) quando se esperava GUA — RA ausente/errado, flags, pool v6 não configurado, ou ipv6 dhcp server/relay não ativo na interface."
+      ],
+      "exam_tips": [
+        "Só link-local ≠ 'tem IPv6 de produção'; confirme GUA e origem (SLAAC vs DHCPv6)."
+      ]
+    },
+    {
+      "heading": "Ordem de Diagnose (checklist)",
+      "bullets": [
+        "1) Cliente: ipconfig/ifconfig — IP, mask, gateway, DNS, APIPA?, GUA v6?",
+        "2) L2 do segmento: porta up, VLAN correta, SVI up.",
+        "3) Relay: helper-address no interface/SVI do cliente se server remoto.",
+        "4) Server/pool: service dhcp, network, excluded, bindings, pool free, interface reachability; ACL 67/68.",
+        "5) Options: default-router e dns-server coerentes com o desenho.",
+        "6) v6: RA, flags M/O, pool/interface DHCPv6, binding v6."
+      ],
+      "exam_tips": [
+        "Siga a ordem; pular para 'trocar o switch' sem ver helper/pool desperdiça tempo."
+      ]
+    }
+  ],
+  "key_commands": [
+    "ipconfig /all   |   ipconfig /release   |   ipconfig /renew",
+    "show ip dhcp binding",
+    "show ip dhcp pool [nome]",
+    "show ip dhcp conflict",
+    "show run | section dhcp   |   show run | include helper-address|excluded",
+    "show ip interface brief   (SVI/interface do segmento)",
+    "ip helper-address <ip-do-server>   (no SVI/interface do cliente)",
+    "show ipv6 interface <intf>   (link-local, GUA, RA)",
+    "show ipv6 dhcp interface   |   show ipv6 dhcp binding   (ideia/plataforma)",
+    "show ipv6 dhcp pool   (quando server v6 no router)",
+    "debug ip dhcp server packet   (uso cuidadoso em lab, não primeiro passo em produção)",
+    "Teste: host estático temporário na subnet para separar 'DHCP' de 'L3 do segmento'"
+  ],
+  "must_know": [
+    "169.254.x.x / APIPA = cliente não completou DHCPv4 (sem Offer/Ack útil).",
+    "Server em outra subnet exige ip helper-address no interface/SVI do cliente.",
+    "Pool esgotado ou excluded demais → novos hosts sem lease (show ip dhcp pool).",
+    "IP ok com gateway/DNS errados = options do pool; renove o lease após corrigir.",
+    "DORA precisa de L2 no segmento; VLAN/porta errada impede Discover.",
+    "DHCPv6/SLAAC: só link-local quando falha GUA — olhe RA, flags e pool/interface v6.",
+    "Ordem: cliente → L2 → helper → server/pool → options (v4 e v6)."
+  ],
+  "reuse_from_v1": null
+}

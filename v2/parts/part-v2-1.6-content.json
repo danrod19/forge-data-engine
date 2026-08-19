@@ -21,86 +21,88 @@
   ],
   "study_notes": [
     {
-      "heading": "Configure e Verify no cliente",
+      "heading": "O que é conectividade do cliente no CCNA",
       "bullets": [
-        "No 1.6 o foco é o host: configurar e verificar IP, máscara/prefixo, gateway e DNS em Windows, macOS e Linux.",
-        "Configure = aplicar estático ou DHCP corretamente; Verify = provar com ping, rota e resolução de nome.",
-        "Helpdesk/NOC L1 resolve muitos tickets só lendo o output do OS antes de culpar o core."
+        "É Configure + Verify no host: IP, máscara/prefixo, default gateway e DNS em Windows, macOS e Linux — o que o usuário realmente tem no OS.",
+        "Helpdesk/NOC L1 resolve muitos tickets só lendo ipconfig/ip addr antes de culpar o core.",
+        "Estático vs DHCP no cliente define de onde vêm os parâmetros; a lógica de verify (ping/rota/DNS) é a mesma nos três SO."
       ],
       "exam_tips": [
-        "Leia o ipconfig/ip addr: se o gateway está errado, a correção começa no cliente (ou no DHCP que o alimentou — 1.7)."
+        "Leia o ipconfig/ip addr: gateway errado começa no cliente (ou no DHCP que o alimentou — 1.7)."
       ]
     },
     {
-      "heading": "Parâmetros essenciais",
+      "heading": "Quando usar / quando NÃO usar",
       "bullets": [
-        "IPv4: endereço + subnet mask; IPv6: endereço + prefix length.",
-        "Default gateway: próximo hop para sair da LAN; deve estar na mesma subnet do host (IPv4 típico).",
-        "DNS: um ou mais resolvedores; IP ok + nome falha aponta DNS (4.4), visível no OS.",
-        "Estático: técnico define tudo; DHCP: OS obtém lease e options (ponte com 1.7)."
+        "Use DHCP no cliente para usuários padrão; use estático documentado em servers, impressoras e labs.",
+        "Use a sequência ping GW → ping IP remoto → nslookup/ping nome para isolar camada.",
+        "NÃO invente estático aleatório para 'consertar' APIPA sem desenho — corrija DHCP (1.7) e renew.",
+        "NÃO conclua 'rede caída' se o tracert já passa do gateway com sucesso parcial.",
+        "NÃO ignore firewall local quando só um app falha e o resto do OS navega."
       ],
       "exam_tips": [
-        "Mask errada faz o host achar que destinos remotos são 'locais' ou o contrário — sintoma clássico de misconfig."
+        "Se o desenho é DHCP, prefira renew e corrigir server/options a inventar estático."
       ]
     },
     {
-      "heading": "Windows — comandos de plantão",
+      "heading": "Exemplo concreto",
       "bullets": [
-        "ipconfig /all — IP, mask, gateway, DNS, DHCP enabled, APIPA.",
-        "ipconfig /release e /renew — renegociar DHCP após correção na rede.",
-        "route print — tabela de rotas e 0.0.0.0 default.",
-        "ping, tracert, nslookup — reachability, caminho e DNS."
+        "PC Windows: ipconfig /all mostra 192.168.10.50/24, gateway 192.168.10.1 ausente ou 192.168.11.1 errado → não sai da LAN.",
+        "Correção estático: gateway 192.168.10.1 na mesma subnet; verify ping 192.168.10.1, depois 8.8.8.8, depois nslookup.",
+        "Variante DHCP: 169.254.x.x → não force estático; ipconfig /release /renew após corrigir VLAN/helper/pool (1.7).",
+        "Nome falha com IP ok → DNS no OS (ponte 4.4)."
       ],
       "exam_tips": [
-        "169.254.x.x no ipconfig = DHCP falhou no cliente (verificar rede/1.7), não usar como IP de produção."
+        "Mask errada faz o host achar remoto 'local' ou o contrário — misconfig clássica."
       ]
     },
     {
-      "heading": "Linux e macOS — comandos de plantão",
+      "heading": "Comandos de plantão (Windows / Linux / macOS)",
       "bullets": [
-        "ip addr (ou ifconfig) — endereços e estado da interface.",
-        "ip route (ou route -n) — default via gateway.",
-        "ping, traceroute/traceroute6, dig/nslookup — mesmos testes de verify.",
-        "macOS: GUI de Rede + networksetup em scripts; a lógica de IP/GW/DNS é a mesma."
+        "Windows: ipconfig /all, /release, /renew; route print; ping; tracert; nslookup.",
+        "Linux: ip addr, ip route; ping; traceroute; dig/nslookup (ifconfig legado).",
+        "macOS: ifconfig/ip + GUI/networksetup; mesma lógica IP/GW/DNS.",
+        "Parâmetros essenciais: endereço+mask/prefix, default gateway na subnet, DNS listado."
       ],
       "exam_tips": [
-        "Sem default route no ip route, o host fala na LAN e não sai — corrija gateway estático ou DHCP."
+        "169.254.x.x = DHCP falhou no cliente — não usar como IP de produção."
       ]
     },
     {
       "heading": "Tabela mental: sintoma → comando → próximo passo",
       "bullets": [
-        "Sem rede alguma → ipconfig/ip addr (tem IP? APIPA? link up?).",
+        "Sem rede → ipconfig/ip addr (tem IP? APIPA? link up?).",
         "LAN ok, Internet não → ping gateway; se falhar, IP/mask/GW no OS ou L2/L3 local.",
         "IP remoto ok, nome falha → nslookup + DNS no OS (4.4).",
         "GW ok, destino falha no meio do tracert → cliente provavelmente ok; problema além do primeiro hop.",
-        "Só um app falha com resto ok → firewall local/app antes de redesenhar a WAN."
+        "Só um app falha → firewall local/app antes de redesenhar a WAN."
       ],
       "exam_tips": [
         "Sempre: ping GW → ping IP conhecido → ping FQDN / nslookup."
       ]
     },
     {
-      "heading": "Estático vs DHCP no cliente",
+      "heading": "Armadilhas comuns",
       "bullets": [
-        "DHCP: escolha padrão em usuários; se APIPA, não 'consertar' com estático aleatório sem desenho.",
-        "Estático: servers, impressoras, labs; documente IP, mask, GW, DNS e evite conflito.",
-        "Trocar de DHCP para estático errado é causa comum de 'quebrou depois que mexi no PC'."
+        "Trocar DHCP por estático errado e achar que 'a WAN quebrou'.",
+        "Culpar o core sem pingar o gateway do próprio host.",
+        "Ignorar APIPA e tentar traceroute para a Internet.",
+        "Confundir falha de DNS (nome) com falha de roteamento (IP)."
       ],
       "exam_tips": [
-        "Se o desenho é DHCP, prefira renew e corrigir o servidor/options (1.7) a inventar estático."
+        "Sem default route no ip route, o host fala na LAN e não sai — corrija GW."
       ]
     },
     {
-      "heading": "Verify de caminho e DNS",
+      "heading": "Ligação com Simulado e Trilha",
       "bullets": [
-        "ping gateway: valida L2/L3 local e config do host na subnet.",
-        "tracert: se o hop 1 (GW) responde e a falha é hop 2+, o cliente e o primeiro salto estão ok o suficiente para escalar além.",
-        "nslookup: prova o que o OS está usando como DNS e se o nome resolve.",
-        "Firewall local pode bloquear ICMP de teste — use outro destino/protocolo se necessário (ideia básica)."
+        "No Estudo, memorize a ordem de verify no OS — ela aparece em stems e em tickets de 'PC sem Internet'.",
+        "No Simulado, leia o output de ipconfig/ip addr como evidência primária.",
+        "Na Trilha (CLI no device + sintoma no host), combine shows do switch/router com o que o cliente reporta no OS.",
+        "Cruze com 1.7 (DHCP) e 4.4 (DNS) sem misturar a causa: option errada vs registro DNS vs cabo."
       ],
       "exam_tips": [
-        "Não conclua 'rede caída' se o tracert já passa do gateway com sucesso parcial."
+        "Após marcar lido: pratique a part e tickets em que o sintoma começa no desktop."
       ]
     }
   ],

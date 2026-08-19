@@ -21,82 +21,85 @@
   ],
   "study_notes": [
     {
-      "heading": "Diagnose L1: ordem de isolamento",
+      "heading": "O que é o diagnóstico L1 (interfaces e cabos)",
       "bullets": [
-        "No CCNA 1.1 o verbo é Diagnose: partir do sintoma (loss, lento, down) e ler evidência de interface/cabo antes de mudanças amplas.",
-        "Ordem prática: status da porta → contadores (CRC, collisions, late collisions) → duplex/speed → mídia (cobre/fibra/SFP) → distância/tipo de cabo.",
-        "Trocar o switch ou reiniciar OSPF não é o primeiro passo quando CRC/late collisions apontam camada física."
+        "É o hábito de Diagnose do CCNA 1.1: a partir do sintoma (link down, flapping, loss, lentidão) ler evidência de porta, cabo e óptica antes de culpar L3, ACL ou 'trocar o switch'.",
+        "Cobre (UTP Cat5e/6/6a, pinagem, distância ~100 m) e fibra (MM/SM, SFP, limpeza, DOM) são a mídia; show interfaces / show interfaces status são a evidência.",
+        "Ordem mental: status da porta → contadores (CRC, collisions, late collisions) → duplex/speed → mídia → distância/tipo de cabo."
       ],
       "exam_tips": [
-        "Se o output mostra CRC ou late collisions, a causa mais provável está em cabo, duplex ou óptica — não em ACL ou rota."
+        "CRC ou late collisions no output → causa provável em cabo, duplex ou óptica, não em OSPF primeiro."
       ]
     },
     {
-      "heading": "Cobre: categoria, distância e pinagem",
+      "heading": "Quando cai na prova / no TShoot",
       "bullets": [
-        "UTP Cat5e/6/6a: em geral até ~100 m de canal para Ethernet de campus; além disso aumentam erros e falha de link.",
-        "T568A e T568B definem a ordem dos pares; straight-through usa o mesmo padrão nos dois lados; crossover cruza pares TX/RX (hoje auto-MDIX reduz a necessidade, mas pinagem/cabo danificado ainda importam).",
-        "Cabo amassado, conector mal crimpado ou pares rompidos geram CRC, flapping ou down/down."
+        "Cai quando o enunciado dá sintoma de usuário isolado + output de show interfaces com erros, duplex half vs a-full, notconnect ou RX óptico baixo.",
+        "Cai no TShoot quando alguém já 'reiniciou OSPF' e o contador de CRC continua subindo — você precisa voltar para L1.",
+        "NÃO trate admin shutdown (down/down manual) como cabo ruim: leia o status antes de trocar patch.",
+        "NÃO use clear ip ospf process / reload do chassis como primeiro passo de L1."
       ],
       "exam_tips": [
-        "Distância excessiva + Cat insuficiente para a velocidade desejada → erros ou negociação ruim."
+        "Pergunta clássica: dado o output, qual a causa mais provável — não a definição isolada do termo."
       ]
     },
     {
-      "heading": "Fibra, SFP e sinal óptico",
+      "heading": "Exemplo concreto",
       "bullets": [
-        "Multimodo (MM) e monomodo (SM) não são intercambiáveis de forma livre: patch errada, SFP errado ou conector sujo derrubam o link ou elevam erros.",
-        "DOM/transceiver: RX power muito baixo ou TX ausente sugere sujeira, patch ruim, alcance excedido ou fibra quebrada — reconheça o padrão sem decorar datasheet.",
-        "SFP ausente, incompatível ou com porta em notconnect/down costuma aparecer em show interfaces status e no estado down/down."
+        "Usuário na VLAN de acesso reclama de lentidão intermitente; ping ao gateway oscila.",
+        "show interfaces Gi1/0/12: input errors e CRC subindo; show interfaces status: a-1000 a-full de um lado e 100 half no outro (ou late collisions).",
+        "Ação: alinhar speed/duplex (preferir auto/auto), trocar patch Cat6, limpar contadores e reobservar — só então escalar se erros continuarem com mídia boa.",
+        "Variante fibra: link flapping + DOM com RX muito baixo → limpar/trocar patch, validar MM vs SM e SFP antes de culpar o IOS."
       ],
       "exam_tips": [
-        "RX baixo + link instável → limpar/trocar patch e validar tipo MM/SM e distância antes de culpar o IOS."
+        "Documente contadores antes/depois da troca de patch — isso prova causa L1 na Trilha e na prova."
       ]
     },
     {
-      "heading": "Contadores que importam no show interfaces",
+      "heading": "Cobre, fibra e SFP (núcleo técnico)",
       "bullets": [
-        "CRC / input errors: corrupção no recebimento — cabo, EMI, SFP, sujeira, duplex mismatch grave.",
-        "Collisions e late collisions: típicos de half-duplex ou mismatch de duplex (um lado full, outro half).",
-        "Runts/giants: frames anômalos; combinar com erros e duplex. Output errors: problemas no envio/fila/mídia.",
-        "reliability e load dão contexto; o Diagnose foca na tendência (erros subindo) e no lado do link afetado."
+        "UTP: canal ~100 m; Cat insuficiente ou cabo amassado/crimp ruim → CRC, flapping ou down/down. T568A/B e pinagem ainda importam mesmo com auto-MDIX.",
+        "Fibra: MM e SM não são intercambiáveis à vontade; conector sujo e patch errada derrubam link ou elevam erros.",
+        "DOM/transceiver: RX baixo / TX ausente → sujeira, alcance, fibra quebrada ou SFP incompatível; SFP ausente aparece como notconnect/down/down."
       ],
       "exam_tips": [
-        "Late collisions + um lado half e outro a-full = mismatch de duplex clássico."
+        "RX baixo + instabilidade → limpar/trocar patch e validar tipo MM/SM antes de culpar software."
       ]
     },
     {
-      "heading": "Duplex, speed e auto-negociação",
+      "heading": "Contadores, duplex e estados (sintoma → causa → comando)",
       "bullets": [
-        "Auto em ambos os lados é o padrão saudável na maioria dos acessos cobre.",
-        "Hardcode de speed/duplex em um lado e auto no outro costuma gerar mismatch (um full, outro half) com late collisions e desempenho ruim.",
-        "Speed mismatch ou cabos que não sustentam a taxa (ex.: expectativa de 1G em mídia inadequada/distância) → notconnect, 100M forçado com erros, ou flapping."
+        "CRC / input errors → cabo, EMI, SFP, sujeira, duplex mismatch grave. Comando: show interfaces <intf> (e filtre error|CRC|collision).",
+        "Late collisions + um lado half e outro a-full → mismatch de duplex. Comando: show interfaces status nos dois lados.",
+        "Auto vs hardcode: hardcode em um lado e auto no outro é receita clássica de mismatch.",
+        "up/up com loss → contadores/caminho além do link; down/down|notconnect → cabo/SFP/mídia/admin down; err-disabled → confira razão (pode ser segurança/loop, não só L1)."
       ],
       "exam_tips": [
-        "Mostre show interfaces status: a-full vs half e a-1000 vs 100 fixo contam a história."
+        "Late collisions + half vs a-full = mismatch de duplex clássico."
       ]
     },
     {
-      "heading": "Estados de interface e o que investigar",
+      "heading": "Armadilhas comuns",
       "bullets": [
-        "up/up: link e protocolo de linha ok — se há loss, olhe contadores e caminho além do link local.",
-        "up/down: link físico up, line protocol down — frequentemente L2/protocolo, mas no 1.1 confirme se não há flapping L1.",
-        "down/down ou notconnect: cabo desconectado, SFP ausente, mídia errada, porta desabilitada administrativamente (se admin down, verifique shutdown).",
-        "err-disabled: pode ser por loop/segurança; só trate como L1 se a razão e os contadores apontarem cabo/link (contexto do tópico)."
+        "Culpar rota/OSPF/ACL quando CRC/late collisions já apontam L1.",
+        "Trocar o chassis sem comparar duplex/speed e contadores nos dois lados do link.",
+        "Hardcode speed/duplex 'para estabilizar' e criar mismatch com o peer em auto.",
+        "Ignorar admin shutdown e ficar trocando cabo; ou misturar MM/SM / SFP errado na fibra."
       ],
       "exam_tips": [
-        "Admin down (manual shutdown) não se resolve trocando cabo — releia o status."
+        "Se o status é administratively down, cabo novo não resolve — no shutdown."
       ]
     },
     {
-      "heading": "Checklist de campo (NOC)",
+      "heading": "Ligação com Simulado e Trilha",
       "bullets": [
-        "1) show interfaces status e show interfaces <intf>  2) anotar duplex/speed e erros  3) comparar com o vizinho  4) cobre: patch/teste de cabo/distância  5) fibra: limpar, SFP, DOM, tipo MM/SM.",
-        "Só escale para troca de chassis se mídia, SFP e contadores do peer estiverem limpos e o problema persistir no hardware.",
-        "Documente antes/depois dos contadores após trocar patch para provar a causa L1."
+        "No Estudo, fixe a ordem sintoma → status → contadores → mídia; isso destrava stems de Diagnose L1.",
+        "No Simulado, espere outputs de show interfaces / status pedindo a causa mais provável (cabo, duplex, óptica).",
+        "Na Trilha (ticket + CLI), use shows de interface/transceiver para isolar L1 antes de changes amplas — sem precisar decorar gabarito.",
+        "Depois desta part: marcar lido → praticar questões da part → misturar com tickets de flapping/err-disable relacionados."
       ],
       "exam_tips": [
-        "Pergunta de exame: dado o output, qual a causa mais provável — não a definição isolada do termo."
+        "Checklist de plantão: status → erros → peer → patch/SFP/DOM → só então escalar hardware."
       ]
     }
   ],

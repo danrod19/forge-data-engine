@@ -21,83 +21,107 @@
   ],
   "study_notes": [
     {
-      "heading": "OSPFv2 single-area no CCNA",
+      "heading": "O que é OSPFv2/v3 single-area",
       "bullets": [
-        "Configure um processo OSPF e coloque interfaces na mesma area (tipicamente 0 em lab single-area, ou area única do desenho).",
-        "Formas comuns: network <ip> <wildcard> area <id> sob router ospf, ou ip ospf <pid> area <id> na interface.",
-        "Verify: neighbor FULL, interface no processo, rotas O na tabela."
+        "OSPF é IGP link-state: routers trocam Hellos, formam adjacência e compartilham LSAs para montar a tabela de rotas (código O).",
+        "No CCNA 200-301 v2.0 (módulo 3 · tópico 3.3) o verbo é Configure: processo, interfaces na mesma area, RID estável, verify de neighbor FULL e rotas — e Diagnose quando a adjacência trava.",
+        "OSPFv2 = IPv4; OSPFv3 = IPv6 (mais interface-centric). Single-area: um único area-id nos links que devem ser vizinhos — sem multi-area/ABR profundo nesta part.",
+        "Sem FULL (no par relevante) não espere rotas aprendidas do vizinho: feche a adjacência antes de caçar ‘falta de rota’."
       ],
       "exam_tips": [
-        "Sem FULL não espere rotas aprendidas do vizinho — feche a adjacência primeiro."
+        "Enunciado com show ip ospf neighbor preso em EXSTART/2-Way → aplique a tabela stuck→causa antes de ‘clear ip ospf process’."
       ]
     },
     {
-      "heading": "Router-ID",
+      "heading": "Quando usar / quando NÃO (prova e TShoot)",
       "bullets": [
-        "RID identifica o router no domínio OSPF; em IOS costuma ser o mais alto loopback/up, ou configurado com router-id.",
-        "Configure RID estável (loopback) antes de adjacências em produção mental de exame.",
-        "RID duplicado: comportamento instável, adjacências problemáticas; RID 0.0.0.0 é inválido/problemático."
+        "Use OSPF single-area em campus/WAN leve quando vários routers precisam aprender redes uns dos outros sem estáticas manuais em massa.",
+        "Use RID fixo (router-id / loopback) antes de adjacências estáveis — evita surpresa se interfaces sobem/descem.",
+        "Use passive-interface em SVIs/LANs de usuário: anuncia a rede, sem Hello com PCs.",
+        "NÃO use area diferente nos dois lados do link que deveria ser vizinho — area mismatch = neighbor não forma.",
+        "NÃO passivar o link WAN/entre routers onde você quer Hello — neighbor forever down.",
+        "NÃO espere que FULL em OSPFv2 (IPv4) crie rotas IPv6: precisa OSPFv3/vizinho v6 separado.",
+        "NÃO comece TShoot por clear/reload: compare Area, Hello/Dead, Network Type e MTU com show ip ospf interface nos dois lados."
       ],
       "exam_tips": [
-        "Dois routers com o mesmo router-id → corrija um deles e limpe o processo se necessário."
+        "Se o lab pede ‘só dois routers no link Ethernet p2p’, network type point-to-point (sem DR) costuma ser o desenho esperado."
       ]
     },
     {
-      "heading": "Adjacency e estados",
+      "heading": "Exemplo concreto (lab Configure)",
       "bullets": [
-        "Down → Init → 2-Way → ExStart → Exchange → Loading → Full.",
-        "2-Way: Hello ok; em broadcast pode parar em 2-way com DROther (nem todo par precisa FULL entre si).",
-        "FULL com o DR/BDR (broadcast) ou com o vizinho p2p é o objetivo de troca de LSAs."
+        "R1↔R2 em GigabitEthernet0/0 (10.0.12.0/30), area 0; cada um tem loopback /32 e uma LAN de usuários.",
+        "Em ambos: router ospf 1; router-id único (1.1.1.1 / 2.2.2.2); network (ou ip ospf 1 area 0) no link e nos prefixos a anunciar.",
+        "passive-interface nas SVIs de usuário; no link R1–R2 deixe Hello ativo (no passive).",
+        "Verify: show ip ospf neighbor → FULL; show ip route ospf → redes O do vizinho; show ip ospf interface → Area 0, timers iguais.",
+        "IPv6 no mesmo desenho: ipv6 unicast-routing + ospfv3/ipv6 ospf area nas interfaces; RID 32-bit ainda obrigatório; show ipv6 ospf neighbor."
       ],
       "exam_tips": [
-        "Stuck EXSTART/EXCHANGE clássico: MTU mismatch entre lados."
+        "Ordem mental: RID → interfaces na area → Hello no link certo → FULL → depois rotas O."
       ]
     },
     {
       "heading": "Tabela mental: stuck → causa comum",
       "bullets": [
-        "Não sobe / Down: area mismatch, interface down, passive, ACL bloqueando 89, IP não no segmento, process off.",
-        "Init only: Hellos de um lado, timers/area/rede, unicast bloqueado.",
-        "2-Way estável em p2p quando se esperava Full: problema de parâmetros ou tipo de rede.",
-        "EXSTART/EXCHANGE: MTU diferente, problemas de DBD.",
-        "Full mas sem rota: filtering/network não anunciada, interface não no OSPF, discards."
+        "Não sobe / Down: area mismatch, interface down, passive, ACL bloqueando IP 89, IP fora do segmento, process off.",
+        "Init only: Hellos de um lado; timers/area/rede; unicast bloqueado.",
+        "2-Way estável em p2p quando se esperava Full: parâmetros ou tipo de rede inconsistente (em broadcast, 2-Way com DROther pode ser normal).",
+        "EXSTART/EXCHANGE: MTU diferente entre lados; problemas de DBD — clássico de prova.",
+        "Full mas sem rota: rede não anunciada / interface fora do OSPF, filtering, discards."
       ],
       "exam_tips": [
-        "Compare show ip ospf interface nos dois lados: Area, Hello/Dead, Network Type, MTU."
+        "Compare show ip ospf interface nos dois lados: Area, Hello/Dead, Network Type, MTU — um campo divergente explica a maioria dos stuck."
       ]
     },
     {
-      "heading": "Broadcast vs point-to-point",
+      "heading": "RID, broadcast vs p2p e passive",
       "bullets": [
-        "Broadcast (Ethernet multiacesso): elege DR/BDR; adjacências FULL com DR/BDR.",
-        "Point-to-point: sem DR/BDR; dois routers formam FULL diretamente — comum em serial/túnel e às vezes forçado em Ethernet p2p.",
-        "Tipo de rede diferente entre lados pode impedir adjacência correta."
+        "RID identifica o router; configure estável e único. Duplicado ou 0.0.0.0 = dor de adjacência.",
+        "Broadcast (Ethernet multiacesso): elege DR/BDR; FULL com DR/BDR (DROthers podem ficar 2-Way entre si).",
+        "Point-to-point: sem DR/BDR; dois routers formam FULL direto — serial/túnel ou Ethernet forçado p2p.",
+        "Tipo de rede diferente entre lados atrapalha a adjacência correta.",
+        "passive-interface: anuncia sem Hello; use em LAN de usuário; erro clássico = passive no WAN."
       ],
       "exam_tips": [
-        "Dois routers só em link p2p não precisam de DR; em LAN multiacesso, sim."
-      ]
-    },
-    {
-      "heading": "passive-interface",
-      "bullets": [
-        "passive-interface: anuncia a rede mas não envia/recebe Hellos — sem adjacência naquela interface.",
-        "Use em SVIs de usuários para não tentar OSPF com PCs.",
-        "Erro clássico: passive no link entre routers → neighbor nunca sobe."
-      ],
-      "exam_tips": [
-        "Neighbor down + passive na interface do WAN = remova passive dali."
+        "Stuck EXSTART → confira MTU primeiro; neighbor down + passive no WAN → remova passive dali."
       ]
     },
     {
       "heading": "OSPFv3 (IPv6) single-area",
       "bullets": [
-        "OSPFv3 carrega IPv6; configuração é mais interface-centric (ospfv3 <pid> ipv6 area <id> ou ipv6 ospf area).",
+        "OSPFv3 carrega IPv6; config mais interface-centric (ospfv3 <pid> ipv6 area <id> ou ipv6 ospf area).",
         "Router-ID continua 32-bit (formato IPv4); sem RID válido o processo v3 pode falhar.",
-        "Adjacência IPv4 FULL (OSPFv2) não cria rotas IPv6 — precisa de OSPFv3/vizinho v6 separado.",
-        "Verify: show ipv6 ospf neighbor / show ospfv3 neighbor; show ipv6 route ospf."
+        "Adjacência IPv4 FULL ≠ rotas IPv6 — verifique show ipv6 ospf neighbor / show ospfv3 neighbor e show ipv6 route ospf.",
+        "Mesma lógica single-area: area-id igual, Hello no link certo, sem multi-area profundo aqui."
       ],
       "exam_tips": [
-        "Só IPv4 FULL + hosts v6 sem rota: configure e verifique OSPFv3 nas interfaces."
+        "Hosts v6 sem rota + só OSPFv2 FULL → configure e verifique OSPFv3 nas interfaces."
+      ]
+    },
+    {
+      "heading": "Armadilhas comuns da prova",
+      "bullets": [
+        "Culpar ‘falta de rota’ sem olhar se o neighbor saiu de FULL.",
+        "Area mismatch ou timers Hello/Dead diferentes e marcar ‘MTU’ sem evidência (ou o inverso: EXSTART sem checar MTU).",
+        "passive-interface default esquecendo no passive no link entre routers.",
+        "RID duplicado entre dois lab routers ‘idênticos’.",
+        "Achar que OSPFv2 FULL resolve IPv6; ou misturar network type broadcast vs p2p nos dois lados.",
+        "clear ip ospf process como primeiro passo sem comparar interface/neighbor."
+      ],
+      "exam_tips": [
+        "Antes do gabarito: estado do neighbor → Area/timers/MTU/tipo → passive/RID → só então rota O."
+      ]
+    },
+    {
+      "heading": "Ligação com Simulado e Trilha CLI",
+      "bullets": [
+        "No Estudo desta part, fixe: FULL antes de rota O + tabela stuck→causa (EXSTART↔MTU, Down↔area/passive).",
+        "No Simulado V2, espere outputs de show ip ospf neighbor/interface e stems de ‘por que não há rota O’ — aplique Diagnose antes de reconfigurar à cega.",
+        "Na Trilha CCNA V2 (tickets CLI), o sintoma vem com CLI: compare Area/Hello/MTU/passive nos dois lados e escolha a correção mínima.",
+        "Pratique verbalizar em uma frase: ‘stuck EXSTART por MTU’, ‘passive no WAN’, ‘OSPFv3 ausente para IPv6’."
+      ],
+      "exam_tips": [
+        "Ordem sugerida: ler estas notas → marcar lido → praticar questões da part → tickets OSPF na Trilha → misturar no Simulado."
       ]
     }
   ],

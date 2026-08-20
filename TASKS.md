@@ -31,6 +31,8 @@
 - [x] Estudo V2 study_notes polish — 18/08/2026 (todas as 17 parts v2-1.1…5.2 + regen bank)
 - [x] Estudo V1 study_notes polish — 18/08/2026 (todas as 31 parts 1.1–6.5 + regen bank)
 - [x] AWS Trilha cenários enriquecidos — 19/08/2026 (50 prioritários em questions_aws_traditional.json)
+- [x] AWS Trilha cenários enriquecidos lote 2 — 19/08/2026 (+50; total ricos 100)
+- [x] AWS Trilha cenários enriquecidos lote 3 — 19/08/2026 (+50; total ricos 150)
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção
@@ -68,6 +70,16 @@
   - Stems EN estilo SAA (situação+requisito+restrição+decisão); `explicacao_profunda` PT; `resposta_correta` intacta
   - Backup: `scripts/output/aws_scenarios_before_enrich.json`
   - `tickets_aws.json` e study notes AWS intocados
+- [x] AWS Trilha cenários enriquecidos lote 2 — 19/08/2026 (+50)
+  - Lista: `scripts/output/aws_scenarios_enrich_batch_2.json` (zero overlap com lote 1)
+  - Backup pré-lote-2: `scripts/output/aws_scenarios_before_enrich_batch2.json`
+  - Gate: 50/50; lote 1 intacto 50/50; pool 360; média enunciado lote2 ~71→~270
+  - `tickets_aws.json` / study notes intocados
+- [x] AWS Trilha cenários enriquecidos lote 3 — 19/08/2026 (+50; total ricos 150)
+  - Lista: `scripts/output/aws_scenarios_enrich_batch_3.json` (overlap com 1∪2 = 0)
+  - Backup: `scripts/output/aws_scenarios_before_enrich_batch3.json`
+  - Gate: 50/50; lotes 1+2 intactos 100/100; média lote3 ~83→~262
+  - `tickets_aws.json` / study notes intocados
 
 ### Bloqueios / Pendências
 - Env Stripe em produção já falhou uma vez (“link não configurado”)

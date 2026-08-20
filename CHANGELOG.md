@@ -4,6 +4,18 @@
 
 ## Entradas Recentes
 
+- **2026-08-19** — AWS Trilha cenários enriquecidos lote 3 — 19/08/2026 (+50; total ricos ~150)
+  - +50 itens em `questions_aws_traditional.json` (lista `aws_scenarios_enrich_batch_3.json`; overlap com 1∪2 = 0)
+  - Stems EN SAA-like; média do lote ~83→~262 chars; `explicacao_profunda` PT; `resposta_correta` intacta
+  - Backup: `scripts/output/aws_scenarios_before_enrich_batch3.json`; lotes 1+2 intactos 100/100
+  - Total enriquecidos lote1+2+3 = 150 / 360
+
+- **2026-08-19** — AWS Trilha cenários enriquecidos lote 2 — 19/08/2026
+  - +50 itens em `questions_aws_traditional.json` (lista `aws_scenarios_enrich_batch_2.json`; zero overlap com lote 1)
+  - Stems EN SAA-like; média do lote ~71→~270 chars; `explicacao_profunda` PT; `resposta_correta` intacta
+  - Backup: `scripts/output/aws_scenarios_before_enrich_batch2.json`; lote 1 verificado intacto
+  - Total enriquecidos lote1+2 = 100 / 360
+
 - **2026-08-19** — AWS Trilha cenários enriquecidos — 19/08/2026
   - 50 itens prioritários em `src/data/questions_aws_traditional.json` (hub Trilha via `awsTrilhaScenarios`)
   - Stems EN SAA-like (situação + requisito + restrição + decisão); média ~56→~277 chars

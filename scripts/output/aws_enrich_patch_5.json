@@ -1,0 +1,144 @@
+{
+  "patched": [
+    {
+      "id": 47,
+      "idx": 46,
+      "part_id": "aws-1.2",
+      "enunciado": "A web fleet uses a Security Group with outbound allow-all and inbound TCP 443 allowed only from 10.0.0.0/8. Compliance forbids opening HTTPS to the public internet (0.0.0.0/0). Operations asks what the practical effect is for sessions the instances initiate versus new inbound HTTPS. What is the correct behavior?",
+      "alternativas": [
+        "Denies all return traffic for 443 because a Security Group is an 'inverted stateless' firewall",
+        "Must block Amazon DNS resolution",
+        "Allows outbound initiation and accepts inbound 443 only from 10.0.0.0/8; return traffic for allowed sessions follows the stateful model",
+        "Opens 443 from the entire Internet (0.0.0.0/0)"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Security Groups são stateful: outbound allow-all deixa a instance iniciar conexões de saída e os pacotes de retorno dessas sessões entram sem regra espelho. Inbound TCP 443 só de 10.0.0.0/8 restringe novas conexões HTTPS àquele CIDR — não abre 0.0.0.0/0. A opção que 'nega todo retorno porque SG seria stateless invertido' confunde SG com NACL (stateless). Bloquear DNS da Amazon não decorre dessa regra inbound. Insight: SG stateful ≠ NACL stateless — não invente regra de retorno no SG."
+    },
+    {
+      "id": 73,
+      "idx": 72,
+      "part_id": "aws-1.3",
+      "enunciado": "Platform ops runs `aws s3 rm s3://config-bucket/config.json` on a production bucket with versioning Enabled. The team must be able to recover the previous object if the delete was accidental, without removing the bucket. What typically happens to the object?",
+      "alternativas": [
+        "All versions are deleted permanently and immediately with no recovery path",
+        "The entire bucket is removed from the account",
+        "A delete marker is created (IsLatest); prior versions remain and can be restored",
+        "Block Public Access is turned off automatically"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Com versioning Enabled, o `aws s3 rm` simples em geral cria um delete marker (IsLatest); as versões anteriores permanecem e podem ser restauradas removendo o marker ou apontando para uma versão. Não apaga todas as versões de forma irrecuperável no rm básico. Não remove o bucket da conta. Não desliga Block Public Access. Insight: objeto 'sumiu' com versioning on → list-object-versions e procure o delete marker antes de recrír a conta."
+    },
+    {
+      "id": 100,
+      "idx": 99,
+      "part_id": "aws-1.4",
+      "enunciado": "A Solutions Architect launches Amazon EC2 instances that must install packages and apply base config on first boot. Permissions for AWS API calls must come from an instance profile, and network access must remain controlled by Security Groups—not by the bootstrap script. What is the primary SAA purpose of user data at launch?",
+      "alternativas": [
+        "Replace the VPC Security Group for the instance",
+        "Bootstrap/script on first boot (packages, config) without replacing IAM role control",
+        "Guarantee automatic Multi-AZ placement for the EBS volume",
+        "Convert the EC2 instance into a Lambda function"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "User data serve para script/bootstrap na primeira inicialização (pacotes, agentes, config via cloud-init) — não substitui o IAM da instance profile nem o Security Group. Não garante Multi-AZ automático do volume EBS (EBS continua por AZ). Não converte a instance em Lambda. Insight: user data = bootstrap; permissões de API = instance profile; firewall da instance = SG."
+    },
+    {
+      "id": 136,
+      "idx": 135,
+      "part_id": "aws-1.5",
+      "enunciado": "An Auto Scaling group behind an ALB reacts to short CPU spikes and then scales back in within minutes, causing flapping and unstable capacity. The max capacity and launch template must stay unchanged. What problem does a cooldown after scale-out primarily help avoid?",
+      "alternativas": [
+        "Permanently blocks any future scale-out forever",
+        "Replaces the ASG maximum capacity setting",
+        "Deletes the launch template",
+        "Rapid scale-out/in oscillation (flapping) after transient spikes"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Cooldown após scale-out evita flapping: picos transitórios não disparam scale-in/out em cascata antes da métrica estabilizar. Não impede scale-out para sempre — só atrasa ações seguintes no período. Não substitui o max do ASG. Não apaga o launch template. Insight: flapping + alarmes nervosos → cooldown (e/ou stabilization de target tracking) antes de mexer em thresholds à toa."
+    },
+    {
+      "id": 175,
+      "idx": 174,
+      "part_id": "aws-1.6",
+      "enunciado": "A three-tier design uses an internet-facing ALB, an Auto Scaling app tier, and Amazon RDS for MySQL. Compliance requires least-privilege database access: only app instances may open TCP 3306, not the public internet or the load balancer tier. Where should you allow port 3306?",
+      "alternativas": [
+        "On the ALB Security Group to 0.0.0.0/0",
+        "On the RDS Security Group with Source = the app instances' Security Group (sg-app)",
+        "On the NACL as Deny all only",
+        "Only on the NAT Gateway Security Group"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "No desenho ALB → ASG app → RDS, a porta 3306 deve ser permitida no SG do RDS com Source = SG das instances de app (sg-app) — least privilege por referência de SG. Abrir 3306 no SG do ALB para 0.0.0.0/0 está na camada errada (ALB não fala MySQL com clientes) e é excessivo. NACL Deny all quebra conectividade. NAT Gateway não é o ponto de controle de acesso SQL do RDS. Insight: modele SG por tier; nunca use o SG do ALB como proxy de regra de banco."
+    },
+    {
+      "id": 199,
+      "idx": 198,
+      "part_id": "aws-1.7",
+      "enunciado": "A marketing site is served from Amazon S3 via CloudFront. The CI pipeline invalidates /* after every CSS commit so users see changes immediately. Finance wants to control CloudFront costs, and Origin Access Identity (OAI) must remain the private-origin control. What is the main trade-off of frequent /* invalidations?",
+      "alternativas": [
+        "It is free and unlimited and mandatory on every S3 PUT",
+        "It replaces Origin Access Identity (OAI)",
+        "It delivers fast edge consistency but can raise invalidation cost/request volume and origin hits if overused",
+        "It disables Route 53"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Invalidation /* a cada commit garante consistência rápida na edge, mas gera custo/quota de invalidation e pode aumentar hits na origem se o hábito for abusivo. Não é grátis ilimitado nem obrigatório em todo PUT S3. Não substitui OAI. Não desliga Route 53. Insight: versionar assets (hash no filename) reduz necessidade de invalidation em massa; reserve /* para emergências."
+    },
+    {
+      "id": 233,
+      "idx": 232,
+      "part_id": "aws-1.8",
+      "enunciado": "A payment processor enqueues jobs on Amazon SQS and must wait a short grace period before workers can see each new message (for soft retries or deferred processing). Visibility timeout already covers in-flight processing and must not be confused with this delay. What does DelaySeconds (queue or per-message timer) primarily do?",
+      "alternativas": [
+        "Increase EBS IOPS",
+        "Force HTTPS on an Application Load Balancer",
+        "Postpone message availability for an interval before consumers can receive it",
+        "Create a Route 53 hosted zone"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "DelaySeconds (na fila ou por mensagem) adia a disponibilidade: o consumer só vê a mensagem após o intervalo — útil para retry suave, janelas de graça ou agendamento curto. Não aumenta IOPS do EBS. Não força HTTPS no ALB. Não cria hosted zone. Insight: delay ≠ visibility timeout (invisibilidade após receive); delay atrasa a primeira visibilidade."
+    },
+    {
+      "id": 254,
+      "idx": 253,
+      "part_id": "aws-1.9",
+      "enunciado": "Security schedules deletion of a customer managed KMS key (CMK) that still encrypts objects in a production S3 bucket. The waiting period has not finished, and apps must keep decrypting existing objects. What is the immediate risk of schedule-key-deletion in this situation?",
+      "alternativas": [
+        "PendingDeletion window: after the waiting period the key is gone and decrypt of existing data fails",
+        "Automatic improvement of Application Load Balancer throughput",
+        "Enables PubliclyAccessible on Amazon RDS",
+        "Creates a free RDS read replica"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "schedule-key-deletion coloca a CMK em PendingDeletion: após o waiting period a chave é eliminada e decrypt de dados existentes (ex. objetos S3) falha de forma permanente. Não melhora throughput do ALB. Não habilita PubliclyAccessible no RDS. Não cria read replica grátis. Insight: risco imediato é a janela — cancele a deletion se a chave ainda for necessária; faça backup/reencrypt antes de apagar de verdade."
+    },
+    {
+      "id": 8,
+      "idx": 7,
+      "part_id": "aws-1.1",
+      "enunciado": "A Node.js app on Amazon EC2 writes to DynamoDB. Security requires temporary credentials via an instance profile, private network paths where possible, and hardened instance metadata. Which identity anti-pattern does the SAA exam most heavily penalize?",
+      "alternativas": [
+        "Using a VPC endpoint for DynamoDB",
+        "Using a role with dynamodb:PutItem scoped to the table ARN",
+        "Enabling IMDSv2 on the instance",
+        "Embedding an IAM user access key in application code or user-data"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "O anti-pattern que o SAA mais pune é gravar access key de IAM user no código ou no user-data: keys estáticas são difíceis de rotacionar e vazam com disco, AMI ou repositório. VPC endpoint para DynamoDB é boa prática de rede privada, não anti-pattern. Role com dynamodb:PutItem no ARN da tabela é o design esperado. IMDSv2 endurece o metadata service e é recomendado. Insight: se a opção coloca AKIA... no código ou userdata, descarte no desenho de Associate."
+    },
+    {
+      "id": 280,
+      "idx": 279,
+      "part_id": "aws-1.10",
+      "enunciado": "A CPU-bound AWS Lambda function is configured with 128 MB of memory and shows long durations under load. The execution role and event triggers must remain intact; the team needs a cost/performance adjustment aligned with how Lambda allocates CPU. What is the recommended idea?",
+      "alternativas": [
+        "Disable the execution role",
+        "Set /tmp to 0 bytes only",
+        "Remove the trigger and wait",
+        "Increase memory size (which scales allocated CPU) and measure cost versus duration"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Em Lambda, memory size escala a CPU alocada: 128 MB em workload CPU-bound alonga a duração — aumente memory e meça custo/duração. Desligar execution role quebra API calls. /tmp de 0 bytes não acelera CPU. Remover o trigger só para o processamento. Insight: CPU-bound em Lambda → subir memory costuma reduzir duração e, às vezes, o custo total por invoke."
+    }
+  ]
+}

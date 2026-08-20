@@ -1,0 +1,144 @@
+{
+  "patched": [
+    {
+      "id": 164,
+      "idx": 163,
+      "part_id": "aws-1.6",
+      "enunciado": "A payments team must restore an Amazon RDS PostgreSQL database from a manual snapshot after a bad migration. Compliance requires the original instance to stay online for forensic comparison, and apps use a DNS CNAME to the DB endpoint. After Restore from snapshot, which object does Amazon RDS create, and what must you plan for connection strings?",
+      "alternativas": [
+        "Uma nova DB instance (novo endpoint) a partir do snapshot",
+        "Um Security Group com as mesmas regras automaticamente público",
+        "Um NAT Gateway na subnet do DB",
+        "Um ALB listener 5432"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Restore from snapshot no RDS sempre cria uma nova DB instance com um endpoint DNS novo; o snapshot não sobrescreve a instância original in-place. Por isso a CNAME/connection string precisa apontar para o hostname restaurado (ou você faz rename/swap em passo separado). O restore não cria Security Group público automaticamente — você associa SG na criação/restauração. NAT Gateway e ALB listener 5432 são recursos de rede/balanceamento, não produto de restore de snapshot. Insight: planeje DNS e string de conexão porque o endpoint muda; o original permanece se você não o excluir."
+    },
+    {
+      "id": 190,
+      "idx": 189,
+      "part_id": "aws-1.7",
+      "enunciado": "A media company must serve country-specific landing pages from Amazon Route 53 and meet a content-licensing constraint that users in certain countries never receive another region's catalog. Latency-based routing is available but must not be used for this compliance rule. Which Route 53 control decides which record is returned?",
+      "alternativas": [
+        "Latência medida em tempo real apenas",
+        "Preço Spot das instances de origem",
+        "Localização geográfica do resolvedor DNS do cliente para escolher o record",
+        "TTL máximo do CloudFront globalmente"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Geolocation routing seleciona o record com base na localização geográfica do resolvedor DNS do cliente (país/continente configurado), o que atende regras de conteúdo/compliance por região. Não usa latência medida em tempo real — isso é latency-based routing. Não controla preço Spot nem define TTL máximo global do CloudFront. Insight: geo = compliance/conteúdo regional; latency = performance; não troque os dois no enunciado do SAA."
+    },
+    {
+      "id": 220,
+      "idx": 219,
+      "part_id": "aws-1.8",
+      "enunciado": "A fintech stores payment events in Amazon SQS before workers process them. Security requires encryption of message payloads at rest with optional customer-managed keys for audit, while API calls to SQS already use TLS. Enabling SSE-SQS or SSE-KMS on the queue primarily protects which aspect of the messages?",
+      "alternativas": [
+        "Criptografia em repouso das mensagens na fila (e trânsito via TLS nos endpoints)",
+        "Autenticação do usuário root sem MFA",
+        "Ordem global em filas standard",
+        "Fan-out automático para todos os tópicos SNS da conta"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "SSE-SQS ou SSE-KMS criptografa as mensagens em repouso enquanto estão na fila; o tráfego aos endpoints SQS já usa TLS para o trânsito. Isso não autentica o usuário root sem MFA, não cria ordem global em filas standard e não faz fan-out automático para todos os tópicos SNS da conta. Insight: ative SSE (KMS/CMK se precisar de auditoria e controle de chave); IAM define quem envia/recebe e TLS cobre o caminho até a API."
+    },
+    {
+      "id": 262,
+      "idx": 261,
+      "part_id": "aws-1.9",
+      "enunciado": "An EC2-hosted API caches a database password from AWS Secrets Manager for 24 hours to reduce GetSecretValue calls. Security rotates that secret every 4 hours and immediately invalidates the previous version. Without changing the cache TTL, what is the primary operational risk?",
+      "alternativas": [
+        "A CMK se auto-destrói",
+        "App pode usar senha antiga após rotation → falhas de auth até refresh do cache",
+        "O secret vira público no S3",
+        "O ASG zera o desired"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Se o app cacheia o secret por 24h e a rotation ocorre a cada 4h, após a rotação a senha antiga deixa de valer no banco enquanto o cache ainda serve o valor velho — falhas de autenticação até o refresh. A CMK não se auto-destrói por causa do cache. O secret não vira público no S3 automaticamente. O ASG não zera o desired por isso. Insight: alinhe o TTL do cache ao intervalo de rotation (ou use SDK com cache curto e retry em auth failure)."
+    },
+    {
+      "id": 24,
+      "idx": 23,
+      "part_id": "aws-1.1",
+      "enunciado": "A Solutions Architect must redesign credentials for an application running on Amazon EC2 that currently embeds long-term IAM user access keys in a local .env file. The security team forbids long-lived keys on disk and requires automatic rotation with least blast radius if the host is compromised. Why prefer an IAM role (instance profile) over long-term access keys for this AWS-native workload?",
+      "alternativas": [
+        "Roles são mais caras e por isso 'melhores'",
+        "Access keys nunca funcionam com S3",
+        "Roles não podem ter policies anexadas",
+        "Credenciais temporárias rotacionam e reduzem o impacto de vazamento no host"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Roles entregam credenciais temporárias via STS/IMDS que expiram e rotacionam, reduzindo o impacto se o host vazar. Access keys de longo prazo no disco vazam com AMI, snapshot ou backup e são difíceis de girar. Roles não são 'melhores porque são mais caras' — o ganho é segurança operacional. Access keys funcionam com S3, mas são pior design em workload na AWS. Roles podem (e devem) ter policies anexadas. Insight: 'longo prazo no host' versus 'temporário/IMDS' costuma decidir a questão no Associate."
+    },
+    {
+      "id": 293,
+      "idx": 292,
+      "part_id": "aws-1.10",
+      "enunciado": "A team exposes an AWS Lambda function with a public Function URL (or a public API Gateway stage) and leaves authentication disabled to 'ship faster'. Finance already saw unexpected invoke charges during a traffic spike from the internet. What is the main risk of this design, and how should you harden it?",
+      "alternativas": [
+        "Melhora automática do least privilege da role",
+        "Invoke anônimo e abuso de custo/throttle — proteja com auth (IAM, JWT, etc.) e WAF quando couber",
+        "Desliga logs",
+        "Obriga VPC"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Function URL ou API Gateway pública sem autenticação permite invoke anônimo: abuso de custo, throttle e superfície de ataque. Proteja com IAM, JWT/authorizer e WAF quando couber. Isso não melhora least privilege da execution role, não desliga logs e não obriga VPC. Insight: endpoint público sem auth é anti-pattern clássico de custo e segurança no SAA — autentique antes de abrir para a Internet."
+    },
+    {
+      "id": 308,
+      "idx": 307,
+      "part_id": "aws-1.11",
+      "enunciado": "You model an Amazon DynamoDB table with partition key OrderId. Product needs a second access pattern that still queries by OrderId but sorts by CreatedAt instead of the current sort key Status. The table has not been created yet, and you must avoid a fully different partition key. When should you choose a local secondary index (LSI) instead of a global secondary index (GSI)?",
+      "alternativas": [
+        "Mesma partition key, outra ordenação/sort key, definida na criação da tabela",
+        "Quando se precisa de PK totalmente diferente (aí é GSI)",
+        "Para substituir IAM",
+        "Para cifrar o item sem KMS"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "LSI mantém a mesma partition key com outra sort key e deve ser definida na criação da tabela — ideal para ordenações alternativas na mesma entidade (ex. OrderId + CreatedAt). Partition key totalmente diferente exige GSI. LSI não substitui IAM e não cifra item sem KMS. Insight: mesma PK, outra ordem → LSI (só na create); PK nova ou índice depois da create → GSI."
+    },
+    {
+      "id": 346,
+      "idx": 345,
+      "part_id": "aws-1.12",
+      "enunciado": "An operations team wants Amazon CloudWatch visibility for a multi-tier app: humans need charts during incidents, and automated paging must fire when error rate exceeds a threshold for 5 minutes. Budget allows both dashboards and alarms. What is the correct division of roles between a CloudWatch dashboard and a CloudWatch alarm?",
+      "alternativas": [
+        "Dashboard envia SMS sozinho sempre",
+        "Alarme proíbe dashboards",
+        "Dashboard visualiza; alarme automatiza reação — um não substitui o outro",
+        "Dashboard aumenta RCU"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Dashboard visualiza séries e widgets para triage humana; alarme avalia threshold e automatiza reação (SNS, ASG, recover). Um não substitui o outro. Dashboard não envia SMS sozinho sem alarm/action. Alarme não proíbe dashboards. Dashboard não aumenta RCU do DynamoDB. Insight: use dashboard para investigação humana e alarme para detecção e ação automatizada."
+    },
+    {
+      "id": 48,
+      "idx": 47,
+      "part_id": "aws-1.2",
+      "enunciado": "An RFP requires the production workload to survive the failure of a single Availability Zone with no full outage. During an architecture review you inventory VPC subnets, application tiers, load balancers, and databases. Which inventory finding is the anti-pattern that violates the AZ-failure requirement?",
+      "alternativas": [
+        "Subnets e app em pelo menos duas AZ",
+        "ALB cobrindo múltiplas AZ",
+        "RDS Multi-AZ quando o engine exige HA de banco",
+        "Todos os recursos de produção apenas na AZ-a"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "A pergunta pede o anti-padrão: concentrar todos os recursos de produção apenas na AZ-a faz a queda dessa AZ derrubar a carga, violando o RFP. Subnets e app em pelo menos duas AZ é o padrão correto. ALB cobrindo múltiplas AZ é boa prática de HA na borda. RDS Multi-AZ quando o engine exige HA de banco está alinhado ao requisito. Insight: inventário single-AZ é o cheiro mais rápido de falha de HA em revisão de arquitetura."
+    },
+    {
+      "id": 82,
+      "idx": 81,
+      "part_id": "aws-1.3",
+      "enunciado": "A config object that previously appeared under aws s3 ls is missing after an operator ran a delete. The bucket has versioning Enabled, Block Public Access is on, and you must recover the prior content without redesigning networking. What is the next check to locate the object or its delete marker?",
+      "alternativas": [
+        "Recriar a VPC de produção",
+        "list-object-versions (ou console de versões) para delete marker ou VersionId anterior",
+        "Desligar rotação de chaves KMS da conta",
+        "Abrir 0.0.0.0/0 em um Security Group 'do bucket'"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Com versioning Enabled, s3 ls (ListObjects) esconde versões e delete markers: o objeto 'sumiu' da listagem atual, mas ainda pode existir como versão anterior. O próximo check é list-object-versions (ou console de versões) para achar delete marker ou VersionId e restaurar. Recriar a VPC não recupera objeto S3. Desligar rotação de chaves KMS não traz o key de volta à listagem e pode atrapalhar decrypt. Security Group 'do bucket' com 0.0.0.0/0 é mito: S3 não usa SG de EC2 para listagem. Insight: delete com versioning = delete marker; restaure a VersionId anterior, não recrie rede."
+    }
+  ]
+}

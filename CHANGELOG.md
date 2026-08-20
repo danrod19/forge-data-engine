@@ -4,6 +4,12 @@
 
 ## Entradas Recentes
 
+- **2026-08-19** — AWS Trilha cenários enriquecidos — 19/08/2026
+  - 50 itens prioritários em `src/data/questions_aws_traditional.json` (hub Trilha via `awsTrilhaScenarios`)
+  - Stems EN SAA-like (situação + requisito + restrição + decisão); média ~56→~277 chars
+  - `explicacao_profunda` PT; `resposta_correta` e IDs estáveis; `tickets_aws.json` intocado
+  - Backup: `scripts/output/aws_scenarios_before_enrich.json`
+
 - **2026-08-18** — Estudo V1 study_notes polish — 18/08/2026
   - Polidas as 31 `src/data/parts/part-*-content.json` (módulos 1–6; O que é · Quando usar/NÃO ou prova/TShoot · Exemplo · tech · Armadilhas · Ligação Simulado+Trilha CLI)
   - Regen: `node scripts/gen-estudo-content.mjs` → `src/data/estudo-content-bank/{1..6}.*.json` + `estudo-content.ts`

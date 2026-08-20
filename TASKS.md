@@ -30,6 +30,7 @@
 - [x] Estudo AWS study_notes polish — 18/08/2026 (aws-1.1–1.12 + regen bank)
 - [x] Estudo V2 study_notes polish — 18/08/2026 (todas as 17 parts v2-1.1…5.2 + regen bank)
 - [x] Estudo V1 study_notes polish — 18/08/2026 (todas as 31 parts 1.1–6.5 + regen bank)
+- [x] AWS Trilha cenários enriquecidos — 19/08/2026 (50 prioritários em questions_aws_traditional.json)
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção
@@ -61,6 +62,12 @@
   - Backup: `scripts/output/estudo_v1_content_before_polish/` (31 arquivos)
   - `1.4-drill` = prática só (sem content próprio); content didático = part `1.4`
   - part_id estáveis; traditional/tickets curated / Trilha wiring intocados
+- [x] AWS Trilha cenários enriquecidos — 19/08/2026 (50 prioritários)
+  - Fonte UI: `src/data/questions_aws_traditional.json` → `awsTrilhaScenarios` / `getTicketsPool("aws")`
+  - Critério: score≥5 (short/dry/no constraint), exclui meta quiz, diversificado por part_id
+  - Stems EN estilo SAA (situação+requisito+restrição+decisão); `explicacao_profunda` PT; `resposta_correta` intacta
+  - Backup: `scripts/output/aws_scenarios_before_enrich.json`
+  - `tickets_aws.json` e study notes AWS intocados
 
 ### Bloqueios / Pendências
 - Env Stripe em produção já falhou uma vez (“link não configurado”)

@@ -1,0 +1,124 @@
+{
+  "patched": [
+    {
+      "id": 237,
+      "enunciado": "A retailer fans out OrderPlaced events with Amazon SNS. One subscriber is a legacy HTTP webhook that briefly drops during deploys and loses notifications. They must keep the SNS publisher unchanged, tolerate at-least-once delivery, and survive temporary consumer outages. Which design best meets the requirement?",
+      "alternativas": [
+        "Replace SNS with direct synchronous HTTPS only; SNS cannot use HTTP endpoints in AWS",
+        "Subscribe an Amazon SQS queue to the SNS topic and have workers poll the queue so messages buffer and redeliver while the HTTP consumer is down",
+        "Switch publishers to SQS alone so IAM policies are no longer required for producers or consumers",
+        "Keep SNS→HTTP only because SNS cannot deliver the same event to more than one subscriber"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "SNS→SQS coloca um buffer entre o fan-out e o consumidor frágil: se o webhook HTTP cair no deploy, a fila guarda e reentrega depois, absorvendo picos e falhas temporárias sem mudar o produtor. SNS→HTTP direto sem buffer perde eventos quando o endpoint oscila. SQS não elimina a necessidade de IAM. SNS suporta vários subscribers — por isso o fan-out. Tip de prova: consumidor instável → prefer SNS→SQS→worker a SNS→HTTP direto."
+    },
+    {
+      "id": 247,
+      "enunciado": "A nightly batch job in another AWS account needs kms:Encrypt and kms:Decrypt on a customer managed key for a six-hour window. Security must grant time-bounded key usage without rewriting the full key policy for every temporary workload. Which KMS mechanism fits?",
+      "alternativas": [
+        "Create a KMS grant that delegates specific key-usage permissions to the principal in a controlled/temporary way without rewriting the entire key policy",
+        "Replace the VPC network ACLs so KMS API calls from the other account are allowed at the subnet edge",
+        "Create a public Route 53 hosted zone so the batch job can resolve the CMK by DNS name",
+        "Disable MFA on the root user so the batch job can use long-term root credentials for the window"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Grant KMS delega permissões de uso da chave a um principal de forma controlada e temporária, sem reescrever a key policy inteira — ideal para workloads pontuais cross-account. NACL não substitui autorização KMS (é filtro de rede na subnet). Hosted zone pública (Route 53) não concede uso de CMK. Desligar MFA do root é péssima prática e não é o mecanismo de delegação. Tip de prova: grant = delegação operacional na chave; administração permanente da CMK continua na key policy."
+    },
+    {
+      "id": 20,
+      "enunciado": "You are scoping an Associate-level IAM foundations pilot for a single AWS account. The syllabus must cover users/groups with least privilege, roles/trust and instance profiles, plus AccessDenied and explicit Deny. Which topic should you deliberately keep out of deep scope for this pilot?",
+      "alternativas": [
+        "IAM users, groups, and least-privilege identity policies",
+        "IAM roles, trust policies, and EC2 instance profiles",
+        "Troubleshooting AccessDenied and explicit Deny evaluation",
+        "Deep AWS Organizations SCPs and a full IAM Identity Center lab"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "O piloto aws-1.1 cobre IAM clássico da conta: users/groups/least privilege, roles/trust/instance profile e leitura de AccessDenied/Deny explícito. Organizations SCPs em profundidade e lab completo de IAM Identity Center ficam para parts de multi-account/federação. Não marque users, roles ou Deny como 'fora' — são o miolo do foundations. Tip de prova: se a questão exigir SCP de Organizations em profundidade, não force só 'group IAM' como resposta completa."
+    },
+    {
+      "id": 286,
+      "enunciado": "A Lambda function unpacks a large dependency bundle and writes intermediate files during a single invocation. The team needs local scratch space for that work, but must not treat it as multi-year durable storage, and cold starts may get a fresh execution environment. How should they use /tmp?",
+      "alternativas": [
+        "Use /tmp instead of Amazon S3 for 10-year retention of compliance archives",
+        "Assume /tmp is Amazon EFS always mounted by default on every function",
+        "Treat /tmp as ephemeral scratch space tied to the execution environment; it is not durable storage across indefinite cold starts",
+        "Rely on /tmp contents to persist after the function is deleted from the account"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "/tmp é storage efêmero do execution environment: útil para unpack, cache local curto e artefatos da invocação. Não é durável entre ambientes frios indefinidos nem substitui objeto de longo prazo. Não troca S3 em retenção de 10 anos. Não é EFS montado por default (EFS exige config explícita). Não sobrevive ao delete da function. Tip de prova: dados que precisam sobreviver → S3/EFS/DynamoDB; /tmp é scratch do runtime."
+    },
+    {
+      "id": 310,
+      "enunciado": "An ecommerce catalog in DynamoDB must invalidate a Redis cache and notify analytics whenever an item is inserted, updated, or deleted. Polling the table every minute is too slow and costly under steady write traffic. Which pattern fits?",
+      "alternativas": [
+        "Rotate the table partition key on every write so readers detect mutations by key change",
+        "Disable encryption at rest so change events can be captured in plaintext",
+        "Create VPC peering automatically from DynamoDB to the cache subnet on each write",
+        "Enable DynamoDB Streams and trigger Lambda to react to inserts/updates/deletes in an event-driven way (cache invalidation, fan-out)"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "DynamoDB Streams + Lambda reage a inserts/updates/deletes de forma event-driven — invalidar cache, fan-out, audit — sem polling. Não substitui a partition key. Não exige desligar encryption. Não cria VPC peering automático. Tip de prova: mude o item na tabela e deixe o stream disparar efeitos colaterais; evite varrer a tabela em loop."
+    },
+    {
+      "id": 348,
+      "enunciado": "An API’s p99 latency SLO needs faster detection than a 60-second CloudWatch period allows. On-call wants ~1-second visibility into spikes, but finance constrains metric ingest cost and volume. What is the correct trade-off for high-resolution metrics?",
+      "alternativas": [
+        "Enable high-resolution metrics on every custom metric because they are always free and mandatory",
+        "Switch to high-resolution metrics so you no longer need to define metric dimensions",
+        "Use high-resolution (~1s) metrics for greater granularity when a 60s period is too coarse, accepting higher cost and data volume",
+        "Enable high-resolution metrics specifically to turn off CloudWatch alarms"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "High-resolution metrics (~1s) dão granularidade maior quando o period de 60s é grosso demais, com trade-off claro de custo e volume de dados. Não são sempre grátis nem obrigatórias. Não removem a necessidade de dimensions. Não desligam alarms. Tip de prova: reserve alta resolução para SLIs sensíveis; o padrão 60s cobre a maioria dos alarmes SAA."
+    },
+    {
+      "id": 39,
+      "enunciado": "You design a VPC with public and private subnets. Private EC2 instances need outbound internet for OS patches without accepting inbound connections from the internet. Where should you place the NAT Gateway in the classic public/private design?",
+      "alternativas": [
+        "In a public subnet with a route to an Internet Gateway, as the 0.0.0.0/0 target for private subnet route tables",
+        "Only inside the Multi-AZ RDS DB instance as a built-in egress feature for the VPC",
+        "As a network attachment on the IAM root user for account-wide egress",
+        "Mandatorily in a different AWS Region from the VPC it serves"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "No desenho clássico public/private, o NAT Gateway fica em subnet pública (com rota ao IGW) para ser target 0.0.0.0/0 das route tables das privadas. Não mora 'dentro' do RDS Multi-AZ. Não é anexo de rede no usuário root IAM. Não precisa estar obrigatoriamente em outra Região — NAT é recurso regional na mesma VPC/AZs do desenho. Tip de prova: NAT precisa de path ao IGW; por isso fica na pública e as privadas apontam para ele."
+    },
+    {
+      "id": 85,
+      "enunciado": "While covering S3 foundations, an architect must explain Cross-Region Replication (CRR) for object durability planning. Leadership wants awareness of multi-Region object copies but not a full multi-Region application failover lab yet. How should CRR be treated at this foundations level?",
+      "alternativas": [
+        "As a mandatory full multi-Region application failover lab required in every S3 question",
+        "As a feature that must never be mentioned on the SAA-C03 exam",
+        "As a capability available only when the object class is Glacier Deep Archive",
+        "As an object resilience/DR concept across Regions; deep multi-Region failover implementation stays outside the foundations pilot"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Em foundations, CRR entra como ideia de resiliência/DR de objetos entre Regiões; o lab multi-region com failover de app não é o foco obrigatório de toda questão. Não é proibido no SAA-C03 — aparece em desenho de DR. Também não é exclusivo de Glacier Deep Archive: CRR replica objetos entre buckets (classes conforme a regra). Tip de prova: foundations = versioning/lifecycle no dia a dia; CRR = conceito de cópia cross-region, sem exigir runbook completo de failover."
+    },
+    {
+      "id": 99,
+      "enunciado": "An ops team hardened a golden EC2 instance (packages, agents, CIS baselines). They must clone that build into Auto Scaling launch templates across accounts with minimal configuration drift. How do they create a reusable AMI from the configured instance?",
+      "alternativas": [
+        "Only copy the Elastic IP association to another AWS account",
+        "Only export the Security Group rules and reuse them as the OS image",
+        "Use CreateImage (CLI) or Create AMI in the console based on snapshots of the selected volumes",
+        "Disable S3 versioning on the account to unlock AMI creation for EC2"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "AMI reutilizável sai de CreateImage (CLI) ou Create AMI no console, baseado em snapshots dos volumes selecionados da instance. Copiar Elastic IP para outra conta não captura disco/SO. Exportar só o Security Group copia regras de rede, não a imagem. Desligar versioning S3 é irrelevante para criar AMI de EC2. Tip de prova: padronize bake de AMI (golden image) em vez de configurar cada instance na mão."
+    },
+    {
+      "id": 147,
+      "enunciado": "Users report intermittent 502/504 errors behind an Application Load Balancer. You need request-level evidence of HTTP status, latency, and which target was chosen—without resizing volumes, creating IAM users, or changing the VPC CIDR. Which approach helps this TShoot?",
+      "alternativas": [
+        "Enable ALB access logs to correlate HTTP status codes, timings, and selected targets for 5xx/timeouts",
+        "Use ALB access logs to automatically resize EBS volumes on unhealthy targets",
+        "Use ALB access logs to create IAM users for each client IP that received an error",
+        "Use ALB access logs to redesign and change the VPC CIDR block"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "ALB access logs mostram status HTTP, latência e target escolhido — base para correlacionar 5xx, timeouts e backends ruins. Não redimensionam EBS. Não criam IAM users. Não alteram CIDR da VPC. Tip de prova: 502/504 no access log + target id → vá ao health check e à app daquele target, não só a um gráfico genérico do CloudWatch."
+    }
+  ]
+}

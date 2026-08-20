@@ -1,0 +1,124 @@
+{
+  "patched": [
+    {
+      "id": 116,
+      "enunciado": "A batch analytics fleet runs long-lived EC2 instances that pause overnight. Operators want to resume the same in-memory working set later without rehydrating from scratch, and stop alone is not enough. Root volume type/size and AMI must support the feature. When is hibernate the right choice versus a normal stop?",
+      "alternativas": [
+        "To securely wipe and delete the root volume",
+        "To migrate the instance across Regions without any snapshot",
+        "To preserve RAM state on the root volume and resume later (specific cases with a suitable root volume)",
+        "To replace the instance Security Group with a network ACL"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Hibernate grava o estado da RAM no root volume (EBS adequado) e retoma processos depois — útil quando o requisito é preservar working set sem rehidratar. Não apaga o root com segurança, não migra entre Regiões sem snapshot e não troca SG por NACL. Insight: hibernate = RAM preservada no disco; stop = desliga sem preservar RAM (EBS persiste, mas memória some)."
+    },
+    {
+      "id": 130,
+      "enunciado": "Microservices in a private VPC call each other over HTTP through a shared Application Load Balancer. Only clients inside the VPC (and connected private networks) may reach the balancer; public internet exposure is forbidden. When should the ALB use an internal scheme instead of internet-facing?",
+      "alternativas": [
+        "Whenever HTTPS/TLS is enabled on listeners",
+        "Only when all targets are Spot Instances",
+        "Only when the ALB is deployed in us-east-1",
+        "When only VPC/private-network clients should reach the load balancer (e.g. service-to-service)"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "ALB internal (scheme internal) atende clientes só na VPC/rede privada — típico service-to-service sem exposição pública. Internet-facing é para clientes via IGW. HTTPS não força internal; ambos os schemes suportam TLS. Spot e Região (us-east-1) não decidem o scheme. Insight: API só interna → ALB internal + SG dos clients; site público → internet-facing em subnets públicas."
+    },
+    {
+      "id": 162,
+      "enunciado": "An RDS production database must support point-in-time recovery for compliance drills. A change sets automated backup retention to 0 to cut storage cost. What recovery capability is lost as a direct result?",
+      "alternativas": [
+        "Enhanced Monitoring only",
+        "The DB instance class type only",
+        "Point-in-time restore and the automated backup window (plus operational risk)",
+        "The ability to use Security Groups"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Retention 0 desliga backups automáticos: some a janela de backup e o PITR, que depende de snapshots contínuos + transaction logs na retention. Enhanced Monitoring só exporta métricas de OS e não some com isso. Instance class e Security Groups são independentes da retention. Insight: retention 0 é anti-pattern operacional; snapshot manual esporádico não devolve granularidade de PITR até o segundo."
+    },
+    {
+      "id": 189,
+      "enunciado": "An API is published on two endpoints (v1 stable and v2 candidate). Product wants ~80% of DNS answers to v1 and ~20% to v2 during a gradual rollout, without forcing CloudFront cache behavior or changing ALB Security Groups. What is the typical use of Route 53 weighted routing 80/20?",
+      "alternativas": [
+        "Canary/blue-green gradual DNS traffic split between two endpoints",
+        "Force a permanent 100% cache hit ratio on CloudFront",
+        "Disable health checks permanently on all records",
+        "Replace the Security Group attached to the ALB"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Weighted routing 80/20 divide respostas DNS por peso — uso típico de canary ou blue-green gradual entre dois endpoints (v1/v2). Não obriga 100% cache hit no CloudFront, não desliga health checks e não substitui SG do ALB. Insight: combine weights baixos no canary com health checks; DNS tem TTL — a mudança de tráfego não é instantânea."
+    },
+    {
+      "id": 236,
+      "enunciado": "An API service role must publish events to a specific SNS topic. CloudTrail shows AccessDenied on sns:Publish. Least privilege requires fixing IAM on that topic ARN without inventing unrelated SQS actions or opening VPC ports on SNS. What is the correct fix?",
+      "alternativas": [
+        "Allow an invented sqs:DeleteMessageStack action",
+        "Allow sns:Publish on the topic ARN in the API role",
+        "Open TCP 587 in a Security Group for SNS (managed service is not typically gated that way in a VPC SG)",
+        "Create an apex CNAME pointing at the SNS topic"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "AccessDenied em sns:Publish corrige-se com Allow sns:Publish no ARN do topic na role da API (e sem Deny conflitante). Ação SQS inventada não autoriza SNS. SNS gerenciado não se 'abre' com porta 587 em SG de VPC como um RDS. CNAME no apex não resolve IAM. Insight: publish negado → policy da role no ARN do topic; confirme região e ARN."
+    },
+    {
+      "id": 261,
+      "enunciado": "A regulated workload moves PII between clients and APIs and stores objects in S3. Compliance requires protection both while data moves on the wire and while it sits on disk; neither control alone is enough. How do TLS in transit and KMS at rest complement each other?",
+      "alternativas": [
+        "KMS replaces TLS for all public APIs",
+        "TLS removes any need for a KMS key policy",
+        "TLS protects data in transit; KMS/CMK protects data at rest — sensitive-data requirements usually need both",
+        "A CMK removes the need for HTTPS on CloudFront"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "TLS protege em trânsito; KMS/CMK protege em repouso — requisitos de dados sensíveis pedem as duas camadas. KMS não substitui TLS em APIs públicas. TLS não elimina key policy. CMK não remove HTTPS do CloudFront. Insight: trânsito ≠ repouso; marcar só um dos eixos deixa o outro exposto."
+    },
+    {
+      "id": 6,
+      "enunciado": "A CI pipeline successfully calls sts:AssumeRole into a deployment role before calling AWS APIs. It must not rely on long-lived access keys, ACM certificates, Elastic IPs, or AMIs for authorization. After a successful AssumeRole, what does the caller receive to sign API requests?",
+      "alternativas": [
+        "A permanent ACM certificate valid for one year",
+        "Temporary session credentials (access key, secret, and session token)",
+        "A fixed Elastic IP associated with the role",
+        "A new AMI with the IAM policy baked into the image"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "AssumeRole bem-sucedido devolve credenciais temporárias STS: AccessKeyId, SecretAccessKey e SessionToken, com validade limitada — o que o pipeline usa para assinar APIs. ACM emite certificados TLS, não output de AssumeRole. Elastic IP é endereço EC2, não identidade IAM. AMI não embute policy de sessão; policies ficam no IAM. Insight: busque 'temporário / sessão / STS' quando a pergunta for o retorno de AssumeRole."
+    },
+    {
+      "id": 295,
+      "enunciado": "Account A owns an S3 bucket that must invoke a Lambda in Account B on object create. The Lambda execution role alone is not enough for a cross-account trigger, and opening SSH or changing DNS/BPA without policies is forbidden. Beyond the execution role, what else is required?",
+      "alternativas": [
+        "Only open TCP 22 on the Lambda ENI",
+        "Invoke permissions on the Lambda resource-based policy plus S3 notification configuration in the source account",
+        "Only an ALIAS record at the DNS apex",
+        "Only disable Block Public Access and skip any policy"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "S3→Lambda cross-account exige resource policy na Lambda permitindo invoke pelo serviço/conta origem e notificação/evento no bucket da conta origem — além da execution role. Abrir 22 na ENI é irrelevante e inseguro. ALIAS no apex é DNS, não trigger. Desligar BPA sem policy não autoriza invoke. Insight: trigger cross-account = permissão nos dois lados (S3 notify + Lambda policy)."
+    },
+    {
+      "id": 307,
+      "enunciado": "An order service writes a new item to DynamoDB and immediately reads it back to confirm the latest value for checkout. Cost and latency matter: strong consistency is only needed on that read path, not everywhere, and GSIs are not the answer. What is the trade-off of a strongly consistent read?",
+      "alternativas": [
+        "Reads the most recent value from the base table with higher RCU use; eventual consistency is the cheaper/faster default in many cases",
+        "It is free and always available on every GSI",
+        "It permanently disables throttling",
+        "It forces the table to on-demand capacity mode"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Strongly consistent read na tabela base devolve o valor mais recente e consome mais RCU; eventually consistent é o default, em geral mais barato/rápido o suficiente. Não é grátis nem 'sempre no GSI' (GSI não oferece strong da mesma forma). Não desliga throttle nem obriga on-demand. Insight: use strong só quando o caso exige ler o write recém-confirmado; o resto fica eventual."
+    },
+    {
+      "id": 338,
+      "enunciado": "A CloudWatch Agent on EC2 fails to publish custom metrics: AccessDenied on PutMetricData. The fix must be least privilege on CloudWatch, not Route 53, S3 CreateBucket, or EC2 CreateTags. What is the most likely cause on the agent role?",
+      "alternativas": [
+        "Missing cloudwatch:PutMetricData (and allowed namespaces) on the identity policy",
+        "Missing route53:ListHostedZones only",
+        "Missing s3:CreateBucket only",
+        "Missing ec2:CreateTags only"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "PutMetricData AccessDenied na role do agent indica falta de cloudwatch:PutMetricData (e namespaces permitidos, se restringidos) na identity policy. ListHostedZones, s3:CreateBucket e ec2:CreateTags são Actions de outros serviços e não autorizam métricas. Insight: custom metrics / CloudWatch Agent exigem PutMetricData explícito; leia a Action negada no CloudTrail."
+    }
+  ]
+}

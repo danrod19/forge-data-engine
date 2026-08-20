@@ -1,0 +1,124 @@
+{
+  "patched": [
+    {
+      "id": 13,
+      "enunciado": "A fintech needs console admins and EC2 apps that call S3. Security requires long-lived identities only for people and temporary credentials for compute workloads. Which design correctly contrasts an IAM user and an IAM role?",
+      "alternativas": [
+        "User is a long-lived identity (person/legacy app); role is assumable and uses temporary credentials",
+        "IAM roles exist only in AWS GovCloud Regions",
+        "IAM users can never have managed or inline policies attached",
+        "IAM roles always have a console password like human users"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "No desenho SAA, user cobre identidade humana/legado de longo prazo (senha ou access keys), enquanto role é assumida e recebe credenciais temporárias via STS — exatamente o que workloads EC2 precisam sem keys permanentes. Role não é exclusiva de GovCloud; existe nas regiões comerciais. User pode e costuma ter policies anexadas. Role não ganha senha de console: quem assume recebe sessão STS. Insight: humano no console → user (ou federação); serviço AWS → role."
+    },
+    {
+      "id": 275,
+      "enunciado": "A team runs a Lambda that writes to DynamoDB and must allow another AWS account's API Gateway to invoke it. Permissions for what the function can call and who can invoke it must stay separate. Which statement is correct?",
+      "alternativas": [
+        "Execution role = what the function can call; resource-based policy = which principals may invoke the function",
+        "Execution role and resource-based policy are always the same IAM document",
+        "A resource-based policy replaces the function timeout setting",
+        "The execution role alone defines the function memory size"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "A execution role autoriza a function a chamar DynamoDB/S3 (egress de permissão); a resource-based policy na function controla quem pode invocar (outra conta, API Gateway) — separação que o cenário exige. Não são o mesmo documento IAM. Resource policy não substitui timeout. Memory size é configuração da function, não da role. Insight: 403 ao invocar de fora → resource policy; falha ao escrever no DynamoDB → execution role."
+    },
+    {
+      "id": 309,
+      "enunciado": "An app stores session tokens in DynamoDB and must expire them after 24 hours without scheduled delete jobs that consume write capacity. Cleanup should be automatic and low-ops. What is the effect of enabling TTL on an expiry attribute?",
+      "alternativas": [
+        "Eligible items are removed later (best-effort) with no app-side delete cost — typical for session/cache cleanup",
+        "The entire table is deleted automatically at midnight every day",
+        "Provisioned WCU is raised automatically to 40,000",
+        "The table is converted from NoSQL to a SQL engine"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "TTL no atributo de expiração marca itens elegíveis para remoção posterior best-effort, sem delete explícito da aplicação nem job que gaste WCU — encaixa sessão/cache de 24h. Não apaga a tabela inteira à meia-noite. Não sobe WCU sozinho para 40k. Não converte a tabela em SQL. Insight: TTL não é delete síncrono no segundo exato; planeje janela eventual de expiração."
+    },
+    {
+      "id": 340,
+      "enunciado": "On-call receives noisy pages when a single CloudWatch metric spikes briefly. They need an alert only when CPU AND 5xx error rate are both high, without changing log groups or account billing. Which approach best reduces noise?",
+      "alternativas": [
+        "Delete and replace every CloudWatch Logs log group in the account",
+        "Disable billing and cost anomaly detection for the whole account",
+        "Create VPC interface endpoints automatically for all AWS services",
+        "Use a composite alarm (AND/OR idea) so action fires only on the aggregated condition"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Composite alarm combina vários alarmes com lógica AND/OR e só dispara na condição agregada (CPU alta E 5xx) — reduz ruído sem mexer em log groups ou billing. Substituir log groups não resolve página por métrica isolada. Desligar billing não é controle de alerta. VPC endpoints não agregam alarmes. Insight: use composite quando um único sintoma é insuficiente para acionar página."
+    },
+    {
+      "id": 52,
+      "enunciado": "A solutions architect must restrict SSH to a bastion so only the corporate office CIDR can connect. Port 22 must not be open to the internet, following least privilege. How should inbound access be configured?",
+      "alternativas": [
+        "Allow TCP 22 from 0.0.0.0/0 and rely only on a generic NACL for protection",
+        "Security group inbound TCP 22 with Source = office CIDR (consider SSM designs without exposing 22)",
+        "Attach an Elastic IP to a Multi-AZ RDS instance to gate bastion SSH",
+        "Remove the Internet Gateway from the entire VPC to protect the bastion"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Least privilege no bastion: SG inbound TCP 22 com Source = CIDR do escritório (ou SSM Session Manager sem expor 22) atende o requisito e a restrição de não abrir à Internet. 0.0.0.0/0 + NACL genérica é fraco e difícil de auditar. Elastic IP no RDS Multi-AZ não controla SSH do bastion. Remover o IGW da VPC inteira quebra outros paths e não substitui Source CIDR preciso na regra 22. Insight: bastion em produção séria → CIDR corporativo ou SSM, nunca 0.0.0.0/0."
+    },
+    {
+      "id": 81,
+      "enunciado": "Platform engineers must audit an S3 bucket policy using GetBucketPolicy. The bucket must remain private to anonymous internet users, and authorization must come from IAM—not network path tricks. Which principal can typically succeed?",
+      "alternativas": [
+        "A principal with s3:GetBucketPolicy allowed (and no Deny) — typically a platform admin/role",
+        "Any anonymous Internet user by default on a new bucket",
+        "Only the Amazon EC2 Auto Scaling service principal",
+        "Only when the VPC NAT Gateway is turned off"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "GetBucketPolicy só sucede com Allow em s3:GetBucketPolicy (IAM e/ou bucket policy) e sem Deny — típico de role/admin de plataforma, mantendo o bucket privado ao anônimo. Anônimo da Internet não lê policy por default (BPA/privado). Auto Scaling não é o único consumidor dessa API. NAT ligado/desligado não autoriza S3: autorização é IAM/policy, não path de egress. Insight: AccessDenied em get-bucket-policy quase sempre é falta de Allow ou Deny explícito no caller."
+    },
+    {
+      "id": 103,
+      "enunciado": "EC2 web instances use an instance profile role and host plugins that can issue outbound HTTP requests. Security must harden against simple SSRF stealing role credentials from instance metadata, without resizing EBS or changing SGs. What should they enable?",
+      "alternativas": [
+        "Automatic EBS volume growth whenever CPU is high",
+        "Disable the instance Security Group entirely",
+        "IMDSv2 so metadata reads require a session token, reducing theft via simple SSRF",
+        "Mandate Spot Instances for every workload in the account"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "IMDSv2 exige token de sessão (PUT) antes de ler metadata, o que mitiga SSRF simples que só faz GET e rouba credenciais da role — sem tocar EBS nem SG. Não aumenta tamanho de EBS. Não desliga Security Group. Não obriga Spot. Insight: em instances com role, IMDSv2 (e hop limit) é controle barato contra SSRF clássico no IMDS."
+    },
+    {
+      "id": 134,
+      "enunciado": "A web tier sits behind an ALB and scales with an Auto Scaling group. New instances must receive traffic automatically, and unhealthy targets should be replaced using ELB health checks. Why register the ASG with the ALB target group?",
+      "alternativas": [
+        "So the ASG can create new VPCs automatically on each scale-out",
+        "So Security Groups on the instances are disabled",
+        "So new instances join load balancing and unhealthy ones are handled via the ELB health path",
+        "So the Application Load Balancer is converted into a Network Load Balancer"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Anexar o ASG ao target group faz o ASG registrar/deregistrar instances no balanceamento e integra health do ELB para substituir unhealthy, mantendo o desired — exatamente o requisito do cenário. ASG não cria VPCs ao se anexar ao TG. Não desliga Security Groups. Não converte ALB em NLB. Insight: sem attach ASG↔TG, scale-out sobe machines que o ALB nunca vê."
+    },
+    {
+      "id": 165,
+      "enunciado": "A three-tier app uses an internet-facing ALB, private EC2 app servers, and Amazon RDS. Compliance forbids placing the database in a public subnet just so the load balancer can reach it. How should connectivity be designed?",
+      "alternativas": [
+        "Place RDS in a public subnet because the ALB must speak SQL to the engine on port 443",
+        "Use Multi-AZ RDS, which forbids any subnet group by design",
+        "ALB talks to the app tier; the app talks to RDS in private subnets — exposing the DB publicly increases attack surface",
+        "Use gp3 only for RDS in public subnets; gp3 does not work in private subnets"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "O ALB termina HTTP(S) no app tier; quem abre SQL no RDS é a aplicação na VPC privada — atender compliance sem expor o banco. Colocar RDS público 'para o ALB conectar' aumenta superfície sem necessidade. ALB não fala SQL na 443 com o engine. Multi-AZ exige subnets em AZs distintas, não 'proíbe subnets'. gp3 funciona independente de pública/privada. Insight: RDS privado + SG permitindo só o SG do app é o padrão SAA."
+    },
+    {
+      "id": 194,
+      "enunciado": "A company publishes a single API hostname and needs DNS that returns one answer without latency, weighted, or geolocation evaluation. Advanced health-based failover is out of scope for now. Which Route 53 simple routing behavior applies?",
+      "alternativas": [
+        "Simple routing always requires at least two health checks before answering",
+        "Simple routing works only when the record is fronted by CloudFront",
+        "Simple routing automatically replaces Origin Access Identity (OAI) settings",
+        "Returns a single value (or multi-value answer idea) without latency/weight/geo advanced policy evaluation"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Simple routing devolve um valor (ou multi-value answer, na ideia básica) sem avaliar latência, peso ou geo — cabe ao hostname único sem failover avançado. Não exige sempre dois health checks. Não 'só funciona com CloudFront'. Não substitui OAI. Insight: simple é o default para um target; se o stem pedir health/failover/weight/geo, a policy já não é simple pura."
+    }
+  ]
+}

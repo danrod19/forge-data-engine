@@ -4,6 +4,10 @@
 
 ## Entradas Recentes
 
+- **2026-09-11** — Planos 7/30/120 sempre visíveis
+  - Home e Paywall deixavam de renderizar `ProPlans` com PRO efetivo (ex.: trial 24h ativo)
+  - `ProPlans` / `getStripePlans` não filtram por `trial_used`; os 3 botões (R$ 6,90 / 20,90 / 57,90) listam sempre
+
 - **2026-09-11** — Copy de lançamento (Sobre + Upgrade/paywall)
   - Parágrafo único em `launchCopy` (Sobre CCNA, Home planos, Conta desbloquear, paywall Upgrade)
   - Bullets PRO: vidas infinitas, explicações sem blur, planos 7/30/120 (sem inventar preço de 7 dias em R$)

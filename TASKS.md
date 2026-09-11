@@ -38,6 +38,7 @@
 - [x] Auth Spec 5 — signup com e-mail já existente (copy genérica + CTAs Entrar / Esqueci a senha)
 - [x] Histórico de simulados na Conta (`simulado_runs` + RLS; grava no resultado se logado)
 - [x] Copy de lançamento — Sobre a Prova + Upgrade/paywall (parágrafo + bullets PRO; e-mail ccnaforge19@gmail.com)
+- [x] UI: 3 planos (7/30/120) sempre visíveis — não esconder 7d após trial/PRO
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção

@@ -11,7 +11,7 @@ export interface StripePlan {
   url: string;
 }
 
-/** Planos one-shot via Stripe Payment Links (sem subscription). */
+/** Planos one-shot via Stripe Payment Links (sem subscription). Sempre 7d+30d+120d. */
 export function getStripePlans(): StripePlan[] {
   return [
     {

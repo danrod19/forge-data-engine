@@ -128,40 +128,38 @@ export function PaywallModal({
           </ul>
 
           <div className="relative mt-5 space-y-3">
-            {isProEfetivo ? (
+            {isProEfetivo && (
               <p className="rounded-lg border border-neon-green/30 bg-neon-green/10 px-3 py-2 text-center font-mono text-xs text-neon-green">
                 PRO já ativo nesta conta.
               </p>
-            ) : (
-              <>
-                {!user && onAuthClick && (
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      onOpenChange(false);
-                      onAuthClick();
-                    }}
-                    className="h-10 w-full gap-2 border border-neon-cyan/35 bg-neon-cyan/10 font-semibold text-neon-cyan hover:bg-neon-cyan/20"
-                  >
-                    <LogIn className="size-4" />
-                    Entrar para usar trial / PRO
-                  </Button>
-                )}
-
-                {user && trialAvailable && (
-                  <div className="space-y-2">
-                    <TrialButton onStart={handleTrial} loading={trialLoading} />
-                    {trialError && (
-                      <p className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 font-mono text-[11px] text-rose-300">
-                        ! {trialError}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                <ProPlans />
-              </>
             )}
+
+            {!isProEfetivo && !user && onAuthClick && (
+              <Button
+                type="button"
+                onClick={() => {
+                  onOpenChange(false);
+                  onAuthClick();
+                }}
+                className="h-10 w-full gap-2 border border-neon-cyan/35 bg-neon-cyan/10 font-semibold text-neon-cyan hover:bg-neon-cyan/20"
+              >
+                <LogIn className="size-4" />
+                Entrar para usar trial / PRO
+              </Button>
+            )}
+
+            {!isProEfetivo && user && trialAvailable && (
+              <div className="space-y-2">
+                <TrialButton onStart={handleTrial} loading={trialLoading} />
+                {trialError && (
+                  <p className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 font-mono text-[11px] text-rose-300">
+                    ! {trialError}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <ProPlans />
 
             <Button
               type="button"

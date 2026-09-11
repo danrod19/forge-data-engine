@@ -278,32 +278,32 @@ export function HomeScreen({
         </div>
       </section>
 
-      {!isPro && (
-        <section className="space-y-3 rounded-xl border border-amber-500/20 bg-slate-900/50 p-4">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-amber-400/80">
-            planos pro
-          </p>
+      <section className="space-y-3 rounded-xl border border-amber-500/20 bg-slate-900/50 p-4">
+        <p className="font-mono text-[10px] uppercase tracking-wider text-amber-400/80">
+          planos pro
+        </p>
+        {!isPro && (
           <p className="text-[12px] leading-relaxed text-slate-400">
             {launchCopy.paragraph}
           </p>
-          {user && trialAvailable && (
-            <div className="space-y-2">
-              <TrialButton onStart={handleTrial} loading={trialLoading} />
-              {trialError && (
-                <p className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 font-mono text-[11px] text-rose-300">
-                  ! {trialError}
-                </p>
-              )}
-            </div>
-          )}
-          {!user && (
-            <p className="text-[12px] text-slate-400">
-              Faça login para ativar o trial grátis de 24h (1x por conta).
-            </p>
-          )}
-          <ProPlans />
-        </section>
-      )}
+        )}
+        {user && trialAvailable && !isPro && (
+          <div className="space-y-2">
+            <TrialButton onStart={handleTrial} loading={trialLoading} />
+            {trialError && (
+              <p className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 font-mono text-[11px] text-rose-300">
+                ! {trialError}
+              </p>
+            )}
+          </div>
+        )}
+        {!user && (
+          <p className="text-[12px] text-slate-400">
+            Faça login para ativar o trial grátis de 24h (1x por conta).
+          </p>
+        )}
+        <ProPlans />
+      </section>
 
       {/* Contato */}
       <section className="rounded-xl border border-slate-800/90 bg-slate-900/50 p-4">

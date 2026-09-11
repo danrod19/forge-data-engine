@@ -24,6 +24,7 @@ function openPlan(plan: StripePlan) {
 }
 
 export function ProPlans({ className }: ProPlansProps) {
+  // Sempre os 3 Payment Links (7d / 30d / 120d). Não filtrar por trial, PRO ou URL vazia.
   const plans = getStripePlans();
 
   return (

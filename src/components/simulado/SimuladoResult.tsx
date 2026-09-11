@@ -38,6 +38,8 @@ export interface SimuladoResultProps {
   onReviewErrors: () => void;
   onNewSimulado: () => void;
   onBackToStart: () => void;
+  /** Falha ao gravar histórico (não bloqueia o resultado) */
+  historyNotice?: string | null;
 }
 
 function TierIcon({
@@ -69,6 +71,7 @@ export function SimuladoResult({
   onReviewErrors,
   onNewSimulado,
   onBackToStart,
+  historyNotice,
 }: SimuladoResultProps) {
   const feedback = getPerformanceFeedback(scorePct);
   const { colors, tier, label, message, summary } = feedback;
@@ -289,6 +292,12 @@ export function SimuladoResult({
           </p>
         )}
       </motion.div>
+
+      {historyNotice && (
+        <p className="rounded-lg border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-center font-mono text-[11px] text-amber-300">
+          {historyNotice}
+        </p>
+      )}
 
       {/* Actions */}
       <motion.div

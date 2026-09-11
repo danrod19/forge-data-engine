@@ -26,6 +26,7 @@ import {
   freeVsProCopy,
   homeHeroCopy,
   homeHowToCopy,
+  launchCopy,
   studyJourneyCopy,
 } from "@/data/copy";
 
@@ -251,15 +252,18 @@ export function HomeScreen({
             )}
           </div>
           <ul className="space-y-1.5 font-mono text-[11px] leading-relaxed text-slate-300">
-            <li className="flex items-center gap-1.5">
-              <Infinity className="size-3 text-amber-400" />{" "}
-              {freeVsProCopy.proBullets[0]}
+            <li className="flex items-start gap-1.5">
+              <Infinity className="mt-0.5 size-3 shrink-0 text-amber-400" />
+              <span>{freeVsProCopy.proBullets[0]}</span>
             </li>
-            <li className="flex items-center gap-1.5">
-              <Zap className="size-3 text-amber-400" />{" "}
-              {freeVsProCopy.proBullets[1]}
+            <li className="flex items-start gap-1.5">
+              <Zap className="mt-0.5 size-3 shrink-0 text-amber-400" />
+              <span>{freeVsProCopy.proBullets[1]}</span>
             </li>
-            <li>› {freeVsProCopy.proBullets[2]}</li>
+            <li className="flex items-start gap-1.5">
+              <span className="mt-0.5 shrink-0 text-amber-400">›</span>
+              <span>{freeVsProCopy.proBullets[2]}</span>
+            </li>
           </ul>
           {!isPro && (
             <Button
@@ -278,6 +282,9 @@ export function HomeScreen({
         <section className="space-y-3 rounded-xl border border-amber-500/20 bg-slate-900/50 p-4">
           <p className="font-mono text-[10px] uppercase tracking-wider text-amber-400/80">
             planos pro
+          </p>
+          <p className="text-[12px] leading-relaxed text-slate-400">
+            {launchCopy.paragraph}
           </p>
           {user && trialAvailable && (
             <div className="space-y-2">

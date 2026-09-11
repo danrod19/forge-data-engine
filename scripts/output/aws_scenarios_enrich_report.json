@@ -1,0 +1,39 @@
+{
+  "patched_input": 50,
+  "applied": 50,
+  "soft_errors": [],
+  "sample": [
+    {
+      "id": 13,
+      "before_len": 71,
+      "after_len": 224,
+      "expl_len": 462
+    },
+    {
+      "id": 275,
+      "before_len": 67,
+      "after_len": 220,
+      "expl_len": 425
+    },
+    {
+      "id": 309,
+      "before_len": 34,
+      "after_len": 235,
+      "expl_len": 366
+    },
+    {
+      "id": 340,
+      "before_len": 35,
+      "after_len": 226,
+      "expl_len": 380
+    },
+    {
+      "id": 52,
+      "before_len": 58,
+      "after_len": 209,
+      "expl_len": 462
+    }
+  ],
+  "avg_before": 56,
+  "avg_after": 277
+}

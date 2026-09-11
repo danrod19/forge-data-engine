@@ -1,0 +1,215 @@
+{
+  "batch": 4,
+  "items": [
+    {
+      "id": 116,
+      "idx": 115,
+      "part_id": "aws-1.4",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 55,
+      "enunciado": "Hibernate (ideia) vs stop: quando hibernate é cogitado?",
+      "alternativas": [
+        "Para apagar o root volume com segurança",
+        "Para migrar a instance entre Regiões sem snapshot",
+        "Para preservar o estado da RAM no root volume e retomar depois (casos específicos, root adequado)",
+        "Para substituir o Security Group por NACL"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Hibernate preserva o estado da RAM no root volume e retoma processos depois (AMI/tipo/tamanho de root adequados). Não serve para apagar root com segurança, nem para migrar entre Regiões sem snapshot, nem para substituir SG por NACL. Insight: hibernate = RAM preservada no disco; stop = desliga sem preservar RAM (EBS persiste)."
+    },
+    {
+      "id": 130,
+      "idx": 129,
+      "part_id": "aws-1.5",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 49,
+      "enunciado": "ALB internal vs internet-facing: quando internal?",
+      "alternativas": [
+        "Sempre que houver HTTPS",
+        "Somente com Spot instances",
+        "Somente em us-east-1",
+        "Quando só clientes da VPC/rede privada devem alcançar o balanceador (ex. service-to-service)"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "ALB internal (scheme internal) serve quando só clientes da VPC/rede privada devem alcançar o balanceador — típico service-to-service. Internet-facing é para clientes públicos via IGW. HTTPS não força internal; ambos os schemes suportam TLS. Spot instances não determinam o scheme. Região (us-east-1) não decide internal vs público. Insight: API só interna na VPC → ALB internal + SG dos clients; site público → internet-facing em subnets públicas."
+    },
+    {
+      "id": 162,
+      "idx": 161,
+      "part_id": "aws-1.6",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 47,
+      "enunciado": "Automated backup retention = 0. O que se perde?",
+      "alternativas": [
+        "Apenas o Enhanced Monitoring",
+        "Apenas o tipo de instance class",
+        "Point-in-time restore e a janela de backup automático (além de risco operacional)",
+        "A capacidade de usar Security Groups"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Com automated backup retention = 0, o RDS desliga backups automáticos: some a janela de backup e o point-in-time restore (PITR), que depende dos snapshots contínuos + transaction logs na retention. Enhanced Monitoring só exporta métricas de OS; desligar backup não o remove. Instance class e Security Groups são independentes da retention — continuar disponíveis. Insight: retention 0 é anti-pattern operacional; mesmo com snapshot manual esporádico você perde granularidade de PITR até o segundo."
+    },
+    {
+      "id": 189,
+      "idx": 188,
+      "part_id": "aws-1.7",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 56,
+      "enunciado": "Weighted routing 80/20 entre v1 e v2 de API. Uso típico?",
+      "alternativas": [
+        "Canary/blue-green gradual de tráfego DNS entre dois endpoints",
+        "Obrigar 100% de cache hit no CloudFront",
+        "Desligar health checks permanentemente",
+        "Substituir o Security Group do ALB"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Weighted routing 80/20 divide respostas DNS por peso — uso típico em canary ou blue-green gradual entre dois endpoints (v1/v2). Não obriga 100% cache hit no CloudFront. Não serve para desligar health checks. Não substitui Security Group do ALB. Insight: combine weights baixos no canary com health checks para não enviar tráfego a target ruim; DNS tem TTL — a mudança não é instantânea."
+    },
+    {
+      "id": 236,
+      "idx": 235,
+      "part_id": "aws-1.8",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 45,
+      "enunciado": "sns:Publish AccessDenied na role da API. Fix?",
+      "alternativas": [
+        "Allow sqs:DeleteMessageStack inventada",
+        "Allow sns:Publish no ARN do topic na role da API",
+        "Abrir porta 587 no SG do SNS (serviço gerenciado sem SG de VPC típico assim)",
+        "Criar CNAME no apex para o topic"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "AccessDenied em sns:Publish corrige-se com Allow sns:Publish no ARN do topic na role da API (e sem Deny conflitante). Ação sqs:DeleteMessageStack inventada não autoriza SNS. SNS gerenciado não se 'abre' com porta 587 em Security Group de VPC como RDS. CNAME no apex para o topic não resolve IAM. Insight: publish negado → policy da role no ARN do topic; confirme região/ARN."
+    },
+    {
+      "id": 261,
+      "idx": 260,
+      "part_id": "aws-1.9",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 56,
+      "enunciado": "Via de trânsito TLS e at rest KMS: como se complementam?",
+      "alternativas": [
+        "KMS substitui TLS em todas as APIs públicas",
+        "TLS desliga a necessidade de key policy",
+        "TLS protege em trânsito; KMS/CMK protege em repouso — requisitos de dados sensíveis costumam exigir ambos",
+        "CMK remove HTTPS do CloudFront"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "TLS protege dados em trânsito; KMS/CMK protege em repouso — requisitos de dados sensíveis costumam exigir ambos, em camadas complementares. KMS não substitui TLS em APIs públicas. TLS não desliga a necessidade de key policy. CMK não remove HTTPS do CloudFront. Insight: trânsito ≠ repouso; marcar só um dos dois deixa um eixo exposto."
+    },
+    {
+      "id": 6,
+      "idx": 5,
+      "part_id": "aws-1.1",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 73,
+      "enunciado": "Após sts:AssumeRole bem-sucedido, o que o caller recebe para chamar APIs?",
+      "alternativas": [
+        "Um certificado ACM permanente de 1 ano",
+        "Credenciais temporárias (access key, secret e session token) da sessão",
+        "Um Elastic IP fixo associado à role",
+        "Uma AMI nova com a policy embutida"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Após sts:AssumeRole bem-sucedido, o STS devolve credenciais temporárias: AccessKeyId, SecretAccessKey e SessionToken da sessão, com validade limitada. Certificado ACM permanente não é output de AssumeRole — ACM emite certificados TLS para endpoints. Elastic IP é endereço de rede EC2 e não tem relação com assume de role. AMI nova com policy embutida não existe como mecanismo de AssumeRole; policies ficam no IAM, não na imagem. Insight: busque 'temporário / sessão / STS' quando a pergunta for o retorno de AssumeRole."
+    },
+    {
+      "id": 295,
+      "idx": 294,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 65,
+      "enunciado": "Cross-account S3 trigger para Lambda (ideia): o que além da role?",
+      "alternativas": [
+        "Somente abrir 22 na ENI",
+        "Permissões de invoke na resource policy da Lambda e config de notificação S3 na conta origem",
+        "Somente ALIAS no apex",
+        "Somente desligar BPA e nada de policy"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Cross-account S3→Lambda exige mais que a execution role: resource policy da Lambda permitindo invoke pelo serviço/conta origem e configuração de notificação/event no bucket da conta origem. Abrir 22 na ENI é irrelevante (e inseguro). ALIAS no apex é DNS, não trigger. Desligar BPA sem policy não autoriza invoke cross-account. Insight: trigger cross-account = permissão nos dois lados (S3 notify + Lambda policy)."
+    },
+    {
+      "id": 307,
+      "idx": 306,
+      "part_id": "aws-1.11",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 44,
+      "enunciado": "Strongly consistent read (ideia): trade-off?",
+      "alternativas": [
+        "Lê o valor mais recente na tabela base com mais consumo de RCU; eventual é default mais barato/rápido em alguns casos",
+        "É grátis e sempre no GSI",
+        "Desliga o throttle",
+        "Obriga on-demand"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Strongly consistent read na tabela base devolve o valor mais recente, consumindo mais RCU; eventually consistent é o default, em geral mais barato/rápido o suficiente. Não é grátis nem 'sempre no GSI' (GSI não oferece strong da mesma forma). Não desliga throttle. Não obriga on-demand. Insight: use strong só quando o caso exige ler o write recém-confirmado; o resto fica eventual."
+    },
+    {
+      "id": 338,
+      "idx": 337,
+      "part_id": "aws-1.12",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 51,
+      "enunciado": "PutMetricData AccessDenied na role do agent. Causa?",
+      "alternativas": [
+        "Falta cloudwatch:PutMetricData (e namespaces permitidos) na identity policy",
+        "Falta rota 53 ListHostedZones apenas",
+        "Falta s3:CreateBucket apenas",
+        "Falta ec2:CreateTags apenas"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "PutMetricData AccessDenied na role do agent indica falta de cloudwatch:PutMetricData (e, se restringido, namespaces permitidos) na identity policy. ListHostedZones do Route 53, s3:CreateBucket e ec2:CreateTags são Actions de outros serviços e não autorizam publicação de métricas. Insight: custom metrics / CloudWatch Agent exigem PutMetricData explícito; leia o erro AccessDenied e a Action negada no CloudTrail."
+    }
+  ]
+}

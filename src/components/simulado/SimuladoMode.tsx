@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ClipboardList,
@@ -51,10 +51,15 @@ import { SimuladoReview } from "@/components/simulado/SimuladoReview";
 import { Explicacao } from "@/components/ticket/Explicacao";
 import { TerminalCLI } from "@/components/ticket/TerminalCLI";
 import { useTrack } from "@/lib/track-context";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { saveSimuladoRun } from "@/lib/simulado-runs";
 import { simuladoConfigCopy, simuladoLangModeCopy } from "@/data/copy";
 import { filterQuestionsByLangMode } from "@/lib/question-lang";
 
 type Phase = "config" | "quiz" | "result" | "review";
+
+/** Evita insert duplicado (React Strict Mode / voltar da revisão). */
+const persistedRunKeys = new Set<string>();
 
 interface AnswerRecord {
   questionId: number;
@@ -85,6 +90,10 @@ export function SimuladoMode({
   onUpgrade,
 }: SimuladoModeProps) {
   const { track } = useTrack();
+  const { user } = useAuth();
+  const runSavedRef = useRef(false);
+  const runKeyRef = useRef("");
+  const [historyNotice, setHistoryNotice] = useState<string | null>(null);
   const [phase, setPhase] = useState<Phase>("config");
   const [countOption, setCountOption] = useState<SimuladoCountOption>(20);
   const [langMode, setLangMode] = useState<SimuladoLangMode>("pt");
@@ -192,6 +201,8 @@ export function SimuladoMode({
       setSecondsLeft(0);
     }
 
+    runKeyRef.current = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    runSavedRef.current = false;
     setPhase("quiz");
   }, [countOption, timerEnabled, source, poolTotal, track, langMode]);
 
@@ -267,6 +278,42 @@ export function SimuladoMode({
     timerEnabled && timerBudgetSeconds > 0
       ? Math.max(0, timerBudgetSeconds - Math.max(0, secondsLeft))
       : null;
+
+  useEffect(() => {
+    if (phase === "config" || phase === "quiz") {
+      runSavedRef.current = false;
+      setHistoryNotice(null);
+    }
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "result") return;
+    if (runSavedRef.current) return;
+    if (!user?.id) return;
+    if (total <= 0) return;
+
+    const persistKey = `${user.id}:${runKeyRef.current || "anon"}`;
+    if (persistedRunKeys.has(persistKey)) {
+      runSavedRef.current = true;
+      return;
+    }
+
+    runSavedRef.current = true;
+    persistedRunKeys.add(persistKey);
+    void saveSimuladoRun({
+      userId: user.id,
+      track,
+      total,
+      acertos: correctCount,
+      durationSeconds: elapsedSeconds,
+    }).then(({ error }) => {
+      if (error) {
+        persistedRunKeys.delete(persistKey);
+        runSavedRef.current = false;
+        setHistoryNotice("Não foi possível salvar o histórico.");
+      }
+    });
+  }, [phase, user?.id, track, total, correctCount, elapsedSeconds]);
 
   // ─── CONFIG ───────────────────────────────────────────────
   if (phase === "config") {
@@ -613,6 +660,7 @@ export function SimuladoMode({
         onReviewErrors={startReview}
         onNewSimulado={handleNewSimulado}
         onBackToStart={handleNewSimulado}
+        historyNotice={historyNotice}
       />
     );
   }

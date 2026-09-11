@@ -100,7 +100,13 @@ export function PaywallModal({
               </DialogTitle>
             </div>
 
-            <DialogDescription className="text-sm leading-relaxed text-slate-400">
+            <DialogDescription
+              className={
+                isLives
+                  ? "text-sm leading-relaxed text-slate-400"
+                  : "text-left text-[12px] leading-relaxed text-slate-400 sm:text-[13px]"
+              }
+            >
               {isLives ? paywallCopy.livesBody : paywallCopy.upgradeBody}
             </DialogDescription>
           </DialogHeader>
@@ -112,11 +118,11 @@ export function PaywallModal({
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.08 * i }}
-                className="flex items-center gap-3 rounded-lg border border-slate-800/90 bg-slate-950/70 px-3 py-2.5 font-mono text-xs text-slate-300 sm:text-sm"
+                className="flex items-start gap-3 rounded-lg border border-slate-800/90 bg-slate-950/70 px-3 py-2.5 font-mono text-[11px] leading-relaxed text-slate-300 sm:text-xs"
               >
-                <span className="text-neon-green">›</span>
-                <Icon className="size-3.5 shrink-0 text-neon-cyan" />
-                {label}
+                <span className="mt-0.5 text-neon-green">›</span>
+                <Icon className="mt-0.5 size-3.5 shrink-0 text-neon-cyan" />
+                <span>{label}</span>
               </motion.li>
             ))}
           </ul>

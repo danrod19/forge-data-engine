@@ -1,0 +1,215 @@
+{
+  "batch": 2,
+  "items": [
+    {
+      "id": 226,
+      "idx": 225,
+      "part_id": "aws-1.8",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 60,
+      "enunciado": "Redrive da DLQ de volta à fila principal: cuidado principal?",
+      "alternativas": [
+        "Redrive apaga o tópico SNS automaticamente",
+        "Redrive exige PubliclyAccessible na fila",
+        "Redrive só funciona com CNAME no apex",
+        "Reprocessar poison messages sem corrigir o bug pode encher a DLQ de novo"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Redrive da DLQ devolve mensagens à fila principal: se o bug do consumer não foi corrigido, as poison messages falham de novo e voltam à DLQ. Redrive não apaga tópico SNS. Não exige PubliclyAccessible na fila (conceito de RDS/EC2, não SQS). Não depende de CNAME no apex. Insight: corrija código/poison, limpe ou descarte msgs irrecuperáveis, só então redrive com monitoramento."
+    },
+    {
+      "id": 258,
+      "idx": 257,
+      "part_id": "aws-1.9",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 86,
+      "enunciado": "SQS SSE-KMS com CMK: producer SendMessage. Além de sqs:SendMessage, o que pode faltar?",
+      "alternativas": [
+        "ec2:RunInstances obrigatório",
+        "route53:ListHostedZones",
+        "kms:GenerateDataKey / uso da CMK conforme a doc do SSE-KMS na fila para o principal que envia",
+        "elasticloadbalancing:CreateLoadBalancer"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Fila SQS com SSE-KMS: o producer além de sqs:SendMessage precisa permissões KMS (tipicamente GenerateDataKey / uso da CMK) conforme a documentação do SSE-KMS na fila, e a key policy deve permitir o principal. ec2:RunInstances não cifra mensagem SQS. route53:ListHostedZones é DNS. CreateLoadBalancer é ELB. Insight: S3/SQS/EBS com SSE-KMS → sempre some a action do serviço com kms na CMK."
+    },
+    {
+      "id": 21,
+      "idx": 20,
+      "part_id": "aws-1.1",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 89,
+      "enunciado": "Função Lambda precisa dynamodb:Query em uma tabela. Onde anexar o Allow no desenho usual?",
+      "alternativas": [
+        "Na execution role da função Lambda",
+        "No Security Group da Lambda como regra TCP 443",
+        "Na NACL da subnet pública apenas",
+        "No DHCP option set da VPC"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "No desenho usual, o Allow dynamodb:Query vai na execution role da função Lambda: é essa role que o serviço Lambda assume para chamar APIs AWS. Security Group da Lambda (quando em VPC) filtra tráfego de rede (ex. TCP 443), não concede autorização DynamoDB. NACL da subnet pública controla tráfego na borda da subnet, não API DynamoDB. DHCP option set configura DNS/NTP da VPC, irrelevante para IAM. Insight: permissão de serviço AWS → role do compute, não SG."
+    },
+    {
+      "id": 279,
+      "idx": 278,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 83,
+      "enunciado": "Event source mapping SQS enabled, fila com 500 msgs, mas Lambda nunca roda. Checks?",
+      "alternativas": [
+        "Somente o TTL do CloudFront",
+        "Somente o Multi-AZ do RDS sem consumers",
+        "Somente o tipo de EBS root",
+        "Permissões da role (sqs:ReceiveMessage/DeleteMessage), mapping state, batch size e se há erros de invoke"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Com mapping SQS enabled e fila cheia mas Lambda parada: verifique permissões da role (sqs:ReceiveMessage/DeleteMessage), estado do event source mapping, batch size e erros de invoke/DLQ. TTL do CloudFront é CDN. Multi-AZ do RDS sem consumers não move mensagem SQS. Tipo de EBS root é disco da EC2. Insight: fila cresce + Lambda idle → mapping/IAM/erros, não DNS ou storage."
+    },
+    {
+      "id": 319,
+      "idx": 318,
+      "part_id": "aws-1.11",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 57,
+      "enunciado": "Point-in-time recovery (PITR) DynamoDB (ideia): para quê?",
+      "alternativas": [
+        "Aumentar RCU grátis",
+        "Criar GSI automático",
+        "Restaurar a tabela a um segundo nos últimos 35 dias (ideia de proteção contra delete/corrupção)",
+        "Substituir Multi-AZ (já built-in)"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "PITR no DynamoDB permite restaurar a tabela a um segundo dentro da janela (ideia: até 35 dias) — proteção contra delete/corrupção acidental. Não aumenta RCU de graça. Não cria GSI automático. Não 'substitui Multi-AZ' (durabilidade multi-AZ já é built-in). Insight: PITR é DR operacional de tabela; Multi-AZ/região é outra dimensão de HA."
+    },
+    {
+      "id": 355,
+      "idx": 354,
+      "part_id": "aws-1.12",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 63,
+      "enunciado": "Evaluation periods = 5, datapoints to alarm = 1. Comportamento?",
+      "alternativas": [
+        "Exige 5 violações sempre",
+        "Mais sensível: 1 violação na janela de 5 pode disparar (dependendo da config) — risco de flapping",
+        "Desliga o alarme",
+        "Converte métrica em log"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Evaluation periods = 5 e datapoints to alarm = 1 torna o alarme mais sensível: uma violação na janela de 5 períodos pode levar a ALARM (conforme config) — maior risco de flapping. Não exige sempre 5 violações (isso seria 5 de 5). Não desliga o alarme. Não converte métrica em log. Insight: M de N baixo → detecção rápida e mais ruído; M de N alto → mais estabilidade."
+    },
+    {
+      "id": 44,
+      "idx": 43,
+      "part_id": "aws-1.2",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 96,
+      "enunciado": "SSH no bastion: cliente reporta timeout (não connection refused). Interpretação inicial de rede?",
+      "alternativas": [
+        "O daemon SSH com certeza recusou ativamente a conexão",
+        "Mais compatível com filtragem de path (SG/NACL/rota) do que serviço recusando na porta",
+        "Sempre é bucket policy do S3 de logs",
+        "Sempre falta Elastic IP no NAT Gateway"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Timeout indica que os pacotes não completam o handshake TCP no caminho (SG/NACL, rota ausente, asymmetric path, etc.); connection refused indica que o host respondeu com RST — o daemon/porta recusou ativamente. Portanto o sintoma aponta mais para filtragem de path do que para SSH recusando na porta. «O daemon SSH com certeza recusou» seria a leitura típica de refused, não de timeout. Bucket policy de S3 de logs não governa conectividade SSH ao bastion. Falta de Elastic IP no NAT Gateway não é a primeira hipótese para timeout de cliente → bastion (especialmente se o bastion está em pública com rota IGW). Insight: timeout vs refused separa firewall/path de processo down."
+    },
+    {
+      "id": 68,
+      "idx": 67,
+      "part_id": "aws-1.3",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 92,
+      "enunciado": "GetObject retorna AccessDenied com 'explicit deny in an identity-based policy'. O que fazer?",
+      "alternativas": [
+        "Adicionar Allow s3:* sem inspecionar o Deny",
+        "Publicar o objeto com ACL public-read e ignorar IAM",
+        "Trocar só a região default do CLI",
+        "Localizar e ajustar o statement Deny na policy do principal que bloqueia GetObject"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Na avaliação IAM, Deny explícito vence Allow. A mensagem 'explicit deny in an identity-based policy' aponta para um statement Deny (ou Condition que o ativa) na policy do principal — localize e ajuste esse Deny. Empilhar Allow s3:* sem inspecionar o Deny não remove o bloqueio. ACL public-read ignora o problema de IAM e piora exposição. Trocar só a região default do CLI não altera o documento de policy. Insight: texto explicit deny = caçar Deny, não ampliar Allow."
+    },
+    {
+      "id": 112,
+      "idx": 111,
+      "part_id": "aws-1.4",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 90,
+      "enunciado": "Snapshot de vol-prod é iniciado com a instance running. Comportamento/expectativa (ideia)?",
+      "alternativas": [
+        "Snapshots só funcionam se a instance estiver terminated",
+        "Pode-se snapshotar volume em uso; consistência de app pode exigir freeze/quiesce dependendo do workload",
+        "O snapshot apaga o volume original imediatamente",
+        "O snapshot move a instance para outra Região"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Pode-se iniciar snapshot de volume com a instance running; é comum. Consistência de aplicação (banco) pode exigir freeze/quiesce ou snapshot gerenciado do serviço. Snapshots não exigem instance terminated. O snapshot não apaga o volume original nem move a instance de Região. Insight: backup EBS = snapshot; DB crítico = coordenar consistência com a app ou usar snapshots de serviço (ex. RDS) quando couber."
+    },
+    {
+      "id": 132,
+      "idx": 131,
+      "part_id": "aws-1.5",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 78,
+      "enunciado": "ASG desired=0, min=0, max=10, TG attached a ALB de produção. Sintoma esperado?",
+      "alternativas": [
+        "ALB anuncia 200 sem backends",
+        "ASG lança 10 instances imediatamente sempre",
+        "Clientes recebem 503 (ou falha) por ausência de targets healthy registrados",
+        "O launch template é apagado"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Com desired=0 e min=0 não há instances registradas healthy no TG; o ALB de produção devolve 503 (ou falha equivalente) aos clientes. ALB não anuncia 200 sem backends saudáveis. max=10 não lança sozinho se desired/min estão em 0. O launch template não é apagado por desired=0. Insight: TG attached + desired 0 = borda viva sem capacity — sintoma clássico de 503."
+    }
+  ]
+}

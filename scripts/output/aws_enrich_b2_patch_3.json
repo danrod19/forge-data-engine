@@ -1,0 +1,144 @@
+{
+  "patched": [
+    {
+      "id": 173,
+      "idx": 172,
+      "part_id": "aws-1.6",
+      "enunciado": "A payments API backed by Amazon RDS for MySQL starts failing commits during a traffic spike. CloudWatch shows the DB instance status as storage-full, FreeStorageSpace near zero, and applications log write/transaction errors. The team must restore write capacity quickly without blaming the load balancer or IAM. What is the typical application symptom, and which remediation should you apply first?",
+      "alternativas": [
+        "App write/transaction errors; increase allocated storage or rely on storage autoscaling if enabled (below max)",
+        "Only HTTP 404 on the ALB listener on port 443 by definition",
+        "Only IAM AssumeRole failures",
+        "Only loss of an Elastic IP attached to RDS"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Quando a instância RDS entra em storage-full, o engine não consegue alocar páginas/espaço para novas escritas e commits — a aplicação enxerga erros de escrita/transação, não um 404 de ALB. Ação imediata: aumentar allocated storage ou confiar no storage autoscaling se já estiver habilitado e ainda abaixo do máximo. 404 no listener 443 é sintoma HTTP no balanceador, não de disco do RDS. AssumeRole é autenticação de API AWS, irrelevante ao espaço em disco do engine. RDS gerenciado não usa Elastic IP da mesma forma que EC2 clássico. Insight: alarme de FreeStorageSpace (e max storage no autoscaling) evita chegar em storage-full em produção."
+    },
+    {
+      "id": 188,
+      "idx": 187,
+      "part_id": "aws-1.7",
+      "enunciado": "A media site terminates viewer HTTPS on Amazon CloudFront in front of an S3 origin in eu-west-1. Security requires an ACM certificate for the custom domain on the distribution. The origin Region must not dictate where the viewer certificate is requested. In which Region must you request or import the ACM certificate used by CloudFront for viewer HTTPS?",
+      "alternativas": [
+        "Always in the same Region as the S3 origin bucket, any Region",
+        "Only eu-central-1",
+        "Only ap-south-1",
+        "us-east-1 (N. Virginia) for certificates used with CloudFront"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Certificados ACM usados no viewer HTTPS do CloudFront devem ser solicitados ou importados em us-east-1 (N. Virginia), independentemente da Região do bucket origem — aqui eu-west-1 não manda no certificado do edge. 'Sempre na mesma Região do S3' está errado para CloudFront. Não há restrição exclusiva a eu-central-1 ou ap-south-1 nesse caso. Insight clássico de prova: ACM regional para ALB/NLB fica na Região do balanceador; a exceção famosa é CloudFront → us-east-1."
+    },
+    {
+      "id": 229,
+      "idx": 228,
+      "part_id": "aws-1.8",
+      "enunciado": "An event platform publishes many message types to a single Amazon SNS topic. Different SQS queues and Lambda subscribers must receive only the events they care about, without creating a separate topic per type and without removing DLQ or IAM controls. What is the purpose of an SNS subscription filter policy in this design?",
+      "alternativas": [
+        "It replaces the SQS dead-letter queue",
+        "It forces FIFO ordering on every queue",
+        "The subscriber receives only messages whose attributes match the filter policy",
+        "It removes the need for IAM authorization"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "A filter policy no SNS faz o subscriber receber só mensagens cujos atributos (ou payload, conforme o tipo de filtro) batem com a política — reduz ruído e evita proliferar tópicos por tipo de evento. Não substitui DLQ da SQS: DLQ continua sendo o destino de mensagens que falham após retries. Não força FIFO em todas as filas. Não elimina IAM: publicação e subscribe ainda precisam de permissão. Insight: use filter para ramificar por tipo/evento no mesmo tópico; mantenha DLQ e IAM no caminho SQS/Lambda."
+    },
+    {
+      "id": 249,
+      "idx": 248,
+      "part_id": "aws-1.9",
+      "enunciado": "A Solutions Architect must store encrypted configuration values and also manage application database credentials that require automatic rotation and native RDS integration. Budget prefers Parameter Store for simple config, but rotation and credential lifecycle matter for the DB password. How should you choose between SSM Parameter Store SecureString and AWS Secrets Manager?",
+      "alternativas": [
+        "They are always identical for managed database rotation in every case",
+        "SecureString is an encrypted parameter; Secrets Manager focuses on app secrets with rotation and credential integrations",
+        "Parameter Store forbids use of KMS",
+        "Secrets Manager works only with S3 website hosting"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "SecureString no Parameter Store é parâmetro cifrado (ótimo para config/flags); Secrets Manager é o serviço focado em secrets de aplicação com rotation e integrações de credenciais (ex.: RDS). Não são idênticos 'sempre' em rotation de DB gerenciada — o destaque de rotation gerenciada e integração de credencial é do Secrets Manager. Parameter Store não proíbe KMS: SecureString usa KMS. Secrets Manager não depende de S3 website. Insight: config cifrada simples → SSM SecureString; secret com rotation/integração → Secrets Manager."
+    },
+    {
+      "id": 14,
+      "idx": 13,
+      "part_id": "aws-1.1",
+      "enunciado": "Account B's analytics role must read objects in an S3 bucket owned by Account A. Security forbids sharing Account A root credentials, opening the bucket to the public internet, or using network ACL tricks as authorization. Which cross-account pattern meets least-privilege SAA guidance?",
+      "alternativas": [
+        "Share Account A root password in Account B's chat channel",
+        "IAM role in Account A trusted by Account B's principal with read permissions; B AssumeRole (plus bucket policy if needed)",
+        "Open 0.0.0.0/0 on the NACL and ignore IAM",
+        "Disable S3 Block Public Access and use a public ACL always"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "O padrão SAA cross-account é role na conta A com trust para o principal da conta B e permissions de leitura; B chama AssumeRole — e, quando necessário, bucket policy na A permitindo o principal de B. Compartilhar senha do root da A é inaceitável. Abrir 0.0.0.0/0 no NACL não autoriza API S3: NACL filtra pacotes na subnet, não substitui IAM. Desligar Block Public Access e ACL pública expõe o bucket em vez de delegar acesso controlado. Insight: cross-account = trust/AssumeRole + resource policy quando preciso, nunca root compartilhado nem ACL pública."
+    },
+    {
+      "id": 297,
+      "idx": 296,
+      "part_id": "aws-1.10",
+      "enunciado": "After a CI/CD deploy, an AWS Lambda function fails immediately with Runtime.ImportModuleError / handler not found. The SNS topic, DNS TTL, and unrelated EBS volumes in other accounts are unchanged. Packaging and the Handler setting were edited in the same commit. What is the typical root cause?",
+      "alternativas": [
+        "Missing Multi-AZ on the SNS topic",
+        "Incorrect Handler string or package path on deploy (module.function) or a missing dependency in the package",
+        "DNS TTL set to 300",
+        "gp3 IOPS 3000 on an EBS volume in another account"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Runtime.ImportModuleError / handler não encontrado após deploy quase sempre indica Handler string errada (module.function), layout/path do package incorreto ou dependência ausente no zip/imagem — exatamente o que o commit mexeu. Multi-AZ em tópico SNS não afeta o import do handler da Lambda. TTL DNS 300 é irrelevante ao carregamento do runtime. IOPS gp3 em EBS de outra conta não carrega o módulo da function. Insight: valide o campo Handler no console/CLI e o layout do artefato no mesmo commit do erro antes de culpar rede ou mensageria."
+    },
+    {
+      "id": 317,
+      "idx": 316,
+      "part_id": "aws-1.11",
+      "enunciado": "A Query against Amazon DynamoDB uses a KeyConditionExpression on the partition key and a FilterExpression to drop unwanted items after the read. Finance complains about high consumed read capacity even when few items match the filter. Which capacity is still consumed when FilterExpression is applied?",
+      "alternativas": [
+        "Zero RCU always",
+        "Write capacity units (WCU) only",
+        "RCU for items read before the filter — Filter does not reduce capacity for partition items already retrieved",
+        "Nothing if a GSI exists on the table"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "FilterExpression em Query filtra depois da leitura: você ainda consome RCU dos itens recuperados pela key condition antes do filtro — o filtro não 'economiza' a leitura da partição já feita. Não é zero RCU. Não é 'apenas WCU'. Existir GSI na tabela não zera o custo do Filter na Query que você está executando. Insight: modele SK/GSI para empurrar o predicado para a key condition; Filter é refino pós-leitura, não mecanismo de economia de RCU."
+    },
+    {
+      "id": 351,
+      "idx": 350,
+      "part_id": "aws-1.12",
+      "enunciado": "On-call must detect Amazon DynamoDB capacity problems before users report timeouts. CloudWatch already exposes UserErrors and ThrottledRequests for the table. The team needs alarms that trigger autoscaling review or on-demand/hot-partition investigation—not CloudFront latency charts or destructive automation. How should these metrics be used?",
+      "alternativas": [
+        "Measure CloudFront edge latency only",
+        "Detect throttle/capacity issues and trigger alarms, provisioned autoscaling, or on-demand/hot-key review",
+        "Replace IAM authorization for GetItem",
+        "Automatically delete the DynamoDB table"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "UserErrors e ThrottledRequests no CloudWatch do DynamoDB sinalizam problemas de capacidade/throttle (e erros de cliente) para acionar alarme, autoscaling de provisioned ou revisão de modo on-demand/hot key. Não medem latência de CloudFront. Não substituem IAM em GetItem. Não apagam a tabela. Insight: combine essas métricas com ConsumedReadCapacityUnits/ConsumedWriteCapacityUnits para distinguir teto de capacidade de partição quente."
+    },
+    {
+      "id": 34,
+      "idx": 33,
+      "part_id": "aws-1.2",
+      "enunciado": "Compliance requires that an Amazon RDS database must not be reachable from the public internet. Application tiers in private subnets must still connect on the engine port. Which network design satisfies the requirement without placing the DB on a public path?",
+      "alternativas": [
+        "Public subnet with an Elastic IP on the RDS instance",
+        "Database security group allowing 0.0.0.0/0 on the engine port",
+        "Default route 0.0.0.0/0 → Internet Gateway on the database subnet",
+        "Private subnet, no public IP, security group allowing only the application tier"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "RDS sem acesso da Internet pública: coloque em subnet privada, sem IP público, e security group permitindo só o tier de aplicação (source = SG ou CIDR do app). Subnet pública com Elastic IP no RDS expõe o banco. SG com 0.0.0.0/0 na porta do engine abre a qualquer origem. Rota 0.0.0.0/0 → IGW na subnet do banco é desenho de subnet pública e aumenta a superfície. Insight: 'sem acesso Internet ao banco' → private + SG restrito + sem EIP/caminho público."
+    },
+    {
+      "id": 86,
+      "idx": 85,
+      "part_id": "aws-1.3",
+      "enunciado": "A bucket policy Allow statement includes Condition aws:SecureTransport = true for principals that need object access. Security wants API calls over cleartext HTTP to fail the condition while HTTPS continues to work. Versioning and VPC MTU settings must remain unchanged. What is the practical effect of this condition?",
+      "alternativas": [
+        "Allows only cleartext HTTP without TLS",
+        "Disables bucket versioning",
+        "Changes the MTU of ENIs in the VPC",
+        "Restricts allowed S3 API access to HTTPS (TLS) connections"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Condition aws:SecureTransport = true no Allow restringe o acesso permitido pela statement à API S3 em conexões HTTPS/TLS — HTTP claro não satisfaz a condição. O efeito não é permitir só HTTP sem TLS (seria o inverso). Não desliga versioning do bucket nem altera MTU de ENIs da VPC; é condição de política IAM/S3, não de storage class ou rede L3. Insight: em provas, SecureTransport quase sempre = 'force HTTPS'; combine com Deny quando aws:SecureTransport = false se quiser fechar buracos de Allows amplos."
+    }
+  ]
+}

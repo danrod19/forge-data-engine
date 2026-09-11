@@ -1,0 +1,144 @@
+{
+  "patched": [
+    {
+      "id": 37,
+      "idx": 36,
+      "part_id": "aws-1.2",
+      "enunciado": "After hardening network ACLs on private application subnets, HTTPS client requests still leave the instances, but responses fail or time out. Security groups were left stateful and allow the same flows. Why does the stateless nature of a NACL matter for this asymmetric failure?",
+      "alternativas": [
+        "Because a NACL only protects the Internet Gateway and ignores subnets",
+        "Because a NACL always ignores ephemeral ports by immutable design",
+        "Because return traffic needs a separate Allow rule (each direction), including client ephemeral ports",
+        "Because a NACL completely replaces the Security Group"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "NACL é stateless: cada sentido do fluxo precisa de regra Allow própria. Depois de endurecer a NACL, respostas HTTPS podem falhar se faltar Allow de retorno na faixa de portas efêmeras do cliente, mesmo com Security Group stateful ok na ida. NACL não protege 'só o IGW' — aplica-se às subnets associadas. Não 'ignora portas efêmeras por design imutável'; você deve permitir a faixa efêmera no retorno. NACL não substitui Security Group; são camadas complementares (SG stateful na ENI, NACL na subnet). Insight: timeout assimétrico logo após mudança de NACL → cheque regras de retorno/efêmeras antes de culpar o app."
+    },
+    {
+      "id": 61,
+      "idx": 60,
+      "part_id": "aws-1.3",
+      "enunciado": "A CI/CD pipeline uploads build artifacts to s3://corp-build/app/v1.2.0.tgz. Platform engineers must document how that specific object is addressed inside the bucket for download, promotion, and audit. What identifies the object in Amazon S3?",
+      "alternativas": [
+        "The object key (e.g. app/v1.2.0.tgz) and versionId if versioning is enabled",
+        "The Security Group of the subnet where the CI runner executes",
+        "The hostname of the NAT Gateway in the build VPC",
+        "The route table ID of the ALB's public subnet"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "No S3, o objeto é identificado por bucket + object key (ex. app/v1.2.0.tgz); com versioning ativo, o versionId distingue versões da mesma key. Security Group da subnet do CI não endereça objeto no armazenamento. Hostname do NAT Gateway e ID da route table do ALB são artefatos de VPC/rede, irrelevantes para localizar o artefato no bucket. Insight: se a pergunta é 'onde está o arquivo no S3?', a resposta é key (+ versionId) — não componente de rede nem SG."
+    },
+    {
+      "id": 114,
+      "idx": 113,
+      "part_id": "aws-1.4",
+      "enunciado": "CloudTrail and instance logs show an Amazon EC2 Spot interruption with reason instance-stop. The batch job must still complete reliably over time without assuming uninterrupted capacity. What is the correct design direction for this workload?",
+      "alternativas": [
+        "Assume 100% uptime with no checkpointing",
+        "Use Spot only for the primary single-AZ database with no replica",
+        "Forbid any retry of the job",
+        "Design stateless/checkpointed jobs plus mixed fleets or On-Demand for critical components"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Interrupção Spot (instance-stop) exige design com jobs stateless/checkpoint, retry idempotente e fleets mistos (ou On-Demand) no que for crítico — a capacidade pode ser reclamada a qualquer momento. Assumir uptime 100% sem checkpoint quebra no reclaim. Banco primário single-AZ só em Spot é anti-pattern grave de durabilidade. Proibir retry piora a recuperação após interrupt. Insight: evidência de Spot interrupt → arquitetura resiliente a reclaim; nunca 'Spot nunca falha'."
+    },
+    {
+      "id": 138,
+      "idx": 137,
+      "part_id": "aws-1.5",
+      "enunciado": "An Application Load Balancer target group uses health check success codes = 200. The application /health endpoint returns HTTP 200 only when the critical database dependency is up. What is the main operational benefit of this deep health check?",
+      "alternativas": [
+        "It removes targets that are not truly ready for traffic (critical dependency down)",
+        "It automatically raises the Auto Scaling group desired capacity to 100",
+        "It disables the HTTPS listener on port 443",
+        "It forces all targets to become Spot instances"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Se /health só retorna 200 com o DB up, o target group remove targets que não estão prontos para tráfego real — health 'profundo' evita 5xx quando a dependência crítica ainda está em falha. Não aumenta desired do ASG automaticamente para 100. Não desliga o listener 443. Não força Spot. Cuidado de prova: health profundo demais pode derrubar a frota inteira se o DB cair; em muitos desenhos separe liveness superficial de readiness com dependência. Insight: deep check = menos tráfego a targets 'zumbis'; monitore blast radius se a dependência for compartilhada."
+    },
+    {
+      "id": 172,
+      "idx": 171,
+      "part_id": "aws-1.6",
+      "enunciado": "A team plans Amazon RDS storage on gp3 for cost efficiency but the workload may need high, predictable IOPS under peak load. Without changing Multi-AZ or Security Group design yet, what is the right storage direction?",
+      "alternativas": [
+        "gp3 lets you size storage and IOPS with good cost; extreme cases may need io classes per engine/support",
+        "gp3 forbids Multi-AZ",
+        "gp3 requires 0.0.0.0/0 on the database Security Group",
+        "gp3 removes the need for backups"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "gp3 no RDS permite dimensionar capacidade e IOPS com boa relação custo/benefício na maioria dos casos; cargas com IOPS muito altos e previsíveis podem exigir classes io (conforme engine e suporte na região). gp3 não proíbe Multi-AZ. Não exige 0.0.0.0/0 no SG. Não elimina backup/snapshot. Insight: comece em gp3 dimensionado; só escale para io quando CloudWatch/Performance Insights mostrarem saturação real de I/O, não por hábito de 'produção = io2'."
+    },
+    {
+      "id": 187,
+      "idx": 186,
+      "part_id": "aws-1.7",
+      "enunciado": "A global API is active in multiple AWS Regions behind Amazon Route 53. Product wants clients steered to the regional endpoint that offers the lowest measured network latency, without replacing database Multi-AZ or forcing everyone to us-east-1. What does latency-based routing provide?",
+      "alternativas": [
+        "Send the client to the record with the lowest measured latency among the configured Regions",
+        "Replace Multi-AZ for Amazon RDS",
+        "Invalidate CloudFront cache on every DNS query",
+        "Force all users to us-east-1 always"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Latency-based routing no Route 53 escolhe, entre records regionais configurados, o que apresenta menor latência medida para o resolvedor do cliente. Não substitui Multi-AZ do RDS (HA de AZ dentro da Região). Não invalida cache do CloudFront a cada query DNS. Não força todos os usuários a us-east-1. Insight: use latency quando há cópias ativas em várias Regiões; use failover quando o modelo é primary/secondary de DR; geolocation responde a política por localização, não ao menor RTT medido."
+    },
+    {
+      "id": 222,
+      "idx": 221,
+      "part_id": "aws-1.8",
+      "enunciado": "An IoT telemetry pipeline must ingest about 100,000 messages per second. Ordering across messages is not required. Someone proposed Amazon SQS FIFO for 'safety'. How should you evaluate that proposal under SAA throughput constraints?",
+      "alternativas": [
+        "FIFO is mandatory for any IoT workload",
+        "Standard is the typical fit for throughput; FIFO adds limits and model cost with no ordering benefit here",
+        "Amazon SNS cannot publish to a standard queue",
+        "A dead-letter queue exists only on FIFO queues"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Telemetria IoT a ~100k msgs/s sem ordem pede SQS standard (alto throughput). FIFO impõe limites por message group/conta e custo de modelo sem benefício se ordem e dedupe estritos não importam. FIFO não é obrigatório para 'qualquer IoT'. SNS pode publicar em filas standard. DLQ existe em standard e FIFO. Insight: escolha FIFO só com requisito real de ordem/deduplicação; throughput extremo sem ordem = standard (e, se preciso, fan-out SNS→SQS)."
+    },
+    {
+      "id": 245,
+      "idx": 244,
+      "part_id": "aws-1.9",
+      "enunciado": "A production database password is stored as secret db/prod/password in AWS Secrets Manager. An AWS Lambda function must read that password at runtime under least privilege. Which IAM action is the primary permission required on the secret?",
+      "alternativas": [
+        "s3:GetObject on the secret ARN",
+        "kms:CreateKey on every invoke",
+        "secretsmanager:GetSecretValue on the secret ARN (and KMS decrypt if the secret uses a customer CMK)",
+        "sqs:DeleteMessage on the secret"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Para ler o valor em runtime a Lambda usa secretsmanager:GetSecretValue no ARN do secret; se o secret usa CMK customer-managed, também precisa kms:Decrypt adequado na mesma role. s3:GetObject no ARN do secret mistura S3 com Secrets Manager — APIs e resources diferentes. kms:CreateKey a cada invoke é anti-pattern caro e não lê o secret. sqs:DeleteMessage apaga mensagem de fila, não recupera senha. Insight: path de secret = GetSecretValue (+ KMS se CMK), com cache curto na function para não martelar a API a cada cold/warm path desnecessário."
+    },
+    {
+      "id": 27,
+      "idx": 26,
+      "part_id": "aws-1.1",
+      "enunciado": "An IAM user can sign in to the AWS Management Console with a password, but has no Allow policy that permits Amazon EC2. When the user attempts RunInstances from the console or CLI, what happens and why?",
+      "alternativas": [
+        "It always succeeds because console authentication succeeded",
+        "The VPC is automatically recreated with admin privileges",
+        "AccessDenied / not authorized — authentication is not authorization",
+        "The Security Group alone authorizes the EC2 control-plane API"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Autenticação (senha de console) não é autorização. Sem policy Allow efetiva de EC2, RunInstances resulta em AccessDenied / not authorized. Não 'sempre funciona porque autenticou'. A VPC não é recriada com admin por falta de policy. Security Group filtra tráfego das ENIs; não autoriza a API de controle EC2 do user. Insight: senha/console OK + API negada = falta de policy IAM (ou Deny explícito), não problema de rede ou de VPC."
+    },
+    {
+      "id": 282,
+      "idx": 281,
+      "part_id": "aws-1.10",
+      "enunciado": "An AWS Lambda function has reserved concurrency set to 10. During a flash sale the function receives about 50 simultaneous invokes. Without changing the function into EC2, what happens to the excess concurrent invokes?",
+      "alternativas": [
+        "AWS always ignores the reserved concurrency limit",
+        "Excess invokes convert automatically into Amazon EC2 instances",
+        "The function timeout increases by itself to 900 seconds",
+        "Invokes above the reserved limit are throttled (unless another capacity or queue architecture absorbs them)"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Reserved concurrency = 10 limita invocações simultâneas dessa function a 10; o excesso (picos de ~50) recebe throttle (429/TooManyRequests), a menos que haja fila/buffer (SQS, etc.) absorvendo o restante antes do invoke síncrono. AWS não ignora o limite — reserved existe justamente para tetar e proteger o account concurrency das outras functions. Não há conversão automática em EC2. Timeout não sobe sozinho para 900s por causa de concurrency. Insight: reserved protege o restante da conta, mas cria teto local — desenhe fila ou aumente reserved se o pico for esperado e aceitável."
+    }
+  ]
+}

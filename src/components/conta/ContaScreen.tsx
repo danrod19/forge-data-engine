@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   User,
@@ -12,6 +12,7 @@ import {
   Loader2,
   Shield,
   Clock,
+  History,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -19,6 +20,12 @@ import { ProPlans, TrialButton } from "@/components/pro/ProPlans";
 import { formatProExpiresAt } from "@/lib/pro";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/types/question";
 import { RESET_PASSWORD_SENT_COPY } from "@/lib/auth-flow";
+import { launchCopy } from "@/data/copy";
+import {
+  listSimuladoRuns,
+  SIMULADO_RUN_TRACK_LABEL,
+  type SimuladoRunRow,
+} from "@/lib/simulado-runs";
 
 interface ContaScreenProps {
   onAuthClick: () => void;
@@ -182,6 +189,17 @@ export function ContaScreen({ onAuthClick }: ContaScreenProps) {
               <p className="font-mono text-[10px] uppercase tracking-wider text-amber-400/80">
                 desbloquear pro
               </p>
+              <p className="text-[12px] leading-relaxed text-slate-400">
+                {launchCopy.paragraph}
+              </p>
+              <ul className="space-y-1.5 font-mono text-[11px] leading-relaxed text-slate-300">
+                {launchCopy.proBullets.map((b) => (
+                  <li key={b} className="flex gap-2">
+                    <span className="text-neon-green">›</span>
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
               {trialAvailable && (
                 <div className="space-y-2">
                   <TrialButton onStart={handleTrial} loading={trialLoading} />
@@ -195,6 +213,8 @@ export function ContaScreen({ onAuthClick }: ContaScreenProps) {
               <ProPlans />
             </section>
           )}
+
+          <SimuladoHistorySection userId={user.id} />
 
           {isProEfetivo && (
             <section className="space-y-2 rounded-xl border border-slate-800 bg-slate-900/50 p-4">
@@ -266,5 +286,82 @@ export function ContaScreen({ onAuthClick }: ContaScreenProps) {
         </div>
       </section>
     </motion.div>
+  );
+}
+
+function formatRunDate(iso: string): string {
+  try {
+    return new Intl.DateTimeFormat("pt-BR", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
+
+function SimuladoHistorySection({ userId }: { userId: string }) {
+  const [rows, setRows] = useState<SimuladoRunRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    void listSimuladoRuns(20).then(({ rows: next }) => {
+      if (cancelled) return;
+      setRows(next);
+      setLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  return (
+    <section className="space-y-3 rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+      <div className="flex items-center gap-2">
+        <History className="size-4 text-neon-cyan" />
+        <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+          histórico de simulados
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center gap-2 py-2 text-slate-500">
+          <Loader2 className="size-4 animate-spin" />
+          <span className="font-mono text-[11px]">$ history --tail 20 …</span>
+        </div>
+      ) : rows.length === 0 ? (
+        <p className="text-[13px] leading-relaxed text-slate-400">
+          Você ainda não terminou um simulado logado.
+        </p>
+      ) : (
+        <ul className="space-y-2">
+          {rows.map((run) => (
+            <li
+              key={run.id}
+              className="flex items-center justify-between gap-3 rounded-lg border border-slate-800 bg-slate-950/50 px-3 py-2"
+            >
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-slate-200">
+                  {SIMULADO_RUN_TRACK_LABEL[run.track] ?? run.track}
+                </p>
+                <p className="font-mono text-[10px] text-slate-500">
+                  {formatRunDate(run.created_at)}
+                </p>
+              </div>
+              <div className="shrink-0 text-right">
+                <p className="font-mono text-sm font-bold tabular-nums text-neon-green">
+                  {run.percentual}%
+                </p>
+                <p className="font-mono text-[10px] tabular-nums text-slate-500">
+                  {run.acertos}/{run.total}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }

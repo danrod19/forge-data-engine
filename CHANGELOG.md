@@ -4,6 +4,16 @@
 
 ## Entradas Recentes
 
+- **2026-09-11** — Copy de lançamento (Sobre + Upgrade/paywall)
+  - Parágrafo único em `launchCopy` (Sobre CCNA, Home planos, Conta desbloquear, paywall Upgrade)
+  - Bullets PRO: vidas infinitas, explicações sem blur, planos 7/30/120 (sem inventar preço de 7 dias em R$)
+  - Trial, blur, 3 Payment Links e e-mail `ccnaforge19@gmail.com` mantidos
+
+- **2026-09-11** — Histórico de simulados (Conta)
+  - Tabela `public.simulado_runs` + RLS (select/insert próprio; sem update/delete no client)
+  - Ao terminar simulado com sessão Auth, insert client-side; falha não bloqueia o resultado
+  - Conta lista as últimas 20 corridas; deslogado não altera Trilha/Simulado
+
 - **2026-09-10** — Auth: reset de senha + signup duplicado
   - Modal Entrar: “Esqueci a senha” → `resetPasswordForEmail` com redirectTo prod/local; copy genérica (não revela se o e-mail existe)
   - Link do e-mail abre modal “Nova senha” (`PASSWORD_RECOVERY` / `type=recovery`); sucesso “Senha atualizada”; link morto + CTA “Pedir novo link”

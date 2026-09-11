@@ -1,0 +1,124 @@
+{
+  "patched": [
+    {
+      "id": 109,
+      "enunciado": "An EC2 instance has a root EBS volume with DeleteOnTermination=true and a separate data volume with DeleteOnTermination=false. Ops will terminate the instance during a cleanup window and must know what remains attachable afterward without relying on automatic snapshots. What should they expect after terminate?",
+      "alternativas": [
+        "Root and data volumes always remain after terminate",
+        "Root and data volumes are always deleted on terminate",
+        "Root is typically removed; the data volume may remain available in the AZ for reattach",
+        "Both volumes are always converted into snapshots automatically on terminate"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "DeleteOnTermination é por volume: com root=true o volume raiz tipicamente some no terminate; com data=false o volume de dados pode ficar available na mesma AZ para reattach a outra instance. Não é 'sempre permanecem' nem 'sempre apagam' os dois juntos. Terminate também não cria snapshots automaticamente sempre — snapshot é ação explícita (ou policy). Insight: antes de terminate, revise DeleteOnTermination em cada volume anexado e tire snapshot do que precisa preservar."
+    },
+    {
+      "id": 129,
+      "enunciado": "A web tier runs behind an Application Load Balancer with an Auto Scaling group. The team wants target tracking so capacity follows real user demand, without using unrelated account inventory metrics. Which metric idea best fits classic ALB-backed web scaling?",
+      "alternativas": [
+        "Number of EBS snapshots in the account",
+        "Request count per target (ALB) or ASG CPU utilization",
+        "Size of the S3 bucket that stores application logs",
+        "Number of IAM users in the account"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Target tracking no web tier costuma usar RequestCountPerTarget (métrica do ALB) ou CPUUtilization do ASG — ambas refletem carga útil para decidir scale-out/in. Número de snapshots EBS não mede demanda da aplicação. Tamanho do bucket de logs não é sinal de capacity do web tier. Quantidade de IAM users é irrelevante para autoscaling. Insight: alinhe a métrica ao gargalo real (CPU vs requests); atrás de ALB, RequestCountPerTarget é o clássico da prova."
+    },
+    {
+      "id": 176,
+      "enunciado": "A primary Amazon RDS database must support geographic disaster recovery and local reads in a second Region. Synchronous same-Region Multi-AZ failover alone is not enough for the DR objective. What does a cross-Region read replica primarily provide?",
+      "alternativas": [
+        "Synchronous Multi-AZ failover that stays only within the same AZ",
+        "Replacement of the database Security Group",
+        "DR and reads in another Region with asynchronous RPO (not identical to local Multi-AZ)",
+        "Elimination of any need for KMS encryption"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Read replica cross-Region replica de forma assíncrona para outra Região: serve DR geográfico e leituras locais com RPO de segundos/minutos — não é o mesmo que Multi-AZ síncrono na Região primária (RPO~0 de escrita local). Não é failover síncrono 'só na mesma AZ'. Não substitui Security Group. Não elimina KMS: criptografia continua sendo decisão à parte. Insight: cross-Region replica = DR/leitura global; Multi-AZ = HA de AZ com RPO quase zero na Região primária."
+    },
+    {
+      "id": 195,
+      "enunciado": "Marketing publishes www via Amazon CloudFront and needs a Route 53 record that keeps resolving correctly as edge IP addresses change. Pinning a static A record to one edge IP is forbidden because edges are dynamic. What is the main benefit of an Alias to the CloudFront distribution?",
+      "alternativas": [
+        "Alias disables HTTPS for the distribution",
+        "Alias forbids CloudFront invalidations",
+        "Alias requires the origin S3 bucket to be public",
+        "Alias tracks the CloudFront distribution (dynamic AWS targets) without pinning an edge IP"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Alias apontando para a distribuição CloudFront acompanha o target AWS dinâmico — IPs de edge mudam; um A com IP fixo de edge quebra quando a borda muda. Alias não desliga HTTPS, não proíbe invalidation e não obriga bucket público na origem. Insight: em produção, use Alias (ou automação equivalente) para CloudFront/ALB; nunca pinne IP de edge no DNS."
+    },
+    {
+      "id": 235,
+      "enunciado": "Worker instances in an Auto Scaling group consume messages from an Amazon SQS queue. Backlog must drive desired capacity so consumers grow when the queue deepens, without using unrelated AWS inventory counts. How should the ASG typically scale?",
+      "alternativas": [
+        "Only on RDS CPU utilization",
+        "On queue depth / approximate oldest message age to adjust desired capacity",
+        "Only on the count of S3 buckets in the account",
+        "Only on the number of Route 53 hosted zones"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ASG de consumers atrás de SQS tipicamente escala por profundidade da fila (ApproximateNumberOfMessages) ou idade da mensagem mais velha — desired capacity sobe com o backlog. Só CPU do RDS não reflete a fila de workers. Contagem de buckets S3 e número de hosted zones são métricas irrelevantes ao throughput de consumo. Insight: alarme + scaling policy na fila evita backlog crescente sem overprovision fixo de workers."
+    },
+    {
+      "id": 250,
+      "enunciado": "A customer managed KMS key (CMK) used to encrypt historical application data is set to KeyState=Disabled during an incident drill. Operators must understand the immediate effect on decrypt without assuming AWS deletes ciphertext. What symptom occurs when reading old data encrypted with that key?",
+      "alternativas": [
+        "Decrypt/use of the key fails until enable-key; ciphertext remains stored encrypted",
+        "AWS automatically deletes every object in all S3 buckets",
+        "The ALB converts all listeners to HTTP",
+        "The SQS queue is converted to FIFO"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Com KeyState=Disabled, Decrypt e demais usos da CMK falham até enable-key; os dados cifrados permanecem no storage — não são apagados automaticamente. A AWS não limpa todos os objetos S3 só porque a chave foi desabilitada. ALB não muda para HTTP por causa de KMS. Fila SQS não vira FIFO por KeyState. Insight: disabled = indisponibilidade criptográfica temporária; pending deletion é o caminho que leva à perda permanente de decrypt."
+    },
+    {
+      "id": 25,
+      "enunciado": "A developer receives AccessDenied from an AWS API call in the CLI and must troubleshoot authorization quickly. Recreating networking or resizing compute is out of scope for the first step. What is the most practical first troubleshooting action?",
+      "alternativas": [
+        "Confirm the principal with get-caller-identity and the Action/Resource from the error; then check attached policies/trust",
+        "Recreate the entire VPC and all subnets",
+        "Change the instance type to bare metal",
+        "Delete the application's CloudWatch Log Group"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Primeiro passo prático em AccessDenied de API: confirmar o principal com sts get-caller-identity e a Action/Resource da mensagem; depois checar Allow, Deny explícito, trust (se role) e resource policy. Recriar a VPC inteira não explica falha de autorização de control-plane. Trocar instance type para bare metal não altera IAM. Apagar Log Group remove evidência sem corrigir permissão. Insight: AccessDenied de API AWS ≠ primeiro recriar rede; isole identidade e policies."
+    },
+    {
+      "id": 277,
+      "enunciado": "A Lambda function stores DB_PASSWORD=SuperSecret as a plain environment variable in the console. Security rejects plaintext secrets in function configuration and requires retrieval at runtime with least privilege. Why is this an anti-pattern, and what should replace it?",
+      "alternativas": [
+        "Secret in plaintext in config; use Secrets Manager/SSM and GetSecretValue with the execution role",
+        "Plain env passwords are mandatory for every Lambda on AWS",
+        "Plain env passwords replace the need for CloudWatch",
+        "Plain env passwords automatically raise reserved concurrency"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "DB_PASSWORD em variável de ambiente no console deixa o secret em plaintext na configuração da function — anti-pattern clássico. Use Secrets Manager ou SSM Parameter Store (SecureString) e GetSecretValue/GetParameter na execution role com least privilege. Não é obrigatório pela AWS em toda Lambda. Não substitui CloudWatch. Não aumenta reserved concurrency. Insight: em prova SAA, senha em env quase sempre perde para Secrets Manager/SSM."
+    },
+    {
+      "id": 305,
+      "enunciado": "A DynamoDB table serves high-volume lookups by partition key. Engineers must choose between Query and Scan for production reads and need the operational cost/latency difference clear. What is the critical distinction?",
+      "alternativas": [
+        "Query uses a key condition on the partition; Scan can read the whole table (more RCU and latency at scale)",
+        "Scan is always free of charge",
+        "Query works only on Amazon S3",
+        "Scan always guarantees strongly consistent reads on every GSI"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Query aplica key condition na partição (e opcionalmente sort key): consumo de RCU previsível e focado. Scan lê potencialmente a tabela inteira — mais RCU e latência em escala. Scan não é grátis. Query não é recurso de S3. Scan não garante strongly consistent em GSI (GSI é eventual). Insight: se dá para expressar com PK/SK, prefira Query; Scan fica para admin/analytics pontual, não para path quente."
+    },
+    {
+      "id": 349,
+      "enunciado": "Each EC2 instance or Lambda function writes to its own CloudWatch Logs stream under one shared log group. FinOps needs retention that controls cost and compliance without configuring every stream individually. Why set retention on the log group?",
+      "alternativas": [
+        "Each stream always ignores the log group retention policy",
+        "Retention deletes the Lambda/EC2 execution role",
+        "Retention policy applies to the whole group (streams inherit) — controls cost and compliance",
+        "Retention creates Multi-AZ for the compute fleet"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Retention é configurada no log group e aplica a todos os streams filhos (instance/function) — controla custo e compliance de retenção sem editar stream a stream. Streams não ignoram a policy do group. Retention não apaga execution role. Retention não cria Multi-AZ. Insight: um put-retention-policy no group cobre todos os streams; Never expire é o vilão de custo mais comum em Logs."
+    }
+  ]
+}

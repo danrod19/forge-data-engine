@@ -1,0 +1,215 @@
+{
+  "batch": 5,
+  "items": [
+    {
+      "id": 47,
+      "idx": 46,
+      "part_id": "aws-1.2",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 73,
+      "enunciado": "SG: outbound allow all; inbound só TCP 443 de 10.0.0.0/8. Efeito prático?",
+      "alternativas": [
+        "Nega todo retorno de 443 porque SG seria 'stateless invertido'",
+        "Bloqueia obrigatoriamente o DNS da Amazon",
+        "Permite iniciar saídas e aceita 443 só de 10.0.0.0/8; retornos de sessões permitidas seguem o modelo stateful",
+        "Abre 443 da Internet inteira (0.0.0.0/0)"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Security Groups são stateful: outbound allow all permite iniciar conexões de saída; os retornos dessas sessões são aceitos automaticamente. Inbound só TCP 443 de 10.0.0.0/8 restringe novas conexões de entrada àquela origem — não abre a Internet inteira. «Nega todo retorno de 443 porque SG seria stateless invertido» confunde SG com NACL: SG não exige regra espelho de retorno. Bloquear obrigatoriamente o DNS da Amazon não segue dessa regra inbound; resolução DNS depende de path/outbound e config de resolver, não desse Allow 443. «Abre 443 da Internet (0.0.0.0/0)» contradiz o Source 10.0.0.0/8. Insight: SG stateful ≠ NACL stateless — não invente regra de retorno no SG."
+    },
+    {
+      "id": 73,
+      "idx": 72,
+      "part_id": "aws-1.3",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 77,
+      "enunciado": "aws s3 rm s3://b/config.json com versioning Enabled. O que acontece em geral?",
+      "alternativas": [
+        "Todas as versões são apagadas irrecuperáveis imediatamente",
+        "O bucket inteiro é removido da conta",
+        "Cria-se um delete marker (IsLatest); versões anteriores permanecem recuperáveis",
+        "O Block Public Access desliga automaticamente"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Com versioning Enabled, `aws s3 rm` em geral cria um delete marker (IsLatest); as versões anteriores permanecem e podem ser restauradas. Não apaga todas as versões de forma irrecuperável no rm simples. Não remove o bucket inteiro da conta. Não desliga Block Public Access. Insight: objeto 'sumiu' com versioning on → procure delete marker em list-object-versions, não recríe a conta."
+    },
+    {
+      "id": 100,
+      "idx": 99,
+      "part_id": "aws-1.4",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 69,
+      "enunciado": "User data no launch de EC2 serve principalmente para quê (ideia SAA)?",
+      "alternativas": [
+        "Substituir o Security Group da VPC",
+        "Script/bootstrap na primeira inicialização (pacotes, config) sem ser o controle de IAM da role",
+        "Garantir multi-AZ automático do volume EBS",
+        "Converter a instance em Lambda"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "User data no launch serve para script/bootstrap na primeira inicialização (pacotes, config, agentes) — não substitui o IAM da role nem o Security Group. Não garante multi-AZ automático do volume EBS (EBS continua por AZ). Não converte a instance em Lambda. Insight: user data = cloud-init/bootstrap; permissões de API = instance profile; firewall de instance = SG."
+    },
+    {
+      "id": 136,
+      "idx": 135,
+      "part_id": "aws-1.5",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 51,
+      "enunciado": "Cooldown-out em scaling policy evita qual problema?",
+      "alternativas": [
+        "Impede qualquer scale-out para sempre",
+        "Substitui o max do ASG",
+        "Apaga o launch template",
+        "Oscilação rápida scale-out/in (flapping) após picos transitórios"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Cooldown após scale-out evita flapping: picos transitórios não disparam scale-in/out em cascata antes da métrica estabilizar. Não impede scale-out para sempre — só atrasa ações seguintes no período. Não substitui o max do ASG. Não apaga o launch template. Insight: flapping + alarmes nervosos → cooldown (e/ou stabilization de target tracking) antes de mexer em thresholds à toa."
+    },
+    {
+      "id": 175,
+      "idx": 174,
+      "part_id": "aws-1.6",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 56,
+      "enunciado": "Desenho: ALB → ASG app → RDS. Onde aplicar o allow 3306?",
+      "alternativas": [
+        "No SG do ALB para 0.0.0.0/0",
+        "No SG do RDS com Source = SG das instances de app (sg-app)",
+        "No NACL only Deny all",
+        "Somente no Security Group do NAT Gateway"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "No desenho ALB → ASG app → RDS, a porta 3306 deve ser permitida no SG do RDS com Source = SG das instances de app (sg-app) — least privilege por referência de SG. Abrir 3306 no SG do ALB para 0.0.0.0/0 está na camada errada (ALB não fala MySQL com clientes) e é excessivo. NACL Deny all quebra conectividade. NAT Gateway não é o ponto de controle de acesso SQL do RDS. Insight: modele SG por tier; nunca use o SG do ALB como proxy de regra de banco."
+    },
+    {
+      "id": 199,
+      "idx": 198,
+      "part_id": "aws-1.7",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 60,
+      "enunciado": "Invalidation /* em produção a cada commit de CSS. Trade-off?",
+      "alternativas": [
+        "É grátis ilimitado e obrigatório em todo PUT S3",
+        "Substitui OAI",
+        "Garante consistência rápida mas pode aumentar custo/requests de invalidation e origem se abusado",
+        "Desliga o Route 53"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Invalidation /* a cada commit garante consistência rápida na edge, mas gera custo/quota de invalidation e pode aumentar hits na origem se o hábito for abusivo. Não é grátis ilimitado nem obrigatório em todo PUT S3. Não substitui OAI. Não desliga Route 53. Insight: versionar assets (hash no filename) reduz necessidade de invalidation em massa; reserve /* para emergências."
+    },
+    {
+      "id": 233,
+      "idx": 232,
+      "part_id": "aws-1.8",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 47,
+      "enunciado": "Delay seconds / timer de mensagem (ideia): uso?",
+      "alternativas": [
+        "Aumentar o IOPS do EBS",
+        "Forçar HTTPS no ALB",
+        "Adiar a disponibilidade da mensagem por um intervalo antes do consumer ver",
+        "Criar hosted zone"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "DelaySeconds (fila ou por mensagem) adia a disponibilidade: o consumer só vê a mensagem após o intervalo — útil para retry suave, janelas de graça ou agendamento curto. Não aumenta IOPS do EBS. Não força HTTPS no ALB. Não cria hosted zone. Insight: delay ≠ visibility timeout (invisibilidade após receive); delay atrasa a primeira visibilidade."
+    },
+    {
+      "id": 254,
+      "idx": 253,
+      "part_id": "aws-1.9",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 59,
+      "enunciado": "schedule-key-deletion na CMK em uso por S3. Risco imediato?",
+      "alternativas": [
+        "Janela de pending deletion: após o waiting period a chave some e decrypt de dados existentes falha",
+        "Melhora automática do throughput do ALB",
+        "Habilita PubliclyAccessible no RDS",
+        "Cria read replica grátis"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "schedule-key-deletion coloca a CMK em PendingDeletion: após o waiting period a chave é eliminada e decrypt de dados existentes (ex. objetos S3) falha de forma permanente. Não melhora throughput do ALB. Não habilita PubliclyAccessible no RDS. Não cria read replica grátis. Insight: risco imediato é a janela — cancele a deletion se a chave ainda for necessária; backup/reencrypt antes de apagar de verdade."
+    },
+    {
+      "id": 8,
+      "idx": 7,
+      "part_id": "aws-1.1",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 80,
+      "enunciado": "App Node em EC2 grava DynamoDB. Qual anti-pattern de identidade o SAA mais pune?",
+      "alternativas": [
+        "Usar VPC endpoint para DynamoDB",
+        "Usar role com dynamodb:PutItem no ARN da tabela",
+        "Habilitar IMDSv2 na instância",
+        "Gravar access key de IAM user no código ou user-data"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "O anti-pattern que o SAA mais pune é gravar access key de IAM user no código ou no user-data: keys estáticas são difíceis de rotacionar e vazam com disco, AMI ou repositório. VPC endpoint para DynamoDB é boa prática de rede privada, não anti-pattern. Role com dynamodb:PutItem no ARN da tabela é o design esperado. IMDSv2 endurece o metadata service e é recomendado. Insight: se a opção coloca AKIA... no código ou userdata, descarte no desenho de Associate."
+    },
+    {
+      "id": 280,
+      "idx": 279,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 74,
+      "enunciado": "Memory 128 MB, CPU efetiva baixa, duração alta em CPU-bound. Ajuste ideia?",
+      "alternativas": [
+        "Desligar a execution role",
+        "Colocar a function em /tmp de 0 bytes apenas",
+        "Remover o trigger e esperar",
+        "Aumentar memory size (escala CPU alocada) e medir custo/duração"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Em Lambda, memory size escala a CPU alocada: 128 MB em workload CPU-bound alonga a duração — aumente memory e meça custo/duração. Desligar execution role quebra API calls. /tmp de 0 bytes não acelera CPU. Remover o trigger só para o processamento. Insight: CPU-bound em Lambda → subir memory costuma reduzir duração e, às vezes, o custo total por invoke."
+    }
+  ]
+}

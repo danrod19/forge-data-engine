@@ -1,0 +1,124 @@
+{
+  "patched": [
+    {
+      "id": 225,
+      "enunciado": "An order-processing pipeline uses Amazon SQS. During a planned consumer outage lasting several days, messages must remain in the queue until workers resume, but expired backlog must not sit forever. Ops asks what the queue message retention period controls in practice. Which statement is correct?",
+      "alternativas": [
+        "The CloudFront cache TTL for static assets",
+        "The ACM certificate validity TTL",
+        "A mandatory interval between SNS Publish calls",
+        "The maximum time a message can remain in the queue if it is not consumed and deleted"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Message retention period é o tempo máximo que a mensagem pode ficar na fila se não for consumida/deletada (padrão 4 dias, até 14). Não é TTL de cache do CloudFront, nem TTL de certificado ACM, nem intervalo entre publishes SNS. Insight: retenção curta demais perde msgs se consumers pararem; longa demais atrasa limpeza de backlog obsoleto — alinhe ao SLA de processamento e à janela de outage planejada."
+    },
+    {
+      "id": 257,
+      "enunciado": "A production app reads DB credentials from AWS Secrets Manager with automatic rotation. The rotation Lambda starts failing overnight. Security must not assume the VPC or Security Groups were wiped, and the app should keep running if possible until the Lambda is fixed. What is the typical symptom for the application?",
+      "alternativas": [
+        "The entire VPC is deleted automatically",
+        "All Security Groups open inbound 0.0.0.0/0",
+        "The app can keep using the current secret version until rotation is fixed, but rotation/compliance stays in a failed state — monitor describe-secret and related events",
+        "CloudFront invalidates all distributions worldwide"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Se a Lambda de rotation falha, o secret costuma permanecer na versão atual utilizável pela app até a correção, mas o estado de rotação/compliance fica em falha — monitore describe-secret e eventos. A VPC não é deletada. Security Groups não abrem 0.0.0.0/0 por falha de rotation. CloudFront não invalida o mundo. Insight: falha de rotation ≠ apagamento do secret; alarme + corrija a Lambda sem assumir outage total da aplicação."
+    },
+    {
+      "id": 18,
+      "enunciado": "A growing startup has dozens of humans accessing the AWS Management Console daily. Security forbids distributing root access keys and requires least-privilege, auditable permissions that scale as people join and leave. How should permissions be organized?",
+      "alternativas": [
+        "Distribute the account root access keys to each person",
+        "Place users in groups by job function (Dev, Ops, ReadOnly) and attach policies to the groups",
+        "Share a single EC2 instance profile role as the console login for everyone",
+        "Disable CloudTrail to reduce audit noise"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Boa prática para dezenas de humanos no console: users em groups por função (Dev, Ops, ReadOnly) com policies nos groups — escala least privilege e facilita entrada/saída de pessoas. Distribuir access keys do root é falha crítica de segurança e auditoria. Uma única role EC2 compartilhada como 'login' de console mistura identidade de workload com humano; o console não autentica assim. Desabilitar CloudTrail remove evidência de quem fez o quê. Insight: console multi-user → groups (ou Identity Center); nunca root keys."
+    },
+    {
+      "id": 294,
+      "enunciado": "On-call must pause a noisy Lambda immediately without deleting the function code or changing its runtime. They run put-function-concurrency with reserved concurrency set to 0 (or a value that zeroes effective capacity). What is the practical effect?",
+      "alternativas": [
+        "It guarantees unlimited throughput for the function",
+        "It can block invocations entirely (full throttle) if reserved concurrency zeroes the function’s effective capacity",
+        "It deletes the function’s deployment package",
+        "It automatically changes the runtime to provided.al2"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "put-function-concurrency com reserved=0 (ou valor que zera a capacidade efetiva) pode impedir invocações — throttle total da function. Não garante throughput ilimitado; faz o oposto. Não apaga o código. Não muda o runtime sozinho para provided.al2. Insight: reserved 0 é alavanca de 'pause' de emergência; confira concurrency antes de culpar o código quando tudo retorna throttle."
+    },
+    {
+      "id": 328,
+      "enunciado": "An ecommerce service creates orders in DynamoDB and must ensure two concurrent writers never overwrite the same new order key. The design should use a conditional write rather than raising RCU or opening Security Groups. What is the practical use of PutItem with attribute_not_exists(PK)?",
+      "alternativas": [
+        "Increase table RCU provisioned capacity",
+        "Create the item only if the primary key does not already exist (avoids accidental overwrite / simple optimistic create-if-not-exists)",
+        "Create a Global Secondary Index",
+        "Open the instance Security Group"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ConditionExpression attribute_not_exists(PK) no PutItem cria o item só se a chave ainda não existir — evita overwrite acidental e serve como lock otimista simples (create-if-not-exists). Não aumenta RCU. Não cria GSI. Não abre Security Group. Insight: use condições para idempotência e corridas (ex. criar pedido único); ConditionalCheckFailedException indica que outro writer ganhou a corrida."
+    },
+    {
+      "id": 339,
+      "enunciado": "On-call receives false pages when a single CloudWatch metric spikes for one minute. They configure an alarm with Datapoints to alarm = 3 of 3 and period = 60 seconds, keeping the same threshold. What does that setting mean?",
+      "alternativas": [
+        "The alarm always fires in the first second",
+        "The alarm ignores the configured threshold",
+        "The metric is deleted from CloudWatch",
+        "Three consecutive 60s periods must breach (~3 min) before ALARM — reducing false positives from a single spike"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Datapoints to alarm = 3 de 3 com period 60s exige 3 períodos consecutivos em violação (~3 min) antes de ALARM — reduz falso positivo de um pico isolado. Não dispara no primeiro segundo. Não ignora o threshold. Não apaga a métrica. Insight: N de N é conservador; 1 de N é sensível (mais flapping). Ajuste conforme SLA de detecção versus ruído de página."
+    },
+    {
+      "id": 43,
+      "enunciado": "A VPC subnet is tagged Name=private, but its route table has 0.0.0.0/0 pointing to an Internet Gateway instead of a NAT Gateway. Instances may get public IPs. What is the main design risk of calling this subnet 'private'?",
+      "alternativas": [
+        "Typical incorrect design: a default route to an IGW is the public-subnet pattern; egress and exposure are misaligned with a 'private' label",
+        "It automatically improves KMS cryptographic performance",
+        "It is mandatory for RDS Multi-AZ to function",
+        "It permanently disables the subnet’s network ACL"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "O rótulo 'private' não define o comportamento: a route table define. 0.0.0.0/0 → igw é o padrão de subnet pública (com IP público/EIP para reachability); privada tipicamente usa NAT (ou endpoint) para egress sem exposição direta. Com IGW na default route, saída e superfície de exposição ficam mal alinhadas ao nome 'privada'. Performance do KMS não depende dessa rota. RDS Multi-AZ não exige que a subnet do app aponte para IGW. NACL não é desligada por causa da rota IGW. Insight: ignore o Name tag e leia a RT — privada com →igw é anti-padrão clássico."
+    },
+    {
+      "id": 78,
+      "enunciado": "Account B’s analytics role must read objects from a private S3 bucket owned by account A. The bucket must not become public, and root access keys must never be shared. Which cross-account pattern is commonly correct?",
+      "alternativas": [
+        "Share account A’s root access key in chat with account B",
+        "Add a bucket policy on A that allows B’s principal, plus IAM/role permissions in B",
+        "Turn off Block Public Access and allow Principal * GetObject globally",
+        "Use only account B’s VPC network ACLs to authorize the S3 API"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Padrão cross-account: bucket policy na conta A Allow no principal (role/user) da conta B + permissões IAM na B (frequentemente AssumeRole). Assim B lê sem tornar o bucket público. Compartilhar access key de root da A é inaceitável. Desligar BPA e abrir Principal * GetObject global resolve 'acesso' com exposição pública. NACL da VPC da B não autoriza a API S3 (controle de rede ≠ resource policy). Insight: cross-account S3 = resource policy no bucket + identity na origem, nunca root key."
+    },
+    {
+      "id": 115,
+      "enunciado": "An operator attaches an EBS data volume to an EC2 instance as /dev/sdf (or the NVMe name). The attach API succeeds, but the application still cannot see a usable filesystem. Recreating the VPC is out of scope. What is the next step inside the guest OS?",
+      "alternativas": [
+        "Only recreate the entire VPC",
+        "Discover, format if new, and mount the device in the OS (lsblk/mkfs/mount, or initialize the disk on Windows)",
+        "Open TCP 2049 on the Security Group to 'activate EBS'",
+        "Convert the volume into an AMI before mounting"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Attach AWS OK em /dev/sdf (ou nome NVMe) não monta sozinho no guest: no SO faça lsblk/mkfs (se novo)/mount ou inicialização de disco no Windows. Recriar a VPC não monta filesystem. Porta 2049 no SG é NFS/EFS, não 'ativa EBS'. Converter volume em AMI antes de montar é desnecessário para ver o disco. Insight: attach é passo de control-plane; mount/format é passo de OS — os dois são obrigatórios."
+    },
+    {
+      "id": 142,
+      "enunciado": "A stateful web app relies on ALB sticky sessions. The Auto Scaling group uses aggressive scale-in during low traffic. Sessions must not break silently when capacity shrinks, and HTTPS on the ALB must remain unchanged. What is the main risk?",
+      "alternativas": [
+        "None — sticky sessions prevent instance termination",
+        "Users pinned to an instance that is terminated experience errors unless connection draining and/or external session rehydration are in place",
+        "The ASG cannot have max capacity greater than 1 when sticky is enabled",
+        "The ALB automatically stops using HTTPS"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Sticky session prende o cliente a uma instance; no scale-in essa instance pode ser terminada e a sessão quebra se não houver draining e/ou re-sessão (store externo). Sticky não ignora terminate. ASG pode ter max > 1 com sticky. Sticky não desliga HTTPS no ALB. Insight: app stateful atrás de ASG → sessão em Redis/DB ou draining generoso; no SAA, preferir desenho stateless sempre que possível."
+    }
+  ]
+}

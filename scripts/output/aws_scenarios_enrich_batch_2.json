@@ -1,0 +1,1109 @@
+{
+  "selected_count": 50,
+  "excluded_batch1": 50,
+  "criterion": "score>=5, exclude batch1 ids + meta + already_rich, diversify by part_id, top 50",
+  "ids": [
+    10,
+    284,
+    324,
+    354,
+    55,
+    77,
+    118,
+    141,
+    169,
+    207,
+    225,
+    257,
+    18,
+    294,
+    328,
+    339,
+    43,
+    78,
+    115,
+    142,
+    173,
+    188,
+    229,
+    249,
+    14,
+    297,
+    317,
+    351,
+    34,
+    86,
+    109,
+    129,
+    176,
+    195,
+    235,
+    250,
+    25,
+    277,
+    305,
+    349,
+    51,
+    70,
+    95,
+    137,
+    158,
+    205,
+    224,
+    264,
+    22,
+    291
+  ],
+  "items": [
+    {
+      "id": 10,
+      "idx": 9,
+      "part_id": "aws-1.1",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 82,
+      "enunciado": "AccessDenied em uma API: qual primeiro comando CLI confirma quem está autenticado?",
+      "alternativas": [
+        "aws ec2 describe-vpcs",
+        "aws sts get-caller-identity",
+        "aws s3 mb s3://teste-temp",
+        "aws configure list-profiles sem inspecionar o ARN ativo"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "O primeiro comando para confirmar quem está autenticado é aws sts get-caller-identity: retorna Account, UserId e Arn do principal efetivo (user ou assumed-role), base do troubleshooting de permissão. aws ec2 describe-vpcs lista VPCs e não identifica o caller. aws s3 mb cria bucket e pode até falhar pelo mesmo AccessDenied sem esclarecer a identidade. list-profiles sem inspecionar o ARN ativo só mostra configuração local, não o principal da chamada atual. Insight: 'quem sou eu nestas credenciais?' → sempre get-caller-identity primeiro."
+    },
+    {
+      "id": 284,
+      "idx": 283,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 74,
+      "enunciado": "lambda:InvokeFunction AccessDenied de uma role de pipeline. Onde corrigir?",
+      "alternativas": [
+        "Só o Security Group da Lambda ENI para 443 world",
+        "Só o MessageRetentionPeriod da fila",
+        "Resource-based policy da function (e/ou IAM da role do pipeline) permitindo invoke",
+        "Só o price class CloudFront"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "AccessDenied em lambda:InvokeFunction é autorização IAM: a resource-based policy da function (e/ou a identity policy da role do pipeline) precisa Allow invoke no principal certo. Security Group da ENI em 443 world não concede InvokeFunction — SG filtra rede, não API IAM. MessageRetentionPeriod da fila não autoriza invoke. Price class CloudFront é de CDN, irrelevante ao erro de pipeline→Lambda. Insight: em invoke cross-role/cross-account, cheque resource policy da function além da role do caller."
+    },
+    {
+      "id": 324,
+      "idx": 323,
+      "part_id": "aws-1.11",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 47,
+      "enunciado": "Composite sort key userId#timestamp: benefício?",
+      "alternativas": [
+        "Substitui a need de encryption",
+        "Permite ranges e hierarquia na SK dentro da mesma PK (Query begins_with/between)",
+        "Desliga throttle para sempre",
+        "Cria Multi-Region automático"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Composite sort key (ex. userId#timestamp) permite Query com begins_with/between na mesma partition key, modelando hierarquia e ranges sem Scan. Não substitui encryption at rest/in transit — segurança é ortogonal ao design de chave. Não desliga throttle: hot partition ainda limita throughput. Não cria Multi-Region automático (isso é Global Tables). Insight: desenhe SK concatenada para o access pattern de lista/intervalo; PK alta cardinalidade evita hot key."
+    },
+    {
+      "id": 354,
+      "idx": 353,
+      "part_id": "aws-1.12",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 54,
+      "enunciado": "Cross-account alarm notification (ideia): peça típica?",
+      "alternativas": [
+        "Abrir 22 em todos os bastions",
+        "SNS topic com policy permitindo a conta de monitoramento publicar/assinar conforme desenho",
+        "Desabilitar MFA do root",
+        "Tornar o log group público ACL"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Notificação cross-account típica usa SNS topic com resource policy permitindo à conta de monitoramento publicar e/ou às contas consumidoras assinar, conforme o desenho. Abrir SSH 22 em bastions não resolve fan-out de alarme. Desabilitar MFA do root piora segurança. Tornar log group público via ACL é anti-padrão e não é o canal clássico de page. Insight: alarme na conta A → SNS (policy) → email/Lambda/Chatbot na conta B."
+    },
+    {
+      "id": 55,
+      "idx": 54,
+      "part_id": "aws-1.2",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 78,
+      "enunciado": "App em privada não alcança repositórios na Internet. Ordem mental de Diagnose?",
+      "alternativas": [
+        "NAT available → rota 0.0.0.0/0 da private RT → SG outbound → NACL → só então app/DNS",
+        "Só recriar a VPC inteira como primeiro passo",
+        "Só trocar o hostname da EC2",
+        "Só desligar o CloudTrail da conta"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Para app em subnet privada sem alcançar a Internet, isole o path de egress antes da aplicação: NAT available → rota 0.0.0.0/0 na RT privada → SG outbound → NACL → só então DNS/app. Recriar a VPC inteira como primeiro passo é destrutivo e lento. Trocar só o hostname da EC2 não cria rota de saída. Desligar CloudTrail não restaura conectividade e remove auditoria. Insight: privada sem egress → confirme NAT + associação de RT antes de tcpdump na app."
+    },
+    {
+      "id": 77,
+      "idx": 76,
+      "part_id": "aws-1.3",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 80,
+      "enunciado": "get-public-access-block: BlockPublicAcls e RestrictPublicBuckets = true. Efeito?",
+      "alternativas": [
+        "Ajuda a impedir exposição pública via ACL e policies públicas no bucket",
+        "Desliga o versioning de todos os objetos",
+        "Cria SCP de Organizations forçando SSE-KMS em toda a org",
+        "Configura CRR para us-west-2 automaticamente"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "BlockPublicAcls e RestrictPublicBuckets = true ajudam a impedir exposição pública via ACLs e via policies públicas no bucket — núcleo do S3 Block Public Access. Não desliga versioning. Não cria SCP de Organizations nem força SSE-KMS em toda a org. Não configura CRR para us-west-2 automaticamente. Insight: ao ver BPA true no get-public-access-block, trate tentativas de ACL/policy públicas como bloqueadas na borda de configuração."
+    },
+    {
+      "id": 118,
+      "idx": 117,
+      "part_id": "aws-1.4",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 71,
+      "enunciado": "Volume 100 GiB com 90% uso; app falha por disco cheio. Ação EBS típica?",
+      "alternativas": [
+        "Terminate e recriar sem snapshot",
+        "Só mudar o instance type para metal",
+        "Só recriar o Security Group",
+        "Modificar o volume (increase size) e estender o filesystem no SO; snapshot antes se possível"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Disco cheio em volume EBS: modifique o volume (increase size), depois estenda o filesystem/partition no SO; tire snapshot antes se possível. Terminate e recriar sem snapshot perde dados. Mudar instance type para metal não aumenta o filesystem do volume atual. Recriar Security Group não libera espaço em disco. Insight: modify-volume + growfs/diskmgmt — tamanho do volume na AWS ≠ filesystem já estendido no guest."
+    },
+    {
+      "id": 141,
+      "idx": 140,
+      "part_id": "aws-1.5",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 57,
+      "enunciado": "Cross-zone load balancing no ALB (ideia): efeito prático?",
+      "alternativas": [
+        "Nodes do ALB podem distribuir a targets em todas as AZ habilitadas, não só na AZ do node",
+        "Obriga todos os targets a ter Elastic IP",
+        "Desliga health checks",
+        "Impede ASG multi-AZ"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Com cross-zone load balancing, nodes do ALB podem enviar tráfego a targets em qualquer AZ habilitada, não só na AZ do node — distribuição mais uniforme. No ALB moderno costuma vir habilitado por padrão. Não obriga Elastic IP nos targets. Não desliga health checks. Não impede ASG multi-AZ. Insight: poucas instances numa AZ e muitas noutra → cross-zone evita sobrecarga na AZ 'cheia' de targets."
+    },
+    {
+      "id": 169,
+      "idx": 168,
+      "part_id": "aws-1.6",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 59,
+      "enunciado": "PITR (point-in-time restore) depende principalmente de quê?",
+      "alternativas": [
+        "Apenas de tags na VPC",
+        "Automated backups habilitados com retention > 0 e janela de restore",
+        "Apenas de read replica pública",
+        "Apenas de Enhanced Monitoring granularity 1s"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "PITR exige automated backups com retention > 0: a AWS mantém snapshots + logs de transação na janela de restore. Tags na VPC não habilitam PITR. Read replica pública serve leitura/DR assíncrono, não substitui a cadeia de backup do primary para PITR. Enhanced Monitoring 1s é telemetria de OS, irrelevante para restore point-in-time. Insight: retention = 0 ou backups off ⇒ sem PITR, mesmo que existam snapshots manuais pontuais (restore de snapshot ≠ PITR contínuo)."
+    },
+    {
+      "id": 207,
+      "idx": 206,
+      "part_id": "aws-1.7",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 68,
+      "enunciado": "Viewer protocol policy Redirect HTTP to HTTPS no CloudFront. Efeito?",
+      "alternativas": [
+        "Desliga o origin protocol",
+        "Requests HTTP do viewer são redirecionadas para HTTPS na edge",
+        "Remove a necessidade de certificado ACM",
+        "Abre a porta 80 no RDS"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Viewer Protocol Policy 'Redirect HTTP to HTTPS' faz a edge do CloudFront responder 301/302 aos pedidos HTTP do viewer apontando para HTTPS — o usuário sobe de protocolo na borda. Não desliga Origin Protocol Policy (HTTP-only / HTTPS-only / Match viewer é outra alavanca, origem↔CF). Não remove a necessidade de certificado ACM no viewer HTTPS. Não abre porta 80 no RDS — camada totalmente diferente. Insight: force HTTPS no viewer na edge; origine e ACM us-east-1 continuam no checklist à parte."
+    },
+    {
+      "id": 225,
+      "idx": 224,
+      "part_id": "aws-1.8",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 49,
+      "enunciado": "Message retention period na fila: efeito prático?",
+      "alternativas": [
+        "Tempo de cache do CloudFront",
+        "TTL do certificado ACM",
+        "Intervalo obrigatório entre publishes SNS",
+        "Tempo máximo que a mensagem pode permanecer na fila se não for consumida/deletada"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Message retention period é o tempo máximo que a mensagem pode ficar na fila se não for consumida/deletada (padrão 4 dias, até 14). Não é TTL de cache do CloudFront. Não é TTL de certificado ACM. Não é intervalo obrigatório entre publishes SNS. Insight: retenção curta demais perde msgs se consumers pararem; longa demais atrasa a limpeza de backlog obsoleto — alinhe ao SLA de processamento."
+    },
+    {
+      "id": 257,
+      "idx": 256,
+      "part_id": "aws-1.9",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 68,
+      "enunciado": "Rotação do secret falhou (rotation Lambda erro). Sintoma para a app?",
+      "alternativas": [
+        "A VPC inteira é deletada",
+        "Todos os Security Groups abrem 0.0.0.0/0",
+        "Pode continuar com a versão atual até correção, mas compliance/rotação fica em estado de falha — monitore describe-secret / eventos",
+        "O CloudFront invalida o mundo"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Se a Lambda de rotation falha, o secret pode permanecer na versão atual utilizável pela app até correção, mas o estado de rotação/compliance fica em falha — monitore describe-secret e eventos. A VPC não é deletada. Security Groups não abrem 0.0.0.0/0 por falha de rotation. CloudFront não invalida 'o mundo'. Insight: falha de rotation ≠ apagamento do secret; trate alarme e corrija a Lambda sem assumir outage total."
+    },
+    {
+      "id": 18,
+      "idx": 17,
+      "part_id": "aws-1.1",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 82,
+      "enunciado": "Dezenas de humanos usam o console. Qual organização de permissões é a boa prática?",
+      "alternativas": [
+        "Distribuir access keys do root a cada pessoa",
+        "Users em groups por função (Dev, Ops, ReadOnly) com policies anexadas aos groups",
+        "Uma única role EC2 compartilhada como 'login' de todos no console",
+        "Desabilitar CloudTrail para não gerar ruído"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Boa prática para dezenas de humanos no console: users em groups por função (Dev, Ops, ReadOnly) com policies nos groups — escala least privilege e entrada/saída de pessoas. Distribuir access keys do root a cada pessoa é falha crítica de segurança e auditoria. Uma única role EC2 compartilhada como 'login' de console mistura identidade de workload com humano; console não autentica assim. Desabilitar CloudTrail remove evidência de quem fez o quê. Insight: console multi-user → groups; nunca root keys."
+    },
+    {
+      "id": 294,
+      "idx": 293,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 76,
+      "enunciado": "put-function-concurrency reserved=0 (ou valor que impede execuções). Efeito?",
+      "alternativas": [
+        "Garante throughput ilimitado",
+        "Pode impedir invocações (throttle total) se reserved zera a capacidade efetiva da function",
+        "Apaga o código da function",
+        "Muda o runtime para provided.al2 sozinho"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "put-function-concurrency com reserved=0 (ou valor que zera capacidade efetiva) pode impedir invocações — throttle total da function. Não garante throughput ilimitado; faz o oposto. Não apaga o código. Não muda o runtime sozinho para provided.al2. Insight: reserved 0 é alavanca de 'pause' de emergência; confira concurrency antes de culpar o código quando tudo retorna throttle."
+    },
+    {
+      "id": 328,
+      "idx": 327,
+      "part_id": "aws-1.11",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 50,
+      "enunciado": "Condicional PutItem attribute_not_exists(PK): uso?",
+      "alternativas": [
+        "Aumentar RCU",
+        "Criar item só se a chave não existir (evita overwrite acidental / lock otimista simples)",
+        "Criar GSI",
+        "Abrir o Security Group"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ConditionExpression attribute_not_exists(PK) no PutItem cria o item só se a chave ainda não existir — evita overwrite acidental e serve como lock otimista simples (create-if-not-exists). Não aumenta RCU. Não cria GSI. Não abre Security Group. Insight: use condições para idempotência e corridas (ex. criar pedido único); falha ConditionalCheckFailedException indica que outro writer ganhou a corrida."
+    },
+    {
+      "id": 339,
+      "idx": 338,
+      "part_id": "aws-1.12",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 57,
+      "enunciado": "Datapoints to alarm = 3 de 3 com period 60s. Significado?",
+      "alternativas": [
+        "Dispara no primeiro segundo sempre",
+        "Ignora o threshold",
+        "Apaga a métrica",
+        "Precisa de 3 períodos consecutivos em violação (3 min) para ALARM — reduz falso positivo de 1 pico"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Datapoints to alarm = 3 de 3 com period 60s exige 3 períodos consecutivos em violação (~3 min) antes de ALARM — reduz falso positivo de um pico isolado. Não dispara no primeiro segundo. Não ignora o threshold. Não apaga a métrica. Insight: N de N é conservador; 1 de N é sensível (mais flapping). Ajuste conforme SLA de detecção vs ruído."
+    },
+    {
+      "id": 43,
+      "idx": 42,
+      "part_id": "aws-1.2",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 81,
+      "enunciado": "Subnet chamada 'private' tem 0.0.0.0/0 → igw em vez de nat. Qual risco de design?",
+      "alternativas": [
+        "Design incorreto típico: default route IGW é padrão de pública; saída/exposição fica mal definida para 'privada'",
+        "Melhora automática a performance do KMS",
+        "É obrigatório para RDS Multi-AZ funcionar",
+        "Desliga permanentemente a NACL da subnet"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "O rótulo 'private' não define o comportamento: a route table define. 0.0.0.0/0 → igw é o padrão de subnet pública (com IP público/EIP para reachability); privada tipicamente usa NAT (ou endpoint) para egress sem exposição direta. Com IGW na default route, saída e superfície de exposição ficam mal alinhadas ao nome 'privada'. Melhorar performance do KMS não tem relação com rota default. RDS Multi-AZ não exige que a subnet do app aponte para IGW. NACL não é desligada por causa da rota IGW. Insight: ignore o Name tag e leia a RT — privada com →igw é anti-padrão clássico de design."
+    },
+    {
+      "id": 78,
+      "idx": 77,
+      "part_id": "aws-1.3",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 80,
+      "enunciado": "Conta B precisa ler bucket da conta A sem tornar o bucket público. Padrão comum?",
+      "alternativas": [
+        "Compartilhar access key de root da conta A no chat",
+        "Bucket policy na A permitindo o principal da B + permissões IAM/role na B",
+        "Desligar BPA e abrir Principal * GetObject global",
+        "Usar apenas NACL da VPC da B para autorizar a API S3"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Padrão cross-account: bucket policy na conta A Allow no principal (role/user) da conta B + permissões IAM na B (frequentemente AssumeRole). Assim B lê sem tornar o bucket público. Compartilhar access key de root da A é inaceitável. Desligar BPA e abrir Principal * GetObject global resolve 'acesso' com exposição pública. NACL da VPC da B não autoriza a API S3 (controle de rede ≠ resource policy). Insight: cross-account S3 = resource policy no bucket + identity na origem, nunca root key."
+    },
+    {
+      "id": 115,
+      "idx": 114,
+      "part_id": "aws-1.4",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 72,
+      "enunciado": "Attach vol-data em /dev/sdf ok; app não vê o disco. Próximo passo no SO?",
+      "alternativas": [
+        "Só recreate a VPC",
+        "Mount/format do device no sistema operacional (lsblk/mkfs/mount ou inicialização de disco no Windows)",
+        "Abrir porta 2049 no SG para 'ativar EBS'",
+        "Converter o volume em AMI antes de montar"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Attach AWS OK em /dev/sdf (ou NVMe name) não monta sozinho no guest: no SO faça lsblk/mkfs (se novo)/mount ou inicialização de disco no Windows. Recriar a VPC não monta filesystem. Porta 2049 no SG é NFS/EFS, não 'ativa EBS'. Converter volume em AMI antes de montar é desnecessário para ver o disco. Insight: attach é passo de controle-plane; mount/format é passo de OS — os dois são obrigatórios."
+    },
+    {
+      "id": 142,
+      "idx": 141,
+      "part_id": "aws-1.5",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 68,
+      "enunciado": "App stateful em sticky session (ideia) vs scale-in agressivo. Risco?",
+      "alternativas": [
+        "Nenhum — sticky ignora terminate",
+        "Usuários grudados em instance que será terminada sofrem erro se não houver draining/re-sessão",
+        "O ASG não pode ter max > 1",
+        "O ALB deixa de usar HTTPS"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Sticky session prende o cliente a uma instance; no scale-in essa instance pode ser terminada e a sessão quebra se não houver draining e/ou re-sessão (store externo). Sticky não ignora terminate. ASG pode ter max > 1 com sticky. Sticky não desliga HTTPS no ALB. Insight: app stateful atrás de ASG → sessão em Redis/DB ou draining generoso; preferir stateless no SAA."
+    },
+    {
+      "id": 173,
+      "idx": 172,
+      "part_id": "aws-1.6",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 59,
+      "enunciado": "Instance RDS em 'storage-full'. Qual sintoma de app e ação?",
+      "alternativas": [
+        "App com erros de escrita/transação; aumentar storage ou confiar em autoscaling se habilitado",
+        "Apenas 404 no ALB listener 443 por definição",
+        "Apenas falha de IAM AssumeRole",
+        "Apenas perda de Elastic IP do RDS"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "storage-full impede alocar páginas/transações: a app vê erros de escrita/commit. Ação: aumentar allocated storage ou confiar em storage autoscaling se já estiver habilitado (e abaixo do max). 404 no ALB 443 é sintoma de HTTP no load balancer, não de disco do RDS. IAM AssumeRole é autenticação de API AWS, não espaço em disco do engine. RDS gerenciado não usa Elastic IP da instância como EC2 clássico. Insight: alarme de FreeStorageSpace evita chegar em storage-full em produção."
+    },
+    {
+      "id": 188,
+      "idx": 187,
+      "part_id": "aws-1.7",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 74,
+      "enunciado": "Certificado ACM para viewer HTTPS no CloudFront deve estar em qual região?",
+      "alternativas": [
+        "Sempre na mesma região do bucket S3 origem, qualquer região",
+        "Somente eu-central-1",
+        "Somente ap-south-1",
+        "us-east-1 (N. Virginia) para certificados usados com CloudFront"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Certificados ACM usados no viewer HTTPS do CloudFront devem ser solicitados/importados em us-east-1 (N. Virginia), independentemente da Região do bucket origem. 'Sempre na mesma Região do S3' está errado para CloudFront. Não há restrição a só eu-central-1 ou só ap-south-1 para esse caso. Insight: ACM regional para ALB fica na Região do ALB; exceção famosa da prova = CloudFront → us-east-1."
+    },
+    {
+      "id": 229,
+      "idx": 228,
+      "part_id": "aws-1.8",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 52,
+      "enunciado": "SNS filter policy (menção leve, fora de lab): ideia?",
+      "alternativas": [
+        "Substitui a DLQ da SQS",
+        "Força FIFO em todas as filas",
+        "Subscriber recebe só mensagens cujos atributos batem com a filter policy",
+        "Remove a necessidade de IAM"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Filter policy no SNS faz o subscriber receber só mensagens cujos atributos (ou payload, conforme tipo) batem com a política — reduz ruído sem duplicar tópicos. Não substitui DLQ da SQS. Não força FIFO em todas as filas. Não remove a necessidade de IAM. Insight: use filter para ramificar por tipo/evento; mantenha DLQ e IAM no caminho SQS."
+    },
+    {
+      "id": 249,
+      "idx": 248,
+      "part_id": "aws-1.9",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 71,
+      "enunciado": "SSM Parameter Store SecureString vs Secrets Manager (ideia de escolha)?",
+      "alternativas": [
+        "São idênticos em rotation de DB gerenciada sempre",
+        "SecureString é parâmetro cifrado; Secrets Manager destaca secrets de app com rotation e casos de integração de credenciais",
+        "Parameter Store proíbe KMS",
+        "Secrets Manager só funciona com S3 website"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "SecureString no Parameter Store é parâmetro cifrado (bom para config); Secrets Manager foca secrets de aplicação com rotation e integrações de credenciais (ex. RDS). Não são idênticos em rotation de DB gerenciada sempre — o destaque de rotation gerenciada é do Secrets Manager. Parameter Store não proíbe KMS (SecureString usa KMS). Secrets Manager não depende de S3 website. Insight: config cifrada simples → SSM SecureString; secret com rotation/integração → Secrets Manager."
+    },
+    {
+      "id": 14,
+      "idx": 13,
+      "part_id": "aws-1.1",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 83,
+      "enunciado": "Conta B precisa ler objetos em bucket da conta A. Qual padrão SAA de cross-account?",
+      "alternativas": [
+        "Compartilhar a senha do root da conta A no chat do time B",
+        "Role na conta A com trust para principal da B + permissions de leitura; B AssumeRole (e bucket policy se necessário)",
+        "Abrir 0.0.0.0/0 no NACL e ignorar IAM",
+        "Desligar S3 Block Public Access e usar ACL pública always"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "O padrão SAA cross-account é role na conta A com trust para principal da conta B e permissions de leitura; B chama AssumeRole (e bucket policy na A permitindo o principal de B, se necessário). Compartilhar senha do root da A é inaceitável. Abrir 0.0.0.0/0 no NACL não concede autorização de API S3 — NACL filtra pacotes na subnet. Desligar Block Public Access e usar ACL pública expõe o bucket em vez de delegar acesso controlado. Insight: cross-account = trust/AssumeRole + resource policy quando preciso, nunca root compartilhado."
+    },
+    {
+      "id": 297,
+      "idx": 296,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 77,
+      "enunciado": "Handler não encontrado / Runtime.ImportModuleError após deploy. Causa típica?",
+      "alternativas": [
+        "Falta de Multi-AZ no tópico SNS",
+        "Handler string ou package path incorreto no deploy (module.function) ou dependência ausente no package",
+        "TTL DNS 300",
+        "gp3 IOPS 3000 no EBS de outra conta"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Runtime.ImportModuleError / handler não encontrado após deploy quase sempre é handler string errada (module.function), path do package ou dependência ausente no zip/image. Multi-AZ em tópico SNS não afeta import do handler. TTL DNS 300 é irrelevante ao runtime load. IOPS gp3 em EBS de outra conta não carrega o módulo da Lambda. Insight: valide Handler no console/CLI e o layout do artefato no mesmo commit do erro."
+    },
+    {
+      "id": 317,
+      "idx": 316,
+      "part_id": "aws-1.11",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 51,
+      "enunciado": "FilterExpression em Query: o que ainda é consumido?",
+      "alternativas": [
+        "Zero RCU sempre",
+        "Apenas WCU",
+        "RCU dos itens lidos antes do filtro — Filter não reduz leituras da partição já recuperadas",
+        "Nada se houver GSI"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "FilterExpression em Query filtra depois da leitura: você ainda consome RCU dos itens recuperados pela key condition antes do filtro. Não é zero RCU. Não é 'apenas WCU'. Ter GSI não zera o custo do Filter na Query feita. Insight: modele SK/GSI para empurrar o predicado para a key condition; Filter é refino, não economia de leitura."
+    },
+    {
+      "id": 351,
+      "idx": 350,
+      "part_id": "aws-1.12",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 59,
+      "enunciado": "DynamoDB UserErrors / ThrottledRequests no CloudWatch: uso?",
+      "alternativas": [
+        "Medir latência do CloudFront edge apenas",
+        "Detectar throttle/capacity issues e acionar alarme/autoscaling de capacidade ou on-demand review",
+        "Substituir IAM GetItem",
+        "Apagar a tabela automaticamente"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "UserErrors e ThrottledRequests no CloudWatch do DynamoDB detectam problemas de capacidade/throttle (e erros de cliente) para acionar alarme, autoscaling de provisioned ou revisão de on-demand/hot key. Não medem latência de CloudFront. Não substituem IAM GetItem. Não apagam a tabela. Insight: combine essas métricas com ConsumedRead/WriteCapacityUnits para ver se o teto ou a partição quente é a causa."
+    },
+    {
+      "id": 34,
+      "idx": 33,
+      "part_id": "aws-1.2",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 83,
+      "enunciado": "Requisito: banco RDS não acessível da Internet pública. Qual design de rede atende?",
+      "alternativas": [
+        "Subnet pública com Elastic IP no RDS",
+        "SG do banco com 0.0.0.0/0 na porta do engine",
+        "Rota 0.0.0.0/0 → IGW na subnet do banco",
+        "Subnet privada, sem IP público, SG permitindo só o tier de aplicação"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "RDS sem acesso da Internet pública: coloque em subnet privada, sem IP público, e SG permitindo só o tier de aplicação (source = SG ou CIDR do app). Subnet pública com Elastic IP no RDS expõe o banco. SG com 0.0.0.0/0 na porta do engine abre a qualquer origem. Rota 0.0.0.0/0 → IGW na subnet do banco é desenho de subnet pública e aumenta superfície. Insight: 'sem acesso Internet ao banco' → private + SG restrito + sem EIP."
+    },
+    {
+      "id": 86,
+      "idx": 85,
+      "part_id": "aws-1.3",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 80,
+      "enunciado": "Bucket policy com Condition aws:SecureTransport = true no Allow. Efeito prático?",
+      "alternativas": [
+        "Permite apenas HTTP claro sem TLS",
+        "Desliga o versioning do bucket",
+        "Altera o MTU das ENIs da VPC",
+        "Restringe o acesso à API S3 a conexões HTTPS (TLS)"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Condition aws:SecureTransport = true no Allow restringe o acesso permitido à API S3 a conexões HTTPS/TLS — HTTP claro não satisfaz a condição. O efeito não é permitir só HTTP sem TLS (seria o inverso). Não desliga versioning do bucket nem altera MTU de ENIs da VPC; é condição de política, não de storage class ou rede L3. Insight: em provas, SecureTransport quase sempre = 'force HTTPS'; combine com Deny de SecureTransport false se quiser fechar o buraco de Allow amplos."
+    },
+    {
+      "id": 109,
+      "idx": 108,
+      "part_id": "aws-1.4",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 88,
+      "enunciado": "Data volume com DeleteOnTermination false; root com true. Após terminate, o que esperar?",
+      "alternativas": [
+        "Root e data sempre permanecem",
+        "Root e data sempre são apagados",
+        "Root tipicamente removido; data volume pode permanecer disponível na AZ para reattach",
+        "Os volumes viram snapshots automaticamente sempre"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "DeleteOnTermination é por volume: root true tipicamente é removido no terminate; data com false pode permanecer available na AZ para reattach. Não é 'sempre permanecem' nem 'sempre apagados' os dois. Terminate não cria snapshots automaticamente sempre. Insight: antes de terminate, revise DeleteOnTermination em cada volume e tire snapshot do que importa."
+    },
+    {
+      "id": 129,
+      "idx": 128,
+      "part_id": "aws-1.5",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 72,
+      "enunciado": "Métrica típica de target tracking com ALB para escalar web tier (ideia)?",
+      "alternativas": [
+        "Número de snapshots EBS na conta",
+        "Request count por target (ALB) ou CPU utilization da ASG",
+        "Tamanho do bucket S3 de logs",
+        "Quantidade de IAM users"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Target tracking típico no web tier usa RequestCountPerTarget (métrica do ALB) ou CPUUtilization do grupo — ambas refletem carga útil para escalar. Número de snapshots EBS não mede demanda da app. Tamanho do bucket de logs não é sinal de scaling do web tier. Quantidade de IAM users é irrelevante para capacity. Insight: alinhe a métrica ao gargalo real (CPU vs requests); ALB RequestCountPerTarget é clássico atrás de ALB."
+    },
+    {
+      "id": 176,
+      "idx": 175,
+      "part_id": "aws-1.6",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 61,
+      "enunciado": "Read replica cross-Region (ideia leve) serve a qual objetivo?",
+      "alternativas": [
+        "Failover síncrono Multi-AZ na mesma AZ apenas",
+        "Substituir o Security Group",
+        "DR/leitura em outra Região com RPO assíncrono (não idêntico a Multi-AZ local)",
+        "Eliminar a necessidade de KMS"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Read replica cross-Region replica de forma assíncrona para outra Região: serve DR geográfico e leituras locais com RPO de segundos/minutos — não é o mesmo que Multi-AZ síncrono na mesma Região. Não é failover síncrono Multi-AZ 'na mesma AZ'. Não substitui Security Group. Não elimina KMS (criptografia segue sendo decisão à parte). Insight: use cross-Region replica para DR/leitura global; Multi-AZ para HA de AZ com RPO~0 de escrita na Região primária."
+    },
+    {
+      "id": 195,
+      "idx": 194,
+      "part_id": "aws-1.7",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 77,
+      "enunciado": "Alias para CloudFront no record www: qual benefício vs A com IP fixo da edge?",
+      "alternativas": [
+        "ALIAS desliga HTTPS",
+        "ALIAS proíbe invalidation",
+        "ALIAS obriga bucket público",
+        "ALIAS acompanha a distribuição CloudFront (targets AWS dinâmicos) sem fixar IP de edge"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Alias para a distribuição CloudFront acompanha o target AWS dinâmico (IPs de edge mudam); um A com IP fixo de edge quebra quando a borda muda. Alias não desliga HTTPS, não proíbe invalidation e não obriga bucket público. Insight: sempre Alias (ou automação equivalente) para ALB/CloudFront — nunca pinne IP de edge em produção."
+    },
+    {
+      "id": 235,
+      "idx": 234,
+      "part_id": "aws-1.8",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 58,
+      "enunciado": "Consumers em ASG atrás de fila: como o ASG escala (ideia)?",
+      "alternativas": [
+        "Somente CPU do RDS",
+        "Métrica de profundidade da fila / idade da msg (approx) para desired capacity",
+        "Somente contagem de buckets S3",
+        "Somente número de hosted zones"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ASG de consumers atrás de SQS tipicamente escala por profundidade da fila (ApproximateNumberOfMessages) ou idade da mensagem mais velha — desired capacity sobe com backlog. Só CPU do RDS não reflete fila de workers. Contagem de buckets S3 e número de hosted zones são métricas irrelevantes. Insight: alarme + scaling policy na fila evita backlog crescente sem overprovision fixo."
+    },
+    {
+      "id": 250,
+      "idx": 249,
+      "part_id": "aws-1.9",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 80,
+      "enunciado": "CMK com KeyState=Disabled. Sintoma ao ler dados antigos cifrados com essa chave?",
+      "alternativas": [
+        "Decrypt/uso da chave falha até reabilitar (enable-key); dados permanecem cifrados",
+        "A AWS apaga automaticamente todos os objetos S3",
+        "O ALB converte para HTTP",
+        "A fila SQS vira FIFO"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Com KeyState=Disabled, Decrypt/uso da CMK falha até enable-key; os dados cifrados permanecem no storage — não são apagados. A AWS não apaga automaticamente todos os objetos S3 quando a chave é desabilitada. ALB não converte para HTTP por causa de KMS. Fila SQS não vira FIFO por KeyState. Insight: disabled = indisponibilidade criptográfica temporária; pending deletion é o caminho que leva à perda permanente de decrypt."
+    },
+    {
+      "id": 25,
+      "idx": 24,
+      "part_id": "aws-1.1",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 83,
+      "enunciado": "Recebeu AccessDenied em uma API no terminal. Qual primeiro passo prático de TShoot?",
+      "alternativas": [
+        "Confirmar o principal com get-caller-identity e a Action/Resource da mensagem; depois checar policies/trust attached",
+        "Recriar a VPC inteira e todas as subnets",
+        "Trocar o tipo de instância para bare metal",
+        "Apagar o CloudWatch Log Group da aplicação"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Primeiro passo prático: confirmar o principal com get-caller-identity e a Action/Resource da mensagem; depois checar policies Allow, Deny explícito, trust (se role) e resource policy. Recriar a VPC inteira não explica AccessDenied de API de controle. Trocar instance type para bare metal não altera autorização IAM. Apagar Log Group remove evidência sem corrigir permissão. Insight: AccessDenied de API AWS ≠ primeiro recriar rede; isole identidade e policies."
+    },
+    {
+      "id": 277,
+      "idx": 276,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 80,
+      "enunciado": "Env var DB_PASSWORD=SuperSecret no console. Anti-pattern: por quê e alternativa?",
+      "alternativas": [
+        "Secret em plaintext no config; use Secrets Manager/SSM e GetSecretValue na role",
+        "É obrigatório pela AWS em toda Lambda",
+        "Substitui a need de CloudWatch",
+        "Aumenta o reserved concurrency automaticamente"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "DB_PASSWORD em variável de ambiente no console deixa o secret em plaintext na config — anti-pattern; use Secrets Manager ou SSM SecureString e GetSecretValue (com permissão na role). Não é obrigatório pela AWS em toda Lambda. Não substitui CloudWatch. Não aumenta reserved concurrency. Insight: em prova, senha em env = resposta errada quase sempre frente a Secrets Manager."
+    },
+    {
+      "id": 305,
+      "idx": 304,
+      "part_id": "aws-1.11",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 52,
+      "enunciado": "Query vs Scan: qual a diferença operacional crítica?",
+      "alternativas": [
+        "Query usa key condition na partição; Scan lê potencialmente toda a tabela (mais RCU e latência em escala)",
+        "Scan é sempre grátis",
+        "Query só funciona em S3",
+        "Scan garante strongly consistent em GSI sempre"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Query aplica key condition na partição (e opcionalmente SK): previsível em RCU. Scan lê potencialmente a tabela inteira — mais RCU e latência em escala. Scan não é grátis. Query não é recurso de S3. Scan não garante strongly consistent em GSI (GSI é eventual). Insight: se dá para expressar com PK/SK, prefira Query; Scan é exceção (admin/analytics)."
+    },
+    {
+      "id": 349,
+      "idx": 348,
+      "part_id": "aws-1.12",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 61,
+      "enunciado": "Log stream por instance/function: por que retention no group?",
+      "alternativas": [
+        "Cada stream ignora retention do group sempre",
+        "Retention apaga a execution role",
+        "Policy de retenção aplica ao group inteiro (streams herdam) — controla custo e compliance",
+        "Retention cria Multi-AZ"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Retention é configurada no log group e aplica a todos os streams filhos (instance/function) — controla custo e compliance de retenção. Streams não ignoram a policy do group. Retention não apaga execution role. Retention não cria Multi-AZ. Insight: um put-retention-policy no group cobre todos os streams; Never expire é o vilão de custo mais comum."
+    },
+    {
+      "id": 51,
+      "idx": 50,
+      "part_id": "aws-1.2",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 86,
+      "enunciado": "NAT em AZ-a; privada só em AZ-b com 0.0.0.0/0 → esse NAT. Qual consideração de design?",
+      "alternativas": [
+        "Funciona, mas cria dependência cross-AZ (custo/latência) e fragilidade de HA do egress",
+        "É proibido em todas as contas AWS sem exceção",
+        "Elimina a necessidade de route tables",
+        "Torna a subnet automaticamente pública com EIP"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "É permitido rotear a privada de AZ-b para um NAT em AZ-a, mas o egress fica acoplado à AZ do NAT: latência/custo de transferência cross-AZ e SPOF se AZ-a cair. Não é proibição universal da AWS. Continua sendo necessário ter route table com 0.0.0.0/0 → nat; a topologia não elimina RTs. Apontar para NAT não torna a subnet pública nem atribui EIP à instância — pública implica path IGW + endereço público. Insight: HA de egress rigoroso → NAT (ou padrão equivalente) por AZ, alinhado às subnets privadas."
+    },
+    {
+      "id": 70,
+      "idx": 69,
+      "part_id": "aws-1.3",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 83,
+      "enunciado": "TShoot de acesso: qual CLI inspeciona o documento de autorização anexado ao bucket?",
+      "alternativas": [
+        "aws ec2 describe-route-tables",
+        "aws iam list-users",
+        "aws s3api get-bucket-policy --bucket <nome>",
+        "aws sts assume-role sem RoleArn válido"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "`aws s3api get-bucket-policy --bucket <nome>` devolve o documento resource-based anexado ao bucket — essencial no tshoot de AccessDenied junto com as policies do caller. `describe-route-tables` descreve rotas EC2/VPC. `iam list-users` lista users, não a policy do bucket. `sts assume-role` sem RoleArn válido nem autentica fluxo cross-account corretamente. Insight: AccessDenied S3 → get-bucket-policy + get-public-access-block + policies anexadas da role."
+    },
+    {
+      "id": 95,
+      "idx": 94,
+      "part_id": "aws-1.4",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 89,
+      "enunciado": "App em EC2 precisa GetObject em S3 sem access key no disco. Qual mecanismo de identidade?",
+      "alternativas": [
+        "Instance profile associando IAM role à instance (credenciais via IMDS)",
+        "Colocar AKIA no user-data em claro",
+        "Abrir o bucket com Principal * e BPA off",
+        "Usar apenas o Security Group com porta 443"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Sem access key no disco: associe instance profile com IAM role à EC2 — credenciais temporárias via IMDS. Colocar AKIA no user-data em claro é vazamento clássico. Abrir o bucket com Principal * e BPA off expõe dados em vez de identidade da instance. Security Group na 443 controla tráfego de rede, não concede assinatura da API S3. Insight: EC2 → APIs AWS = role/instance profile; nunca AKIA permanente no host."
+    },
+    {
+      "id": 137,
+      "idx": 136,
+      "part_id": "aws-1.5",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 74,
+      "enunciado": "ALB em 2 AZ; ASG só em subnet us-east-1a. Incidente derruba 1a. Resultado?",
+      "alternativas": [
+        "ALB continua com targets healthy na 1b automaticamente",
+        "Sem targets em outras AZ, a app fica indisponível apesar do ALB multi-AZ",
+        "O ASG migra EBS multi-attach para 1b sozinho",
+        "Route 53 remove a necessidade de multi-AZ no ASG"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ALB em 2 AZ sem targets em outras AZs: se us-east-1a cai e o ASG só tem subnet ali, não há backends healthy — a app fica indisponível apesar do ALB multi-AZ. O ALB não inventa targets na 1b se o ASG nunca lançou lá. ASG não migra EBS multi-attach sozinho para outra AZ. Route 53 não elimina a necessidade de ASG multi-AZ para compute. Insight: HA de verdade = ALB e ASG (e dados) alinhados em ≥2 AZs."
+    },
+    {
+      "id": 158,
+      "idx": 157,
+      "part_id": "aws-1.6",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 64,
+      "enunciado": "Produção típica: o parâmetro PubliclyAccessible deve ficar como?",
+      "alternativas": [
+        "true com SG 0.0.0.0/0 para o ALB alcançar o SQL",
+        "true somente se Multi-AZ estiver off",
+        "false — app na VPC acessa por IP privado; ALB não precisa falar SQL na Internet",
+        "Irrelevante porque SG é ignorado no RDS"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Em produção típica, PubliclyAccessible=false: app na VPC fala com o endpoint privado; o ALB termina HTTP na borda e não precisa expor a porta SQL na Internet. true com SG 0.0.0.0/0 para o ALB 'alcançar SQL' é anti-pattern — ALB não substitui path privado app→RDS. Multi-AZ off não justifica tornar público. SG não é ignorado no RDS. Insight: RDS produção = privado + SG Source=sg-app na porta do engine."
+    },
+    {
+      "id": 205,
+      "idx": 204,
+      "part_id": "aws-1.7",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 102,
+      "enunciado": "S3 website endpoint vs REST API origin no CloudFront (ideia): por que OAI/OAC prefere REST/API origin?",
+      "alternativas": [
+        "Website endpoint é obrigatório com OAC",
+        "OAI/OAC integra com bucket via REST e policy; website endpoint é outro modelo de hosting público clássico",
+        "REST origin proíbe HTTPS no viewer",
+        "Website endpoint desliga Route 53"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "OAI/OAC amarra o CloudFront ao bucket via origin REST/API e bucket policy (Principal do OAI/OAC). O website endpoint do S3 é outro modelo (hosting estático clássico, muitas vezes público) e não é o caminho preferido com OAI/OAC. Website endpoint não é obrigatório com OAC. REST origin não proíbe HTTPS no viewer — viewer protocol é política da distribuição. Website endpoint não 'desliga' Route 53. Insight: origem S3 privada no CF → REST + OAC/OAI; website endpoint costuma ser anti-pattern com origem restrita."
+    },
+    {
+      "id": 224,
+      "idx": 223,
+      "part_id": "aws-1.8",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 60,
+      "enunciado": "ChangeMessageVisibility serve para quê durante um job longo?",
+      "alternativas": [
+        "Converter standard em FIFO in-place",
+        "Criar o tópico SNS",
+        "Invalidar o CloudFront",
+        "Estender o invisibilidade da mensagem enquanto o processamento continua (evitar reentrega precoce)"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "ChangeMessageVisibility estende (ou ajusta) o período em que a mensagem fica invisível enquanto o job longo continua — evita reentrega precoce antes do DeleteMessage. Não converte standard em FIFO in-place. Não cria tópico SNS. Não invalida CloudFront. Insight: visibility inicial generosa ou heartbeats com ChangeMessageVisibility em processamento de duração variável."
+    },
+    {
+      "id": 264,
+      "idx": 263,
+      "part_id": "aws-1.9",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 85,
+      "enunciado": "describe-key mostra KeyState=PendingDeletion. Ação para recuperar uso antes do purge?",
+      "alternativas": [
+        "create-invalidation no CloudFront",
+        "cancel-key-deletion e ensure KeyState Enabled com policies intactas",
+        "terminate nas instances",
+        "delete-bucket force"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Com KeyState=PendingDeletion, a recuperação antes do purge é cancel-key-deletion e garantir KeyState Enabled com policies intactas. create-invalidation no CloudFront não restaura CMK. terminate de instances não cancela deletion da chave. delete-bucket force apaga bucket, piora o cenário de dados. Insight: janela de waiting period existe para esse cancel; depois do purge, decrypt histórico some."
+    },
+    {
+      "id": 22,
+      "idx": 21,
+      "part_id": "aws-1.1",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 86,
+      "enunciado": "aws sts get-caller-identity retorna Arn …:assumed-role/AppRole/session. Interpretação?",
+      "alternativas": [
+        "O principal está usando o root user sem MFA",
+        "A sessão atual é de uma role assumida (credenciais temporárias de role)",
+        "Não há conta AWS válida",
+        "O bucket S3 da conta está público"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Arn no formato …:assumed-role/AppRole/session indica que a sessão atual veio de uma role assumida, com credenciais temporárias STS — não de um IAM user permanente. Não significa root sem MFA: root teria ARN de root user, não assumed-role. Conta AWS inválida não retornaria esse Arn estruturado com Account/UserId. Publicidade do bucket S3 não aparece em get-caller-identity. Insight: leia o path do Arn — assumed-role/<RoleName>/<session> confirma role assumption."
+    },
+    {
+      "id": 291,
+      "idx": 290,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 80,
+      "enunciado": "Dead-letter queue / on-failure destination (ideia) para async invoke: propósito?",
+      "alternativas": [
+        "Aumentar memory automaticamente",
+        "Capturar eventos que esgotaram retries para análise (não perder silenciosamente)",
+        "Remover a need de IAM",
+        "Converter a function em EC2"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "DLQ ou on-failure destination em invoke assíncrono captura eventos que esgotaram retries para análise — evita perda silenciosa. Não aumenta memory automaticamente. Não remove a necessidade de IAM (a destination ainda exige permissões). Não converte a function em EC2. Insight: async sem destino de falha = risco de sumiço após retries; pareie com alarmes no DLQ/destino."
+    }
+  ]
+}

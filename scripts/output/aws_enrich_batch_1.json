@@ -1,0 +1,220 @@
+{
+  "batch": 1,
+  "items": [
+    {
+      "id": 13,
+      "idx": 12,
+      "part_id": "aws-1.1",
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 71,
+      "enunciado": "Qual diferença essencial entre IAM user e IAM role no design Associate?",
+      "alternativas": [
+        "User é identidade de longo prazo (pessoa/app legado); role é assumível e usa credenciais temporárias",
+        "Role só existe em regiões GovCloud",
+        "User nunca pode ter policies anexadas",
+        "Role sempre tem senha de console como user humano"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "IAM user é identidade de longo prazo (pessoa ou app legado) com senha/keys permanentes; IAM role é assumível e recebe credenciais temporárias via STS — padrão para serviços AWS e federação. Role não é exclusiva de GovCloud; existe em regiões comerciais. User pode (e costuma) ter policies anexadas. Role não tem senha de console como user humano típico; quem assume recebe sessão STS. Insight: workload AWS → role; humano no console → user (ou federation assumindo role)."
+    },
+    {
+      "id": 275,
+      "idx": 274,
+      "part_id": "aws-1.10",
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 67,
+      "enunciado": "Qual diferença execution role vs resource-based policy na function?",
+      "alternativas": [
+        "Role = o que a function pode chamar; resource policy = quais principals podem invocar a function",
+        "São o mesmo documento IAM sempre",
+        "Resource policy substitui o timeout",
+        "Role define o memory size"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Execution role define o que a function pode chamar (S3, DynamoDB, etc.); resource-based policy define quais principals podem invocar a function (outras contas, serviços). Não são o mesmo documento IAM. Resource policy não substitui timeout. Role não define memory size — isso é configuração da function. Insight: 403 ao invocar de fora → resource policy; erro interno ao chamar S3 → execution role."
+    },
+    {
+      "id": 309,
+      "idx": 308,
+      "part_id": "aws-1.11",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 34,
+      "enunciado": "TTL em atributo expira_em: efeito?",
+      "alternativas": [
+        "Itens elegíveis são removidos posteriormente (best-effort) sem custo de delete app — limpeza de sessão/cache",
+        "Apaga a tabela inteira à meia-noite",
+        "Aumenta WCU automaticamente para 40k",
+        "Converte a tabela em SQL"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "TTL em atributo (ex. expira_em) marca itens para remoção posterior best-effort, sem delete explícito da app — típico para sessão/cache. Não apaga a tabela inteira à meia-noite. Não sobe WCU para 40k sozinho. Não converte a tabela em SQL. Insight: TTL não é delete síncrono no segundo exato; planeje janela eventual de expiração."
+    },
+    {
+      "id": 340,
+      "idx": 339,
+      "part_id": "aws-1.12",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 35,
+      "enunciado": "Composite alarm (ideia): benefício?",
+      "alternativas": [
+        "Substituir todos os log groups",
+        "Desligar billing da conta",
+        "Criar VPC endpoints automaticamente",
+        "Combinar vários alarmes (AND/OR ideia) para reduzir ruído e acionar só em condição agregada"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Composite alarm combina vários alarmes com lógica AND/OR (ideia) para acionar só quando a condição agregada vale — reduz ruído de alertas isolados. Não substitui log groups. Não desliga billing da conta. Não cria VPC endpoints. Insight: use composite quando um único sintoma é insuficiente (ex. CPU alta E erros 5xx) para disparar página."
+    },
+    {
+      "id": 52,
+      "idx": 51,
+      "part_id": "aws-1.2",
+      "score": 6,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_rich_kw"
+      ],
+      "len": 58,
+      "enunciado": "Como restringir SSH do bastion apenas ao IP do escritório?",
+      "alternativas": [
+        "Abrir 0.0.0.0/0 na 22 e confiar só em NACL genérica",
+        "SG inbound TCP 22 com Source = CIDR do escritório (e considerar SSM em designs sem 22)",
+        "Colocar Elastic IP no RDS Multi-AZ",
+        "Remover o IGW de toda a VPC para 'proteger' o bastion"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Least privilege de rede no bastion: SG inbound TCP 22 com Source = CIDR do escritório (ou, melhor em muitos designs modernos, SSM Session Manager sem expor 22). Abrir 0.0.0.0/0 na 22 e confiar só em NACL genérica é fraco e difícil de auditar. Elastic IP no RDS Multi-AZ não restringe SSH do bastion. Remover o IGW de toda a VPC 'para proteger' o bastion pode quebrar outros paths e não substitui Source CIDR preciso na regra 22. Insight: bastion 22 em produção séria → Source corporativo (ou SSM), nunca 0.0.0.0/0."
+    },
+    {
+      "id": 81,
+      "idx": 80,
+      "part_id": "aws-1.3",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 54,
+      "enunciado": "Quem consegue get-bucket-policy com sucesso, em geral?",
+      "alternativas": [
+        "Principal com s3:GetBucketPolicy (sem Deny) — tipicamente role/admin de plataforma",
+        "Qualquer usuário anônimo da Internet por default",
+        "Somente o serviço EC2 Auto Scaling",
+        "Somente quando o NAT Gateway da VPC está desligado"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "GetBucketPolicy só sucede quando o principal autenticado tem Allow em s3:GetBucketPolicy (IAM e/ou bucket policy) e não há Deny explícito — tipicamente roles/admins de plataforma. Anônimo da Internet não lê policy por default: buckets começam privados e BPA costuma bloquear público. EC2 Auto Scaling não é o único consumidor dessa API; qualquer principal com a ação permitida pode chamá-la. NAT Gateway ligado/desligado não autoriza S3 — autorização é IAM/policy, não path de egress. Insight: AccessDenied em get-bucket-policy quase sempre é falta de Allow ou Deny explícito no principal usado no caller."
+    },
+    {
+      "id": 103,
+      "idx": 102,
+      "part_id": "aws-1.4",
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 55,
+      "enunciado": "Por que habilitar IMDSv2 (ideia) em instances com role?",
+      "alternativas": [
+        "Para aumentar o tamanho do EBS automaticamente",
+        "Para desligar o Security Group",
+        "Para exigir token de sessão no metadata e reduzir roubo de credenciais da role via SSRF simples",
+        "Para obrigar Spot em todas as instances"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "IMDSv2 exige token de sessão (PUT) para ler metadata, reduzindo roubo de credenciais da role via SSRF simples que só faz GET no IMDS. Não aumenta tamanho do EBS, não desliga Security Group e não obriga Spot. Insight: em instances com role, prefira IMDSv2 (hop limit) — é controle barato contra SSRF clássico no metadata."
+    },
+    {
+      "id": 134,
+      "idx": 133,
+      "part_id": "aws-1.5",
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 47,
+      "enunciado": "Por que registrar o ASG no target group do ALB?",
+      "alternativas": [
+        "Para o ASG criar VPCs automaticamente",
+        "Para desligar Security Groups",
+        "Para instances novas entrarem no balanceamento e unhealthy serem gerenciadas no caminho ELB",
+        "Para converter ALB em NLB"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Registrar o ASG no TG faz o ASG registrar/deregistrar instances automaticamente no balanceamento e integra ELB health para replace de unhealthy, mantendo desired. ASG não cria VPCs ao se anexar ao TG. Não desliga Security Groups. Não converte ALB em NLB. Insight: sem attach ASG↔TG, scale-out sobe machines que o ALB nunca vê."
+    },
+    {
+      "id": 165,
+      "idx": 164,
+      "part_id": "aws-1.6",
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 69,
+      "enunciado": "Por que NÃO colocar o RDS na subnet pública só 'para o ALB conectar'?",
+      "alternativas": [
+        "Porque o ALB precisa falar SQL na 443 com o engine",
+        "Porque Multi-AZ proíbe subnets",
+        "O ALB fala com o app tier; o app fala com o RDS na VPC privada — expor o DB na pública aumenta superfície",
+        "Porque gp3 só funciona em privada"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "O ALB termina HTTP(S) no app tier; quem abre sessão SQL no RDS é a aplicação na VPC. Colocar o RDS em subnet pública 'para o ALB conectar' expõe o banco sem necessidade e aumenta a superfície de ataque. ALB não fala SQL na 443 com o engine — misturar camadas. Multi-AZ exige subnet group com subnets em AZs distintas, não 'proíbe subnets'. gp3 funciona independentemente de pública/privada. Insight: RDS privado + SG permitindo só o SG do app é o desenho padrão SAA."
+    },
+    {
+      "id": 194,
+      "idx": 193,
+      "part_id": "aws-1.7",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 37,
+      "enunciado": "Simple routing policy: comportamento?",
+      "alternativas": [
+        "Sempre exige dois health checks",
+        "Só funciona com CloudFront",
+        "Substitui OAI automaticamente",
+        "Único valor (ou multi-value answer ideia) sem avaliação de latência/peso/geo por policy avançada"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Simple routing devolve um valor (ou multi-value answer, na ideia básica) sem as políticas avançadas de latência, peso ou geo. Não exige sempre dois health checks. Não 'só funciona com CloudFront'. Não substitui OAI. Insight: simple é o default para um único target; quando aparecer health/failover/weight/geo no stem, a policy já não é 'simple' pura."
+    }
+  ]
+}

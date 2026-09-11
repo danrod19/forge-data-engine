@@ -36,6 +36,8 @@
 - [x] Stripe/PRO E2E — descoberta + docs (19/08/2026): fluxo já no código; `.env.example` + README Test mode
 - [x] Auth Spec 4 — reset de senha completo (forgot no Entrar, form Nova senha no link, Conta com o mesmo redirectTo/copy)
 - [x] Auth Spec 5 — signup com e-mail já existente (copy genérica + CTAs Entrar / Esqueci a senha)
+- [x] Histórico de simulados na Conta (`simulado_runs` + RLS; grava no resultado se logado)
+- [x] Copy de lançamento — Sobre a Prova + Upgrade/paywall (parágrafo + bullets PRO; e-mail ccnaforge19@gmail.com)
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção

@@ -1,0 +1,922 @@
+{
+  "criterion": "score>=5 preferred; top 60 by score then short len",
+  "ids": [
+    125,
+    134,
+    185,
+    17,
+    29,
+    103,
+    275,
+    237,
+    99,
+    165,
+    13,
+    20,
+    24,
+    309,
+    340,
+    194,
+    300,
+    150,
+    247,
+    310,
+    164,
+    308,
+    330,
+    269,
+    119,
+    179,
+    299,
+    230,
+    239,
+    149,
+    180,
+    190,
+    209,
+    240,
+    270,
+    286,
+    307,
+    329,
+    220,
+    236,
+    147,
+    348,
+    162,
+    233,
+    260,
+    324,
+    346,
+    120,
+    130,
+    225,
+    200,
+    328,
+    136,
+    170,
+    317,
+    338,
+    210,
+    229,
+    305,
+    321
+  ],
+  "indexes": [
+    124,
+    133,
+    184,
+    16,
+    28,
+    102,
+    274,
+    236,
+    98,
+    164,
+    12,
+    19,
+    23,
+    308,
+    339,
+    193,
+    299,
+    149,
+    246,
+    309,
+    163,
+    307,
+    329,
+    268,
+    118,
+    178,
+    298,
+    229,
+    238,
+    148,
+    179,
+    189,
+    208,
+    239,
+    269,
+    285,
+    306,
+    328,
+    219,
+    235,
+    146,
+    347,
+    161,
+    232,
+    259,
+    323,
+    345,
+    119,
+    129,
+    224,
+    199,
+    327,
+    135,
+    169,
+    316,
+    337,
+    209,
+    228,
+    304,
+    320
+  ],
+  "detail": [
+    {
+      "idx": 124,
+      "id": 125,
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 44,
+      "expl": 376,
+      "e": "O que um target group faz no caminho do ALB?"
+    },
+    {
+      "idx": 133,
+      "id": 134,
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 47,
+      "expl": 326,
+      "e": "Por que registrar o ASG no target group do ALB?"
+    },
+    {
+      "idx": 184,
+      "id": 185,
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 47,
+      "expl": 395,
+      "e": "Qual diferença prática ALIAS Route 53 vs CNAME?"
+    },
+    {
+      "idx": 16,
+      "id": 17,
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 50,
+      "expl": 430,
+      "e": "O que um instance profile faz no design EC2 + IAM?"
+    },
+    {
+      "idx": 28,
+      "id": 29,
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 54,
+      "expl": 408,
+      "e": "Qual checklist mental de TShoot IAM esta part reforça?"
+    },
+    {
+      "idx": 102,
+      "id": 103,
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 55,
+      "expl": 320,
+      "e": "Por que habilitar IMDSv2 (ideia) em instances com role?"
+    },
+    {
+      "idx": 274,
+      "id": 275,
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 67,
+      "expl": 398,
+      "e": "Qual diferença execution role vs resource-based policy na function?"
+    },
+    {
+      "idx": 236,
+      "id": 237,
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 68,
+      "expl": 397,
+      "e": "Por que combinar SNS + SQS em vez de só SNS HTTP ao endpoint frágil?"
+    },
+    {
+      "idx": 98,
+      "id": 99,
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 69,
+      "expl": 402,
+      "e": "Como criar uma AMI reutilizável a partir de uma instance configurada?"
+    },
+    {
+      "idx": 164,
+      "id": 165,
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 69,
+      "expl": 466,
+      "e": "Por que NÃO colocar o RDS na subnet pública só 'para o ALB conectar'?"
+    },
+    {
+      "idx": 12,
+      "id": 13,
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 71,
+      "expl": 471,
+      "e": "Qual diferença essencial entre IAM user e IAM role no design Associate?"
+    },
+    {
+      "idx": 19,
+      "id": 20,
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 75,
+      "expl": 376,
+      "e": "Qual tema está fora do escopo profundo do piloto IAM foundations (aws-1.1)?"
+    },
+    {
+      "idx": 23,
+      "id": 24,
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 76,
+      "expl": 470,
+      "e": "Por que preferir IAM roles a access keys de longo prazo em workloads na AWS?"
+    },
+    {
+      "idx": 308,
+      "id": 309,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 34,
+      "expl": 328,
+      "e": "TTL em atributo expira_em: efeito?"
+    },
+    {
+      "idx": 339,
+      "id": 340,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 35,
+      "expl": 338,
+      "e": "Composite alarm (ideia): benefício?"
+    },
+    {
+      "idx": 193,
+      "id": 194,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 37,
+      "expl": 350,
+      "e": "Simple routing policy: comportamento?"
+    },
+    {
+      "idx": 299,
+      "id": 300,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 37,
+      "expl": 497,
+      "e": "Resumo Lambda foundations no SAA-C03:"
+    },
+    {
+      "idx": 149,
+      "id": 150,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 38,
+      "expl": 419,
+      "e": "Resumo ALB+ASG foundations no SAA-C03:"
+    },
+    {
+      "idx": 246,
+      "id": 247,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 38,
+      "expl": 406,
+      "e": "Grant KMS (ideia leve) serve para quê?"
+    },
+    {
+      "idx": 309,
+      "id": 310,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 38,
+      "expl": 295,
+      "e": "Streams + Lambda (ideia): caso de uso?"
+    },
+    {
+      "idx": 163,
+      "id": 164,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 39,
+      "expl": 469,
+      "e": "Restore from snapshot cria qual objeto?"
+    },
+    {
+      "idx": 307,
+      "id": 308,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 39,
+      "expl": 321,
+      "e": "LSI (ideia): quando usar em vez de GSI?"
+    },
+    {
+      "idx": 329,
+      "id": 330,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 39,
+      "expl": 491,
+      "e": "Resumo DynamoDB foundations no SAA-C03:"
+    },
+    {
+      "idx": 268,
+      "id": 269,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 40,
+      "expl": 380,
+      "e": "Checklist mental KMS/Secrets nesta part?"
+    },
+    {
+      "idx": 118,
+      "id": 119,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 42,
+      "expl": 388,
+      "e": "Checklist mental de TShoot EC2 nesta part?"
+    },
+    {
+      "idx": 178,
+      "id": 179,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 42,
+      "expl": 452,
+      "e": "Checklist mental de TShoot RDS nesta part?"
+    },
+    {
+      "idx": 298,
+      "id": 299,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 42,
+      "expl": 398,
+      "e": "Checklist mental TShoot Lambda nesta part?"
+    },
+    {
+      "idx": 229,
+      "id": 230,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 43,
+      "expl": 348,
+      "e": "Fora de escopo profundo desta part SQS/SNS?"
+    },
+    {
+      "idx": 238,
+      "id": 239,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 43,
+      "expl": 379,
+      "e": "Checklist mental TShoot SQS/SNS nesta part?"
+    },
+    {
+      "idx": 148,
+      "id": 149,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 44,
+      "expl": 354,
+      "e": "Checklist mental 503 / unhealthy nesta part?"
+    },
+    {
+      "idx": 179,
+      "id": 180,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 44,
+      "expl": 497,
+      "e": "Resumo de design RDS foundations no SAA-C03:"
+    },
+    {
+      "idx": 189,
+      "id": 190,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 44,
+      "expl": 372,
+      "e": "Geolocation routing (ideia): o que controla?"
+    },
+    {
+      "idx": 208,
+      "id": 209,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 44,
+      "expl": 477,
+      "e": "Checklist mental TShoot DNS/edge nesta part?"
+    },
+    {
+      "idx": 239,
+      "id": 240,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 44,
+      "expl": 486,
+      "e": "Resumo de desacoplamento SQS/SNS no SAA-C03:"
+    },
+    {
+      "idx": 269,
+      "id": 270,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 44,
+      "expl": 444,
+      "e": "Resumo KMS + Secrets foundations no SAA-C03:"
+    },
+    {
+      "idx": 285,
+      "id": 286,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 44,
+      "expl": 419,
+      "e": "Ephemeral storage /tmp (ideia): uso correto?"
+    },
+    {
+      "idx": 306,
+      "id": 307,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 44,
+      "expl": 381,
+      "e": "Strongly consistent read (ideia): trade-off?"
+    },
+    {
+      "idx": 328,
+      "id": 329,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 44,
+      "expl": 468,
+      "e": "Checklist mental TShoot DynamoDB nesta part?"
+    },
+    {
+      "idx": 219,
+      "id": 220,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 45,
+      "expl": 345,
+      "e": "SSE-SQS / KMS na fila (ideia): o que protege?"
+    },
+    {
+      "idx": 235,
+      "id": 236,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 45,
+      "expl": 374,
+      "e": "sns:Publish AccessDenied na role da API. Fix?"
+    },
+    {
+      "idx": 146,
+      "id": 147,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 46,
+      "expl": 320,
+      "e": "ALB access logs (ideia) ajudam em qual TShoot?"
+    },
+    {
+      "idx": 347,
+      "id": 348,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 46,
+      "expl": 331,
+      "e": "High-resolution metrics (ideia 1s): trade-off?"
+    },
+    {
+      "idx": 161,
+      "id": 162,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 47,
+      "expl": 497,
+      "e": "Automated backup retention = 0. O que se perde?"
+    },
+    {
+      "idx": 232,
+      "id": 233,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 47,
+      "expl": 344,
+      "e": "Delay seconds / timer de mensagem (ideia): uso?"
+    },
+    {
+      "idx": 259,
+      "id": 260,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 47,
+      "expl": 344,
+      "e": "Fora de escopo profundo desta part KMS/Secrets?"
+    },
+    {
+      "idx": 323,
+      "id": 324,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 47,
+      "expl": 460,
+      "e": "Composite sort key userId#timestamp: benefício?"
+    },
+    {
+      "idx": 345,
+      "id": 346,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 47,
+      "expl": 321,
+      "e": "Dashboard operacional (ideia): papel vs alarme?"
+    },
+    {
+      "idx": 119,
+      "id": 120,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 48,
+      "expl": 441,
+      "e": "Resumo de design EC2+EBS foundations no SAA-C03:"
+    },
+    {
+      "idx": 129,
+      "id": 130,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 49,
+      "expl": 447,
+      "e": "ALB internal vs internet-facing: quando internal?"
+    },
+    {
+      "idx": 224,
+      "id": 225,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 49,
+      "expl": 391,
+      "e": "Message retention period na fila: efeito prático?"
+    },
+    {
+      "idx": 199,
+      "id": 200,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 50,
+      "expl": 378,
+      "e": "Fora de escopo profundo desta part R53/CloudFront?"
+    },
+    {
+      "idx": 327,
+      "id": 328,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 50,
+      "expl": 400,
+      "e": "Condicional PutItem attribute_not_exists(PK): uso?"
+    },
+    {
+      "idx": 135,
+      "id": 136,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 51,
+      "expl": 379,
+      "e": "Cooldown-out em scaling policy evita qual problema?"
+    },
+    {
+      "idx": 169,
+      "id": 170,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 51,
+      "expl": 455,
+      "e": "Fora de escopo profundo desta part RDS foundations?"
+    },
+    {
+      "idx": 316,
+      "id": 317,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 51,
+      "expl": 332,
+      "e": "FilterExpression em Query: o que ainda é consumido?"
+    },
+    {
+      "idx": 337,
+      "id": 338,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 51,
+      "expl": 413,
+      "e": "PutMetricData AccessDenied na role do agent. Causa?"
+    },
+    {
+      "idx": 209,
+      "id": 210,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 52,
+      "expl": 546,
+      "e": "Resumo Route 53 + CloudFront foundations no SAA-C03:"
+    },
+    {
+      "idx": 228,
+      "id": 229,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 52,
+      "expl": 339,
+      "e": "SNS filter policy (menção leve, fora de lab): ideia?"
+    },
+    {
+      "idx": 304,
+      "id": 305,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 52,
+      "expl": 350,
+      "e": "Query vs Scan: qual a diferença operacional crítica?"
+    },
+    {
+      "idx": 320,
+      "id": 321,
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 52,
+      "expl": 622,
+      "e": "BatchWriteItem partial failure (ideia): o que fazer?"
+    }
+  ]
+}

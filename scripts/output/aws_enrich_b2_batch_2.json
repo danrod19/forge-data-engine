@@ -1,0 +1,215 @@
+{
+  "batch": 2,
+  "items": [
+    {
+      "id": 225,
+      "idx": 224,
+      "part_id": "aws-1.8",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 49,
+      "enunciado": "Message retention period na fila: efeito prático?",
+      "alternativas": [
+        "Tempo de cache do CloudFront",
+        "TTL do certificado ACM",
+        "Intervalo obrigatório entre publishes SNS",
+        "Tempo máximo que a mensagem pode permanecer na fila se não for consumida/deletada"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Message retention period é o tempo máximo que a mensagem pode ficar na fila se não for consumida/deletada (padrão 4 dias, até 14). Não é TTL de cache do CloudFront. Não é TTL de certificado ACM. Não é intervalo obrigatório entre publishes SNS. Insight: retenção curta demais perde msgs se consumers pararem; longa demais atrasa a limpeza de backlog obsoleto — alinhe ao SLA de processamento."
+    },
+    {
+      "id": 257,
+      "idx": 256,
+      "part_id": "aws-1.9",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 68,
+      "enunciado": "Rotação do secret falhou (rotation Lambda erro). Sintoma para a app?",
+      "alternativas": [
+        "A VPC inteira é deletada",
+        "Todos os Security Groups abrem 0.0.0.0/0",
+        "Pode continuar com a versão atual até correção, mas compliance/rotação fica em estado de falha — monitore describe-secret / eventos",
+        "O CloudFront invalida o mundo"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Se a Lambda de rotation falha, o secret pode permanecer na versão atual utilizável pela app até correção, mas o estado de rotação/compliance fica em falha — monitore describe-secret e eventos. A VPC não é deletada. Security Groups não abrem 0.0.0.0/0 por falha de rotation. CloudFront não invalida 'o mundo'. Insight: falha de rotation ≠ apagamento do secret; trate alarme e corrija a Lambda sem assumir outage total."
+    },
+    {
+      "id": 18,
+      "idx": 17,
+      "part_id": "aws-1.1",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 82,
+      "enunciado": "Dezenas de humanos usam o console. Qual organização de permissões é a boa prática?",
+      "alternativas": [
+        "Distribuir access keys do root a cada pessoa",
+        "Users em groups por função (Dev, Ops, ReadOnly) com policies anexadas aos groups",
+        "Uma única role EC2 compartilhada como 'login' de todos no console",
+        "Desabilitar CloudTrail para não gerar ruído"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Boa prática para dezenas de humanos no console: users em groups por função (Dev, Ops, ReadOnly) com policies nos groups — escala least privilege e entrada/saída de pessoas. Distribuir access keys do root a cada pessoa é falha crítica de segurança e auditoria. Uma única role EC2 compartilhada como 'login' de console mistura identidade de workload com humano; console não autentica assim. Desabilitar CloudTrail remove evidência de quem fez o quê. Insight: console multi-user → groups; nunca root keys."
+    },
+    {
+      "id": 294,
+      "idx": 293,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 76,
+      "enunciado": "put-function-concurrency reserved=0 (ou valor que impede execuções). Efeito?",
+      "alternativas": [
+        "Garante throughput ilimitado",
+        "Pode impedir invocações (throttle total) se reserved zera a capacidade efetiva da function",
+        "Apaga o código da function",
+        "Muda o runtime para provided.al2 sozinho"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "put-function-concurrency com reserved=0 (ou valor que zera capacidade efetiva) pode impedir invocações — throttle total da function. Não garante throughput ilimitado; faz o oposto. Não apaga o código. Não muda o runtime sozinho para provided.al2. Insight: reserved 0 é alavanca de 'pause' de emergência; confira concurrency antes de culpar o código quando tudo retorna throttle."
+    },
+    {
+      "id": 328,
+      "idx": 327,
+      "part_id": "aws-1.11",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 50,
+      "enunciado": "Condicional PutItem attribute_not_exists(PK): uso?",
+      "alternativas": [
+        "Aumentar RCU",
+        "Criar item só se a chave não existir (evita overwrite acidental / lock otimista simples)",
+        "Criar GSI",
+        "Abrir o Security Group"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ConditionExpression attribute_not_exists(PK) no PutItem cria o item só se a chave ainda não existir — evita overwrite acidental e serve como lock otimista simples (create-if-not-exists). Não aumenta RCU. Não cria GSI. Não abre Security Group. Insight: use condições para idempotência e corridas (ex. criar pedido único); falha ConditionalCheckFailedException indica que outro writer ganhou a corrida."
+    },
+    {
+      "id": 339,
+      "idx": 338,
+      "part_id": "aws-1.12",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 57,
+      "enunciado": "Datapoints to alarm = 3 de 3 com period 60s. Significado?",
+      "alternativas": [
+        "Dispara no primeiro segundo sempre",
+        "Ignora o threshold",
+        "Apaga a métrica",
+        "Precisa de 3 períodos consecutivos em violação (3 min) para ALARM — reduz falso positivo de 1 pico"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Datapoints to alarm = 3 de 3 com period 60s exige 3 períodos consecutivos em violação (~3 min) antes de ALARM — reduz falso positivo de um pico isolado. Não dispara no primeiro segundo. Não ignora o threshold. Não apaga a métrica. Insight: N de N é conservador; 1 de N é sensível (mais flapping). Ajuste conforme SLA de detecção vs ruído."
+    },
+    {
+      "id": 43,
+      "idx": 42,
+      "part_id": "aws-1.2",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 81,
+      "enunciado": "Subnet chamada 'private' tem 0.0.0.0/0 → igw em vez de nat. Qual risco de design?",
+      "alternativas": [
+        "Design incorreto típico: default route IGW é padrão de pública; saída/exposição fica mal definida para 'privada'",
+        "Melhora automática a performance do KMS",
+        "É obrigatório para RDS Multi-AZ funcionar",
+        "Desliga permanentemente a NACL da subnet"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "O rótulo 'private' não define o comportamento: a route table define. 0.0.0.0/0 → igw é o padrão de subnet pública (com IP público/EIP para reachability); privada tipicamente usa NAT (ou endpoint) para egress sem exposição direta. Com IGW na default route, saída e superfície de exposição ficam mal alinhadas ao nome 'privada'. Melhorar performance do KMS não tem relação com rota default. RDS Multi-AZ não exige que a subnet do app aponte para IGW. NACL não é desligada por causa da rota IGW. Insight: ignore o Name tag e leia a RT — privada com →igw é anti-padrão clássico de design."
+    },
+    {
+      "id": 78,
+      "idx": 77,
+      "part_id": "aws-1.3",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 80,
+      "enunciado": "Conta B precisa ler bucket da conta A sem tornar o bucket público. Padrão comum?",
+      "alternativas": [
+        "Compartilhar access key de root da conta A no chat",
+        "Bucket policy na A permitindo o principal da B + permissões IAM/role na B",
+        "Desligar BPA e abrir Principal * GetObject global",
+        "Usar apenas NACL da VPC da B para autorizar a API S3"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Padrão cross-account: bucket policy na conta A Allow no principal (role/user) da conta B + permissões IAM na B (frequentemente AssumeRole). Assim B lê sem tornar o bucket público. Compartilhar access key de root da A é inaceitável. Desligar BPA e abrir Principal * GetObject global resolve 'acesso' com exposição pública. NACL da VPC da B não autoriza a API S3 (controle de rede ≠ resource policy). Insight: cross-account S3 = resource policy no bucket + identity na origem, nunca root key."
+    },
+    {
+      "id": 115,
+      "idx": 114,
+      "part_id": "aws-1.4",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 72,
+      "enunciado": "Attach vol-data em /dev/sdf ok; app não vê o disco. Próximo passo no SO?",
+      "alternativas": [
+        "Só recreate a VPC",
+        "Mount/format do device no sistema operacional (lsblk/mkfs/mount ou inicialização de disco no Windows)",
+        "Abrir porta 2049 no SG para 'ativar EBS'",
+        "Converter o volume em AMI antes de montar"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Attach AWS OK em /dev/sdf (ou NVMe name) não monta sozinho no guest: no SO faça lsblk/mkfs (se novo)/mount ou inicialização de disco no Windows. Recriar a VPC não monta filesystem. Porta 2049 no SG é NFS/EFS, não 'ativa EBS'. Converter volume em AMI antes de montar é desnecessário para ver o disco. Insight: attach é passo de controle-plane; mount/format é passo de OS — os dois são obrigatórios."
+    },
+    {
+      "id": 142,
+      "idx": 141,
+      "part_id": "aws-1.5",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 68,
+      "enunciado": "App stateful em sticky session (ideia) vs scale-in agressivo. Risco?",
+      "alternativas": [
+        "Nenhum — sticky ignora terminate",
+        "Usuários grudados em instance que será terminada sofrem erro se não houver draining/re-sessão",
+        "O ASG não pode ter max > 1",
+        "O ALB deixa de usar HTTPS"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Sticky session prende o cliente a uma instance; no scale-in essa instance pode ser terminada e a sessão quebra se não houver draining e/ou re-sessão (store externo). Sticky não ignora terminate. ASG pode ter max > 1 com sticky. Sticky não desliga HTTPS no ALB. Insight: app stateful atrás de ASG → sessão em Redis/DB ou draining generoso; preferir stateless no SAA."
+    }
+  ]
+}

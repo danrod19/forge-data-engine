@@ -1,0 +1,215 @@
+{
+  "batch": 1,
+  "items": [
+    {
+      "id": 19,
+      "idx": 18,
+      "part_id": "aws-1.1",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 88,
+      "enunciado": "Policy Allow com Condition aws:MultiFactorAuthPresent = true. Qual o papel da Condition?",
+      "alternativas": [
+        "Trocar a região física do hardware do data center",
+        "Criar VPC peering automático com outra conta",
+        "Restringir o Allow a contextos (ex. MFA presente, IP de origem, tags)",
+        "Substituir o Route 53 privado da VPC"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Condition restringe quando o Statement Allow se aplica — por exemplo aws:MultiFactorAuthPresent = true, SourceIp corporativo ou tags — sem mudar topologia física. Não troca a região física do hardware do data center. Não cria VPC peering automático com outra conta. Não substitui Route 53 privado da VPC (DNS). Insight: Condition = 'só se…'; se a opção fala em hardware ou peering, está fora do escopo de IAM Condition."
+    },
+    {
+      "id": 278,
+      "idx": 277,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 81,
+      "enunciado": "Function sem permissão logs:CreateLogGroup/CreateLogStream/PutLogEvents. Sintoma?",
+      "alternativas": [
+        "Invokes podem 'funcionar' mas logs não aparecem no CloudWatch (ou falha ao criar log stream)",
+        "A VPC é apagada",
+        "O SQS vira FIFO sozinho",
+        "O ALB perde o listener 443"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Sem logs:CreateLogGroup/CreateLogStream/PutLogEvents, invokes podem até completar mas os logs não aparecem no CloudWatch (ou falha ao criar o log stream). A VPC não é apagada. SQS não vira FIFO sozinho. ALB não perde listener 443 por falta de permissão de log. Insight: 'function ok, CloudWatch vazio' → cheque a execution role de logs antes de achar que o código não rodou."
+    },
+    {
+      "id": 321,
+      "idx": 320,
+      "part_id": "aws-1.11",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 52,
+      "enunciado": "BatchWriteItem partial failure (ideia): o que fazer?",
+      "alternativas": [
+        "Ignorar e aumentar só o timeout da Lambda",
+        "Apagar a tabela",
+        "Retentar os UnprocessedItems com backoff; não assumir que o batch inteiro gravou",
+        "Trocar para Scan"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "BatchWriteItem pode gravar só parte do batch: a API devolve UnprocessedItems com as chaves que falharam (throttle, limite de tamanho, etc.). O cliente deve retentar esses itens com exponential backoff e jitter até esvaziar a lista — nunca assumir sucesso total só porque a chamada HTTP retornou 200. Ignorar e só aumentar timeout da Lambda não reprocessa os UnprocessedItems e deixa dados faltando. Apagar a tabela destrói dados e não corrige falha parcial. Trocar para Scan não escreve nada e é padrão de leitura. Insight: trate BatchWriteItem como at-most-once por item e sempre cheque UnprocessedItems no loop de retry."
+    },
+    {
+      "id": 334,
+      "idx": 333,
+      "part_id": "aws-1.12",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 62,
+      "enunciado": "ASG deveria subir com CPU > 60%, mas desired não muda. Checks?",
+      "alternativas": [
+        "Alarme em ALARM? action AutoScaling correta? métrica do grupo/instances e policies do ASG habilitadas",
+        "Só o price class do CloudFront",
+        "Só o CNAME do apex",
+        "Só o TTL do objeto S3"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Se o ASG deveria scale-out com CPU > 60% e desired não muda, verifique: alarme em ALARM? action apontando para a scaling policy correta? métrica do grupo ou das instances? policies do ASG habilitadas e limites min/max/desired? Price class do CloudFront, CNAME do apex e TTL de objeto S3 não controlam desired do ASG. Insight: na prova, 'ASG não sobe' quase sempre é alarme/action/policy/limites, não CDN ou DNS."
+    },
+    {
+      "id": 38,
+      "idx": 37,
+      "part_id": "aws-1.2",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 94,
+      "enunciado": "SG do app não tem inbound 8080; processo escuta em 8080. Efeito típico do health check do ALB?",
+      "alternativas": [
+        "Tráfego 8080 é permitido por default em todo SG",
+        "A NACL vira allow all automaticamente",
+        "A rota 0.0.0.0/0 é removida da subnet",
+        "Conexões inbound na 8080 são negadas (deny implícito do SG) → health timeout"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Security Group nega por omissão o que não está explicitamente permitido. Sem inbound 8080, conexões do ALB na 8080 são bloqueadas (deny implícito) e o health check dá timeout, mesmo com o processo escutando. Tráfego 8080 não é permitido por default em todo SG. NACL não vira allow all automaticamente. Rota 0.0.0.0/0 não é removida por falta de regra de SG. Insight: health check do ALB → confirme porta/protocolo no target group e inbound do SG do target liberando o SG do ALB."
+    },
+    {
+      "id": 65,
+      "idx": 64,
+      "part_id": "aws-1.3",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 89,
+      "enunciado": "Estagiário sobrescreveu config/prod.json. Versioning está Enabled. Qual benefício direto?",
+      "alternativas": [
+        "É possível recuperar a versão anterior do objeto (histórico), em vez de depender só de backup externo",
+        "O bucket deixa de exigir IAM para GetObject",
+        "O bucket torna-se público automaticamente para rollback",
+        "O bucket é convertido em sistema de arquivos EBS"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Com versioning Enabled, overwrite não destrói o histórico: a versão anterior permanece recuperável (list-object-versions / restaurar). Isso reduz dependência exclusiva de backup externo para o caso do estagiário. Versioning não remove a necessidade de IAM para GetObject. Não torna o bucket público para rollback. Não converte o bucket em sistema de arquivos EBS — S3 continua object storage. Insight: overwrite acidental + versioning on → recupere a versão, não recrie o objeto do zero."
+    },
+    {
+      "id": 101,
+      "idx": 100,
+      "part_id": "aws-1.4",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 90,
+      "enunciado": "describe-instances mostra State terminated. Ops tenta start-instances. Resultado esperado?",
+      "alternativas": [
+        "A instance volta running com o mesmo instance id sempre",
+        "Start falha / não se aplica — terminated não reinicia; é preciso launch nova instance (ex. de AMI)",
+        "O volume EBS se reconecta sozinho em outra Região",
+        "O Spot bid é recriado automaticamente"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Estado terminated: start-instances não se aplica — a instance não volta running com o mesmo id; é preciso lançar nova instance (de AMI/launch template). Volume EBS não se 'reconecta sozinho' em outra Região por causa do start. Spot bid não é recriado automaticamente só porque alguém tentou start em terminated. Insight: terminated é fim de ciclo; recovery = AMI/snapshot + launch, não start."
+    },
+    {
+      "id": 146,
+      "idx": 145,
+      "part_id": "aws-1.5",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 76,
+      "enunciado": "503 intermitente durante deploy rolling do ASG. Mitigação alinhada a health?",
+      "alternativas": [
+        "Health check grace period / ensure novos targets fiquem healthy antes de derrubar os antigos demais",
+        "desired=0 durante todo o deploy",
+        "Health path apontando para URL externa 500 fixo",
+        "Remover todas as subnets de uma AZ no meio do deploy sem plano"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "No rolling deploy, derrubar antigas antes das novas ficarem healthy gera 503 intermitente. Health check grace period e/ou garantir novos targets healthy (e min healthy %) antes de terminar demais mitiga. desired=0 durante o deploy zera backends. Health path para URL externa 500 fixo marca tudo unhealthy. Remover subnets de uma AZ no meio do deploy sem plano reduz HA. Insight: grace period curto demais marca 'starting' como unhealthy e acelera replace desnecessário."
+    },
+    {
+      "id": 177,
+      "idx": 176,
+      "part_id": "aws-1.6",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 79,
+      "enunciado": "Enhanced Monitoring / Performance Insights (menção): para que servem no TShoot?",
+      "alternativas": [
+        "Métricas de OS/SQL para diagnosticar CPU, wait, conexões — não substituem SG/backup",
+        "Abrem automaticamente 0.0.0.0/0",
+        "Criam Multi-AZ sozinhos",
+        "Apagam snapshots antigos por padrão sem policy"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Enhanced Monitoring e Performance Insights fornecem métricas de OS e do engine (CPU, waits, conexões, SQL top) para diagnosticar lentidão — não substituem SG, backup ou desenho de rede. Não abrem 0.0.0.0/0. Não criam Multi-AZ sozinhos. Não apagam snapshots por padrão. Insight: combine PI para 'qual query/wait' com CloudWatch alarms; SG/backup continuam no checklist de resiliência e segurança."
+    },
+    {
+      "id": 201,
+      "idx": 200,
+      "part_id": "aws-1.7",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 108,
+      "enunciado": "CNAME www.exemplo.com → d111.cloudfront.net vs ALIAS para a mesma distribuição. Ambos válidos em subdomínio?",
+      "alternativas": [
+        "CNAME é inválido em qualquer subdomínio",
+        "ALIAS é proibido em www",
+        "Sim em subdomínio; ALIAS ainda é preferível por integração AWS e opções de routing/health",
+        "Só MX pode apontar a CloudFront"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Em subdomínio (ex.: www), CNAME para d111.cloudfront.net e ALIAS (Route 53 alias) para a mesma distribuição CloudFront são ambos válidos no DNS. ALIAS ainda é preferível na AWS: resolve para IPs da edge, evita cadeia CNAME extra e permite routing policies/health checks nativos do Route 53. CNAME não é 'inválido em qualquer subdomínio' — o problema clássico do CNAME é no apex (zona root), não em www. ALIAS não é proibido em www. MX não é o mecanismo para apontar hostname web a CloudFront. Insight: apex → ALIAS/A-alias; subdomínio → CNAME ou ALIAS."
+    }
+  ]
+}

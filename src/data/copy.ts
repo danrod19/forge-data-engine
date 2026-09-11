@@ -12,6 +12,7 @@ import {
 } from "@/data/simulado-questions";
 import { TOTAL_V2_TICKETS } from "@/data/v2-banks";
 import { TOTAL_AWS_TICKETS } from "@/data/aws-banks";
+import { CONTACT_EMAIL } from "@/types/question";
 
 export const BRAND_NAME = "CCNA Forge";
 export const CONTACT_LABEL = "Fale conosco";
@@ -215,6 +216,16 @@ export const simuladoLangModeCopy = {
     "Itens classificados como mixed entram nos dois modos (PT e EN).",
 };
 
+/** Copy de lançamento — Sobre a Prova + Upgrade / paywall. Sem preço de 7 dias em R$. */
+export const launchCopy = {
+  paragraph: `O CCNA Forge é preparação prática para o 200-301: estudo por tópico, tickets com CLI e simulados no estilo da prova, com feedback na hora. No Free você entra na trilha com vidas limitadas e parte das explicações borradas; no PRO as vidas são infinitas e as explicações ficam abertas. Há trial de 24h (1× por conta). Depois disso, escolha 7 dias, 30 dias (R$ 20,90) ou 120 dias (R$ 57,90). O pagamento redireciona de volta ao app; a liberação do PRO costuma ser rápida — se não aparecer, escreva para ${CONTACT_EMAIL}.`,
+  proBullets: [
+    "Vidas infinitas na trilha e nos simulados — sem travar o ritmo de estudo",
+    "Explicações completas, sem blur, depois de errar ou revisar",
+    "Planos: 7 dias, 30 dias (R$ 20,90) ou 120 dias (R$ 57,90)",
+  ],
+};
+
 export const freeVsProCopy = {
   freeTitle: "Free",
   freeBullets: [
@@ -223,11 +234,7 @@ export const freeVsProCopy = {
     "Explicações profundas com blur",
   ],
   proTitle: "PRO",
-  proBullets: [
-    "Vidas infinitas",
-    "Explicações sem blur",
-    "Trial 24h (1× por conta)",
-  ],
+  proBullets: launchCopy.proBullets,
   proCta: "Ver planos PRO",
 };
 
@@ -324,13 +331,8 @@ export const paywallCopy = {
   livesBody:
     "Você zerou as vidas deste track. Espere o cooldown ou desbloqueie o PRO para continuar sem limite.",
   upgradeTitle: "Desbloquear PRO",
-  upgradeBody:
-    "Vidas infinitas e explicações completas sem blur — no track que você estiver estudando.",
-  features: [
-    "Vidas infinitas — sem ficar parado",
-    "Explicações profundas sem blur",
-    "Mesmo app, ritmo de estudo contínuo",
-  ],
+  upgradeBody: launchCopy.paragraph,
+  features: launchCopy.proBullets,
 };
 
 export const bankCountsHint = {

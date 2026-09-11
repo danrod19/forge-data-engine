@@ -1,0 +1,215 @@
+{
+  "batch": 4,
+  "items": [
+    {
+      "id": 106,
+      "idx": 105,
+      "part_id": "aws-1.4",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 94,
+      "enunciado": "Public IP da instance em subnet pública mudou após stop/start. Como manter IP público estável?",
+      "alternativas": [
+        "Usar Elastic IP associado à instance (ou ENI) conforme design",
+        "Aumentar o tamanho do root volume",
+        "Trocar a AMI para Windows",
+        "Desligar o source/dest check apenas"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Public IP automático de subnet pública muda após stop/start. Para IP público estável, associe Elastic IP à instance (ou ENI). Aumentar root volume não fixa endereço. Trocar AMI para Windows não preserva public IP. Desligar source/dest check é para NAT/router, não para estabilidade de IP. Insight: DNS/clientes fixos → Elastic IP (e lembre do custo se ficar associado sem instance)."
+    },
+    {
+      "id": 123,
+      "idx": 122,
+      "part_id": "aws-1.5",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 79,
+      "enunciado": "Padrão de Security Group entre ALB e targets EC2 na porta do target group 8080?",
+      "alternativas": [
+        "sg-app 0.0.0.0/0 em todas as portas e sg-alb sem inbound",
+        "sg-alb inbound 443 (clientes); sg-app inbound 8080 com Source = sg-alb",
+        "Somente NACL Deny all entre públicas e privadas",
+        "Sem Security Groups se o ASG estiver enabled"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "O padrão least-privilege é: sg-alb com inbound 443 dos clientes; sg-app com inbound 8080 cujo Source é o sg-alb (não 0.0.0.0/0). Assim só o ALB alcança a porta do target group. Abrir sg-app para a Internet em todas as portas e deixar sg-alb sem inbound quebra a borda e a segurança. NACL Deny all entre públicas e privadas corta o path ALB→target. ASG enabled não elimina Security Groups — ENIs continuam filtradas por SG. Insight: no SAA, Source = security group do ALB na porta do TG é o desenho esperado."
+    },
+    {
+      "id": 168,
+      "idx": 167,
+      "part_id": "aws-1.6",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 82,
+      "enunciado": "sg-db permite 3306 de 0.0.0.0/0 e PubliclyAccessible true. Avaliação de segurança?",
+      "alternativas": [
+        "Best practice de least privilege",
+        "Obrigatório para Multi-AZ",
+        "Aceitável se houver snapshot diário",
+        "Anti-pattern: DB exposto à Internet — restrinja SG ao app e PubliclyAccessible false"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "3306 liberado de 0.0.0.0/0 com PubliclyAccessible true expõe o motor à Internet — anti-pattern claro; restrinja o SG à origem do app (SG ou CIDR privado) e prefira PubliclyAccessible false em subnet privada. Isso não é least privilege. Não é obrigatório para Multi-AZ. Snapshot diário não mitiga exploração ativa na porta aberta. Insight: em prova, combinação SG aberto + PubliclyAccessible = resposta de segurança quase sempre 'fechar e privatizar'."
+    },
+    {
+      "id": 181,
+      "idx": 180,
+      "part_id": "aws-1.7",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 117,
+      "enunciado": "Site apex exemplo.com deve apontar ao ALB app-alb-123.us-east-1.elb.amazonaws.com. Qual record Route 53 é o adequado?",
+      "alternativas": [
+        "Record A/AAAA ALIAS para o Application Load Balancer",
+        "CNAME no apex (exemplo.com) para o DNS do ALB (DNS clássico não permite CNAME no apex)",
+        "MX apontando ao ALB na porta 443",
+        "NS record substituindo os name servers da AWS pelo IP do ALB"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Para apex (exemplo.com) apontando a um ALB, o adequado é record A/AAAA ALIAS (alias Route 53) para o Application Load Balancer — Alias funciona no zone apex e resolve para o DNS do ALB. CNAME no apex não é permitido no DNS clássico (RFC). MX é para correio, não HTTP no ALB. Trocar NS pelos IPs do ALB quebra a delegação da zona. Insight: apex → Alias para ALB/CloudFront; subdomínio pode ser Alias ou CNAME."
+    },
+    {
+      "id": 228,
+      "idx": 227,
+      "part_id": "aws-1.8",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 65,
+      "enunciado": "At-least-once delivery no SQS standard implica o quê no consumer?",
+      "alternativas": [
+        "Que a ordem global é sempre garantida",
+        "Que DeleteMessage é opcional",
+        "Desenhar idempotência / dedup de negócio porque a mesma msg pode ser entregue mais de uma vez",
+        "Que DLQ é proibida"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "At-least-once no SQS standard significa que a mesma mensagem pode ser entregue mais de uma vez: o consumer deve ser idempotente ou fazer dedup de negócio (ex.: chave de pedido já processada). Ordem global não é garantida em standard. DeleteMessage continua obrigatório após sucesso. DLQ não é proibida — é recomendada. Insight: desenhe 'processar de novo sem efeito colateral'; não assuma exactly-once só porque usou SQS."
+    },
+    {
+      "id": 266,
+      "idx": 265,
+      "part_id": "aws-1.9",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 87,
+      "enunciado": "Secret com resource policy + IAM da role: ordem mental de TShoot GetSecretValue denied?",
+      "alternativas": [
+        "Só recriar a AMI",
+        "Só aumentar o EBS",
+        "Só abrir 443 0.0.0.0/0 no SG do Lambda",
+        "Caller identity → IAM GetSecretValue → resource policy do secret → kms se CMK → ARN do secret correto"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Ordem mental de TShoot GetSecretValue denied: confirmar caller identity → IAM GetSecretValue → resource policy do secret → kms se o secret usa CMK → ARN do secret correto. Recriar AMI não analisa policies. Aumentar EBS não libera API. Abrir 443 0.0.0.0/0 no SG pode ajudar rede, mas sozinho não explica Deny de resource/IAM. Insight: separe rede (timeout) de autorização (AccessDenied)."
+    },
+    {
+      "id": 2,
+      "idx": 1,
+      "part_id": "aws-1.1",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 93,
+      "enunciado": "App em EC2 precisa ler DynamoDB e gravar em S3 sem access key no disco. Qual identidade usar?",
+      "alternativas": [
+        "IAM user com senha e access key no user-data",
+        "IAM role associada via instance profile (credenciais temporárias no IMDS)",
+        "Grupo IAM vazio sem policy, apenas para 'organização'",
+        "Root user da conta com MFA desligado na instância"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Workloads em EC2 devem usar IAM role associada via instance profile: o IMDS entrega credenciais temporárias do STS que rotacionam sozinhas, sem access key estática no disco. IAM user com senha e access key no user-data grava segredo de longo prazo na instância (visível em userdata/AMI) e é o anti-pattern clássico. Grupo IAM vazio sem policy não concede identidade à EC2 nem entrega credenciais de API. Root user com MFA desligado na instância é péssima prática de conta e não é como apps autenticam em APIs AWS. Insight: serviço AWS falando com outro serviço AWS → role, não user nem root."
+    },
+    {
+      "id": 296,
+      "idx": 295,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 85,
+      "enunciado": "Memory 1024 MB, timeout 60s, job I/O bound a API externa lenta. Melhor eixo primeiro?",
+      "alternativas": [
+        "Memory 10 GB obrigatório",
+        "Timeout adequado + retries/backoff assíncrono; memory extra ajuda pouco se o gargalo é espera de rede",
+        "Remover todos os logs",
+        "Reserved concurrency 1 sempre"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Job I/O-bound esperando API externa lenta: memory extra sobe CPU proporcional, mas ajuda pouco enquanto o tempo é wait de rede. Priorize timeout adequado, retries com backoff e, se possível, fluxo assíncrono. Memory 10 GB obrigatório é overkill sem prova de CPU-bound. Remover logs não acelera a API externa. Reserved=1 sempre só serializa e pode piorar fila. Insight: meça se o gargalo é compute ou espera externa."
+    },
+    {
+      "id": 325,
+      "idx": 324,
+      "part_id": "aws-1.11",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 67,
+      "enunciado": "Adaptive capacity (ideia): o que ajuda e o que não resolve sozinho?",
+      "alternativas": [
+        "Elimina a need de GSI sempre",
+        "Ajuda desbalanceamento temporário entre partições; não corrige PK de baixíssima cardinalidade crônica",
+        "Remove IAM",
+        "Torna Scan O(1)"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Adaptive capacity redistribui throughput entre partições quando há desbalanceamento temporário, ajudando picos assimétricos. Não corrige sozinho PK de baixíssima cardinalidade crônica (hot key permanente). Não elimina a necessidade de GSI quando o access pattern exige outra chave. Não remove IAM. Não torna Scan O(1) — Scan continua linear no tamanho. Insight: adaptive capacity é alívio operacional; modelagem ruim de chave exige redesign (sharding, GSI, write sharding)."
+    },
+    {
+      "id": 356,
+      "idx": 355,
+      "part_id": "aws-1.12",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 64,
+      "enunciado": "Lambda Throttles metric em ALARM sem SNS. Resultado operacional?",
+      "alternativas": [
+        "O alarme invoca a function automaticamente sempre",
+        "Problema existe na métrica mas ninguém é notificado — falta action",
+        "Reserved concurrency sobe sozinho",
+        "O código é corrigido por IA na conta"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Alarme em Throttles da Lambda sem action SNS (ou equivalente) deixa o problema visível na métrica/estado ALARM, mas ninguém é notificado — falta o elo de ação. O alarme não invoca a function automaticamente só por existir. Reserved concurrency não sobe sozinho. Código não é 'corrigido por IA'. Insight: alarme sem action = detector mudo; sempre amarre SNS/ASG/EventBridge."
+    }
+  ]
+}

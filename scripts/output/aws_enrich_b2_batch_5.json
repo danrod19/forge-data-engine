@@ -1,0 +1,215 @@
+{
+  "batch": 5,
+  "items": [
+    {
+      "id": 51,
+      "idx": 50,
+      "part_id": "aws-1.2",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 86,
+      "enunciado": "NAT em AZ-a; privada só em AZ-b com 0.0.0.0/0 → esse NAT. Qual consideração de design?",
+      "alternativas": [
+        "Funciona, mas cria dependência cross-AZ (custo/latência) e fragilidade de HA do egress",
+        "É proibido em todas as contas AWS sem exceção",
+        "Elimina a necessidade de route tables",
+        "Torna a subnet automaticamente pública com EIP"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "É permitido rotear a privada de AZ-b para um NAT em AZ-a, mas o egress fica acoplado à AZ do NAT: latência/custo de transferência cross-AZ e SPOF se AZ-a cair. Não é proibição universal da AWS. Continua sendo necessário ter route table com 0.0.0.0/0 → nat; a topologia não elimina RTs. Apontar para NAT não torna a subnet pública nem atribui EIP à instância — pública implica path IGW + endereço público. Insight: HA de egress rigoroso → NAT (ou padrão equivalente) por AZ, alinhado às subnets privadas."
+    },
+    {
+      "id": 70,
+      "idx": 69,
+      "part_id": "aws-1.3",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 83,
+      "enunciado": "TShoot de acesso: qual CLI inspeciona o documento de autorização anexado ao bucket?",
+      "alternativas": [
+        "aws ec2 describe-route-tables",
+        "aws iam list-users",
+        "aws s3api get-bucket-policy --bucket <nome>",
+        "aws sts assume-role sem RoleArn válido"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "`aws s3api get-bucket-policy --bucket <nome>` devolve o documento resource-based anexado ao bucket — essencial no tshoot de AccessDenied junto com as policies do caller. `describe-route-tables` descreve rotas EC2/VPC. `iam list-users` lista users, não a policy do bucket. `sts assume-role` sem RoleArn válido nem autentica fluxo cross-account corretamente. Insight: AccessDenied S3 → get-bucket-policy + get-public-access-block + policies anexadas da role."
+    },
+    {
+      "id": 95,
+      "idx": 94,
+      "part_id": "aws-1.4",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 89,
+      "enunciado": "App em EC2 precisa GetObject em S3 sem access key no disco. Qual mecanismo de identidade?",
+      "alternativas": [
+        "Instance profile associando IAM role à instance (credenciais via IMDS)",
+        "Colocar AKIA no user-data em claro",
+        "Abrir o bucket com Principal * e BPA off",
+        "Usar apenas o Security Group com porta 443"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Sem access key no disco: associe instance profile com IAM role à EC2 — credenciais temporárias via IMDS. Colocar AKIA no user-data em claro é vazamento clássico. Abrir o bucket com Principal * e BPA off expõe dados em vez de identidade da instance. Security Group na 443 controla tráfego de rede, não concede assinatura da API S3. Insight: EC2 → APIs AWS = role/instance profile; nunca AKIA permanente no host."
+    },
+    {
+      "id": 137,
+      "idx": 136,
+      "part_id": "aws-1.5",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 74,
+      "enunciado": "ALB em 2 AZ; ASG só em subnet us-east-1a. Incidente derruba 1a. Resultado?",
+      "alternativas": [
+        "ALB continua com targets healthy na 1b automaticamente",
+        "Sem targets em outras AZ, a app fica indisponível apesar do ALB multi-AZ",
+        "O ASG migra EBS multi-attach para 1b sozinho",
+        "Route 53 remove a necessidade de multi-AZ no ASG"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ALB em 2 AZ sem targets em outras AZs: se us-east-1a cai e o ASG só tem subnet ali, não há backends healthy — a app fica indisponível apesar do ALB multi-AZ. O ALB não inventa targets na 1b se o ASG nunca lançou lá. ASG não migra EBS multi-attach sozinho para outra AZ. Route 53 não elimina a necessidade de ASG multi-AZ para compute. Insight: HA de verdade = ALB e ASG (e dados) alinhados em ≥2 AZs."
+    },
+    {
+      "id": 158,
+      "idx": 157,
+      "part_id": "aws-1.6",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 64,
+      "enunciado": "Produção típica: o parâmetro PubliclyAccessible deve ficar como?",
+      "alternativas": [
+        "true com SG 0.0.0.0/0 para o ALB alcançar o SQL",
+        "true somente se Multi-AZ estiver off",
+        "false — app na VPC acessa por IP privado; ALB não precisa falar SQL na Internet",
+        "Irrelevante porque SG é ignorado no RDS"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Em produção típica, PubliclyAccessible=false: app na VPC fala com o endpoint privado; o ALB termina HTTP na borda e não precisa expor a porta SQL na Internet. true com SG 0.0.0.0/0 para o ALB 'alcançar SQL' é anti-pattern — ALB não substitui path privado app→RDS. Multi-AZ off não justifica tornar público. SG não é ignorado no RDS. Insight: RDS produção = privado + SG Source=sg-app na porta do engine."
+    },
+    {
+      "id": 205,
+      "idx": 204,
+      "part_id": "aws-1.7",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 102,
+      "enunciado": "S3 website endpoint vs REST API origin no CloudFront (ideia): por que OAI/OAC prefere REST/API origin?",
+      "alternativas": [
+        "Website endpoint é obrigatório com OAC",
+        "OAI/OAC integra com bucket via REST e policy; website endpoint é outro modelo de hosting público clássico",
+        "REST origin proíbe HTTPS no viewer",
+        "Website endpoint desliga Route 53"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "OAI/OAC amarra o CloudFront ao bucket via origin REST/API e bucket policy (Principal do OAI/OAC). O website endpoint do S3 é outro modelo (hosting estático clássico, muitas vezes público) e não é o caminho preferido com OAI/OAC. Website endpoint não é obrigatório com OAC. REST origin não proíbe HTTPS no viewer — viewer protocol é política da distribuição. Website endpoint não 'desliga' Route 53. Insight: origem S3 privada no CF → REST + OAC/OAI; website endpoint costuma ser anti-pattern com origem restrita."
+    },
+    {
+      "id": 224,
+      "idx": 223,
+      "part_id": "aws-1.8",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 60,
+      "enunciado": "ChangeMessageVisibility serve para quê durante um job longo?",
+      "alternativas": [
+        "Converter standard em FIFO in-place",
+        "Criar o tópico SNS",
+        "Invalidar o CloudFront",
+        "Estender o invisibilidade da mensagem enquanto o processamento continua (evitar reentrega precoce)"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "ChangeMessageVisibility estende (ou ajusta) o período em que a mensagem fica invisível enquanto o job longo continua — evita reentrega precoce antes do DeleteMessage. Não converte standard em FIFO in-place. Não cria tópico SNS. Não invalida CloudFront. Insight: visibility inicial generosa ou heartbeats com ChangeMessageVisibility em processamento de duração variável."
+    },
+    {
+      "id": 264,
+      "idx": 263,
+      "part_id": "aws-1.9",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 85,
+      "enunciado": "describe-key mostra KeyState=PendingDeletion. Ação para recuperar uso antes do purge?",
+      "alternativas": [
+        "create-invalidation no CloudFront",
+        "cancel-key-deletion e ensure KeyState Enabled com policies intactas",
+        "terminate nas instances",
+        "delete-bucket force"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Com KeyState=PendingDeletion, a recuperação antes do purge é cancel-key-deletion e garantir KeyState Enabled com policies intactas. create-invalidation no CloudFront não restaura CMK. terminate de instances não cancela deletion da chave. delete-bucket force apaga bucket, piora o cenário de dados. Insight: janela de waiting period existe para esse cancel; depois do purge, decrypt histórico some."
+    },
+    {
+      "id": 22,
+      "idx": 21,
+      "part_id": "aws-1.1",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 86,
+      "enunciado": "aws sts get-caller-identity retorna Arn …:assumed-role/AppRole/session. Interpretação?",
+      "alternativas": [
+        "O principal está usando o root user sem MFA",
+        "A sessão atual é de uma role assumida (credenciais temporárias de role)",
+        "Não há conta AWS válida",
+        "O bucket S3 da conta está público"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Arn no formato …:assumed-role/AppRole/session indica que a sessão atual veio de uma role assumida, com credenciais temporárias STS — não de um IAM user permanente. Não significa root sem MFA: root teria ARN de root user, não assumed-role. Conta AWS inválida não retornaria esse Arn estruturado com Account/UserId. Publicidade do bucket S3 não aparece em get-caller-identity. Insight: leia o path do Arn — assumed-role/<RoleName>/<session> confirma role assumption."
+    },
+    {
+      "id": 291,
+      "idx": 290,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 80,
+      "enunciado": "Dead-letter queue / on-failure destination (ideia) para async invoke: propósito?",
+      "alternativas": [
+        "Aumentar memory automaticamente",
+        "Capturar eventos que esgotaram retries para análise (não perder silenciosamente)",
+        "Remover a need de IAM",
+        "Converter a function em EC2"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "DLQ ou on-failure destination em invoke assíncrono captura eventos que esgotaram retries para análise — evita perda silenciosa. Não aumenta memory automaticamente. Não remove a necessidade de IAM (a destination ainda exige permissões). Não converte a function em EC2. Insight: async sem destino de falha = risco de sumiço após retries; pareie com alarmes no DLQ/destino."
+    }
+  ]
+}

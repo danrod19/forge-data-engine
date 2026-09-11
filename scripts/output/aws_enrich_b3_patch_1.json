@@ -1,0 +1,124 @@
+{
+  "patched": [
+    {
+      "id": 19,
+      "enunciado": "An IAM Allow statement includes Condition aws:MultiFactorAuthPresent = true for a sensitive API. Ops must limit when the Allow applies without redesigning VPC peering or Route 53. What is the role of that Condition?",
+      "alternativas": [
+        "Change the physical data-center region of the hardware",
+        "Create automatic VPC peering with another account",
+        "Restrict the Allow to matching contexts (e.g. MFA present, source IP, tags)",
+        "Replace the VPC's private Route 53 hosted zone"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "A Condition restringe quando o Statement Allow vale — MFA presente, SourceIp, tags, etc. — sem alterar topologia de rede ou DNS. Trocar região física do hardware está fora do escopo de IAM. Condition não cria VPC peering automático. Não substitui Route 53 privado da VPC. Insight: Condition = 'só se…'; se a opção fala em hardware, peering ou DNS, não é papel de Condition."
+    },
+    {
+      "id": 278,
+      "enunciado": "A Lambda function completes invokes successfully, but no log streams appear in CloudWatch Logs. The execution role lacks logs:CreateLogGroup, CreateLogStream, and PutLogEvents. VPC and load balancer config are unrelated. What is the typical symptom?",
+      "alternativas": [
+        "Invokes may 'succeed' but logs never show in CloudWatch (or fail creating the log stream)",
+        "The VPC is deleted",
+        "The related SQS queue becomes FIFO by itself",
+        "The ALB loses its HTTPS listener on port 443"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Sem permissões de logs na execution role, a function pode até terminar o invoke, mas o runtime não cria log group/stream nem escreve eventos — CloudWatch fica vazio ou falha ao criar o stream. A VPC não é apagada. SQS não vira FIFO sozinho. ALB não perde o listener 443 por falta de permissão de log. Insight: 'function ok, CloudWatch vazio' → cheque a role de logs antes de achar que o código não rodou."
+    },
+    {
+      "id": 321,
+      "enunciado": "A worker calls DynamoDB BatchWriteItem and receives HTTP 200 with some UnprocessedItems still present. Raising only the Lambda timeout or switching to Scan will not finish the write. What should the client do?",
+      "alternativas": [
+        "Ignore UnprocessedItems and only increase the Lambda timeout",
+        "Delete the DynamoDB table",
+        "Retry the UnprocessedItems with backoff; do not assume the whole batch was written",
+        "Replace the write path with a Scan"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "BatchWriteItem pode gravar só parte do lote: UnprocessedItems lista o que falhou (throttle, tamanho, etc.). O cliente deve retentar esses itens com backoff/jitter até esvaziar — nunca assumir sucesso total só porque a chamada retornou 200. Só aumentar timeout da Lambda não reprocessa os itens faltantes. Apagar a tabela destrói dados. Scan é leitura e não escreve. Insight: trate BatchWriteItem como at-most-once por item e sempre cheque UnprocessedItems no loop."
+    },
+    {
+      "id": 334,
+      "enunciado": "An Auto Scaling group should scale out when average CPU exceeds 60%, but DesiredCapacity never changes. CloudFront price class, apex CNAME, and S3 object TTL are already correct. What should Ops verify first?",
+      "alternativas": [
+        "Alarm in ALARM? correct Auto Scaling action? group/instance metric and ASG policies enabled",
+        "Only the CloudFront distribution price class",
+        "Only the apex domain CNAME record",
+        "Only the TTL of an object in S3"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Se o ASG deveria subir com CPU > 60% e desired não muda, verifique alarme em ALARM, action apontando para a scaling policy certa, métrica do grupo/instances, policies habilitadas e limites min/max/desired. Price class do CloudFront, CNAME do apex e TTL de objeto S3 não controlam DesiredCapacity. Insight: na prova, 'ASG não sobe' quase sempre é alarme/action/policy/limites, não CDN ou DNS."
+    },
+    {
+      "id": 38,
+      "enunciado": "An ALB target group health-checks instances on port 8080. The app process listens on 8080, but the instance Security Group has no inbound rule for 8080 from the ALB. NACLs and default routes are unchanged. What is the typical effect?",
+      "alternativas": [
+        "Port 8080 inbound is allowed by default on every Security Group",
+        "The NACL automatically becomes allow-all",
+        "The 0.0.0.0/0 route is removed from the subnet",
+        "Inbound 8080 connections are denied (implicit SG deny) → health check times out"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Security Group nega por omissão o que não está explicitamente permitido. Sem inbound 8080 do ALB, o health check dá timeout mesmo com o processo escutando. Porta 8080 não é permitida por default em todo SG. NACL não vira allow-all sozinha. Rota 0.0.0.0/0 não some por falta de regra de SG. Insight: health check do ALB → confirme porta/protocolo no target group e inbound do SG do target liberando o SG (ou CIDR) do ALB."
+    },
+    {
+      "id": 65,
+      "enunciado": "An intern overwrote config/prod.json in an S3 bucket that already has Versioning Enabled. The team must recover the previous object without making the bucket public or converting it to EBS. What is the direct benefit of versioning here?",
+      "alternativas": [
+        "You can restore the previous object version (history) instead of relying only on an external backup",
+        "The bucket no longer requires IAM for GetObject",
+        "The bucket becomes public automatically so rollback is easier",
+        "The bucket is converted into an EBS filesystem"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Com versioning Enabled, o overwrite não apaga o histórico: a versão anterior permanece recuperável (list-object-versions / restaurar), reduzindo dependência exclusiva de backup externo. Versioning não remove a necessidade de IAM para GetObject. Não torna o bucket público para rollback. Não converte o bucket em filesystem EBS — S3 continua object storage. Insight: overwrite acidental + versioning on → recupere a versão, não recrie o objeto do zero."
+    },
+    {
+      "id": 101,
+      "enunciado": "aws ec2 describe-instances shows an instance in State terminated. Ops runs start-instances expecting the same instance id to return to running. Spot bids and cross-Region EBS reconnect are not in scope. What is the expected result?",
+      "alternativas": [
+        "The instance always returns to running with the same instance id",
+        "Start fails / does not apply — terminated cannot restart; launch a new instance (e.g. from an AMI)",
+        "The EBS volume reconnects by itself in another Region",
+        "The Spot bid is recreated automatically"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Estado terminated encerra o ciclo de vida: start-instances não se aplica — a instance não volta running com o mesmo id; é preciso lançar nova instance (AMI/launch template). Volume EBS não se reconecta sozinho em outra Região por causa do start. Spot bid não é recriado automaticamente só porque alguém tentou start em terminated. Insight: terminated é fim de ciclo; recovery = AMI/snapshot + launch, não start."
+    },
+    {
+      "id": 146,
+      "enunciado": "During an ASG rolling deploy, clients see intermittent 503s while old instances are replaced. Ops must keep capacity online and cannot set desired=0, point health to a fixed 500 URL, or remove AZ subnets mid-deploy. Which mitigation aligns with health?",
+      "alternativas": [
+        "Health check grace period / ensure new targets are healthy before draining too many old ones",
+        "Set desired=0 for the entire deploy",
+        "Point the health path at an external URL that always returns 500",
+        "Remove all subnets of one AZ mid-deploy with no plan"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "No rolling deploy, derrubar antigas antes das novas ficarem healthy gera 503. Grace period e/ou garantir novos targets healthy (e min healthy %) antes de terminar demais mitiga. desired=0 zera backends. Health path para URL externa 500 marca tudo unhealthy. Remover subnets de uma AZ no meio do deploy sem plano reduz HA. Insight: grace period curto demais marca 'starting' como unhealthy e acelera replace desnecessário."
+    },
+    {
+      "id": 177,
+      "enunciado": "An RDS database is slow under load. The team enables Enhanced Monitoring and Performance Insights to diagnose OS/SQL waits and top queries. Opening 0.0.0.0/0, enabling Multi-AZ alone, or deleting snapshots is out of scope. What are these features for in troubleshooting?",
+      "alternativas": [
+        "OS/SQL metrics to diagnose CPU, waits, and connections — they do not replace SG or backup design",
+        "They automatically open the DB Security Group to 0.0.0.0/0",
+        "They create Multi-AZ by themselves",
+        "They delete old snapshots by default with no retention policy"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Enhanced Monitoring e Performance Insights entregam métricas de OS e do engine (CPU, waits, conexões, SQL top) para diagnosticar lentidão — não substituem SG, backup ou desenho de rede. Não abrem 0.0.0.0/0. Não criam Multi-AZ sozinhos. Não apagam snapshots por padrão. Insight: use PI para 'qual query/wait' com CloudWatch alarms; SG e backup continuam no checklist de segurança e resiliência."
+    },
+    {
+      "id": 201,
+      "enunciado": "For www.exemplo.com, Ops can use a CNAME to d111.cloudfront.net or a Route 53 ALIAS to the same CloudFront distribution. MX records are irrelevant; apex CNAME limits do not apply to www. Are both valid on a subdomain, and which is often preferred on AWS?",
+      "alternativas": [
+        "CNAME is invalid on any subdomain",
+        "ALIAS is forbidden on www",
+        "Yes on a subdomain; ALIAS is still preferable for AWS integration and routing/health options",
+        "Only MX records can point a hostname to CloudFront"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Em subdomínio (ex.: www), CNAME para d111.cloudfront.net e ALIAS (Route 53) para a mesma distribuição são ambos válidos. ALIAS ainda é preferível na AWS: resolve para IPs da edge, evita cadeia CNAME extra e permite routing policies/health checks nativos. CNAME não é inválido em qualquer subdomínio — o problema clássico é no apex. ALIAS não é proibido em www. MX não aponta hostname web a CloudFront. Insight: apex → ALIAS/A-alias; subdomínio → CNAME ou ALIAS."
+    }
+  ]
+}

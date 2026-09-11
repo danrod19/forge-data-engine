@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { CCNA_DOMAINS, domainAccentClasses } from "@/data/domains";
 import { MODULE_1_PARTS, MODULE_1_TITLE, MODULE_1_WEIGHT } from "@/data/module-1-fundamentos";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/types/question";
+import { launchCopy } from "@/data/copy";
 import { useTrack } from "@/lib/track-context";
 import { SobreProvaAws } from "@/components/sobre/SobreProvaAws";
 
@@ -72,6 +73,10 @@ export function SobreProva() {
           </div>
         </div>
       </div>
+
+      <Section delay={0.04} icon={Zap} title="O CCNA Forge" accent="cyan">
+        <p>{launchCopy.paragraph}</p>
+      </Section>
 
       {/* O que é */}
       <Section

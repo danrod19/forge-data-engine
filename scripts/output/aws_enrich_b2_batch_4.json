@@ -1,0 +1,215 @@
+{
+  "batch": 4,
+  "items": [
+    {
+      "id": 109,
+      "idx": 108,
+      "part_id": "aws-1.4",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 88,
+      "enunciado": "Data volume com DeleteOnTermination false; root com true. Após terminate, o que esperar?",
+      "alternativas": [
+        "Root e data sempre permanecem",
+        "Root e data sempre são apagados",
+        "Root tipicamente removido; data volume pode permanecer disponível na AZ para reattach",
+        "Os volumes viram snapshots automaticamente sempre"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "DeleteOnTermination é por volume: root true tipicamente é removido no terminate; data com false pode permanecer available na AZ para reattach. Não é 'sempre permanecem' nem 'sempre apagados' os dois. Terminate não cria snapshots automaticamente sempre. Insight: antes de terminate, revise DeleteOnTermination em cada volume e tire snapshot do que importa."
+    },
+    {
+      "id": 129,
+      "idx": 128,
+      "part_id": "aws-1.5",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 72,
+      "enunciado": "Métrica típica de target tracking com ALB para escalar web tier (ideia)?",
+      "alternativas": [
+        "Número de snapshots EBS na conta",
+        "Request count por target (ALB) ou CPU utilization da ASG",
+        "Tamanho do bucket S3 de logs",
+        "Quantidade de IAM users"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Target tracking típico no web tier usa RequestCountPerTarget (métrica do ALB) ou CPUUtilization do grupo — ambas refletem carga útil para escalar. Número de snapshots EBS não mede demanda da app. Tamanho do bucket de logs não é sinal de scaling do web tier. Quantidade de IAM users é irrelevante para capacity. Insight: alinhe a métrica ao gargalo real (CPU vs requests); ALB RequestCountPerTarget é clássico atrás de ALB."
+    },
+    {
+      "id": 176,
+      "idx": 175,
+      "part_id": "aws-1.6",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 61,
+      "enunciado": "Read replica cross-Region (ideia leve) serve a qual objetivo?",
+      "alternativas": [
+        "Failover síncrono Multi-AZ na mesma AZ apenas",
+        "Substituir o Security Group",
+        "DR/leitura em outra Região com RPO assíncrono (não idêntico a Multi-AZ local)",
+        "Eliminar a necessidade de KMS"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Read replica cross-Region replica de forma assíncrona para outra Região: serve DR geográfico e leituras locais com RPO de segundos/minutos — não é o mesmo que Multi-AZ síncrono na mesma Região. Não é failover síncrono Multi-AZ 'na mesma AZ'. Não substitui Security Group. Não elimina KMS (criptografia segue sendo decisão à parte). Insight: use cross-Region replica para DR/leitura global; Multi-AZ para HA de AZ com RPO~0 de escrita na Região primária."
+    },
+    {
+      "id": 195,
+      "idx": 194,
+      "part_id": "aws-1.7",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 77,
+      "enunciado": "Alias para CloudFront no record www: qual benefício vs A com IP fixo da edge?",
+      "alternativas": [
+        "ALIAS desliga HTTPS",
+        "ALIAS proíbe invalidation",
+        "ALIAS obriga bucket público",
+        "ALIAS acompanha a distribuição CloudFront (targets AWS dinâmicos) sem fixar IP de edge"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Alias para a distribuição CloudFront acompanha o target AWS dinâmico (IPs de edge mudam); um A com IP fixo de edge quebra quando a borda muda. Alias não desliga HTTPS, não proíbe invalidation e não obriga bucket público. Insight: sempre Alias (ou automação equivalente) para ALB/CloudFront — nunca pinne IP de edge em produção."
+    },
+    {
+      "id": 235,
+      "idx": 234,
+      "part_id": "aws-1.8",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 58,
+      "enunciado": "Consumers em ASG atrás de fila: como o ASG escala (ideia)?",
+      "alternativas": [
+        "Somente CPU do RDS",
+        "Métrica de profundidade da fila / idade da msg (approx) para desired capacity",
+        "Somente contagem de buckets S3",
+        "Somente número de hosted zones"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "ASG de consumers atrás de SQS tipicamente escala por profundidade da fila (ApproximateNumberOfMessages) ou idade da mensagem mais velha — desired capacity sobe com backlog. Só CPU do RDS não reflete fila de workers. Contagem de buckets S3 e número de hosted zones são métricas irrelevantes. Insight: alarme + scaling policy na fila evita backlog crescente sem overprovision fixo."
+    },
+    {
+      "id": 250,
+      "idx": 249,
+      "part_id": "aws-1.9",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 80,
+      "enunciado": "CMK com KeyState=Disabled. Sintoma ao ler dados antigos cifrados com essa chave?",
+      "alternativas": [
+        "Decrypt/uso da chave falha até reabilitar (enable-key); dados permanecem cifrados",
+        "A AWS apaga automaticamente todos os objetos S3",
+        "O ALB converte para HTTP",
+        "A fila SQS vira FIFO"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Com KeyState=Disabled, Decrypt/uso da CMK falha até enable-key; os dados cifrados permanecem no storage — não são apagados. A AWS não apaga automaticamente todos os objetos S3 quando a chave é desabilitada. ALB não converte para HTTP por causa de KMS. Fila SQS não vira FIFO por KeyState. Insight: disabled = indisponibilidade criptográfica temporária; pending deletion é o caminho que leva à perda permanente de decrypt."
+    },
+    {
+      "id": 25,
+      "idx": 24,
+      "part_id": "aws-1.1",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 83,
+      "enunciado": "Recebeu AccessDenied em uma API no terminal. Qual primeiro passo prático de TShoot?",
+      "alternativas": [
+        "Confirmar o principal com get-caller-identity e a Action/Resource da mensagem; depois checar policies/trust attached",
+        "Recriar a VPC inteira e todas as subnets",
+        "Trocar o tipo de instância para bare metal",
+        "Apagar o CloudWatch Log Group da aplicação"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Primeiro passo prático: confirmar o principal com get-caller-identity e a Action/Resource da mensagem; depois checar policies Allow, Deny explícito, trust (se role) e resource policy. Recriar a VPC inteira não explica AccessDenied de API de controle. Trocar instance type para bare metal não altera autorização IAM. Apagar Log Group remove evidência sem corrigir permissão. Insight: AccessDenied de API AWS ≠ primeiro recriar rede; isole identidade e policies."
+    },
+    {
+      "id": 277,
+      "idx": 276,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 80,
+      "enunciado": "Env var DB_PASSWORD=SuperSecret no console. Anti-pattern: por quê e alternativa?",
+      "alternativas": [
+        "Secret em plaintext no config; use Secrets Manager/SSM e GetSecretValue na role",
+        "É obrigatório pela AWS em toda Lambda",
+        "Substitui a need de CloudWatch",
+        "Aumenta o reserved concurrency automaticamente"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "DB_PASSWORD em variável de ambiente no console deixa o secret em plaintext na config — anti-pattern; use Secrets Manager ou SSM SecureString e GetSecretValue (com permissão na role). Não é obrigatório pela AWS em toda Lambda. Não substitui CloudWatch. Não aumenta reserved concurrency. Insight: em prova, senha em env = resposta errada quase sempre frente a Secrets Manager."
+    },
+    {
+      "id": 305,
+      "idx": 304,
+      "part_id": "aws-1.11",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 52,
+      "enunciado": "Query vs Scan: qual a diferença operacional crítica?",
+      "alternativas": [
+        "Query usa key condition na partição; Scan lê potencialmente toda a tabela (mais RCU e latência em escala)",
+        "Scan é sempre grátis",
+        "Query só funciona em S3",
+        "Scan garante strongly consistent em GSI sempre"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Query aplica key condition na partição (e opcionalmente SK): previsível em RCU. Scan lê potencialmente a tabela inteira — mais RCU e latência em escala. Scan não é grátis. Query não é recurso de S3. Scan não garante strongly consistent em GSI (GSI é eventual). Insight: se dá para expressar com PK/SK, prefira Query; Scan é exceção (admin/analytics)."
+    },
+    {
+      "id": 349,
+      "idx": 348,
+      "part_id": "aws-1.12",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 61,
+      "enunciado": "Log stream por instance/function: por que retention no group?",
+      "alternativas": [
+        "Cada stream ignora retention do group sempre",
+        "Retention apaga a execution role",
+        "Policy de retenção aplica ao group inteiro (streams herdam) — controla custo e compliance",
+        "Retention cria Multi-AZ"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Retention é configurada no log group e aplica a todos os streams filhos (instance/function) — controla custo e compliance de retenção. Streams não ignoram a policy do group. Retention não apaga execution role. Retention não cria Multi-AZ. Insight: um put-retention-policy no group cobre todos os streams; Never expire é o vilão de custo mais comum."
+    }
+  ]
+}

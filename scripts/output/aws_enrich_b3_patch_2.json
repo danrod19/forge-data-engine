@@ -1,0 +1,124 @@
+{
+  "patched": [
+    {
+      "id": 226,
+      "enunciado": "A payments team uses Amazon SQS with a dead-letter queue. After fixing a consumer bug, ops plans a DLQ redrive back to the main queue so backlog can be reprocessed. The constraint is that poison messages must not loop endlessly if any defect remains. What is the main operational risk of redrive before the consumer is truly fixed?",
+      "alternativas": [
+        "Redrive automatically deletes the related SNS topic",
+        "Redrive requires PubliclyAccessible on the queue",
+        "Redrive only works with a CNAME at the zone apex",
+        "Reprocessing poison messages without fixing the bug can refill the DLQ again"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Redrive move mensagens da DLQ de volta à fila principal para reprocessamento. Se o bug do consumer (ou o formato poison) ainda não foi corrigido, as mesmas mensagens falham de novo, esgotam maxReceiveCount e retornam à DLQ — loop operacional caro. Redrive não apaga tópico SNS. PubliclyAccessible é conceito de RDS/EC2, não de SQS. CNAME no apex é DNS e irrelevante a filas. Insight: corrija código/schema, descarte msgs irrecuperáveis, só então redrive com alarme de ApproximateNumberOfMessages e DLQ depth."
+    },
+    {
+      "id": 258,
+      "enunciado": "Producers call SendMessage on an Amazon SQS queue encrypted with SSE-KMS using a customer managed key. Callers already have sqs:SendMessage, but sends still fail with KMS-related AccessDenied. Security forbids weakening encryption to SSE-SQS. Besides sqs:SendMessage, what permission is typically still missing for the sending principal?",
+      "alternativas": [
+        "ec2:RunInstances is mandatory",
+        "route53:ListHostedZones",
+        "kms:GenerateDataKey / CMK usage as required by SQS SSE-KMS docs for the sending principal",
+        "elasticloadbalancing:CreateLoadBalancer"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Com SSE-KMS na fila, o producer precisa de sqs:SendMessage e permissões KMS na CMK (tipicamente kms:GenerateDataKey e uso conforme a doc do SSE-KMS), além de key policy que permita o principal. Sem isso, SendMessage falha mesmo com Allow em SQS. ec2:RunInstances não cifra mensagem SQS. route53:ListHostedZones é DNS. CreateLoadBalancer é ELB. Insight: S3/SQS/EBS com SSE-KMS → some sempre a action do serviço com kms na CMK; cheque IAM identity e key policy."
+    },
+    {
+      "id": 21,
+      "enunciado": "A Lambda function must call dynamodb:Query on a specific table. The design must follow least privilege for AWS API authorization and must not confuse network controls with IAM. In the usual Lambda design, where should the Allow for dynamodb:Query be attached?",
+      "alternativas": [
+        "On the Lambda function’s execution role",
+        "On the Lambda Security Group as a TCP 443 rule",
+        "Only on the NACL of the public subnet",
+        "On the VPC DHCP option set"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "No desenho usual, dynamodb:Query vai na execution role da function: é essa role que o serviço Lambda assume para chamar APIs AWS. Security Group (Lambda em VPC) filtra tráfego de rede (ex. TCP 443 ao endpoint), não concede autorização DynamoDB. NACL controla tráfego na borda da subnet, não API IAM. DHCP option set configura DNS/NTP da VPC e é irrelevante para IAM. Insight: permissão de serviço AWS → role do compute; SG/NACL resolvem path de rede, não Action DynamoDB."
+    },
+    {
+      "id": 279,
+      "enunciado": "An SQS event source mapping is enabled and the queue holds about 500 messages, yet the target Lambda never runs. Ops must restore processing without changing CloudFront or RDS topology. Which checks should they run first?",
+      "alternativas": [
+        "Only the CloudFront TTL",
+        "Only the RDS Multi-AZ setting with no consumers",
+        "Only the root EBS volume type",
+        "Execution role permissions (sqs:ReceiveMessage/DeleteMessage), mapping state, batch size, and invoke errors"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Com mapping enabled e fila cheia mas Lambda idle: verifique permissões da role (sqs:ReceiveMessage, DeleteMessage, GetQueueAttributes), estado do event source mapping, batch size e erros de invoke/DLQ no console. TTL do CloudFront é CDN e não consome SQS. Multi-AZ do RDS não move mensagem da fila. Tipo de EBS root é disco de EC2. Insight: ApproximateNumberOfMessages sobe + Lambda parada → IAM do mapping, estado disabled/throttled ou erros de invoke — não DNS nem storage."
+    },
+    {
+      "id": 319,
+      "enunciado": "A product catalog lives in DynamoDB. Compliance requires recovery if someone accidentally deletes or corrupts items, without treating PITR as a substitute for Multi-AZ durability already built into the service. What is the main purpose of DynamoDB point-in-time recovery (PITR)?",
+      "alternativas": [
+        "Increase RCU for free",
+        "Automatically create a GSI",
+        "Restore the table to a second within roughly the last 35 days (protection against delete/corruption)",
+        "Replace Multi-AZ (already built-in)"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "PITR permite restaurar a tabela a um segundo dentro da janela (ideia: até 35 dias) — proteção operacional contra delete/corrupção acidental, criando uma nova tabela a partir do ponto escolhido. Não aumenta RCU de graça. Não cria GSI automático. Não 'substitui Multi-AZ': durabilidade multi-AZ já é built-in no DynamoDB. Insight: PITR é DR/operacional de tabela no tempo; Multi-AZ/região e Global Tables são outras dimensões de HA e DR geográfico."
+    },
+    {
+      "id": 355,
+      "enunciado": "On-call wants CloudWatch alarms to catch brief breaches quickly. They set Evaluation periods = 5 and Datapoints to alarm = 1, keeping the same threshold. What is the practical behavior of that M-of-N setting?",
+      "alternativas": [
+        "It always requires 5 breaches",
+        "More sensitive: 1 breach in the 5-period window can trigger (depending on config) — higher flapping risk",
+        "It disables the alarm",
+        "It converts the metric into a log"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Com Evaluation periods = 5 e Datapoints to alarm = 1, o alarme fica mais sensível: uma violação na janela de 5 períodos pode levar a ALARM (conforme a config) — detecção rápida, porém maior risco de flapping e páginas falsas. Não exige sempre 5 violações (isso seria 5 de 5). Não desliga o alarme. Não converte métrica em log. Insight: M de N baixo → rápido e ruidoso; M de N alto → mais estável e lento; escolha conforme SLA de detecção versus custo de ruído."
+    },
+    {
+      "id": 44,
+      "enunciado": "Engineers SSH to a bastion host. The client reports timeout, not connection refused. They must interpret the symptom before changing application code or S3 logging. What is the initial network reading?",
+      "alternativas": [
+        "The SSH daemon definitely actively refused the connection",
+        "More consistent with path filtering (SG/NACL/route) than the service actively refusing on the port",
+        "It is always the S3 log bucket policy",
+        "It is always a missing Elastic IP on the NAT Gateway"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Timeout indica que os pacotes não completam o handshake TCP no caminho (SG/NACL drop, rota ausente, asymmetric routing, etc.). Connection refused (RST) indica que o host respondeu e o daemon/porta recusou ativamente. Portanto o sintoma aponta mais para filtragem de path do que para SSH recusando na porta. «Daemon recusou com certeza» é a leitura típica de refused, não de timeout. Bucket policy de S3 de logs não governa conectividade SSH. Falta de EIP no NAT não é a primeira hipótese para cliente→bastion em subnet pública com rota IGW. Insight: timeout vs refused separa firewall/path de processo down."
+    },
+    {
+      "id": 68,
+      "enunciado": "An application GetObject call fails with AccessDenied and the error text cites an explicit deny in an identity-based policy. The team must restore access without making the object world-readable. What should they do?",
+      "alternativas": [
+        "Add Allow s3:* without inspecting the Deny",
+        "Publish the object with ACL public-read and ignore IAM",
+        "Only change the CLI default Region",
+        "Locate and adjust the Deny statement in the principal’s policy that blocks GetObject"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Na avaliação IAM, Deny explícito vence qualquer Allow. A mensagem 'explicit deny in an identity-based policy' aponta para um statement Deny (ou Condition que o ativa) na policy do principal — localize e ajuste esse Deny. Empilhar Allow s3:* sem inspecionar o Deny não remove o bloqueio. ACL public-read ignora o problema de IAM e piora exposição. Trocar só a região default do CLI não altera o documento de policy. Insight: texto explicit deny = caçar e corrigir o Deny, não ampliar Allow."
+    },
+    {
+      "id": 112,
+      "enunciado": "Ops must back up an EBS data volume (vol-prod) while the EC2 instance stays running to meet RPO. Consistency for a busy database may need application coordination, but the snapshot itself must not require terminating the instance. What is the expected behavior when a snapshot is started with the instance running?",
+      "alternativas": [
+        "Snapshots only work if the instance is terminated",
+        "You can snapshot an in-use volume; app consistency may require freeze/quiesce depending on the workload",
+        "The snapshot immediately deletes the original volume",
+        "The snapshot moves the instance to another Region"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Pode-se iniciar snapshot de volume com a instance running; é operação comum. Consistência de aplicação (banco com writes ativos) pode exigir freeze/quiesce do filesystem/app ou snapshot gerenciado do serviço (ex. RDS). Snapshots não exigem instance terminated. O snapshot não apaga o volume original nem move a instance de Região. Insight: backup EBS = snapshot crash-consistent por padrão; DB crítico = coordenar consistência com a app ou usar backups nativos do serviço quando couber."
+    },
+    {
+      "id": 132,
+      "enunciado": "A production ALB target group is attached to an Auto Scaling group configured with desired=0, min=0, and max=10. No other capacity source registers targets. What symptom should operators expect for client traffic?",
+      "alternativas": [
+        "The ALB returns 200 with no backends",
+        "The ASG always launches 10 instances immediately",
+        "Clients receive 503 (or equivalent failure) because no healthy targets are registered",
+        "The launch template is deleted"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Com desired=0 e min=0 não há instances registradas healthy no target group; o ALB de produção devolve 503 (ou falha equivalente) aos clientes. ALB não anuncia 200 sem backends saudáveis. max=10 não lança capacity sozinho se desired/min estão em 0. O launch template não é apagado por desired=0. Insight: TG attached + desired 0 = borda viva sem capacity — sintoma clássico de 503 após scale-in agressivo ou desired zerado por engano."
+    }
+  ]
+}

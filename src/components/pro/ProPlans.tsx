@@ -68,8 +68,8 @@ export function ProPlans({ className }: ProPlansProps) {
       </div>
 
       <p className="text-[11px] leading-relaxed text-slate-500">
-        Após o pagamento, a ativação pode levar alguns minutos. Já pagou?
-        Escreva para{" "}
+        O pagamento redireciona de volta ao app. Se o PRO não aparecer, escreva
+        para{" "}
         <a
           href={CONTACT_MAILTO}
           className="font-mono text-neon-cyan underline-offset-2 hover:underline"

@@ -1,0 +1,218 @@
+{
+  "batch": 2,
+  "items": [
+    {
+      "id": 237,
+      "idx": 236,
+      "part_id": "aws-1.8",
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 68,
+      "enunciado": "Por que combinar SNS + SQS em vez de só SNS HTTP ao endpoint frágil?",
+      "alternativas": [
+        "HTTP é proibido em toda a AWS",
+        "SQS bufferiza e reentrega se o consumer HTTP estiver fora; desacopla picos e falhas temporárias",
+        "SQS remove a necessidade de IAM",
+        "SNS não suporta múltiplos subscribers"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "SNS + SQS bufferiza: se o endpoint HTTP do subscriber estiver fora, a fila guarda e reentrega depois — absorve picos e falhas temporárias. HTTP não é 'proibido em toda a AWS', mas endpoint frágil sem buffer perde eventos. SQS não remove a necessidade de IAM. SNS suporta múltiplos subscribers — por isso o fan-out. Insight: prefer SNS→SQS→worker a SNS→HTTP direto quando o consumidor pode oscilar."
+    },
+    {
+      "id": 247,
+      "idx": 246,
+      "part_id": "aws-1.9",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 38,
+      "enunciado": "Grant KMS (ideia leve) serve para quê?",
+      "alternativas": [
+        "Delegar permissões de uso da chave a um principal de forma controlada/temporária sem reescrever toda a key policy",
+        "Substituir o NACLs da VPC",
+        "Criar hosted zone pública",
+        "Desligar MFA do root"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Grant KMS delega permissões de uso da chave a um principal de forma controlada/temporária sem reescrever a key policy inteira — útil para workloads pontuais. Não substitui NACLs da VPC (filtro de rede). Não cria hosted zone pública (Route 53). Não desliga MFA do root (conta/IAM). Insight: grant = delegação operacional na chave; mudanças permanentes de quem pode administrar a CMK continuam na key policy."
+    },
+    {
+      "id": 20,
+      "idx": 19,
+      "part_id": "aws-1.1",
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 75,
+      "enunciado": "Qual tema está fora do escopo profundo do piloto IAM foundations (aws-1.1)?",
+      "alternativas": [
+        "Users, groups e least privilege",
+        "Roles, trust e instance profile",
+        "AccessDenied e Deny explícito",
+        "Organizations SCPs profundos e IAM Identity Center lab completo"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "O piloto aws-1.1 cobre IAM clássico da conta: users/groups/least privilege, roles/trust/instance profile, AccessDenied e Deny explícito. Organizations SCPs profundos e lab completo de IAM Identity Center ficam para parts posteriores de multi-account/federação. Insight: se a questão exigir SCP de Organizations em profundidade, não force só 'group IAM' como resposta completa."
+    },
+    {
+      "id": 286,
+      "idx": 285,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 44,
+      "enunciado": "Ephemeral storage /tmp (ideia): uso correto?",
+      "alternativas": [
+        "Substitui o S3 para dados de 10 anos",
+        "É o mesmo que EFS sempre montado por default",
+        "Espaço temporário por execution environment; não é storage durável entre deploys frios indefinidos",
+        "Persiste após delete da function"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "/tmp é storage efêmero do execution environment: útil para unpack, cache local curto e artefatos da invocação; não é durável entre ambientes frios indefinidos nem substitui objeto de longo prazo. Não substitui S3 para retenção de 10 anos. Não é EFS montado por default (EFS exige config explícita). Não persiste após delete da function. Insight: dados que precisam sobreviver → S3/EFS/Dynamo; /tmp é scratch do runtime."
+    },
+    {
+      "id": 310,
+      "idx": 309,
+      "part_id": "aws-1.11",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 38,
+      "enunciado": "Streams + Lambda (ideia): caso de uso?",
+      "alternativas": [
+        "Substituir a partition key",
+        "Desligar encryption",
+        "Criar o VPC peering automático",
+        "Reagir a inserts/updates/deletes (ex. invalidar cache, fan-out) de forma event-driven"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "DynamoDB Streams + Lambda reage a inserts/updates/deletes de forma event-driven (invalidar cache, fan-out, audit). Não substitui a partition key. Não desliga encryption. Não cria VPC peering automático. Insight: mude o item na tabela e deixe o stream disparar efeitos colaterais — evita polling."
+    },
+    {
+      "id": 348,
+      "idx": 347,
+      "part_id": "aws-1.12",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 46,
+      "enunciado": "High-resolution metrics (ideia 1s): trade-off?",
+      "alternativas": [
+        "Sempre grátis e obrigatório",
+        "Remove a need de dimensions",
+        "Maior granularidade e possível custo/volume; use quando period 60s é grosso demais",
+        "Desliga alarms"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "High-resolution metrics (~1s) dão granularidade maior quando period 60s é grosso demais, com trade-off de custo e volume de dados. Não são sempre grátis nem obrigatórias. Não removem a necessidade de dimensions. Não desligam alarms. Insight: reserve alta resolução para SLIs sensíveis; o padrão 60s cobre a maioria dos alarmes SAA."
+    },
+    {
+      "id": 39,
+      "idx": 38,
+      "part_id": "aws-1.2",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 64,
+      "enunciado": "Onde implantar o NAT Gateway no desenho clássico public/private?",
+      "alternativas": [
+        "Em subnet pública (com path ao IGW) para servir como target de saída das privadas",
+        "Somente dentro da instância RDS Multi-AZ",
+        "No usuário root IAM como 'anexo de rede'",
+        "Obrigatoriamente em outra Região para cada VPC"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "No desenho clássico public/private, o NAT Gateway fica em subnet pública (com rota ao IGW) para ser target 0.0.0.0/0 das route tables das privadas. Não fica 'dentro' da instância RDS Multi-AZ. Não é anexo de rede no usuário root IAM. Não precisa estar obrigatoriamente em outra Região para cada VPC — NAT é recurso regional na mesma VPC/AZs do desenho. Insight: NAT precisa path ao IGW; por isso mora na pública e as privadas apontam para ele."
+    },
+    {
+      "id": 85,
+      "idx": 84,
+      "part_id": "aws-1.3",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 67,
+      "enunciado": "No nível desta part, como tratar S3 Cross-Region Replication (CRR)?",
+      "alternativas": [
+        "Como lab completo multi-region com failover de app obrigatório em toda questão",
+        "Como recurso proibido de mencionar no SAA-C03",
+        "Como recurso exclusivo de Glacier Deep Archive",
+        "Como ideia de resiliência/DR de objetos; implementação deep fora do piloto foundations"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Nesta part de foundations, CRR entra como ideia de resiliência/DR de objetos entre Regiões; o lab multi-region com failover de app não é o foco obrigatório de toda questão. Não é proibido no SAA-C03 — aparece em desenho de DR. Também não é recurso exclusivo de Glacier Deep Archive: CRR replica objetos entre buckets (classes conforme regra). Insight: foundations = versioning/lifecycle no dia a dia; CRR = conceito de cópia cross-region, sem exigir runbook completo de failover."
+    },
+    {
+      "id": 99,
+      "idx": 98,
+      "part_id": "aws-1.4",
+      "score": 8,
+      "reasons": [
+        "short",
+        "dry_open",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 69,
+      "enunciado": "Como criar uma AMI reutilizável a partir de uma instance configurada?",
+      "alternativas": [
+        "Apenas copiar o Elastic IP para outro account",
+        "Somente exportar o Security Group",
+        "CreateImage / console Create AMI (baseado em snapshots dos volumes selecionados)",
+        "Desligar o versioning do S3 da conta"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "AMI reutilizável: CreateImage (CLI) ou Create AMI no console, baseado em snapshots dos volumes selecionados da instance. Copiar Elastic IP para outro account não captura disco/SO. Exportar só o Security Group copia regras de rede, não a imagem. Desligar versioning S3 da conta é irrelevante para criar AMI de EC2. Insight: padronize bake de AMI (golden image) em vez de configurar cada instance na mão."
+    },
+    {
+      "id": 147,
+      "idx": 146,
+      "part_id": "aws-1.5",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 46,
+      "enunciado": "ALB access logs (ideia) ajudam em qual TShoot?",
+      "alternativas": [
+        "Ver códigos HTTP, tempos e targets escolhidos para correlacionar 5xx/timeouts",
+        "Redimensionar EBS automaticamente",
+        "Criar IAM users",
+        "Alterar o CIDR da VPC"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "ALB access logs mostram status HTTP, latência e target escolhido — base para correlacionar 5xx, timeouts e backends ruins. Não redimensionam EBS automaticamente. Não criam IAM users. Não alteram CIDR da VPC. Insight: 502/504 no access log + target id → vá ao health e à app daquele target, não só ao CloudWatch genérico."
+    }
+  ]
+}

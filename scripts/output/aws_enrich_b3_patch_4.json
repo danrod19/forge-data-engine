@@ -1,0 +1,124 @@
+{
+  "patched": [
+    {
+      "id": 106,
+      "enunciado": "A customer-facing API runs on an EC2 instance in a public subnet. After a maintenance stop/start, clients that hardcoded the previous public IPv4 address fail to reconnect. Ops must keep a stable public IP across stop/start without redesigning the whole VPC. How should they provide a stable public address?",
+      "alternativas": [
+        "Associate an Elastic IP with the instance (or its ENI) per the design",
+        "Increase the size of the root volume",
+        "Switch the AMI to Windows",
+        "Disable source/destination check only"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "O public IP automático atribuído pela subnet pública muda após stop/start — não é estável. Para endereço público fixo, associe um Elastic IP à instance (ou à ENI) conforme o design; ele sobrevive a stop/start enquanto permanecer associado. Aumentar o root volume não fixa IP. Trocar a AMI para Windows não preserva o public IP automático. Desligar source/dest check é para NAT/router/appliance, não para estabilidade de endereço. Insight: DNS ou clientes com IP fixo → Elastic IP (e lembre do custo horário se o EIP ficar associado sem instance em execução)."
+    },
+    {
+      "id": 123,
+      "enunciado": "A three-tier web app places an Application Load Balancer in public subnets and EC2 targets in private subnets. The target group forwards to port 8080. Security requires least privilege so only the ALB can reach the app port, while clients reach the ALB on HTTPS. Which Security Group pattern is correct?",
+      "alternativas": [
+        "sg-app allows 0.0.0.0/0 on all ports and sg-alb has no inbound rules",
+        "sg-alb inbound 443 from clients; sg-app inbound 8080 with Source = sg-alb",
+        "Only NACL Deny all between public and private subnets",
+        "No Security Groups needed if the Auto Scaling group is enabled"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "O padrão least-privilege SAA é: sg-alb com inbound 443 dos clientes (ou do edge); sg-app com inbound 8080 cujo Source é o security group do ALB — não 0.0.0.0/0. Assim só o balanceador alcança a porta do target group. Abrir sg-app para a Internet em todas as portas e deixar sg-alb sem inbound quebra a borda e a defesa em profundidade. NACL Deny all entre públicas e privadas corta o path ALB→target. ASG enabled não elimina Security Groups: ENIs continuam filtradas por SG. Insight: na prova, Source = SG do ALB na porta do TG é o desenho esperado."
+    },
+    {
+      "id": 168,
+      "enunciado": "A security review finds an Amazon RDS MySQL instance with PubliclyAccessible=true and a Security Group that allows inbound TCP 3306 from 0.0.0.0/0. The database should only be reachable from the application tier in private subnets. How should this configuration be evaluated?",
+      "alternativas": [
+        "It is a least-privilege best practice",
+        "It is mandatory for Multi-AZ",
+        "It is acceptable if daily snapshots exist",
+        "Anti-pattern: DB exposed to the Internet — restrict the SG to the app and set PubliclyAccessible false"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "3306 liberado de 0.0.0.0/0 com PubliclyAccessible true expõe o motor de banco à Internet — anti-pattern claro de segurança. Restrinja o SG à origem do app (SG da aplicação ou CIDR privado) e prefira PubliclyAccessible false em subnet privada. Isso não é least privilege. Não é obrigatório para Multi-AZ (HA de AZ não exige exposição pública). Snapshot diário ajuda backup/DR, mas não mitiga exploração ativa na porta aberta. Insight: em prova, combinação SG aberto + PubliclyAccessible quase sempre pede 'fechar e privatizar'."
+    },
+    {
+      "id": 181,
+      "enunciado": "Marketing owns the apex domain exemplo.com in a Route 53 public hosted zone and must point it at an Application Load Balancer whose DNS name is app-alb-123.us-east-1.elb.amazonaws.com. Classic DNS forbids a CNAME at the zone apex. Which Route 53 record type is appropriate?",
+      "alternativas": [
+        "An A/AAAA Alias record targeting the Application Load Balancer",
+        "A CNAME at the apex (exemplo.com) to the ALB DNS name (classic DNS does not allow CNAME at apex)",
+        "An MX record pointing to the ALB on port 443",
+        "An NS record replacing the AWS name servers with the ALB IP"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Para o apex (exemplo.com) apontar a um ALB, o adequado é um record A/AAAA Alias (alias do Route 53) para o Application Load Balancer: Alias funciona no zone apex e acompanha o DNS dinâmico do ALB. CNAME no apex não é permitido no DNS clássico (RFC). MX é para correio, não para HTTP(S) no ALB. Trocar NS pelos IPs do ALB quebra a delegação da zona. Insight: apex → Alias para ALB/CloudFront; subdomínio pode ser Alias ou CNAME conforme o caso."
+    },
+    {
+      "id": 228,
+      "enunciado": "A worker fleet consumes messages from an Amazon SQS standard queue. The team documents that SQS standard provides at-least-once delivery and must design the consumer accordingly. What does at-least-once delivery imply for the consumer application?",
+      "alternativas": [
+        "That global ordering is always guaranteed",
+        "That DeleteMessage is optional",
+        "Design idempotency / business-level dedup because the same message may be delivered more than once",
+        "That a dead-letter queue is forbidden"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "At-least-once no SQS standard significa que a mesma mensagem pode ser entregue mais de uma vez (visibilidade expirada, retry, falha antes do delete). O consumer deve ser idempotente ou fazer deduplicação de negócio (ex.: chave de pedido já processada). Ordem global não é garantida em standard (use FIFO se precisar). DeleteMessage continua obrigatório após sucesso para remover a mensagem. DLQ não é proibida — é recomendada para falhas persistentes. Insight: desenhe 'processar de novo sem efeito colateral'; não assuma exactly-once só porque usou SQS."
+    },
+    {
+      "id": 266,
+      "enunciado": "A Lambda execution role receives AccessDenied on secretsmanager:GetSecretValue for a secret that has both an IAM identity policy and a resource-based policy. Networking timeouts are not the symptom. What mental troubleshooting order should you follow for GetSecretValue denied?",
+      "alternativas": [
+        "Only recreate the AMI",
+        "Only increase the EBS volume size",
+        "Only open 443 from 0.0.0.0/0 on the Lambda Security Group",
+        "Caller identity → IAM GetSecretValue → secret resource policy → KMS if CMK → correct secret ARN"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Ordem mental de TShoot GetSecretValue denied: confirmar caller identity (quem está chamando) → Allow/Deny de IAM na Action GetSecretValue → resource policy do secret → permissão KMS se o secret usa CMK customer managed → ARN do secret correto (incluindo stage/versão). Recriar AMI não analisa policies. Aumentar EBS não libera API. Abrir 443 0.0.0.0/0 no SG pode ajudar rede, mas sozinho não explica Deny de resource/IAM quando o sintoma é AccessDenied. Insight: separe rede (timeout) de autorização (AccessDenied)."
+    },
+    {
+      "id": 2,
+      "enunciado": "An application on Amazon EC2 must read items from DynamoDB and write objects to Amazon S3. Security forbids long-lived access keys on disk or in user data. The instance needs temporary credentials that rotate automatically. Which identity approach should you use?",
+      "alternativas": [
+        "An IAM user with a password and access key embedded in user-data",
+        "An IAM role attached via an instance profile (temporary credentials from IMDS)",
+        "An empty IAM group with no policies, only for 'organization'",
+        "The account root user with MFA disabled on the instance"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Workloads em EC2 devem usar IAM role associada via instance profile: o IMDS entrega credenciais temporárias do STS que rotacionam sozinhas, sem access key estática no disco. IAM user com senha e access key no user-data grava segredo de longo prazo na instância (visível em userdata/AMI) e é o anti-pattern clássico. Grupo IAM vazio sem policy não concede identidade à EC2 nem entrega credenciais de API. Root user com MFA desligado na instância é péssima prática de conta e não é como apps autenticam em APIs AWS. Insight: serviço AWS falando com outro serviço AWS → role, não user nem root."
+    },
+    {
+      "id": 296,
+      "enunciado": "A Lambda function is configured with 1024 MB of memory and a 60-second timeout. Most of the runtime is spent waiting on a slow external HTTP API (I/O-bound). Ops want the first tuning axis that actually helps completion and resilience, without blindly maxing memory. What should they prioritize first?",
+      "alternativas": [
+        "Memory must be set to 10 GB",
+        "Adequate timeout plus retries/backoff or an async flow; extra memory helps little if the bottleneck is network wait",
+        "Remove all logging",
+        "Always set reserved concurrency to 1"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Job I/O-bound esperando API externa lenta: memory extra sobe CPU proporcionalmente, mas ajuda pouco enquanto o tempo é wait de rede. Priorize timeout adequado ao SLA, retries com backoff e, se possível, fluxo assíncrono (fila/evento) para não prender a invocação. Memory 10 GB obrigatório é overkill sem prova de CPU-bound. Remover logs não acelera a API externa. Reserved concurrency = 1 sempre só serializa e pode piorar fila/latência. Insight: meça se o gargalo é compute ou espera externa antes de subir memória."
+    },
+    {
+      "id": 325,
+      "enunciado": "A DynamoDB table occasionally sees uneven traffic across partitions. Engineers discuss adaptive capacity and must separate what it helps from what it cannot fix alone. A chronically low-cardinality partition key remains a modeling problem. What does adaptive capacity help, and what does it not solve by itself?",
+      "alternativas": [
+        "It always eliminates the need for any GSI",
+        "It helps temporary imbalance across partitions; it does not fix a chronically very low-cardinality PK",
+        "It removes IAM from DynamoDB access",
+        "It makes Scan O(1)"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Adaptive capacity redistribui throughput entre partições quando há desbalanceamento temporário, ajudando picos assimétricos sem throttle imediato. Não corrige sozinho PK de baixíssima cardinalidade crônica (hot key permanente) — isso exige redesign (write sharding, melhor chave, etc.). Não elimina a necessidade de GSI quando o access pattern exige outra chave. Não remove IAM. Não torna Scan O(1): Scan continua linear no tamanho da tabela/segmento. Insight: adaptive capacity é alívio operacional; modelagem ruim de chave exige redesign."
+    },
+    {
+      "id": 356,
+      "enunciado": "CloudWatch shows a Lambda Throttles metric alarm stuck in ALARM state. The alarm has no SNS topic (or other action) configured. Operators expect someone to be paged when throttling spikes. What is the operational outcome of an alarm without a notification action?",
+      "alternativas": [
+        "The alarm always invokes the function automatically",
+        "The problem is visible in the metric/ALARM state but nobody is notified — the action link is missing",
+        "Reserved concurrency increases by itself",
+        "The code is fixed by AI in the account"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Alarme em Throttles da Lambda sem action SNS (ou equivalente: EventBridge, Auto Scaling, ticket) deixa o problema visível na métrica e no estado ALARM, mas ninguém é notificado — falta o elo de ação operacional. O alarme não invoca a function automaticamente só por existir. Reserved concurrency não sobe sozinho. Código não é 'corrigido por IA' na conta. Insight: alarme sem action = detector mudo; sempre amarre SNS/Chatbot/ASG/EventBridge ao criar o alarme."
+    }
+  ]
+}

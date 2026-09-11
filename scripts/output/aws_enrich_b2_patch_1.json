@@ -1,0 +1,124 @@
+{
+  "patched": [
+    {
+      "id": 10,
+      "enunciado": "An API call returns AccessDenied. Before changing policies, the team must confirm which IAM principal the CLI is actually using under the current credentials. Which AWS CLI command should they run first?",
+      "alternativas": [
+        "aws ec2 describe-vpcs — lists VPCs, does not identify the caller",
+        "aws sts get-caller-identity",
+        "aws s3 mb s3://teste-temp — creates a bucket and may fail with the same AccessDenied",
+        "aws configure list-profiles without inspecting the active ARN"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "O requisito é saber quem está autenticado antes de mexer em policy: aws sts get-caller-identity devolve Account, UserId e Arn do principal efetivo (user ou assumed-role) — base do troubleshooting de AccessDenied. describe-vpcs só lista VPCs e não identifica o caller. s3 mb pode falhar com o mesmo erro sem esclarecer a identidade. list-profiles sem inspecionar o ARN ativo mostra só config local, não o principal da chamada atual. Insight: 'quem sou eu nestas credenciais?' → get-caller-identity primeiro."
+    },
+    {
+      "id": 284,
+      "enunciado": "A CI/CD pipeline role receives AccessDenied on lambda:InvokeFunction when calling a function in the same or another account. Network and queue settings are already fine. Where should permissions be fixed so the pipeline can invoke?",
+      "alternativas": [
+        "Only open the Lambda ENI Security Group to 443 from the world",
+        "Only raise the SQS MessageRetentionPeriod on a related queue",
+        "Resource-based policy of the function (and/or IAM of the pipeline role) allowing invoke",
+        "Only change the CloudFront price class"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "AccessDenied em lambda:InvokeFunction é autorização IAM: a resource-based policy da function (e/ou a identity policy da role do pipeline) precisa Allow invoke no principal certo — atende o requisito sem mexer em rede. Security Group da ENI em 443 world filtra rede, não concede InvokeFunction. MessageRetentionPeriod da fila não autoriza invoke. Price class CloudFront é de CDN e irrelevante ao erro pipeline→Lambda. Insight: invoke cross-role/cross-account → cheque resource policy da function além da role do caller."
+    },
+    {
+      "id": 324,
+      "enunciado": "A DynamoDB table stores events under one partition key and must Query ranges like 'all items for user X after time T' without a full Scan. Designers propose a composite sort key userId#timestamp. What is the main benefit?",
+      "alternativas": [
+        "It replaces the need for encryption at rest or in transit",
+        "Allows ranges and hierarchy on the SK within the same PK (Query begins_with/between)",
+        "Permanently disables throttling for every partition",
+        "Automatically enables Multi-Region Global Tables"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Composite sort key (ex. userId#timestamp) permite Query com begins_with/between na mesma partition key, modelando hierarquia e ranges sem Scan — exatamente o access pattern pedido. Não substitui encryption at rest/in transit. Não desliga throttle: hot partition ainda limita throughput. Não cria Multi-Region automático (isso é Global Tables). Insight: desenhe SK concatenada para lista/intervalo; PK de alta cardinalidade evita hot key."
+    },
+    {
+      "id": 354,
+      "enunciado": "A central monitoring account must fan out CloudWatch alarm notifications to application accounts without opening bastion SSH or weakening root MFA. What is the typical cross-account notification building block?",
+      "alternativas": [
+        "Open TCP 22 on every bastion to 0.0.0.0/0",
+        "SNS topic with a resource policy allowing the monitoring account to publish/subscribe per design",
+        "Disable MFA on the root user for simpler paging",
+        "Make the CloudWatch Logs log group publicly readable via ACL"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Notificação cross-account típica usa SNS com resource policy permitindo à conta de monitoramento publicar e/ou às contas consumidoras assinar — atende fan-out sem abrir SSH nem enfraquecer MFA. Abrir 22 em bastions não resolve page de alarme. Desabilitar MFA do root piora segurança. Tornar log group público via ACL é anti-padrão e não é o canal clássico de page. Insight: alarme na conta A → SNS (policy) → email/Lambda/Chatbot na conta B."
+    },
+    {
+      "id": 55,
+      "enunciado": "An app in a private subnet cannot reach package repositories on the Internet. Recreating the VPC is too disruptive; hostname and CloudTrail are unrelated. What mental diagnosis order should you follow for egress?",
+      "alternativas": [
+        "NAT available → private RT 0.0.0.0/0 → SG outbound → NACL → only then app/DNS",
+        "Recreate the entire VPC as the first troubleshooting step",
+        "Only change the EC2 instance hostname",
+        "Only disable CloudTrail for the whole account"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Para app em subnet privada sem Internet, isole o path de egress antes da aplicação: NAT available → rota 0.0.0.0/0 na RT privada → SG outbound → NACL → só então DNS/app — respeita a restrição de não recriar a VPC. Recriar a VPC inteira como primeiro passo é destrutivo e lento. Trocar só o hostname não cria rota de saída. Desligar CloudTrail não restaura conectividade e remove auditoria. Insight: privada sem egress → confirme NAT + associação de RT antes de tcpdump na app."
+    },
+    {
+      "id": 77,
+      "enunciado": "Security runs get-public-access-block and sees BlockPublicAcls and RestrictPublicBuckets set to true. Versioning, SCPs, and CRR must stay unchanged. What practical effect do these two settings provide?",
+      "alternativas": [
+        "Helps block public exposure via ACLs and public bucket policies",
+        "Disables versioning for every object in the bucket",
+        "Creates an Organizations SCP forcing SSE-KMS across the org",
+        "Automatically configures CRR to us-west-2"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "BlockPublicAcls e RestrictPublicBuckets = true impedem exposição pública via ACLs e via policies públicas no bucket — núcleo do S3 Block Public Access, sem tocar versioning/SCP/CRR. Não desliga versioning. Não cria SCP de Organizations nem força SSE-KMS na org. Não configura CRR para us-west-2 automaticamente. Insight: ao ver BPA true no get-public-access-block, trate tentativas de ACL/policy públicas como bloqueadas na borda de configuração."
+    },
+    {
+      "id": 118,
+      "enunciado": "A 100 GiB EBS volume is ~90% full and the app fails with disk full. Data must be preserved; changing instance type or Security Groups will not free filesystem space. What is the typical EBS action?",
+      "alternativas": [
+        "Terminate and recreate the instance without a snapshot",
+        "Only change the instance type to a bare-metal size",
+        "Only recreate the instance Security Group",
+        "Modify the volume (increase size) and extend the filesystem in the OS; snapshot first if possible"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Disco cheio em EBS: modify-volume (increase size) e depois estenda filesystem/partição no SO; snapshot antes se possível — preserva dados e resolve o requisito. Terminate sem snapshot perde dados. Mudar instance type para metal não aumenta o filesystem do volume atual. Recriar Security Group não libera espaço em disco. Insight: tamanho do volume na AWS ≠ filesystem já estendido no guest — falta growfs/diskmgmt após o resize."
+    },
+    {
+      "id": 141,
+      "enunciado": "An ALB spans multiple AZs with uneven target counts per zone. Ops want each ALB node to spread traffic across all enabled AZ targets, without requiring Elastic IPs or disabling health checks. What does cross-zone load balancing do?",
+      "alternativas": [
+        "ALB nodes can distribute to targets in all enabled AZs, not only the node's own AZ",
+        "Forces every target to have an Elastic IP",
+        "Disables target health checks",
+        "Prevents multi-AZ Auto Scaling groups"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Com cross-zone load balancing, nodes do ALB enviam tráfego a targets em qualquer AZ habilitada, não só na AZ do node — distribuição mais uniforme sem exigir EIP nem desligar health. No ALB moderno costuma vir habilitado por padrão. Não obriga Elastic IP nos targets. Não desliga health checks. Não impede ASG multi-AZ. Insight: poucas instances numa AZ e muitas noutra → cross-zone evita sobrecarga na AZ 'cheia' de targets."
+    },
+    {
+      "id": 169,
+      "enunciado": "A team must restore an RDS database to a specific second within the backup window after accidental deletes. VPC tags, public replicas, and Enhanced Monitoring alone are not enough. What does point-in-time restore (PITR) mainly depend on?",
+      "alternativas": [
+        "Only VPC tags on the DB subnet group",
+        "Automated backups enabled with retention > 0 and a restore window",
+        "Only a publicly accessible read replica",
+        "Only Enhanced Monitoring at 1-second granularity"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "PITR exige automated backups com retention > 0: a AWS mantém snapshots + logs de transação na janela de restore — único caminho que atende restore a um segundo específico. Tags na VPC não habilitam PITR. Read replica pública serve leitura/DR assíncrono, não substitui a cadeia de backup do primary. Enhanced Monitoring 1s é telemetria de OS, irrelevante para restore point-in-time. Insight: retention = 0 ou backups off ⇒ sem PITR (snapshot manual pontual ≠ PITR contínuo)."
+    },
+    {
+      "id": 207,
+      "enunciado": "A site is fronted by CloudFront. Security requires browsers hitting HTTP to be upgraded to HTTPS at the edge, without changing origin protocol policy, removing ACM, or touching RDS. What does Viewer Protocol Policy 'Redirect HTTP to HTTPS' do?",
+      "alternativas": [
+        "Disables the Origin Protocol Policy entirely",
+        "HTTP viewer requests are redirected to HTTPS at the edge",
+        "Removes the need for an ACM certificate on the distribution",
+        "Opens port 80 on the RDS instance"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Viewer Protocol Policy 'Redirect HTTP to HTTPS' faz a edge responder 301/302 aos pedidos HTTP do viewer apontando para HTTPS — upgrade na borda sem mexer na origem nem no RDS. Não desliga Origin Protocol Policy (HTTP-only / HTTPS-only / Match viewer é outra alavanca). Não remove a necessidade de certificado ACM no viewer HTTPS. Não abre porta 80 no RDS. Insight: force HTTPS no viewer na edge; origem e ACM us-east-1 continuam no checklist à parte."
+    }
+  ]
+}

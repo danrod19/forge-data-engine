@@ -1,0 +1,215 @@
+{
+  "batch": 3,
+  "items": [
+    {
+      "id": 155,
+      "idx": 154,
+      "part_id": "aws-1.6",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 82,
+      "enunciado": "Antes de major upgrade, o time quer ponto de restauração sob demanda. O que criar?",
+      "alternativas": [
+        "Apenas aumentar max_connections",
+        "Apenas abrir 0.0.0.0/0 temporariamente",
+        "Desligar o CloudWatch",
+        "Snapshot manual (e manter automated backup com retention adequada)"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Snapshot manual cria ponto de restauração sob demanda antes do major upgrade; mantenha também automated backup com retention adequada para PITR. Aumentar max_connections não é restore point. Abrir 0.0.0.0/0 é risco, não backup. Desligar CloudWatch remove métricas, não protege dados. Insight: major upgrade → snapshot manual + janela de manutenção; teste restore em staging."
+    },
+    {
+      "id": 208,
+      "idx": 207,
+      "part_id": "aws-1.7",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 113,
+      "enunciado": "Após mudar origin do CloudFront de S3 A para S3 B, alguns paths ainda servem objetos do bucket A. Causa provável?",
+      "alternativas": [
+        "Route 53 ignora mudanças de origin",
+        "Cache na edge ainda tem objetos do origin antigo até TTL/invalidation",
+        "ALIAS impede troca de origin",
+        "Health check R53 grava objetos no bucket A"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Trocar o origin (S3 A → S3 B) não esvazia o cache: edges ainda servem objetos do origin antigo até expirar o TTL ou rodar invalidation/versioned URLs. Route 53 não 'ignora' mudança de origin — DNS e origin do CF são planos distintos. ALIAS não impede troca de origin na distribuição. Health check R53 não grava objetos no bucket A. Insight: após cutover de origin, invalide paths críticos ou use cache policy/TTL curto + versionamento de objeto para evitar conteúdo fantasma."
+    },
+    {
+      "id": 217,
+      "idx": 216,
+      "part_id": "aws-1.8",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 65,
+      "enunciado": "Long polling (WaitTimeSeconds > 0) na ReceiveMessage reduz o quê?",
+      "alternativas": [
+        "Número de receives vazios e custo/chatter de short polling agressivo",
+        "A necessidade de IAM na fila",
+        "O tamanho máximo da mensagem para 0",
+        "A obrigação de DeleteMessage"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "Long polling (WaitTimeSeconds > 0) segura a ReceiveMessage até chegar mensagem ou estourar o wait — reduz receives vazios e o chatter/custo do short polling agressivo. Não elimina a necessidade de IAM na fila. Não zera o tamanho máximo da mensagem. Não torna DeleteMessage opcional — ainda é preciso apagar após processar. Insight: use long polling (até 20s) como default em consumers; short polling só se o padrão de latência exigir."
+    },
+    {
+      "id": 265,
+      "idx": 264,
+      "part_id": "aws-1.9",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 86,
+      "enunciado": "IAM condition kms:ViaService = s3.us-east-1.amazonaws.com na key policy. Efeito ideia?",
+      "alternativas": [
+        "Permite qualquer Decrypt de qualquer conta sem log",
+        "Restringe uso da chave a pedidos que vêm via o serviço S3 na região, reduzindo uso direto indevido",
+        "Desliga CloudTrail",
+        "Obriga PubliclyAccessible no RDS"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Condition kms:ViaService = s3.us-east-1.amazonaws.com restringe o uso da chave a chamadas que passam pelo serviço S3 naquela região, reduzindo Decrypt direto indevido por outros caminhos. Não permite Decrypt de qualquer conta sem log. Não desliga CloudTrail. Não obriga PubliclyAccessible no RDS. Insight: ViaService é controle fino clássico em key policy para amarrar CMK ao serviço esperado."
+    },
+    {
+      "id": 9,
+      "idx": 8,
+      "part_id": "aws-1.1",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 91,
+      "enunciado": "Ao revisar uma identity-based policy JSON, quais elementos formam o núcleo de um Statement?",
+      "alternativas": [
+        "Effect, Action e Resource (Condition opcional)",
+        "Somente CIDR de origem e porta de destino",
+        "Somente AMI ID e instance type da EC2",
+        "Somente o record type do Route 53"
+      ],
+      "resposta_correta": 0,
+      "explicacao_profunda": "O núcleo de um Statement em identity-based policy é Effect (Allow/Deny), Action (API) e Resource (ARN); Condition é opcional para afinar contexto (MFA, IP, tags). CIDR de origem e porta são elementos de Security Group/NACL, não de policy IAM. AMI ID e instance type descrevem compute EC2, não autorização. Record type do Route 53 é DNS, fora do modelo de Statement IAM. Insight: se a alternativa fala em porta/CIDR ao revisar JSON IAM, está misturando SG com IAM."
+    },
+    {
+      "id": 287,
+      "idx": 286,
+      "part_id": "aws-1.10",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 84,
+      "enunciado": "S3 ObjectCreated → Lambda; a function falha e S3 redrive não é fila. Risco de retry?",
+      "alternativas": [
+        "S3 nunca retenta",
+        "Falhas apagam o objeto automaticamente",
+        "S3 pode retentar delivers; desenhe idempotência ou use SQS entre S3 e Lambda para controle de retry/DLQ",
+        "Reserved concurrency desliga retries de S3"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Notificação S3→Lambda pode retentar delivers quando a function falha; S3 não é fila com redrive/DLQ nativo como SQS. Desenhe idempotência ou coloque SQS entre S3 e Lambda para controle de retry/DLQ. 'S3 nunca retenta' é falso. Falha não apaga o objeto automaticamente. Reserved concurrency limita paralelismo; não desliga retries de S3. Insight: event source 'direto' S3 → cuidado com reentrega e efeitos colaterais."
+    },
+    {
+      "id": 312,
+      "idx": 311,
+      "part_id": "aws-1.11",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 58,
+      "enunciado": "Hot partition: 90% dos writes usam PK=STATUS#OPEN. Efeito?",
+      "alternativas": [
+        "Distribuição perfeita automática sempre",
+        "Conversão para on-demand resolve modelagem de chave sempre",
+        "Scan fica grátis",
+        "Throttle/latência nessa partição mesmo com WCU total 'teoricamente' suficiente"
+      ],
+      "resposta_correta": 3,
+      "explicacao_profunda": "Hot partition (90% writes em PK=STATUS#OPEN) concentra throughput numa partição: throttle/latência mesmo com WCU total 'teoricamente' suficiente. Não há distribuição perfeita automática com chave tão enviesada. Só mudar para on-demand não conserta modelagem de chave quente. Scan não fica grátis. Insight: evite status único como PK; use IDs de alta cardinalidade ou sharding na chave."
+    },
+    {
+      "id": 352,
+      "idx": 351,
+      "part_id": "aws-1.12",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 64,
+      "enunciado": "EC2 StatusCheckFailed_System em ALARM com action recover. Ideia?",
+      "alternativas": [
+        "Sempre significa disco cheio do convidado",
+        "Problema de host AWS; recover pode migrar a instance — distinto de falha de app (instance status)",
+        "É métrica de S3",
+        "Desliga o SNS topic"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "StatusCheckFailed_System em ALARM com action recover indica problema de host AWS (rede/power/host); recover pode migrar a instance para hardware saudável. É distinto de StatusCheckFailed_Instance (falha no guest/app). Não significa sempre disco cheio do convidado. Não é métrica de S3. Não desliga SNS. Insight: system check → recover; instance check → reboot/SSM/app fix."
+    },
+    {
+      "id": 36,
+      "idx": 35,
+      "part_id": "aws-1.2",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 105,
+      "enunciado": "EC2 com IP público em subnet 'pública' não sai para a Internet; SG egress allow all. Hipótese mais forte?",
+      "alternativas": [
+        "Falta de IAM role na instância para 'liberar TCP'",
+        "Route table sem 0.0.0.0/0 → IGW ou IGW não anexado à VPC",
+        "S3 versioning desligado na conta",
+        "Ausência de alarme CloudWatch na CPU"
+      ],
+      "resposta_correta": 1,
+      "explicacao_profunda": "Com SG egress allow all e IP público, a hipótese mais forte para não sair à Internet é route table sem 0.0.0.0/0 → IGW ou IGW não anexado à VPC — falta o path de camada 3. IAM role não 'libera TCP'; role autentica APIs AWS, não cria rota de internet. S3 versioning desligado não impede egress da EC2. Alarme CloudWatch de CPU é observabilidade, não conectividade. Insight: pública sem internet → describe-route-tables e attachment do IGW."
+    },
+    {
+      "id": 67,
+      "idx": 66,
+      "part_id": "aws-1.3",
+      "score": 6,
+      "reasons": [
+        "short",
+        "no_constraint",
+        "no_rich_kw"
+      ],
+      "len": 97,
+      "enunciado": "EC2 app precisa GetObject só em s3://dados/app/*. Qual identidade/permissão é o design preferido?",
+      "alternativas": [
+        "Access key do root no código da aplicação",
+        "Bucket 100% público com Principal * GetObject",
+        "IAM role da instância com least privilege s3:GetObject no prefixo app/*",
+        "Desligar CloudTrail para o GetObject 'funcionar mais rápido'"
+      ],
+      "resposta_correta": 2,
+      "explicacao_profunda": "Design preferido: instance profile / IAM role da EC2 com s3:GetObject least privilege no ARN do prefixo app/*. Credenciais vêm do IMDS, sem key de longa duração no código. Access key do root no código é o pior anti-padrão (root + segredo embutido). Bucket 100% público com Principal * GetObject resolve 'acesso' destruindo confidencialidade. Desligar CloudTrail não acelera GetObject e remove trilha de auditoria. Insight: workload em EC2 → role + Resource no prefixo; nunca root key no repositório."
+    }
+  ]
+}

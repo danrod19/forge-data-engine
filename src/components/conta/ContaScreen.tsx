@@ -18,6 +18,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { ProPlans, TrialButton } from "@/components/pro/ProPlans";
 import { formatProExpiresAt } from "@/lib/pro";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/types/question";
+import { RESET_PASSWORD_SENT_COPY } from "@/lib/auth-flow";
 
 interface ContaScreenProps {
   onAuthClick: () => void;
@@ -55,9 +56,7 @@ export function ContaScreen({ onAuthClick }: ContaScreenProps) {
       return;
     }
     setResetStatus("ok");
-    setResetMessage(
-      "E-mail de redefinição enviado. Confira sua caixa de entrada (e spam)."
-    );
+    setResetMessage(RESET_PASSWORD_SENT_COPY);
   };
 
   const handleTrial = async () => {

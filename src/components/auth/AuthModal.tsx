@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
-import { LogIn, UserPlus, Terminal, Loader2 } from "lucide-react";
+import { LogIn, UserPlus, Terminal, Loader2, KeyRound } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -12,27 +12,51 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth/AuthProvider";
+import {
+  RESET_PASSWORD_SENT_COPY,
+  SIGNUP_DUPLICATE_COPY,
+} from "@/lib/auth-flow";
+
+export type AuthModalMode = "signin" | "signup" | "forgot";
 
 interface AuthModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialMode?: AuthModalMode;
+  initialEmail?: string;
 }
 
-type AuthMode = "signin" | "signup";
-
-export function AuthModal({ open, onOpenChange }: AuthModalProps) {
-  const { signIn, signUp } = useAuth();
-  const [mode, setMode] = useState<AuthMode>("signin");
-  const [email, setEmail] = useState("");
+export function AuthModal({
+  open,
+  onOpenChange,
+  initialMode = "signin",
+  initialEmail = "",
+}: AuthModalProps) {
+  const { signIn, signUp, resetPassword } = useAuth();
+  const [mode, setMode] = useState<AuthModalMode>(initialMode);
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [duplicate, setDuplicate] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const resetFeedback = () => {
     setError(null);
     setInfo(null);
+    setDuplicate(false);
   };
+
+  useEffect(() => {
+    if (!open) return;
+    setMode(initialMode);
+    setEmail(initialEmail);
+    setPassword("");
+    setSubmitting(false);
+    setError(null);
+    setInfo(null);
+    setDuplicate(false);
+  }, [open, initialMode, initialEmail]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -40,6 +64,16 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
     setSubmitting(true);
 
     try {
+      if (mode === "forgot") {
+        const { error: err } = await resetPassword(email.trim());
+        if (err) {
+          setError(err);
+          return;
+        }
+        setInfo(RESET_PASSWORD_SENT_COPY);
+        return;
+      }
+
       if (mode === "signin") {
         const { error: err } = await signIn(email.trim(), password);
         if (err) {
@@ -49,25 +83,54 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
         onOpenChange(false);
         setEmail("");
         setPassword("");
-      } else {
-        const { error: err } = await signUp(email.trim(), password);
-        if (err) {
-          setError(err);
-          return;
-        }
-        setInfo(
-          "Conta criada. Se o e-mail de confirmação estiver ativo no Supabase, confira sua caixa de entrada — ou faça login se a sessão já foi aberta."
-        );
+        return;
       }
+
+      const { error: err, duplicate: isDup } = await signUp(
+        email.trim(),
+        password
+      );
+      if (isDup) {
+        setDuplicate(true);
+        setPassword("");
+        return;
+      }
+      if (err) {
+        setError(err);
+        return;
+      }
+      setInfo(
+        "Conta criada. Se o e-mail de confirmação estiver ativo no Supabase, confira sua caixa de entrada — ou faça login se a sessão já foi aberta."
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
-  const switchMode = (next: AuthMode) => {
+  const switchMode = (next: AuthModalMode) => {
     setMode(next);
+    setPassword("");
     resetFeedback();
   };
+
+  const title =
+    mode === "signin"
+      ? "Entrar"
+      : mode === "signup"
+        ? "Criar conta"
+        : "Redefinir senha";
+  const prompt =
+    mode === "signin"
+      ? "$ login --session"
+      : mode === "signup"
+        ? "$ useradd --create"
+        : "$ passwd --reset";
+  const description =
+    mode === "signin"
+      ? "Acesse sua conta para sincronizar o status PRO."
+      : mode === "signup"
+        ? "Crie uma conta com e-mail e senha (mín. 6 caracteres)."
+        : "Informe o e-mail da conta. Enviaremos um link se ele estiver cadastrado.";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -97,15 +160,13 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
 
           <DialogHeader className="relative space-y-2 text-center">
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-neon-green/70">
-              {mode === "signin" ? "$ login --session" : "$ useradd --create"}
+              {prompt}
             </p>
             <DialogTitle className="text-lg font-bold tracking-tight text-slate-50">
-              {mode === "signin" ? "Entrar" : "Criar conta"}
+              {title}
             </DialogTitle>
             <DialogDescription className="text-sm text-slate-400">
-              {mode === "signin"
-                ? "Acesse sua conta para sincronizar o status PRO."
-                : "Crie uma conta com e-mail e senha (mín. 6 caracteres)."}
+              {description}
             </DialogDescription>
           </DialogHeader>
 
@@ -125,23 +186,64 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
               />
             </label>
 
-            <label className="block space-y-1.5">
-              <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
-                password
-              </span>
-              <input
-                type="password"
-                autoComplete={
-                  mode === "signin" ? "current-password" : "new-password"
-                }
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="h-10 w-full rounded-lg border border-slate-700 bg-slate-950/80 px-3 font-mono text-sm text-slate-100 outline-none ring-neon-green/40 placeholder:text-slate-600 focus:border-neon-green/50 focus:ring-2"
-                placeholder="••••••••"
-              />
-            </label>
+            {mode !== "forgot" && !duplicate && (
+              <label className="block space-y-1.5">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                  password
+                </span>
+                <input
+                  type="password"
+                  autoComplete={
+                    mode === "signin" ? "current-password" : "new-password"
+                  }
+                  required
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-10 w-full rounded-lg border border-slate-700 bg-slate-950/80 px-3 font-mono text-sm text-slate-100 outline-none ring-neon-green/40 placeholder:text-slate-600 focus:border-neon-green/50 focus:ring-2"
+                  placeholder="••••••••"
+                />
+              </label>
+            )}
+
+            {mode === "signin" && (
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={() => switchMode("forgot")}
+                  className="font-mono text-[11px] text-slate-500 transition-colors hover:text-neon-cyan"
+                >
+                  Esqueci a senha
+                </button>
+              </div>
+            )}
+
+            {duplicate && (
+              <div className="space-y-3 rounded-md border border-amber-400/30 bg-amber-500/10 px-3 py-3">
+                <p className="font-mono text-xs text-amber-200">
+                  {SIGNUP_DUPLICATE_COPY}
+                </p>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    type="button"
+                    onClick={() => switchMode("signin")}
+                    className="h-10 w-full gap-2 border border-neon-green/40 bg-neon-green/15 font-semibold text-neon-green hover:bg-neon-green/25"
+                  >
+                    <LogIn className="size-4" />
+                    Entrar
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => switchMode("forgot")}
+                    className="h-10 w-full gap-2 border-slate-700 bg-slate-950/50 font-mono text-xs text-slate-200 hover:bg-slate-800"
+                  >
+                    <KeyRound className="size-4 text-neon-cyan" />
+                    Esqueci a senha
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {error && (
               <p className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 font-mono text-xs text-rose-300">
@@ -154,43 +256,53 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
               </p>
             )}
 
-            <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-              <Button
-                type="submit"
-                disabled={submitting}
-                className="h-11 w-full gap-2 border border-neon-green/40 bg-neon-green/15 font-semibold text-neon-green hover:bg-neon-green/25"
-              >
-                {submitting ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : mode === "signin" ? (
-                  <LogIn className="size-4" />
-                ) : (
-                  <UserPlus className="size-4" />
-                )}
-                {mode === "signin" ? "Entrar" : "Criar conta"}
-              </Button>
-            </motion.div>
+            {!duplicate && (
+              <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                <Button
+                  type="submit"
+                  disabled={submitting}
+                  className="h-11 w-full gap-2 border border-neon-green/40 bg-neon-green/15 font-semibold text-neon-green hover:bg-neon-green/25"
+                >
+                  {submitting ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : mode === "signin" ? (
+                    <LogIn className="size-4" />
+                  ) : mode === "signup" ? (
+                    <UserPlus className="size-4" />
+                  ) : (
+                    <KeyRound className="size-4" />
+                  )}
+                  {mode === "signin"
+                    ? "Entrar"
+                    : mode === "signup"
+                      ? "Criar conta"
+                      : "Enviar link"}
+                </Button>
+              </motion.div>
+            )}
           </form>
 
-          <div className="relative mt-4 text-center">
-            {mode === "signin" ? (
-              <button
-                type="button"
-                onClick={() => switchMode("signup")}
-                className="font-mono text-xs text-slate-500 transition-colors hover:text-neon-cyan"
-              >
-                {">"} ainda não tem conta? criar
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => switchMode("signin")}
-                className="font-mono text-xs text-slate-500 transition-colors hover:text-neon-cyan"
-              >
-                {">"} já tem conta? entrar
-              </button>
-            )}
-          </div>
+          {!duplicate && (
+            <div className="relative mt-4 text-center">
+              {mode === "signin" ? (
+                <button
+                  type="button"
+                  onClick={() => switchMode("signup")}
+                  className="font-mono text-xs text-slate-500 transition-colors hover:text-neon-cyan"
+                >
+                  {">"} ainda não tem conta? criar
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => switchMode("signin")}
+                  className="font-mono text-xs text-slate-500 transition-colors hover:text-neon-cyan"
+                >
+                  {">"} já tem conta? entrar
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

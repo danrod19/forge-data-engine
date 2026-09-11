@@ -6,7 +6,8 @@ import { TopBar } from "@/components/layout/TopBar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { TicketDeSuporte } from "@/components/ticket/TicketDeSuporte";
 import { PaywallModal } from "@/components/ticket/PaywallModal";
-import { AuthModal } from "@/components/auth/AuthModal";
+import { AuthModal, type AuthModalMode } from "@/components/auth/AuthModal";
+import { RecoveryModal } from "@/components/auth/RecoveryModal";
 import { SimuladoMode } from "@/components/simulado/SimuladoMode";
 import { EstudoMode } from "@/components/estudo/EstudoMode";
 import { SobreProva } from "@/components/sobre/SobreProva";
@@ -37,7 +38,7 @@ function readStoredNumber(key: string, fallback: number): number {
 }
 
 export default function HomePage() {
-  const { isPro, isProEfetivo } = useAuth();
+  const { isPro, isProEfetivo, passwordRecovery } = useAuth();
   const { track, trackReady } = useTrack();
 
   const [mounted, setMounted] = useState(false);
@@ -49,6 +50,18 @@ export default function HomePage() {
     "upgrade"
   );
   const [authOpen, setAuthOpen] = useState(false);
+  const [authInitialMode, setAuthInitialMode] =
+    useState<AuthModalMode>("signin");
+  const [authInitialEmail, setAuthInitialEmail] = useState("");
+
+  const openAuth = useCallback(
+    (mode: AuthModalMode = "signin", email = "") => {
+      setAuthInitialMode(mode);
+      setAuthInitialEmail(email);
+      setAuthOpen(true);
+    },
+    []
+  );
   const [trilhaSession, setTrilhaSession] = useState<Question[]>([]);
   const [trilhaKey, setTrilhaKey] = useState(0);
   const [simuladoKey, setSimuladoKey] = useState(0);
@@ -57,6 +70,12 @@ export default function HomePage() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (passwordRecovery === "ready" || passwordRecovery === "invalid") {
+      setAuthOpen(false);
+    }
+  }, [passwordRecovery]);
 
   // Load lives/streak when track is ready or changes
   useEffect(() => {
@@ -143,7 +162,7 @@ export default function HomePage() {
         isPro={isPro}
         statsReady={mounted && trackReady}
         onUpgradeClick={openUpgrade}
-        onAuthClick={() => setAuthOpen(true)}
+        onAuthClick={() => openAuth("signin")}
         onAccountClick={() => setActiveTab("conta")}
         onLogoClick={() => setActiveTab("home")}
         onTrackChange={handleTrackChange}
@@ -163,7 +182,7 @@ export default function HomePage() {
                 isPro={isProEfetivo}
                 onNavigate={setActiveTab}
                 onUpgrade={openUpgrade}
-                onAuthClick={() => setAuthOpen(true)}
+                onAuthClick={() => openAuth("signin")}
               />
             </motion.div>
           )}
@@ -250,7 +269,7 @@ export default function HomePage() {
               transition={{ duration: 0.2 }}
             >
               <ContaScreen
-                onAuthClick={() => setAuthOpen(true)}
+                onAuthClick={() => openAuth("signin")}
                 onUpgrade={openUpgrade}
               />
             </motion.div>
@@ -264,10 +283,18 @@ export default function HomePage() {
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
         reason={paywallReason}
-        onAuthClick={() => setAuthOpen(true)}
+        onAuthClick={() => openAuth("signin")}
       />
 
-      <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
+      <AuthModal
+        open={authOpen}
+        onOpenChange={setAuthOpen}
+        initialMode={authInitialMode}
+        initialEmail={authInitialEmail}
+      />
+      <RecoveryModal
+        onRequestNewLink={(email) => openAuth("forgot", email ?? "")}
+      />
     </div>
   );
 }

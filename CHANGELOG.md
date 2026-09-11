@@ -4,6 +4,17 @@
 
 ## Entradas Recentes
 
+- **2026-09-10** — Auth: reset de senha + signup duplicado
+  - Modal Entrar: “Esqueci a senha” → `resetPasswordForEmail` com redirectTo prod/local; copy genérica (não revela se o e-mail existe)
+  - Link do e-mail abre modal “Nova senha” (`PASSWORD_RECOVERY` / `type=recovery`); sucesso “Senha atualizada”; link morto + CTA “Pedir novo link”
+  - Conta (logado) usa o mesmo redirectTo e a mesma copy genérica
+  - Signup com e-mail existente: copy + CTAs Entrar (e-mail pré-preenchido) e Esqueci a senha; sem segundo user e sem vazar PRO/FREE
+
+- **2026-08-19** — Stripe/PRO E2E: descoberta + documentação (sem rearquitetura)
+  - Static export mantido; webhook permanece em `supabase/functions/stripe-webhook`
+  - `.env.example` + README: envs client/Edge, trial localhost, Test mode 4242, matching de e-mail
+  - Código de Auth/Payment Links/Paywall já cobria ~85% do E2E; gaps restantes = ops/config
+
 - **2026-08-19** — AWS Trilha cenários enriquecidos lote 3 — 19/08/2026 (+50; total ricos ~150)
   - +50 itens em `questions_aws_traditional.json` (lista `aws_scenarios_enrich_batch_3.json`; overlap com 1∪2 = 0)
   - Stems EN SAA-like; média do lote ~83→~262 chars; `explicacao_profunda` PT; `resposta_correta` intacta

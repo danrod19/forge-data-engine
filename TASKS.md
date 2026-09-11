@@ -33,11 +33,13 @@
 - [x] AWS Trilha cenários enriquecidos — 19/08/2026 (50 prioritários em questions_aws_traditional.json)
 - [x] AWS Trilha cenários enriquecidos lote 2 — 19/08/2026 (+50; total ricos 100)
 - [x] AWS Trilha cenários enriquecidos lote 3 — 19/08/2026 (+50; total ricos 150)
+- [x] Stripe/PRO E2E — descoberta + docs (19/08/2026): fluxo já no código; `.env.example` + README Test mode
+- [x] Auth Spec 4 — reset de senha completo (forgot no Entrar, form Nova senha no link, Conta com o mesmo redirectTo/copy)
+- [x] Auth Spec 5 — signup com e-mail já existente (copy genérica + CTAs Entrar / Esqueci a senha)
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção
 - [ ] Validar webhook Stripe → Edge Function → atualização de `profiles.pro_expires_at` (mesmo e-mail)
-- [ ] Criar README curto com: trial, planos, regra do e-mail e contato
 - [ ] Checklist manual pós-deploy (Home, login, trial, Trilha, Simulado, estado PRO/free)
 - [ ] Deploy produção multi-track
 

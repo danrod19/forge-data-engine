@@ -16,6 +16,18 @@ import {
   computeIsProEfetivo,
   isTrialAvailable,
 } from "@/lib/pro";
+import {
+  PASSWORD_RECOVERY_EVENT,
+  clearPasswordRecoveryHint,
+  getAuthRedirectTo,
+  isBenignResetError,
+  isDuplicateSignup,
+  mapResetPasswordError,
+  mapUpdatePasswordError,
+  peekPasswordRecoveryHint,
+  stripAuthParamsFromUrl,
+  type PasswordRecoveryStatus,
+} from "@/lib/auth-flow";
 
 export interface AuthContextValue {
   user: User | null;
@@ -32,13 +44,16 @@ export interface AuthContextValue {
   signUp: (
     email: string,
     password: string
-  ) => Promise<{ error: string | null }>;
+  ) => Promise<{ error: string | null; duplicate: boolean }>;
   signIn: (
     email: string,
     password: string
   ) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: string | null }>;
+  updatePassword: (password: string) => Promise<{ error: string | null }>;
+  passwordRecovery: PasswordRecoveryStatus;
+  clearPasswordRecovery: (opts?: { clearHint?: boolean }) => void;
   startTrial: () => Promise<{ error: string | null }>;
   refreshProfile: () => Promise<void>;
 }
@@ -77,6 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [proExpiresAt, setProExpiresAt] = useState<string | null>(null);
   const [trialUsedAt, setTrialUsedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [passwordRecovery, setPasswordRecovery] =
+    useState<PasswordRecoveryStatus>("none");
   /** Tick para reavaliar expiração sem recarregar o profile */
   const [nowMs, setNowMs] = useState(() => Date.now());
 
@@ -136,9 +153,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     });
 
+    setPasswordRecovery(peekPasswordRecoveryHint());
+
+    const onRecoveryEvent = (ev: Event) => {
+      const detail = (ev as CustomEvent<PasswordRecoveryStatus>).detail;
+      if (detail === "ready" || detail === "invalid") {
+        setPasswordRecovery(detail);
+      }
+    };
+    window.addEventListener(PASSWORD_RECOVERY_EVENT, onRecoveryEvent);
+
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setPasswordRecovery("ready");
+      }
       const sessionUser = session?.user ?? null;
       setUser(sessionUser);
       void loadProfile(sessionUser);
@@ -146,6 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       mounted = false;
+      window.removeEventListener(PASSWORD_RECOVERY_EVENT, onRecoveryEvent);
       subscription.unsubscribe();
     };
   }, [loadProfile]);
@@ -157,12 +188,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.clearInterval(id);
   }, [proExpiresAt]);
 
+  // type=recovery na URL sem sessão = link morto
+  useEffect(() => {
+    if (loading) return;
+    if (passwordRecovery === "ready" && !user) {
+      setPasswordRecovery("invalid");
+    }
+  }, [loading, passwordRecovery, user]);
+
   const signUp = useCallback(async (email: string, password: string) => {
     if (!isSupabaseConfigured()) {
-      return { error: "Supabase não configurado (.env.local)." };
+      return {
+        error: "Supabase não configurado (.env.local).",
+        duplicate: false,
+      };
     }
-    const { error } = await supabase.auth.signUp({ email, password });
-    return { error: error?.message ?? null };
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (isDuplicateSignup(error, data)) {
+      return { error: null, duplicate: true };
+    }
+    return { error: error?.message ?? null, duplicate: false };
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
@@ -186,13 +231,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!isSupabaseConfigured()) {
       return { error: "Supabase não configurado (.env.local)." };
     }
-    const redirectTo =
-      typeof window !== "undefined" ? window.location.origin : undefined;
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo,
+      redirectTo: getAuthRedirectTo(),
     });
-    return { error: error?.message ?? null };
+    if (!error || isBenignResetError(error)) {
+      return { error: null };
+    }
+    return { error: mapResetPasswordError(error) };
   }, []);
+
+  const updatePassword = useCallback(async (password: string) => {
+    if (!isSupabaseConfigured()) {
+      return { error: "Supabase não configurado (.env.local)." };
+    }
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) {
+      const mapped = mapUpdatePasswordError(error);
+      if (/inválido ou expirou/.test(mapped ?? "")) {
+        setPasswordRecovery("invalid");
+      }
+      return { error: mapped };
+    }
+    // Hint some para um refresh não reabrir o form; o modal fecha depois do copy de sucesso.
+    clearPasswordRecoveryHint();
+    stripAuthParamsFromUrl();
+    return { error: null };
+  }, []);
+
+  const clearPasswordRecovery = useCallback(
+    (opts?: { clearHint?: boolean }) => {
+      setPasswordRecovery("none");
+      if (opts?.clearHint) {
+        clearPasswordRecoveryHint();
+        stripAuthParamsFromUrl();
+      }
+    },
+    []
+  );
 
   const startTrial = useCallback(async () => {
     if (!isSupabaseConfigured()) {
@@ -243,6 +318,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn,
       signOut,
       resetPassword,
+      updatePassword,
+      passwordRecovery,
+      clearPasswordRecovery,
       startTrial,
       refreshProfile,
     }),
@@ -257,6 +335,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn,
       signOut,
       resetPassword,
+      updatePassword,
+      passwordRecovery,
+      clearPasswordRecovery,
       startTrial,
       refreshProfile,
     ]

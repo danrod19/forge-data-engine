@@ -120,10 +120,18 @@ export function TopBar({
             </motion.div>
 
             {isPro ? (
-              <span className="flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-500/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-300 sm:gap-1.5 sm:px-2.5 sm:text-xs">
+              <motion.button
+                type="button"
+                onClick={onUpgradeClick}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+                className="flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-500/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-300 sm:gap-1.5 sm:px-2.5 sm:text-xs"
+                title="Ver planos PRO"
+                aria-label="Ver planos PRO"
+              >
                 <Crown className="size-3 sm:size-3.5" fill="currentColor" />
                 PRO
-              </span>
+              </motion.button>
             ) : (
               <motion.button
                 type="button"

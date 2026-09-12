@@ -145,6 +145,33 @@ export function HomeScreen({
         </div>
       </section>
 
+      <section className="space-y-3 rounded-xl border border-amber-500/20 bg-slate-900/50 p-4">
+        <p className="font-mono text-[10px] uppercase tracking-wider text-amber-400/80">
+          planos pro
+        </p>
+        {!isPro && (
+          <p className="text-[12px] leading-relaxed text-slate-400">
+            {launchCopy.paragraph}
+          </p>
+        )}
+        {user && trialAvailable && !isPro && (
+          <div className="space-y-2">
+            <TrialButton onStart={handleTrial} loading={trialLoading} />
+            {trialError && (
+              <p className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 font-mono text-[11px] text-rose-300">
+                ! {trialError}
+              </p>
+            )}
+          </div>
+        )}
+        {!user && (
+          <p className="text-[12px] text-slate-400">
+            Faça login para ativar o trial grátis de 24h (1x por conta).
+          </p>
+        )}
+        <ProPlans />
+      </section>
+
       {/* Jornada recomendada */}
       <section className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
         <div className="mb-2 flex items-center gap-2">
@@ -265,44 +292,17 @@ export function HomeScreen({
               <span>{freeVsProCopy.proBullets[2]}</span>
             </li>
           </ul>
-          {!isPro && (
-            <Button
-              type="button"
-              onClick={onUpgrade}
-              className="relative mt-3 h-9 w-full overflow-hidden border-0 text-xs font-bold text-slate-950"
-            >
-              <span className="gold-gradient absolute inset-0" />
-              <span className="relative">{freeVsProCopy.proCta}</span>
-            </Button>
-          )}
+          <Button
+            type="button"
+            onClick={onUpgrade}
+            className="relative mt-3 h-9 w-full overflow-hidden border-0 text-xs font-bold text-slate-950"
+          >
+            <span className="gold-gradient absolute inset-0" />
+            <span className="relative">
+              {isPro ? "Ver planos / renovar" : freeVsProCopy.proCta}
+            </span>
+          </Button>
         </div>
-      </section>
-
-      <section className="space-y-3 rounded-xl border border-amber-500/20 bg-slate-900/50 p-4">
-        <p className="font-mono text-[10px] uppercase tracking-wider text-amber-400/80">
-          planos pro
-        </p>
-        {!isPro && (
-          <p className="text-[12px] leading-relaxed text-slate-400">
-            {launchCopy.paragraph}
-          </p>
-        )}
-        {user && trialAvailable && !isPro && (
-          <div className="space-y-2">
-            <TrialButton onStart={handleTrial} loading={trialLoading} />
-            {trialError && (
-              <p className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 font-mono text-[11px] text-rose-300">
-                ! {trialError}
-              </p>
-            )}
-          </div>
-        )}
-        {!user && (
-          <p className="text-[12px] text-slate-400">
-            Faça login para ativar o trial grátis de 24h (1x por conta).
-          </p>
-        )}
-        <ProPlans />
       </section>
 
       {/* Contato */}

@@ -13,58 +13,82 @@ interface ProPlansProps {
   className?: string;
 }
 
-function openPlan(plan: StripePlan) {
+function planClassName(plan: StripePlan) {
+  return cn(
+    "relative z-10 flex min-h-11 w-full touch-manipulation items-center justify-between gap-3 rounded-xl border px-3.5 py-3 text-left no-underline transition-colors",
+    plan.bestValue
+      ? "border-amber-400/45 bg-amber-500/10 hover:bg-amber-500/15"
+      : "border-slate-700/90 bg-slate-950/60 hover:border-slate-500 hover:bg-slate-900/80"
+  );
+}
+
+function PlanLabel({ plan }: { plan: StripePlan }) {
+  return (
+    <>
+      <span className="min-w-0">
+        <span className="flex flex-wrap items-center gap-2">
+          <span className="text-sm font-bold text-slate-50">
+            {plan.priceLabel}
+          </span>
+          <span className="font-mono text-[11px] text-slate-400">
+            · {plan.durationLabel}
+          </span>
+          {plan.bestValue && (
+            <span className="inline-flex items-center gap-0.5 rounded-full border border-amber-400/40 bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-300">
+              <Sparkles className="size-2.5" />
+              Melhor custo
+            </span>
+          )}
+        </span>
+      </span>
+      <ExternalLink
+        className={cn(
+          "size-4 shrink-0",
+          plan.bestValue ? "text-amber-300" : "text-slate-500"
+        )}
+      />
+    </>
+  );
+}
+
+function PlanRow({ plan }: { plan: StripePlan }) {
   if (!plan.url) {
-    window.alert(
-      `Link do plano ${plan.durationLabel} ainda não configurado. Contato: ${CONTACT_EMAIL}`
+    return (
+      <button
+        type="button"
+        onClick={() =>
+          window.alert(
+            `Link do plano ${plan.durationLabel} ainda não configurado. Contato: ${CONTACT_EMAIL}`
+          )
+        }
+        className={planClassName(plan)}
+      >
+        <PlanLabel plan={plan} />
+      </button>
     );
-    return;
   }
-  window.open(plan.url, "_blank", "noopener,noreferrer");
+
+  // <a href> por plano — no mobile o window.open dentro do Dialog caía no último link (120d).
+  return (
+    <a
+      href={plan.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={planClassName(plan)}
+    >
+      <PlanLabel plan={plan} />
+    </a>
+  );
 }
 
 export function ProPlans({ className }: ProPlansProps) {
-  // Sempre os 3 Payment Links (7d / 30d / 120d). Não filtrar por trial, PRO ou URL vazia.
   const plans = getStripePlans();
 
   return (
-    <div className={cn("space-y-2.5", className)}>
-      <div className="grid grid-cols-1 gap-2">
+    <div className={cn("relative z-10 space-y-2.5", className)}>
+      <div className="flex flex-col gap-2">
         {plans.map((plan) => (
-          <button
-            key={plan.id}
-            type="button"
-            onClick={() => openPlan(plan)}
-            className={cn(
-              "relative flex w-full items-center justify-between gap-3 rounded-xl border px-3.5 py-3 text-left transition-colors",
-              plan.bestValue
-                ? "border-amber-400/45 bg-amber-500/10 hover:bg-amber-500/15"
-                : "border-slate-700/90 bg-slate-950/60 hover:border-slate-500 hover:bg-slate-900/80"
-            )}
-          >
-            <span className="min-w-0">
-              <span className="flex flex-wrap items-center gap-2">
-                <span className="text-sm font-bold text-slate-50">
-                  {plan.priceLabel}
-                </span>
-                <span className="font-mono text-[11px] text-slate-400">
-                  · {plan.durationLabel}
-                </span>
-                {plan.bestValue && (
-                  <span className="inline-flex items-center gap-0.5 rounded-full border border-amber-400/40 bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-300">
-                    <Sparkles className="size-2.5" />
-                    Melhor custo
-                  </span>
-                )}
-              </span>
-            </span>
-            <ExternalLink
-              className={cn(
-                "size-4 shrink-0",
-                plan.bestValue ? "text-amber-300" : "text-slate-500"
-              )}
-            />
-          </button>
+          <PlanRow key={plan.id} plan={plan} />
         ))}
       </div>
 

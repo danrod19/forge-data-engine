@@ -53,7 +53,7 @@ export function PaywallModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[min(90dvh,40rem)] max-w-[min(100vw-2rem,24rem)] gap-0 overflow-y-auto border-slate-700/80 bg-[#0a0f1a] p-0 shadow-2xl shadow-neon-green/5 sm:max-w-md">
+      <DialogContent className="flex max-h-[min(92dvh,42rem)] w-full max-w-[min(100vw-2rem,24rem)] flex-col gap-0 overflow-hidden border-slate-700/80 bg-[#0a0f1a] p-0 shadow-2xl shadow-neon-green/5 sm:max-w-md">
         <div className="flex items-center gap-2 border-b border-slate-800 bg-slate-950/90 px-3 py-2">
           <span className="size-2.5 rounded-full bg-[#ff5f57]" />
           <span className="size-2.5 rounded-full bg-[#febc2e]" />
@@ -66,10 +66,10 @@ export function PaywallModal({
 
         <div className="gold-gradient h-0.5 w-full opacity-80" />
 
-        <div className="relative p-5 sm:p-6">
+        <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain p-5 sm:p-6">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-40"
+            className="pointer-events-none absolute inset-0 z-0 opacity-40"
             style={{
               backgroundImage:
                 "linear-gradient(rgba(34,197,94,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(34,197,94,0.04) 1px, transparent 1px)",
@@ -77,7 +77,7 @@ export function PaywallModal({
             }}
           />
 
-          <DialogHeader className="relative space-y-3 text-center sm:text-center">
+          <DialogHeader className="relative z-10 space-y-2 text-center sm:text-center">
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -104,33 +104,19 @@ export function PaywallModal({
               className={
                 isLives
                   ? "text-sm leading-relaxed text-slate-400"
-                  : "text-left text-[12px] leading-relaxed text-slate-400 sm:text-[13px]"
+                  : "text-left text-[12px] leading-relaxed text-slate-400"
               }
             >
-              {isLives ? paywallCopy.livesBody : paywallCopy.upgradeBody}
+              {isLives
+                ? paywallCopy.livesBody
+                : "Escolha 7, 30 ou 120 dias. Cada botão abre o checkout daquele plano."}
             </DialogDescription>
           </DialogHeader>
 
-          <ul className="relative mt-4 space-y-2">
-            {features.map(({ icon: Icon, label }, i) => (
-              <motion.li
-                key={label}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.08 * i }}
-                className="flex items-start gap-3 rounded-lg border border-slate-800/90 bg-slate-950/70 px-3 py-2.5 font-mono text-[11px] leading-relaxed text-slate-300 sm:text-xs"
-              >
-                <span className="mt-0.5 text-neon-green">›</span>
-                <Icon className="mt-0.5 size-3.5 shrink-0 text-neon-cyan" />
-                <span>{label}</span>
-              </motion.li>
-            ))}
-          </ul>
-
-          <div className="relative mt-5 space-y-3">
+          <div className="relative z-10 mt-4 space-y-3">
             {isProEfetivo && (
               <p className="rounded-lg border border-neon-green/30 bg-neon-green/10 px-3 py-2 text-center font-mono text-xs text-neon-green">
-                PRO já ativo nesta conta.
+                PRO já ativo nesta conta — os 3 planos abaixo renovam/estendem.
               </p>
             )}
 
@@ -160,7 +146,25 @@ export function PaywallModal({
             )}
 
             <ProPlans />
+          </div>
 
+          <ul className="relative z-10 mt-3 space-y-1.5">
+            {features.map(({ icon: Icon, label }, i) => (
+              <motion.li
+                key={label}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.08 * i }}
+                className="flex items-start gap-3 rounded-lg border border-slate-800/90 bg-slate-950/70 px-3 py-2 font-mono text-[11px] leading-relaxed text-slate-300"
+              >
+                <span className="mt-0.5 text-neon-green">›</span>
+                <Icon className="mt-0.5 size-3.5 shrink-0 text-neon-cyan" />
+                <span>{label}</span>
+              </motion.li>
+            ))}
+          </ul>
+
+          <div className="relative z-10 mt-3">
             <Button
               type="button"
               variant="ghost"

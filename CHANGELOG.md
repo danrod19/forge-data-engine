@@ -4,6 +4,11 @@
 
 ## Entradas Recentes
 
+- **2026-09-11** — Mobile PRO: 3 planos acionáveis (Home / Paywall / Conta)
+  - Home: bloco de planos logo após o hero (não no fim da página)
+  - Paywall: `flex` + scroll interno; planos no topo; cada plano é `<a href>` próprio (não `window.open` no Dialog, que no iOS caía no 120d)
+  - Badge PRO no TopBar abre o paywall de renovação
+
 - **2026-09-11** — Planos 7/30/120 sempre visíveis
   - Home e Paywall deixavam de renderizar `ProPlans` com PRO efetivo (ex.: trial 24h ativo)
   - `ProPlans` / `getStripePlans` não filtram por `trial_used`; os 3 botões (R$ 6,90 / 20,90 / 57,90) listam sempre

@@ -242,8 +242,10 @@ export default function HomePage() {
             >
               <EstudoMode
                 lives={lives}
+                isPro={isPro}
                 onWrongAnswer={handleWrongAnswer}
                 disabled={livesBlocked}
+                onUpgrade={openUpgrade}
               />
             </motion.div>
           )}

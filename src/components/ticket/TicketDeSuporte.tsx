@@ -19,6 +19,7 @@ import { playCorrectSound, playWrongSound } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import type { Question } from "@/types/question";
 import {
+  formatBankId,
   getQuestionPrompt,
   hasDeepExplanation,
   isTraditionalQuestion,
@@ -280,10 +281,9 @@ export function TicketDeSuporte({
                 <span className="text-slate-500">/{total}</span>
               </span>
             </div>
-            <div className="flex items-center gap-1 rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 text-[10px] text-slate-400">
+            <div className="flex items-center gap-1 rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
               <Headphones className="size-3 text-neon-green" />
-              {isTraditional ? "SCN-" : "TKT-"}
-              {String(question.id).padStart(4, "0")}
+              {formatBankId(question.id)}
             </div>
           </div>
         </div>

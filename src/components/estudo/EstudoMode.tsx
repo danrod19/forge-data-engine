@@ -47,9 +47,12 @@ import { ESTUDO_PRACTICE_LIMIT, estudoHeaderCopy, estudoUiCopy } from "@/data/co
 import { EstudoContentPanel } from "@/components/estudo/EstudoContentPanel";
 import type { Question } from "@/types/question";
 import {
+  formatBankId,
   getQuestionPrompt,
+  hasDeepExplanation,
   isTraditionalQuestion,
 } from "@/types/question";
+import { Explicacao } from "@/components/ticket/Explicacao";
 import { playCorrectSound, playWrongSound } from "@/lib/sounds";
 import {
   loadEstudoProgressForTrack,
@@ -86,8 +89,10 @@ interface AccentStyle {
 
 interface EstudoModeProps {
   lives: number;
+  isPro?: boolean;
   onWrongAnswer: () => void;
   disabled: boolean;
+  onUpgrade: () => void;
 }
 
 function trackToEstudo(track: TrackId): EstudoTrackId {
@@ -114,7 +119,12 @@ function resolveAwsDomainContent(
   return mergeDidacticContents(parts, domain.name, domain.id);
 }
 
-export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
+export function EstudoMode({
+  isPro = false,
+  onWrongAnswer,
+  disabled,
+  onUpgrade,
+}: EstudoModeProps) {
   const { track } = useTrack();
   const isAws = track === "aws";
   const estudoTrack = trackToEstudo(track);
@@ -864,9 +874,14 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
             <ChevronLeft className="size-4" />
             {backLabel}
           </button>
-          <span className="text-[10px] tabular-nums text-slate-500">
-            {currentIndex + 1}/{total}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
+              {formatBankId(question.id)}
+            </span>
+            <span className="text-[10px] tabular-nums text-slate-500">
+              {currentIndex + 1}/{total}
+            </span>
+          </div>
         </div>
         <Progress value={progressPct} className="h-1 bg-slate-800" />
         {practiceEnFallback && (
@@ -932,7 +947,7 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
             <motion.div
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-between gap-3"
+              className="space-y-3"
             >
               <div
                 className={cn(
@@ -950,10 +965,18 @@ export function EstudoMode({ onWrongAnswer, disabled }: EstudoModeProps) {
                   </>
                 )}
               </div>
+              {hasDeepExplanation(question) && (
+                <Explicacao
+                  text={question.explicacao_profunda!}
+                  isPremium={question.isPremium && !isPro}
+                  isCorrect={!!isCorrect}
+                  onUpgrade={onUpgrade}
+                />
+              )}
               <Button
                 type="button"
                 onClick={handleNext}
-                className="gap-1 rounded-xl bg-neon-green px-4 font-bold text-slate-950"
+                className="h-11 w-full gap-1 rounded-xl bg-neon-green px-4 font-bold text-slate-950"
               >
                 {currentIndex + 1 >= total ? "Ver resultado" : "Próxima"}
                 <ChevronRight className="size-4" />

@@ -21,6 +21,7 @@ import {
   getQuestionPrompt,
   isTraditionalQuestion,
   hasDeepExplanation,
+  formatBankId,
 } from "@/types/question";
 import {
   SIMULADO_COUNTS,
@@ -730,6 +731,9 @@ export function SimuladoMode({
                 {formatTime(secondsLeft)}
               </div>
             )}
+            <div className="rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
+              {formatBankId(question.id)}
+            </div>
           </div>
         </div>
 

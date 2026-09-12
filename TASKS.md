@@ -40,6 +40,8 @@
 - [x] Copy de lançamento — Sobre a Prova + Upgrade/paywall (parágrafo + bullets PRO; e-mail ccnaforge19@gmail.com)
 - [x] UI: 3 planos (7/30/120) sempre visíveis — não esconder 7d após trial/PRO
 - [x] Mobile PRO ~390px: Home mostra 7/30/120; Paywall não força checkout 120d (`<a href>` por plano)
+- [x] UI: ID estável `#id` no header de Trilha / Simulado / Estudo
+- [x] Estudo: após responder, `Explicacao` (blur/paywall se isPremium e não PRO)
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção

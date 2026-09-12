@@ -88,6 +88,11 @@ export function hasDeepExplanation(q: Question): boolean {
   return Boolean(q.explicacao_profunda?.trim());
 }
 
+/** ID estável do banco — ex. #184 */
+export function formatBankId(id: number): string {
+  return `#${id}`;
+}
+
 /** Drill de subnetting (cálculo IPv4) — fora do simulado cronometrado padrão */
 export function isDrillQuestion(q: Question): boolean {
   return q.part_id === "1.4-drill";

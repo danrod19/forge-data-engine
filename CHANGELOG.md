@@ -4,6 +4,10 @@
 
 ## Entradas Recentes
 
+- **2026-09-11** — ID do banco + explicação no Estudo
+  - Header Trilha/Simulado/Estudo mostra `#id` estável do JSON
+  - Estudo passa a usar o bloco `Explicacao` da Trilha/Simulado (blur + CTA PRO se `isPremium` e não PRO)
+
 - **2026-09-11** — Mobile PRO: 3 planos acionáveis (Home / Paywall / Conta)
   - Home: bloco de planos logo após o hero (não no fim da página)
   - Paywall: `flex` + scroll interno; planos no topo; cada plano é `<a href>` próprio (não `window.open` no Dialog, que no iOS caía no 120d)

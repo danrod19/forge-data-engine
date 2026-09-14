@@ -25,6 +25,11 @@ export interface PerformanceFeedback {
   };
 }
 
+/** Cor do % (90+ verde, 70–89 ciano, 50–69 âmbar, <50 rose). */
+export function scorePercentTextClass(scorePct: number): string {
+  return getPerformanceFeedback(scorePct).colors.text;
+}
+
 export function getPerformanceFeedback(scorePct: number): PerformanceFeedback {
   if (scorePct >= 90) {
     return {

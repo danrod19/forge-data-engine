@@ -37,6 +37,7 @@
 - [x] Auth Spec 4 — reset de senha completo (forgot no Entrar, form Nova senha no link, Conta com o mesmo redirectTo/copy)
 - [x] Auth Spec 5 — signup com e-mail já existente (copy genérica + CTAs Entrar / Esqueci a senha)
 - [x] Histórico de simulados na Conta (`simulado_runs` + RLS; grava no resultado se logado)
+- [x] Histórico persistente `simulado_attempts` (track ccna1/ccna2/aws, 10 linhas, RLS, SQL Editor)
 - [x] Copy de lançamento — Sobre a Prova + Upgrade/paywall (parágrafo + bullets PRO; e-mail ccnaforge19@gmail.com)
 - [x] UI: 3 planos (7/30/120) sempre visíveis — não esconder 7d após trial/PRO
 - [x] Mobile PRO ~390px: Home mostra 7/30/120; Paywall não força checkout 120d (`<a href>` por plano)

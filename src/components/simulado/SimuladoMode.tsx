@@ -53,7 +53,10 @@ import { Explicacao } from "@/components/ticket/Explicacao";
 import { TerminalCLI } from "@/components/ticket/TerminalCLI";
 import { useTrack } from "@/lib/track-context";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { saveSimuladoRun } from "@/lib/simulado-runs";
+import {
+  insertAttempt,
+  trackIdToAttemptTrack,
+} from "@/lib/simulado-history";
 import { simuladoConfigCopy, simuladoLangModeCopy } from "@/data/copy";
 import { filterQuestionsByLangMode } from "@/lib/question-lang";
 
@@ -285,7 +288,10 @@ export function SimuladoMode({
   useEffect(() => {
     if (phase !== "result") return;
     if (runSavedRef.current) return;
-    if (!user?.id) return;
+    if (!user?.id) {
+      console.debug("[simulado] skip history: no session.user.id");
+      return;
+    }
     if (total <= 0) return;
 
     const persistKey = `${user.id}:${runKeyRef.current || "anon"}`;
@@ -296,16 +302,14 @@ export function SimuladoMode({
 
     runSavedRef.current = true;
     persistedRunKeys.add(persistKey);
-    void saveSimuladoRun({
+    void insertAttempt({
       userId: user.id,
-      track,
-      total,
+      track: trackIdToAttemptTrack(track),
+      nQuestoes: total,
       acertos: correctCount,
       durationSeconds: elapsedSeconds,
     }).then(({ error }) => {
       if (error) {
-        persistedRunKeys.delete(persistKey);
-        runSavedRef.current = false;
         setHistoryNotice("Não foi possível salvar o histórico.");
       }
     });

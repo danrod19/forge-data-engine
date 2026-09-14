@@ -4,6 +4,12 @@
 
 ## Entradas Recentes
 
+- **2026-09-14** — Histórico persistente de simulados (`simulado_attempts`)
+  - INSERT ao terminar simulado logado (anti-dupe da sessão; anônimo skip)
+  - Conta: últimas 10 linhas, % com cores do resultado, vazio/erro explícitos
+  - SQL: `supabase/migrations/20260914_simulado_attempts.sql` (colar no SQL Editor)
+  - Tracks canônicos `ccna1` | `ccna2` | `aws`; sem UPDATE/DELETE no client
+
 - **2026-09-14** — Estudo: explicação visível + ID estável no header
   - Estudo sempre monta `Explicacao` após responder (blur+CTA se `isPremium && !isPro`); sem campo → “Sem explicação neste item”
   - `Explicacao` não usa mais `height: 0` + `overflow-hidden` (podia ficar mudo no Estudo)

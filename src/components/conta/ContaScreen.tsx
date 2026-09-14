@@ -22,10 +22,11 @@ import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/types/question";
 import { RESET_PASSWORD_SENT_COPY } from "@/lib/auth-flow";
 import { launchCopy } from "@/data/copy";
 import {
-  listSimuladoRuns,
-  SIMULADO_RUN_TRACK_LABEL,
-  type SimuladoRunRow,
-} from "@/lib/simulado-runs";
+  attemptTrackLabel,
+  listAttempts,
+} from "@/lib/simulado-history";
+import type { SimuladoAttemptRow } from "@/types/simulado-attempt";
+import { scorePercentTextClass } from "@/components/simulado/simulado-feedback";
 
 interface ContaScreenProps {
   onAuthClick: () => void;
@@ -289,27 +290,40 @@ export function ContaScreen({ onAuthClick }: ContaScreenProps) {
   );
 }
 
-function formatRunDate(iso: string): string {
+function formatAttemptDate(iso: string): string {
   try {
-    return new Intl.DateTimeFormat("pt-BR", {
-      dateStyle: "short",
-      timeStyle: "short",
-    }).format(new Date(iso));
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const hh = String(d.getHours()).padStart(2, "0");
+    const min = String(d.getMinutes()).padStart(2, "0");
+    return `${dd}/${mm} ${hh}:${min}`;
   } catch {
     return iso;
   }
 }
 
+function formatAttemptPercent(value: number): string {
+  return `${Number(value).toLocaleString("pt-BR", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+  })}%`;
+}
+
 function SimuladoHistorySection({ userId }: { userId: string }) {
-  const [rows, setRows] = useState<SimuladoRunRow[]>([]);
+  const [rows, setRows] = useState<SimuladoAttemptRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    void listSimuladoRuns(20).then(({ rows: next }) => {
+    setFetchError(null);
+    void listAttempts(10).then(({ rows: next, error }) => {
       if (cancelled) return;
       setRows(next);
+      setFetchError(error);
       setLoading(false);
     });
     return () => {
@@ -329,38 +343,49 @@ function SimuladoHistorySection({ userId }: { userId: string }) {
       {loading ? (
         <div className="flex items-center gap-2 py-2 text-slate-500">
           <Loader2 className="size-4 animate-spin" />
-          <span className="font-mono text-[11px]">$ history --tail 20 …</span>
+          <span className="font-mono text-[11px]">$ history --tail 10 …</span>
         </div>
+      ) : fetchError ? (
+        <p className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 font-mono text-[11px] text-rose-300">
+          Não foi possível carregar o histórico.
+        </p>
       ) : rows.length === 0 ? (
         <p className="text-[13px] leading-relaxed text-slate-400">
-          Você ainda não terminou um simulado logado.
+          Nenhum simulado salvo ainda. Termine um simulado logado para aparecer
+          aqui.
         </p>
       ) : (
-        <ul className="space-y-2">
-          {rows.map((run) => (
-            <li
-              key={run.id}
-              className="flex items-center justify-between gap-3 rounded-lg border border-slate-800 bg-slate-950/50 px-3 py-2"
-            >
-              <div className="min-w-0">
-                <p className="text-xs font-semibold text-slate-200">
-                  {SIMULADO_RUN_TRACK_LABEL[run.track] ?? run.track}
-                </p>
-                <p className="font-mono text-[10px] text-slate-500">
-                  {formatRunDate(run.created_at)}
-                </p>
-              </div>
-              <div className="shrink-0 text-right">
-                <p className="font-mono text-sm font-bold tabular-nums text-neon-green">
-                  {run.percentual}%
-                </p>
-                <p className="font-mono text-[10px] tabular-nums text-slate-500">
-                  {run.acertos}/{run.total}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div className="overflow-hidden rounded-lg border border-slate-800">
+          <div className="grid grid-cols-[5.6rem_3.4rem_minmax(0,1fr)_3.2rem] gap-x-2 border-b border-slate-800 bg-slate-950/80 px-3 py-1.5 font-mono text-[9px] uppercase tracking-wider text-slate-500">
+            <span>data</span>
+            <span>track</span>
+            <span className="text-right">acertos</span>
+            <span className="text-right">%</span>
+          </div>
+          <ul>
+            {rows.map((run) => (
+              <li
+                key={run.id}
+                className="grid grid-cols-[5.6rem_3.4rem_minmax(0,1fr)_3.2rem] items-center gap-x-2 border-t border-slate-800/80 px-3 py-2 font-mono text-[11px] first:border-t-0"
+              >
+                <span className="tabular-nums text-slate-400">
+                  {formatAttemptDate(run.created_at)}
+                </span>
+                <span className="truncate font-semibold text-slate-200">
+                  {attemptTrackLabel(run.track)}
+                </span>
+                <span className="text-right tabular-nums text-slate-300">
+                  {run.acertos}/{run.n_questoes}
+                </span>
+                <span
+                  className={`text-right font-bold tabular-nums ${scorePercentTextClass(run.percentual)}`}
+                >
+                  {formatAttemptPercent(run.percentual)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </section>
   );

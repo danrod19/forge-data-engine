@@ -88,9 +88,54 @@ export function hasDeepExplanation(q: Question): boolean {
   return Boolean(q.explicacao_profunda?.trim());
 }
 
-/** ID estável do banco — ex. #184 */
-export function formatBankId(id: number): string {
-  return `#${id}`;
+export function getDeepExplanation(q: Question): string {
+  return (q.explicacao_profunda ?? "").trim();
+}
+
+/**
+ * ID numérico do banco. Nunca retorna "#" vazio.
+ * Aceita number ou dígitos em string; qualquer outro valor → "".
+ */
+export function formatBankId(id: number | string | null | undefined): string {
+  if (typeof id === "number" && Number.isFinite(id)) {
+    return `#${id}`;
+  }
+  if (typeof id === "string") {
+    const t = id.trim();
+    if (/^\d+$/.test(t)) return `#${Number(t)}`;
+  }
+  return "";
+}
+
+/** part_id estilo tópico: "v2-2.2", "1.1", "aws-1.3", "1.4-drill". */
+export function isTopicPartId(partId: string | undefined | null): boolean {
+  if (!partId?.trim()) return false;
+  return /^(v2-|aws-)?\d+(\.\d+)*(-[a-z0-9]+)?$/i.test(partId.trim());
+}
+
+/** Exibe tópico estável: v2-2.2 → V2-2.2 */
+export function formatTopicCode(partId: string | undefined | null): string | null {
+  if (!partId || !isTopicPartId(partId)) return null;
+  const p = partId.trim();
+  if (/^v2-/i.test(p)) return `V2-${p.slice(p.indexOf("-") + 1)}`;
+  if (/^aws-/i.test(p)) return `AWS-${p.slice(p.indexOf("-") + 1)}`;
+  return p;
+}
+
+/**
+ * ID visível no header: prefere #id numérico.
+ * Se houver código de tópico (V2-2.2), mostra os dois: "V2-2.2 · #184".
+ * Nunca "#".
+ */
+export function formatQuestionId(
+  q: Pick<Question, "id" | "part_id">
+): string {
+  const bank = formatBankId(q.id);
+  const topic = formatTopicCode(q.part_id);
+  if (topic && bank) return `${topic} · ${bank}`;
+  if (bank) return bank;
+  if (topic) return topic;
+  return "";
 }
 
 /** Drill de subnetting (cálculo IPv4) — fora do simulado cronometrado padrão */

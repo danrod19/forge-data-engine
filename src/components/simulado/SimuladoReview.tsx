@@ -13,7 +13,11 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Question } from "@/types/question";
-import { getQuestionPrompt, isTraditionalQuestion } from "@/types/question";
+import {
+  formatQuestionId,
+  getQuestionPrompt,
+  isTraditionalQuestion,
+} from "@/types/question";
 import { letterIndex } from "@/components/simulado/simulado-feedback";
 import { TerminalCLI } from "@/components/ticket/TerminalCLI";
 
@@ -68,6 +72,7 @@ export function SimuladoReview({
   const item = items[safeIndex];
   const { question: rq, record } = item;
   const prompt = getQuestionPrompt(rq);
+  const idLabel = formatQuestionId(rq);
   const userAnswer = rq.alternativas[record.selected] ?? "—";
   const correctAnswer = rq.alternativas[rq.resposta_correta] ?? "—";
   const progressPct = ((safeIndex + 1) / items.length) * 100;
@@ -95,10 +100,17 @@ export function SimuladoReview({
               </p>
             </div>
           </div>
-          <span className="shrink-0 rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 font-mono text-xs tabular-nums text-slate-300">
-            {safeIndex + 1}
-            <span className="text-slate-600">/{items.length}</span>
-          </span>
+          <div className="flex shrink-0 flex-col items-end gap-1">
+            {idLabel ? (
+              <span className="rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
+                {idLabel}
+              </span>
+            ) : null}
+            <span className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 font-mono text-xs tabular-nums text-slate-300">
+              {safeIndex + 1}
+              <span className="text-slate-600">/{items.length}</span>
+            </span>
+          </div>
         </div>
         <Progress value={progressPct} className="h-1.5 bg-slate-800" />
       </div>
@@ -120,7 +132,6 @@ export function SimuladoReview({
                 : "Questão"}
             </p>
             <h2 className="text-sm font-medium leading-relaxed text-slate-100 sm:text-base">
-              <span className="mr-1.5 text-neon-green">#</span>
               {prompt}
             </h2>
           </div>

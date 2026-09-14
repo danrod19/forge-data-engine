@@ -47,9 +47,9 @@ import { ESTUDO_PRACTICE_LIMIT, estudoHeaderCopy, estudoUiCopy } from "@/data/co
 import { EstudoContentPanel } from "@/components/estudo/EstudoContentPanel";
 import type { Question } from "@/types/question";
 import {
-  formatBankId,
+  formatQuestionId,
+  getDeepExplanation,
   getQuestionPrompt,
-  hasDeepExplanation,
   isTraditionalQuestion,
 } from "@/types/question";
 import { Explicacao } from "@/components/ticket/Explicacao";
@@ -855,6 +855,7 @@ export function EstudoMode({
     const backLabel = isAws
       ? (selectedAwsDomain?.name ?? "Domínio")
       : (selectedPart?.part_id ?? "Parte");
+    const idLabel = formatQuestionId(question);
 
     return (
       <motion.div
@@ -875,9 +876,11 @@ export function EstudoMode({
             {backLabel}
           </button>
           <div className="flex items-center gap-2">
-            <span className="rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
-              {formatBankId(question.id)}
-            </span>
+            {idLabel ? (
+              <span className="rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
+                {idLabel}
+              </span>
+            ) : null}
             <span className="text-[10px] tabular-nums text-slate-500">
               {currentIndex + 1}/{total}
             </span>
@@ -965,14 +968,12 @@ export function EstudoMode({
                   </>
                 )}
               </div>
-              {hasDeepExplanation(question) && (
-                <Explicacao
-                  text={question.explicacao_profunda!}
-                  isPremium={question.isPremium && !isPro}
-                  isCorrect={!!isCorrect}
-                  onUpgrade={onUpgrade}
-                />
-              )}
+              <Explicacao
+                text={getDeepExplanation(question)}
+                isPremium={question.isPremium && !isPro}
+                isCorrect={!!isCorrect}
+                onUpgrade={onUpgrade}
+              />
               <Button
                 type="button"
                 onClick={handleNext}

@@ -19,9 +19,9 @@ import { playCorrectSound, playWrongSound } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import type { Question } from "@/types/question";
 import {
-  formatBankId,
+  formatQuestionId,
+  getDeepExplanation,
   getQuestionPrompt,
-  hasDeepExplanation,
   isTraditionalQuestion,
   shouldShowTerminalCli,
 } from "@/types/question";
@@ -78,9 +78,8 @@ export function TicketDeSuporte({
     total > 0 ? ((currentIndex + (hasAnswered ? 1 : 0)) / total) * 100 : 0;
   const isCorrect = selected === question?.resposta_correta;
   const isTraditional = question ? isTraditionalQuestion(question) : false;
-  const showExplanation =
-    hasAnswered && question && hasDeepExplanation(question);
   const prompt = question ? getQuestionPrompt(question) : "";
+  const questionIdLabel = question ? formatQuestionId(question) : "";
 
   const handleSelect = useCallback(
     (index: number) => {
@@ -281,10 +280,12 @@ export function TicketDeSuporte({
                 <span className="text-slate-500">/{total}</span>
               </span>
             </div>
-            <div className="flex items-center gap-1 rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
-              <Headphones className="size-3 text-neon-green" />
-              {formatBankId(question.id)}
-            </div>
+            {questionIdLabel ? (
+              <div className="flex items-center gap-1 rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
+                <Headphones className="size-3 text-neon-green" />
+                {questionIdLabel}
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -297,7 +298,6 @@ export function TicketDeSuporte({
         <Progress value={progressPct} className="mb-3 h-1.5 bg-slate-800" />
 
         <h1 className="text-sm font-medium leading-relaxed text-slate-100 sm:text-base">
-          <span className="mr-1.5 text-neon-green">#</span>
           {prompt}
         </h1>
       </div>
@@ -305,7 +305,7 @@ export function TicketDeSuporte({
       {/* ── Question body with slide transition ── */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={question.id}
+          key={`q-${currentIndex}-${question.question_type ?? "q"}-${question.id}`}
           initial={{ opacity: 0, x: 28 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -28 }}
@@ -478,9 +478,9 @@ export function TicketDeSuporte({
               </motion.p>
             )}
 
-            {showExplanation && (
+            {question && (
               <Explicacao
-                text={question.explicacao_profunda!}
+                text={getDeepExplanation(question)}
                 isPremium={question.isPremium && !isPro}
                 isCorrect={!!isCorrect}
                 onUpgrade={onUpgrade}

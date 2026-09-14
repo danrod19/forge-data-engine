@@ -4,6 +4,13 @@
 
 ## Entradas Recentes
 
+- **2026-09-14** — Estudo: explicação visível + ID estável no header
+  - Estudo sempre monta `Explicacao` após responder (blur+CTA se `isPremium && !isPro`); sem campo → “Sem explicação neste item”
+  - `Explicacao` não usa mais `height: 0` + `overflow-hidden` (podia ficar mudo no Estudo)
+  - Header Trilha/Simulado/Estudo: `formatQuestionId` (`V2-2.2 · #121`); `#` decorativo no enunciado removido
+  - Simulado V2 deixa de renumerar `id` da sessão (mostra o id do JSON)
+  - Banco intocado: Estudo V2 506/506 e V1 929/929 com `explicacao_profunda`
+
 - **2026-09-11** — ID do banco + explicação no Estudo
   - Header Trilha/Simulado/Estudo mostra `#id` estável do JSON
   - Estudo passa a usar o bloco `Explicacao` da Trilha/Simulado (blur + CTA PRO se `isPremium` e não PRO)

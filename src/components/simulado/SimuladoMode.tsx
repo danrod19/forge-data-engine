@@ -20,8 +20,8 @@ import type { Question } from "@/types/question";
 import {
   getQuestionPrompt,
   isTraditionalQuestion,
-  hasDeepExplanation,
-  formatBankId,
+  formatQuestionId,
+  getDeepExplanation,
 } from "@/types/question";
 import {
   SIMULADO_COUNTS,
@@ -132,19 +132,14 @@ export function SimuladoMode({
       ? Math.round((correctCount / answers.length) * 100)
       : 0;
 
-  const wrongAnswers = useMemo(
-    () => answers.filter((a) => !a.correct),
-    [answers]
-  );
-
   const wrongQuestions = useMemo(() => {
-    return wrongAnswers
-      .map((a) => {
-        const q = sessionQuestions.find((sq) => sq.id === a.questionId);
-        return q ? { question: q, record: a } : null;
+    return answers
+      .map((a, i) => {
+        const q = sessionQuestions[i];
+        return q && !a.correct ? { question: q, record: a } : null;
       })
       .filter(Boolean) as { question: Question; record: AnswerRecord }[];
-  }, [wrongAnswers, sessionQuestions]);
+  }, [answers, sessionQuestions]);
 
   // Countdown timer
   useEffect(() => {
@@ -685,6 +680,7 @@ export function SimuladoMode({
   const isTicket =
     question.question_type === "ticket" || !isTraditionalQuestion(question);
   const timerUrgent = timerEnabled && secondsLeft <= 60;
+  const idLabel = formatQuestionId(question);
 
   return (
     <div className="space-y-4">
@@ -731,9 +727,11 @@ export function SimuladoMode({
                 {formatTime(secondsLeft)}
               </div>
             )}
-            <div className="rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
-              {formatBankId(question.id)}
-            </div>
+            {idLabel ? (
+              <div className="rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
+                {idLabel}
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -751,7 +749,6 @@ export function SimuladoMode({
           </span>
         )}
         <h1 className="text-sm font-medium leading-relaxed text-slate-100 sm:text-base">
-          <span className="mr-1.5 text-neon-green">#</span>
           {prompt}
         </h1>
       </div>
@@ -759,7 +756,7 @@ export function SimuladoMode({
       {/* Alternatives (+ CLI se ticket) */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={question.id}
+          key={`q-${currentIndex}-${question.question_type ?? "q"}-${question.id}`}
           initial={{ opacity: 0, x: 28 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -28 }}
@@ -920,14 +917,12 @@ export function SimuladoMode({
               </motion.p>
             )}
 
-            {hasDeepExplanation(question) && (
-              <Explicacao
-                text={question.explicacao_profunda!}
-                isPremium={question.isPremium && !isPro}
-                isCorrect={!!isCorrect}
-                onUpgrade={onUpgrade}
-              />
-            )}
+            <Explicacao
+              text={getDeepExplanation(question)}
+              isPremium={question.isPremium && !isPro}
+              isCorrect={!!isCorrect}
+              onUpgrade={onUpgrade}
+            />
 
             <Button
               type="button"

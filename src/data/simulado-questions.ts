@@ -238,7 +238,8 @@ export function getSimuladoPoolByTrackAndLang(
 
 /**
  * Sessão Simulado CCNA V2 com bias de posture (~30% tickets).
- * IDs renumerados 1..N (trad e tickets v2 colidem no JSON).
+ * Preserva `id` do banco (trad e tickets podem colidir — a UI usa
+ * question_type+id+índice como chave, não o id sozinho).
  * Não altera pools de ccna-v1 / aws.
  */
 export function pickSimuladoV2MixedSession(
@@ -289,11 +290,7 @@ export function pickSimuladoV2MixedSession(
     })),
   ];
 
-  // Shuffle final + IDs únicos de sessão (evita colisão trad/ticket)
-  return shuffleQuestions(picked).map((q, index) => ({
-    ...q,
-    id: index + 1,
-  }));
+  return shuffleQuestions(picked);
 }
 
 /** Alias pedido no contrato */

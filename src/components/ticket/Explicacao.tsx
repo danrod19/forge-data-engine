@@ -17,12 +17,32 @@ export function Explicacao({
   isCorrect,
   onUpgrade,
 }: ExplicacaoProps) {
+  const body = text.trim();
+
+  if (!body) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+            Explicação
+          </p>
+          <p className="text-sm leading-relaxed text-slate-400">
+            Sem explicação neste item
+          </p>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12, height: 0 }}
-      animate={{ opacity: 1, y: 0, height: "auto" }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="overflow-hidden"
     >
       <div
         className={`relative rounded-xl border p-4 ${

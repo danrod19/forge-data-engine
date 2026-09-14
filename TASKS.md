@@ -42,6 +42,8 @@
 - [x] Mobile PRO ~390px: Home mostra 7/30/120; Paywall não força checkout 120d (`<a href>` por plano)
 - [x] UI: ID estável `#id` no header de Trilha / Simulado / Estudo
 - [x] Estudo: após responder, `Explicacao` (blur/paywall se isPremium e não PRO)
+- [x] Estudo: `Explicacao` sempre após responder (mesmo bloco da Trilha/Simulado; “Sem explicação neste item” se o campo vier vazio)
+- [x] Header ID: `formatQuestionId` — `#184` ou `V2-2.2 · #184`; nunca `#` vazio; Simulado V2 preserva id do banco
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção

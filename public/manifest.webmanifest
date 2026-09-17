@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "CCNA Forge",
+  "short_name": "Forge",
+  "description": "Estudo gamificado multi-track: CCNA 200-301 e AWS SAA.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#22c55e",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

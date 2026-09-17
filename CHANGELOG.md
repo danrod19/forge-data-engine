@@ -4,6 +4,20 @@
 
 ## Entradas Recentes
 
+- **2026-09-17** — E-mail transacional mínimo (Resend)
+  - Pagamento: 1 e-mail após `checkout.session.completed` (mesmo handler que marca PRO); sem chave = warn + 200
+  - Idempotência por `profiles.last_mail_session_id` (Stripe `session.id`)
+  - Trial < 24h: Edge Function `trial-reminder` (não dispara no request do usuário; cron no Dashboard)
+  - SQL: `supabase/migrations/20260917_transactional_email.sql` (colar no SQL Editor)
+  - Templates: `src/lib/email/templates.ts`; From `RESEND_FROM` / Reply-To `ccnaforge19@gmail.com`
+
+- **2026-09-17** — PWA instalável (Android Chrome + iOS Safari)
+  - `public/manifest.webmanifest` (name CCNA Forge, standalone, theme `#22c55e`, fundo slate-950)
+  - Ícones PNG 192/512 + apple-touch 180 (“F” neon; sem logo Cisco)
+  - SW mínimo em `public/sw.js` (só `/`, `/_next/static`, ícones, manifest; skipWaiting + clientsClaim)
+  - Banner “Instalar app” via `beforeinstallprompt`; tip iOS dismiss `ccna-forge-pwa-tip-v1`
+  - Sem push, sem cache de API/webhook/Auth/JSON de questões
+
 - **2026-09-14** — Histórico persistente de simulados (`simulado_attempts`)
   - INSERT ao terminar simulado logado (anti-dupe da sessão; anônimo skip)
   - Conta: últimas 10 linhas, % com cores do resultado, vazio/erro explícitos

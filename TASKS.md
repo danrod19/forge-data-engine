@@ -45,6 +45,8 @@
 - [x] Estudo: após responder, `Explicacao` (blur/paywall se isPremium e não PRO)
 - [x] Estudo: `Explicacao` sempre após responder (mesmo bloco da Trilha/Simulado; “Sem explicação neste item” se o campo vier vazio)
 - [x] Header ID: `formatQuestionId` — `#184` ou `V2-2.2 · #184`; nunca `#` vazio; Simulado V2 preserva id do banco
+- [x] PWA instalável — manifest + ícones 192/512/180 + SW mínimo (estáticos) + banner Android / tip iOS
+- [x] E-mail transacional mínimo (Resend): pagamento no webhook `checkout.session.completed` + trial-reminder diário (SQL colunas; sem deploy/cron neste repo)
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção

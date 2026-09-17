@@ -1,6 +1,12 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import Stripe from "https://esm.sh/stripe@17.7.0?target=deno";
+import { isDevForceMail, sendResendEmail } from "../_shared/resend.ts";
+import {
+  formatBrlFromCents,
+  paymentConfirmedEmail,
+  planIdFromDays,
+} from "../_shared/templates.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -61,6 +67,7 @@ Deno.serve(async (req) => {
     return new Response("Invalid signature", { status: 400, headers: cors });
   }
 
+  // Único evento que o app usa. Não tratar invoice.paid (não inventar 2º fluxo).
   if (event.type !== "checkout.session.completed") {
     return new Response(
       JSON.stringify({ received: true, ignored: event.type }),
@@ -156,8 +163,76 @@ Deno.serve(async (req) => {
     payment_id: session.id
   });
 
+  // E-mail transacional: falha nunca altera o 200 do Stripe.
+  try {
+    await sendPaymentConfirmedMail({
+      supabase,
+      profileId: profile.id,
+      email,
+      sessionId: session.id,
+      days,
+      amountTotal: session.amount_total ?? null,
+    });
+  } catch (err) {
+    console.error("[email] payment mail failed", err);
+  }
+
   return new Response(JSON.stringify({ received: true, ok: true, days }), {
     status: 200,
     headers: { ...cors, "Content-Type": "application/json" },
   });
 });
+
+async function sendPaymentConfirmedMail(opts: {
+  supabase: ReturnType<typeof createClient>;
+  profileId: string;
+  email: string;
+  sessionId: string;
+  days: number;
+  amountTotal: number | null;
+}): Promise<void> {
+  const { data: mailRow, error: mailFindErr } = await opts.supabase
+    .from("profiles")
+    .select("last_mail_session_id")
+    .eq("id", opts.profileId)
+    .maybeSingle();
+
+  if (mailFindErr) {
+    console.warn(
+      "[email] skip (aplique a migration last_mail_session_id)",
+      mailFindErr.message
+    );
+    return;
+  }
+
+  const alreadySent = mailRow?.last_mail_session_id === opts.sessionId;
+  if (alreadySent && !isDevForceMail()) {
+    console.log("[email] skip duplicate session.id", opts.sessionId);
+    return;
+  }
+
+  const mail = paymentConfirmedEmail({
+    plan: planIdFromDays(opts.days),
+    amountLabel: formatBrlFromCents(opts.amountTotal),
+  });
+  const result = await sendResendEmail({
+    to: opts.email,
+    subject: mail.subject,
+    text: mail.text,
+    html: mail.html,
+  });
+
+  if (!result.ok || result.skipped) return;
+
+  const { error: mailUpdErr } = await opts.supabase
+    .from("profiles")
+    .update({
+      last_mail_session_id: opts.sessionId,
+      last_payment_email_at: new Date().toISOString(),
+    })
+    .eq("id", opts.profileId);
+
+  if (mailUpdErr) {
+    console.error("[email] failed to store last_mail_session_id", mailUpdErr);
+  }
+}

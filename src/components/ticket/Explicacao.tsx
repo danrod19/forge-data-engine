@@ -22,9 +22,9 @@ export function Explicacao({
   if (!body) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 1, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
           <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
@@ -40,9 +40,9 @@ export function Explicacao({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 1, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
     >
       <div
         className={`relative rounded-xl border p-4 ${
@@ -120,14 +120,9 @@ export function Explicacao({
             </div>
           </div>
         ) : (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="text-sm leading-relaxed text-slate-200"
-          >
+          <p className="text-sm leading-relaxed text-slate-200 whitespace-pre-wrap">
             {text}
-          </motion.p>
+          </p>
         )}
       </div>
     </motion.div>

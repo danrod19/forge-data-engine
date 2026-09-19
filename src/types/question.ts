@@ -146,6 +146,7 @@ export function formatQuestionId(
   if (topic && bank) return `${topic} · ${bank}`;
   if (bank) return bank;
   if (topic) return topic;
+  if (typeof q.id === "number" && Number.isFinite(q.id)) return `#${q.id}`;
   return "";
 }
 

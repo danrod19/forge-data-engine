@@ -4,6 +4,12 @@
 
 ## Entradas Recentes
 
+- **2026-09-19** — Bugs CCNA Estudo + tickets 143/144 (auditoria PRO)
+  - Estudo: após responder, mesmo bloco do Simulado (`Explicacao` + “Resposta correta” se errar + paywall se `isPremium && !isPro`). Wrapper sem AnimatePresence/`opacity: 0` (explicação não some). `Explicacao` deixa de iniciar invisível.
+  - Header Estudo: `#id` do JSON (`5.1 · #12`); N/M só na linha “Progresso”. 5.1/6.1 nunca `#` vazio.
+  - Trilha V1 `#143`/`#144` (`tickets_module6.json` ids 13–14): `cli_output` reescrito com `hostname#` + show/logging IOS; alternativas/gabarito intactos
+  - Sem Stripe / PWA / AWS / Auth / deploy
+
 - **2026-09-19** — Bugs AWS (auditoria 18/09): stems, IDs, Estudo
   - Banco: `questions_aws_traditional.json` 360 + `tickets_aws.json` 60 (tickets sem corte)
   - Stems corrigidos (14): 12, 30, 54, 90, 120, 150, 180, 210, 240, 270, 300, 322, 330, 360 — heading “Resumo …:”, colon incompleto, `…` no meio da frase IAM; alternativas/`resposta_correta` intactos

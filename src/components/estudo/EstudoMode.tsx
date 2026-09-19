@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useCallback, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   BookOpen,
   ChevronLeft,
@@ -47,6 +47,7 @@ import { ESTUDO_PRACTICE_LIMIT, estudoHeaderCopy, estudoUiCopy } from "@/data/co
 import { EstudoContentPanel } from "@/components/estudo/EstudoContentPanel";
 import type { Question } from "@/types/question";
 import {
+  formatBankId,
   formatQuestionId,
   getDeepExplanation,
   getQuestionPrompt,
@@ -856,6 +857,11 @@ export function EstudoMode({
       ? (selectedAwsDomain?.name ?? "Domínio")
       : (selectedPart?.part_id ?? "Parte");
     const idLabel = formatQuestionId(question);
+    const bankId = formatBankId(question.id);
+    const headerId =
+      (idLabel.includes("#") ? idLabel : "") ||
+      bankId ||
+      (Number.isFinite(question.id) ? `#${question.id}` : "");
 
     return (
       <motion.div
@@ -870,21 +876,26 @@ export function EstudoMode({
               setView("detail");
               setDetailTab("practice");
             }}
-            className="flex items-center gap-1 text-xs text-slate-400 hover:text-neon-green"
+            className="flex min-w-0 items-center gap-1 text-xs text-slate-400 hover:text-neon-green"
           >
-            <ChevronLeft className="size-4" />
-            {backLabel}
+            <ChevronLeft className="size-4 shrink-0" />
+            <span className="truncate">{backLabel}</span>
           </button>
-          <div className="flex items-center gap-2">
-            {idLabel ? (
-              <span className="shrink-0 whitespace-nowrap rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
-                {idLabel}
-              </span>
-            ) : null}
-            <span className="text-[10px] tabular-nums text-slate-500">
-              {currentIndex + 1}/{total}
+          {headerId ? (
+            <span className="shrink-0 whitespace-nowrap rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
+              {headerId}
             </span>
-          </div>
+          ) : (
+            <span className="shrink-0 whitespace-nowrap rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
+              #{question.id}
+            </span>
+          )}
+        </div>
+        <div className="mb-1 flex items-center justify-between text-[10px] text-slate-500">
+          <span>Progresso</span>
+          <span className="tabular-nums text-slate-400">
+            {currentIndex + 1}/{total}
+          </span>
         </div>
         <Progress value={progressPct} className="h-1 bg-slate-800" />
         {practiceEnFallback && (
@@ -945,46 +956,50 @@ export function EstudoMode({
             );
           })}
         </div>
-        <AnimatePresence>
-          {hasAnswered && (
-            <motion.div
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-3"
+        {hasAnswered && (
+          <div className="space-y-3 overflow-visible">
+            <div
+              className={cn(
+                "flex items-center gap-1.5 text-xs font-semibold",
+                isCorrect ? "text-neon-green" : "text-rose-400"
+              )}
             >
-              <div
-                className={cn(
-                  "flex items-center gap-1.5 text-xs font-semibold",
-                  isCorrect ? "text-neon-green" : "text-rose-400"
-                )}
-              >
-                {isCorrect ? (
-                  <>
-                    <CheckCircle2 className="size-4" /> Correto
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="size-4" /> Incorreto
-                  </>
-                )}
-              </div>
-              <Explicacao
-                text={getDeepExplanation(question)}
-                isPremium={question.isPremium && !isPro}
-                isCorrect={!!isCorrect}
-                onUpgrade={onUpgrade}
-              />
-              <Button
-                type="button"
-                onClick={handleNext}
-                className="h-11 w-full gap-1 rounded-xl bg-neon-green px-4 font-bold text-slate-950"
-              >
-                {currentIndex + 1 >= total ? "Ver resultado" : "Próxima"}
-                <ChevronRight className="size-4" />
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              {isCorrect ? (
+                <>
+                  <CheckCircle2 className="size-4" /> Correto
+                </>
+              ) : (
+                <>
+                  <XCircle className="size-4" /> Incorreto
+                </>
+              )}
+            </div>
+            {!isCorrect && (
+              <p className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs text-slate-400">
+                Resposta correta:{" "}
+                <span className="font-semibold text-neon-green">
+                  {String.fromCharCode(65 + question.resposta_correta)}.{" "}
+                  {question.alternativas[question.resposta_correta]}
+                </span>
+              </p>
+            )}
+            <Explicacao
+              key={`estudo-exp-${question.id}-${currentIndex}`}
+              text={getDeepExplanation(question)}
+              isPremium={Boolean(question.isPremium) && !isPro}
+              isCorrect={!!isCorrect}
+              onUpgrade={onUpgrade}
+            />
+            <Button
+              type="button"
+              onClick={handleNext}
+              className="h-11 w-full gap-1 rounded-xl bg-neon-green px-4 font-bold text-slate-950"
+            >
+              {currentIndex + 1 >= total ? "Ver resultado" : "Próxima"}
+              <ChevronRight className="size-4" />
+            </Button>
+          </div>
+        )}
       </motion.div>
     );
   }

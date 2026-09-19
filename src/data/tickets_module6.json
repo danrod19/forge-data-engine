@@ -196,7 +196,7 @@
     "question_type": "ticket",
     "isPremium": true,
     "sintoma": "Chamado #6303 — o POST de policy falha; o dev colou JSON de template com erro de digitação e a API responde 400.",
-    "cli_output": "$ curl -i -X POST -H \"Authorization: Bearer VALID\" -H \"Content-Type: application/json\" \\\n  -d '{\n  \"name\": \"QOS-VOICE\",\n  \"enabled\": true,\n  \"dscp\": 46,\n}' \\\n  https://ctrl.lab/api/v1/policy\nHTTP/1.1 400 Bad Request\nContent-Type: application/json\n\n{\n  \"error\": \"Invalid JSON: Unexpected token } in JSON at position 52\",\n  \"hint\": \"trailing comma or quote issue\"\n}\n\n// JSON enviado tem virgula apos 46 antes do fecha-chaves\n// Apos remover a trailing comma, POST retorna 201 Created",
+    "cli_output": "POLICY-SW# show restconf\nRESTCONF is enabled\n\nPOLICY-SW# show ip http server status\nHTTP server status: Enabled\nHTTP secure server status: Enabled\nHTTP server authentication: local\n\nPOLICY-SW# show logging | include RESTCONF\n*Sep 19 10:12:01.114: %RESTCONF-3-PARSE: POST /restconf/data/policy rejected\n*Sep 19 10:12:01.114: Invalid JSON: Unexpected token } at position 52 (trailing comma after dscp 46)\n*Sep 19 10:12:01.115: RESTCONF reply: 400 Bad Request (parse error) — session netops still authenticated\n\nPOLICY-SW# show users\nLine     User     Host(s)     Idle\n*  1 vty 0  netops   idle        00:00:03\n\n! Token/sessao VALID. Path /policy existe. Nao e 401 nem 404. Primeiro POST nao foi 201.",
     "alternativas": [
       "401 por token VALID",
       "201 Created ja no primeiro POST com trailing comma",
@@ -212,7 +212,7 @@
     "question_type": "ticket",
     "isPremium": true,
     "sintoma": "Chamado #6304 — o dashboard mostra sucesso, mas o campo softwareVersion que o script grava no CMDB fica vazio.",
-    "cli_output": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  \"id\": \"dev-001\",\n  \"hostname\": \"SW-DIST-1\",\n  \"managementIp\": \"10.20.20.5\",\n  \"platform\": \"C9300-48P\",\n  \"reachability\": \"REACHABLE\",\n  \"software\": {\n    \"type\": \"IOS-XE\",\n    \"version\": \"17.9.4a\"\n  }\n}\n\n// script legado\nversion = body.softwareVersion\n// version === undefined\n// body.software.version === \"17.9.4a\"\n// API v2 moveu a versao para objeto aninhado software",
+    "cli_output": "SW-DIST-1# show version\nCisco IOS XE Software, Version 17.9.4a\nCisco IOS Software [Cupertino], Catalyst L3 Switch Software (CAT9K_IOSXE), Version 17.9.4a\ncisco C9300-48P (ARM64) processor\n\nSW-DIST-1# show inventory\nNAME: \"Chassis\", DESCR: \"Cisco Catalyst 9300 Series Switch\"\nPID: C9300-48P           , VID: V02  , SN: FCW1234A1B2\n\nSW-DIST-1# show restconf\nRESTCONF is enabled\n\nSW-DIST-1# show logging | include RESTCONF GET\n*Sep 19 11:02:44.201: RESTCONF GET /restconf/data/network-device/dev-001\n*Sep 19 11:02:44.208: RESTCONF reply 200 OK (yang-data valid)\n*Sep 19 11:02:44.208: leaves: hostname=SW-DIST-1 mgmt=10.20.20.5 platform=C9300-48P\n*Sep 19 11:02:44.208: software/type=IOS-XE software/version=17.9.4a\n*Sep 19 11:02:44.208: no leaf 'softwareVersion' at root (legacy script reads undefined)\n\n! GET 200, payload valido; versao esta em software/version, nao na raiz.",
     "alternativas": [
       "Campo softwareVersion na raiz esta presente como 17.9.4a",
       "Status 404 Not Found",

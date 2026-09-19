@@ -47,6 +47,7 @@
 - [x] Header ID: `formatQuestionId` — `#184` ou `V2-2.2 · #184`; nunca `#` vazio; Simulado V2 preserva id do banco
 - [x] PWA instalável — manifest + ícones 192/512/180 + SW mínimo (estáticos) + banner Android / tip iOS
 - [x] E-mail transacional mínimo (Resend): pagamento no webhook `checkout.session.completed` + trial-reminder diário (SQL colunas; sem deploy/cron neste repo)
+- [x] Bugs AWS (auditoria 18/09): stems incompletos + ID visível `AWS-x.y · #n` + Estudo só mostra item com enunciado+explicação (sem Stripe/PWA/e-mail/CCNA)
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção
@@ -93,6 +94,12 @@
   - Backup: `scripts/output/aws_scenarios_before_enrich_batch3.json`
   - Gate: 50/50; lotes 1+2 intactos 100/100; média lote3 ~83→~262
   - `tickets_aws.json` / study notes intocados
+- [x] Bugs AWS auditoria 18/09 — 19/09/2026
+  - 14 stems em `questions_aws_traditional.json` (heading/OCR/`…`); tickets 0
+  - IDs: 360 já numéricos; UI `AWS-1.x · #n` (nunca `#` vazio)
+  - Estudo: `isAwsPracticeReady` (stem≥40 + expl≥80) em `filterQuestionsForAwsDomain`
+  - Gabarito: nenhum `resposta_correta` alterado
+  - `npx tsc --noEmit` ok
 
 ### Bloqueios / Pendências
 - Env Stripe em produção já falhou uma vez (“link não configurado”)

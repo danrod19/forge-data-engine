@@ -4,6 +4,7 @@
  */
 
 import type { Question } from "@/types/question";
+import { getDeepExplanation, getQuestionPrompt } from "@/types/question";
 import { AWS_PARTS, type AwsPartMeta } from "@/data/aws-parts";
 
 export type AwsStudyDomainId =
@@ -224,6 +225,26 @@ export function countQuestionsForAwsDomain(
   return pool.filter((q) => q.part_id && set.has(q.part_id)).length;
 }
 
+/** Item AWS pronto para Estudo: enunciado completo + explicação profunda. */
+export function isAwsPracticeReady(q: Question): boolean {
+  const stem = getQuestionPrompt(q).trim();
+  const expl = getDeepExplanation(q);
+  if (stem.length < 40) return false;
+  if (!expl || expl.length < 80) return false;
+  if (/for this item/i.test(expl) || /the other options misstate/i.test(expl)) {
+    return false;
+  }
+  const last = (stem.split(/\s+/).pop() || "").replace(/[^A-Za-zÀ-ÿ0-9]/g, "");
+  const midWord =
+    /[A-Za-zÀ-ÿ]$/.test(stem) &&
+    last.length > 0 &&
+    last.length <= 4 &&
+    !/[.!?]$/.test(stem);
+  if (midWord) return false;
+  if (/:\s*$/.test(stem) && stem.length < 80 && !/\?/.test(stem)) return false;
+  return true;
+}
+
 /** Filtra pool do domínio (part_id match; fallback keywords no enunciado). */
 export function filterQuestionsForAwsDomain(
   pool: Question[],
@@ -231,13 +252,16 @@ export function filterQuestionsForAwsDomain(
 ): Question[] {
   const set = new Set(domain.partIds);
   const byPart = pool.filter((q) => q.part_id && set.has(q.part_id));
-  if (byPart.length > 0) return byPart;
-
-  const kws = domain.keywords.map((k) => k.toLowerCase());
-  return pool.filter((q) => {
-    const text = `${q.enunciado ?? ""} ${q.sintoma ?? ""}`.toLowerCase();
-    return kws.some((k) => text.includes(k));
-  });
+  let matched = byPart;
+  if (matched.length === 0) {
+    const kws = domain.keywords.map((k) => k.toLowerCase());
+    matched = pool.filter((q) => {
+      const text = `${q.enunciado ?? ""} ${q.sintoma ?? ""}`.toLowerCase();
+      return kws.some((k) => text.includes(k));
+    });
+  }
+  const ready = matched.filter(isAwsPracticeReady);
+  return ready.length > 0 ? ready : matched;
 }
 
 export function awsDomainAccentClasses(accent: AwsDomainAccent): {

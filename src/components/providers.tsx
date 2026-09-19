@@ -2,12 +2,16 @@
 
 import type { ReactNode } from "react";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { PwaInstall } from "@/components/pwa/PwaInstall";
 import { TrackProvider } from "@/lib/track-context";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <AuthProvider>
-      <TrackProvider>{children}</TrackProvider>
+      <TrackProvider>
+        {children}
+        <PwaInstall />
+      </TrackProvider>
     </AuthProvider>
   );
 }

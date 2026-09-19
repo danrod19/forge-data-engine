@@ -281,7 +281,7 @@ export function TicketDeSuporte({
               </span>
             </div>
             {questionIdLabel ? (
-              <div className="flex items-center gap-1 rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
+              <div className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
                 <Headphones className="size-3 text-neon-green" />
                 {questionIdLabel}
               </div>
@@ -297,7 +297,7 @@ export function TicketDeSuporte({
         </div>
         <Progress value={progressPct} className="mb-3 h-1.5 bg-slate-800" />
 
-        <h1 className="text-sm font-medium leading-relaxed text-slate-100 sm:text-base">
+        <h1 className="break-words text-sm font-medium leading-relaxed text-slate-100 sm:text-base">
           {prompt}
         </h1>
       </div>

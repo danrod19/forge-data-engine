@@ -101,7 +101,7 @@ export function formatBankId(id: number | string | null | undefined): string {
     return `#${id}`;
   }
   if (typeof id === "string") {
-    const t = id.trim();
+    const t = id.trim().replace(/^#+/, "");
     if (/^\d+$/.test(t)) return `#${Number(t)}`;
   }
   return "";
@@ -124,14 +124,25 @@ export function formatTopicCode(partId: string | undefined | null): string | nul
 
 /**
  * ID visível no header: prefere #id numérico.
- * Se houver código de tópico (V2-2.2), mostra os dois: "V2-2.2 · #184".
- * Nunca "#".
+ * Se houver código de tópico (V2-2.2 / AWS-1.3), mostra os dois: "AWS-1.3 · #184".
+ * AWS nunca fica só "#": prefixa tópico ou "AWS · #n".
+ * Nunca retorna "#".
  */
 export function formatQuestionId(
-  q: Pick<Question, "id" | "part_id">
+  q: Pick<Question, "id" | "part_id" | "source">
 ): string {
   const bank = formatBankId(q.id);
   const topic = formatTopicCode(q.part_id);
+  const isAws =
+    q.source === "aws" || Boolean(q.part_id && /^aws-/i.test(q.part_id));
+
+  if (isAws) {
+    if (topic && bank) return `${topic} · ${bank}`;
+    if (topic) return topic;
+    if (bank) return `AWS · ${bank}`;
+    return "AWS";
+  }
+
   if (topic && bank) return `${topic} · ${bank}`;
   if (bank) return bank;
   if (topic) return topic;

@@ -4,6 +4,19 @@
 
 ## Entradas Recentes
 
+- **2026-09-19** — Bugs AWS (auditoria 18/09): stems, IDs, Estudo
+  - Banco: `questions_aws_traditional.json` 360 + `tickets_aws.json` 60 (tickets sem corte)
+  - Stems corrigidos (14): 12, 30, 54, 90, 120, 150, 180, 210, 240, 270, 300, 322, 330, 360 — heading “Resumo …:”, colon incompleto, `…` no meio da frase IAM; alternativas/`resposta_correta` intactos
+  - Explicações: 0 reescritas (min 285 chars; sem template “For this item” / “the other options misstate”)
+  - IDs JSON: 0 (já 1–360 + `part_id` aws-1.x). UI: `formatQuestionId` AWS nunca `#` vazio → `AWS-1.3 · #184`
+  - Estudo: `isAwsPracticeReady` no filtro por domínio — item mostrado tem enunciado completo + `explicacao_profunda` após responder
+  - Amostras Simulado AWS (id + 80 chars do stem):
+    - `#2` aws-1.1 — `An application on Amazon EC2 must read items from DynamoDB and write objects to `
+    - `#24` aws-1.1 — `A Solutions Architect must redesign credentials for an application running on Am` (stem completo 396 chars; “Am…” era corte a 80)
+    - `#123` aws-1.5 — `A three-tier web app places an Application Load Balancer in public subnets and E`
+    - `#150` aws-1.5 — `Qual opção resume um desenho ALB+ASG alinhado às foundations SAA-C03 para um app`
+  - Sem Stripe / PWA / e-mail / JSON CCNA / deploy
+
 - **2026-09-17** — E-mail transacional mínimo (Resend)
   - Pagamento: 1 e-mail após `checkout.session.completed` (mesmo handler que marca PRO); sem chave = warn + 200
   - Idempotência por `profiles.last_mail_session_id` (Stripe `session.id`)

@@ -877,7 +877,7 @@ export function EstudoMode({
           </button>
           <div className="flex items-center gap-2">
             {idLabel ? (
-              <span className="rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
+              <span className="shrink-0 whitespace-nowrap rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5 font-mono text-[10px] text-slate-400">
                 {idLabel}
               </span>
             ) : null}
@@ -904,7 +904,7 @@ export function EstudoMode({
               {practiceLabel}
             </span>
           </div>
-          <p className="text-sm leading-relaxed text-slate-100">
+          <p className="break-words text-sm leading-relaxed text-slate-100">
             {getQuestionPrompt(question)}
           </p>
         </div>

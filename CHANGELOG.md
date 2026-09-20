@@ -4,6 +4,23 @@
 
 ## Entradas Recentes
 
+- **2026-09-20** — Smoke Trilha V2 `#63`: **já IOS** (não reescrito)
+  - Arquivo: `src/data/tickets_v2.json` id 63 · `resposta_correta`: **3**
+  - Sintoma: `NOC-4403: PCs e o próprio roteador resolvem www.empresa.com, mas falham ao traduzir mail.empresa.com (option 150 / ip host / name-server). NS público responde; www continua ok.`
+  - `cli_output` (8 primeiras linhas):
+    ```
+    EDGE# show run | include ip name-server|ip domain|ip host|ip dhcp
+    ip domain-lookup
+    ip name-server 203.0.113.53
+    ip host www.empresa.com 203.0.113.80
+    ! sem ip host mail.empresa.com
+
+    EDGE# show run | section dhcp
+    ip dhcp pool USERS
+    ```
+  - Flags: sem nslookup / MX cru / Windows / “Prompt usado”. Tem `EDGE#`, `show run`, `show hosts`.
+  - Por que não saiu em 7 sessões: Trilha sorteia 10 de 85; `#63` não é pinado. Sem `?ticket=` (seria >10 linhas). `#12` e `#82` ok no smoke.
+
 - **2026-09-19** — QA geral CCNA+AWS (scanner + correção; auditoria 12/63/82)
   - Scanner: `scripts/qa-scan-questions.mjs` → `scripts/qa-report.json` (pós-fix: flagged=0)
   - 1ª passagem: **vistos 4683** · **high 407** · **med 96** (stem_lt40 339, expl_lt80 140, cli_not_ios 56, cli_json_http 26, ocr 2, template 1)

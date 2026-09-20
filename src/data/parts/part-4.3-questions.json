@@ -18,7 +18,7 @@
     "id": 2,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Stratum no NTP indica principalmente:",
+    "enunciado": "Qual alternativa completa corretamente este item (4.3): Stratum no NTP indica principalmente?",
     "alternativas": [
       "A largura de banda da WAN em Mbps",
       "A distância hierárquica/qualidade relativa à fonte de tempo de referência",
@@ -123,7 +123,7 @@
     "id": 9,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "No modelo SNMP do CCNA, o agent é:",
+    "enunciado": "Qual alternativa completa corretamente este item (4.3): No modelo SNMP do CCNA, o agent é?",
     "alternativas": [
       "O software no device gerenciado que responde a polls e pode enviar traps",
       "Sempre o servidor NTP da Internet",
@@ -198,7 +198,7 @@
     "id": 14,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "SNMPv2c vs ideia de SNMPv3 no CCNA:",
+    "enunciado": "Qual alternativa completa corretamente este item (4.3): SNMPv2c vs ideia de SNMPv3 no CCNA?",
     "alternativas": [
       "v3 elimina o agent no device",
       "v2c usa community em claro; v3 introduz autenticação/criptografia (mais seguro)",
@@ -288,7 +288,7 @@
     "id": 20,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Manager SNMP é, no modelo da parte 4.3:",
+    "enunciado": "Qual alternativa completa corretamente este item (4.3): Manager SNMP é, no modelo da parte 4.3?",
     "alternativas": [
       "O processo DORA do DHCP",
       "A interface com ip nat outside",

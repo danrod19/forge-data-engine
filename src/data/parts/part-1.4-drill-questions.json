@@ -3,7 +3,7 @@
     "id": 1,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Qual é a rede de 192.168.5.100/24?",
+    "enunciado": "No contexto do exame (1.4-drill), Qual é a rede de 192.168.5.100/24?",
     "alternativas": [
       "192.168.5.0",
       "192.168.5.100",
@@ -18,7 +18,7 @@
     "id": 2,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Broadcast de 10.0.0.0/30?",
+    "enunciado": "No contexto do exame (1.4-drill), Broadcast de 10.0.0.0/30?",
     "alternativas": [
       "10.0.0.1",
       "10.0.0.3",
@@ -33,7 +33,7 @@
     "id": 3,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Hosts utilizáveis em /28?",
+    "enunciado": "No contexto do exame (1.4-drill), Hosts utilizáveis em /28?",
     "alternativas": [
       "16",
       "32",
@@ -48,7 +48,7 @@
     "id": 4,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Máscara de /26 em decimal?",
+    "enunciado": "No contexto do exame (1.4-drill), Máscara de /26 em decimal?",
     "alternativas": [
       "255.255.255.128",
       "255.255.255.224",
@@ -63,7 +63,7 @@
     "id": 5,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Rede de 172.16.4.77/27?",
+    "enunciado": "No contexto do exame (1.4-drill), Rede de 172.16.4.77/27?",
     "alternativas": [
       "172.16.4.64",
       "172.16.4.0",
@@ -78,7 +78,7 @@
     "id": 6,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Broadcast de 172.16.4.64/27?",
+    "enunciado": "No contexto do exame (1.4-drill), Broadcast de 172.16.4.64/27?",
     "alternativas": [
       "172.16.4.64",
       "172.16.4.95",
@@ -108,7 +108,7 @@
     "id": 8,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Bloco (incremento) de 255.255.255.248?",
+    "enunciado": "No contexto do exame (1.4-drill), Bloco (incremento) de 255.255.255.248?",
     "alternativas": [
       "16",
       "4",
@@ -153,7 +153,7 @@
     "id": 11,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Hosts utilizáveis em /25?",
+    "enunciado": "No contexto do exame (1.4-drill), Hosts utilizáveis em /25?",
     "alternativas": [
       "128",
       "254",
@@ -183,7 +183,7 @@
     "id": 13,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Rede de 200.1.1.50/29?",
+    "enunciado": "No contexto do exame (1.4-drill), Rede de 200.1.1.50/29?",
     "alternativas": [
       "200.1.1.48",
       "200.1.1.0",
@@ -198,7 +198,7 @@
     "id": 14,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Broadcast de 200.1.1.48/29?",
+    "enunciado": "No contexto do exame (1.4-drill), Broadcast de 200.1.1.48/29?",
     "alternativas": [
       "200.1.1.48",
       "200.1.1.55",
@@ -228,7 +228,7 @@
     "id": 16,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Prefixo de 255.255.255.240?",
+    "enunciado": "No contexto do exame (1.4-drill), Prefixo de 255.255.255.240?",
     "alternativas": [
       "/27",
       "/26",
@@ -258,7 +258,7 @@
     "id": 18,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Quantas /28 cabem em um /24?",
+    "enunciado": "No contexto do exame (1.4-drill), Quantas /28 cabem em um /24?",
     "alternativas": [
       "4",
       "8",

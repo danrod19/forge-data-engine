@@ -138,7 +138,7 @@
     "id": 10,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "DTP, em visão leve do CCNA, serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.2): DTP, em visão leve do CCNA, serve para?",
     "alternativas": [
       "Negociar dinamicamente se a porta opera como trunk ou não",
       "Calcular máscaras VLSM",
@@ -146,7 +146,7 @@
       "Substituir o protocolo 802.1Q por ISL sempre"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "DTP negocia trunking. Não faz VLSM, 802.1X nem obriga ISL no lugar de 802.1Q.",
+    "explicacao_profunda": "DTP negocia trunking. Não faz VLSM, 802.1X nem obriga ISL no lugar de 802.1Q. Isso casa com «Negociar dinamicamente se a porta opera como trunk ou não». «Calcular máscaras VLSM» não descreve o mesmo recorte. «Autenticar usuários 802.1X na access VLAN» mistura causa que o enunciado não mostra. «Substituir o protocolo 802.1Q por ISL sempre» também fica fora da evidência.",
     "part_id": "2.2"
   },
   {

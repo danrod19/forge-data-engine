@@ -33,7 +33,7 @@
     "id": 3,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "O data plane é responsável por:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.1): O data plane é responsável por?",
     "alternativas": [
       "Somente autenticação RADIUS de admin",
       "Somente gerar chaves SSH",
@@ -48,7 +48,7 @@
     "id": 4,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "O management plane inclui tipicamente:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.1): O management plane inclui tipicamente?",
     "alternativas": [
       "Apenas o hash do OSPF LSA",
       "Apenas a fila de prioridade de voz sem gestão",
@@ -78,7 +78,7 @@
     "id": 6,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Northbound refere-se a:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.1): Northbound refere-se a?",
     "alternativas": [
       "Somente cabos de console RJ-45",
       "Aplicações/orquestração consumindo a API do controller",
@@ -123,7 +123,7 @@
     "id": 9,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Control plane, em uma frase de prova:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.1): Control plane, em uma frase de prova?",
     "alternativas": [
       "É o plano que toma decisões de encaminhamento e roda protocolos (rotas, topologia, tabelas lógicas)",
       "É apenas o cabo de fibra do core",
@@ -333,7 +333,7 @@
     "id": 23,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Qual par está correto?",
+    "enunciado": "No contexto do exame (6.1), Qual par está correto?",
     "alternativas": [
       "Northbound = controller → switch; southbound = app → controller",
       "Northbound = app → controller; southbound = controller → device",
@@ -513,7 +513,7 @@
     "id": 35,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "POST em REST costuma corresponder a:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.2): POST em REST costuma corresponder a?",
     "alternativas": [
       "Create (criar recurso) ou disparar uma operação no servidor",
       "Somente leitura idempotente de inventário",
@@ -528,7 +528,7 @@
     "id": 36,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "DELETE no mapeamento CRUD significa:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.2): DELETE no mapeamento CRUD significa?",
     "alternativas": [
       "Sempre criar um recurso duplicado",
       "Remover o recurso identificado na URI",
@@ -558,7 +558,7 @@
     "id": 38,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Código HTTP 401 indica tipicamente:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.2): Código HTTP 401 indica tipicamente?",
     "alternativas": [
       "Recurso criado com sucesso",
       "Pedido bem-formado e autorizado",
@@ -678,7 +678,7 @@
     "id": 46,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "JSON no payload REST do módulo 6 é:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.2): JSON no payload REST do módulo 6 é?",
     "alternativas": [
       "Formato textual comum de representação (chaves/valores, listas) nas respostas e bodies",
       "Um protocolo de roteamento interno",
@@ -708,7 +708,7 @@
     "id": 48,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "HTTP 500 no controller API indica:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.2): HTTP 500 no controller API indica?",
     "alternativas": [
       "Erro no lado do servidor da API (falha interna)",
       "Sempre URI perfeita e cliente culpado apenas",
@@ -843,7 +843,7 @@
     "id": 57,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Qual par CRUD ↔ verbo está correto?",
+    "enunciado": "No contexto do exame (6.2), Qual par CRUD ↔ verbo está correto?",
     "alternativas": [
       "Read → DELETE; Create → GET",
       "Create → GET; Delete → POST",
@@ -858,7 +858,7 @@
     "id": 58,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "URI identifica o recurso; o body JSON:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.2): URI identifica o recurso; o body JSON?",
     "alternativas": [
       "Substitui sempre o método HTTP",
       "Carrega a representação/dados enviados ou retornados do recurso",
@@ -918,7 +918,7 @@
     "id": 62,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Em JSON, um objeto é delimitado por:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.3): Em JSON, um objeto é delimitado por?",
     "alternativas": [
       "Apenas colchetes [ ]",
       "Chaves { } com pares chave–valor",
@@ -933,7 +933,7 @@
     "id": 63,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Um array JSON é tipicamente usado para:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.3): Um array JSON é tipicamente usado para?",
     "alternativas": [
       "Substituir o status HTTP",
       "Eliminar a necessidade de aspas em strings",
@@ -978,7 +978,7 @@
     "id": 66,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "\"managementIp\": \"10.1.1.1\" — o valor é:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.3): \"managementIp\": \"10.1.1.1\" — o valor é?",
     "alternativas": [
       "number decimal",
       "string (IP entre aspas)",
@@ -1143,7 +1143,7 @@
     "id": 77,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "\"interfaces\": [] significa:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.3): \"interfaces\": [] significa?",
     "alternativas": [
       "null",
       "Array vazio válido — lista sem elementos",
@@ -1158,7 +1158,7 @@
     "id": 78,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Contraste leve JSON vs XML no CCNA:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.3): Contraste leve JSON vs XML no CCNA?",
     "alternativas": [
       "JSON é o formato de payload mais citado em REST de controllers; XML é legado/contraste, sem lab profundo",
       "XML substituiu JSON em todas as APIs DNA",
@@ -1383,7 +1383,7 @@
     "id": 93,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Inventory no Ansible serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.4): Inventory no Ansible serve para?",
     "alternativas": [
       "Cifrar o data plane com IPsec automaticamente",
       "Substituir o enable secret",
@@ -1413,7 +1413,7 @@
     "id": 95,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Module no Ansible é:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.4): Module no Ansible é?",
     "alternativas": [
       "A unidade de ação usada nas tasks (ex.: ios_config, ping)",
       "Somente o nome do switch no CDP",
@@ -1443,7 +1443,7 @@
     "id": 97,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Push model do Ansible indica que:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.4): Push model do Ansible indica que?",
     "alternativas": [
       "O device puxa o playbook sozinho a cada segundo sem control node",
       "Só existe pull de Chef no Ansible",
@@ -1473,7 +1473,7 @@
     "id": 99,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Drift de configuração ocorre quando:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.4): Drift de configuração ocorre quando?",
     "alternativas": [
       "O estado real do device diverge do estado desejado (ex.: mudança manual após o playbook)",
       "O inventory lista o host correto e o playbook aplica sem erro",
@@ -1563,7 +1563,7 @@
     "id": 105,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Caso típico de playbook no nível CCNA:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.4): Caso típico de playbook no nível CCNA?",
     "alternativas": [
       "Compilar kernel Linux em todos os APs",
       "Aplicar banner, usuários locais ou VLAN de access padrão em muitos switches",
@@ -1818,7 +1818,7 @@
     "id": 122,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Discovery/inventário no DNA serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.5): Discovery/inventário no DNA serve para?",
     "alternativas": [
       "Apagar todas as VLANs do campus",
       "Descobrir e catalogar devices gerenciados (plataforma, IP, software, reachability)",
@@ -1863,7 +1863,7 @@
     "id": 125,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "YANG, em uma frase de exame, é:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.5): YANG, em uma frase de exame, é?",
     "alternativas": [
       "O modelo de dados que estrutura config/estado operacional do device",
       "Um protocolo de Spanning Tree",
@@ -1893,7 +1893,7 @@
     "id": 127,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "RESTCONF relaciona-se a:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.5): RESTCONF relaciona-se a?",
     "alternativas": [
       "Apenas CDP neighbors",
       "Apenas PortFast",

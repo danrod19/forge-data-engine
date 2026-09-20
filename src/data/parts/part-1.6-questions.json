@@ -318,7 +318,7 @@
     "id": 22,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Distribution no three-tier costuma:",
+    "enunciado": "Qual alternativa completa corretamente este item (1.6): Distribution no three-tier costuma?",
     "alternativas": [
       "Conectar só teclados USB",
       "Agregar uplinks de access e aplicar política, frequentemente com L3 de bloco",

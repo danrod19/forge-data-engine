@@ -163,8 +163,8 @@
     "id": 11,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "HD-1601: estação Windows ficou 'sem rede' depois que o técnico colocou IP estático na mão. Corrija com base no output.",
-    "cli_output": "C:\\> ipconfig /all\nEthernet adapter Ethernet:\n   DHCP Enabled. . . . . . . . . . . : No\n   IPv4 Address. . . . . . . . . . . : 10.40.0.88\n   Subnet Mask . . . . . . . . . . . : 255.255.0.0\n   Default Gateway . . . . . . . . . : 10.41.0.1\n   DNS Servers . . . . . . . . . . . : 10.40.0.53\n\nC:\\> ping 10.41.0.1\nDestination host unreachable.\n\nC:\\> route print | findstr 0.0.0.0\n          0.0.0.0          0.0.0.0       10.41.0.1     10.40.0.88     25\n\nDesign: VLAN 40 = 10.40.0.0/24, SVI/gateway = 10.40.0.1",
+    "sintoma": "HD-1601: após IP estático na estação da VLAN 40, o host não alcança o gateway. Desenho: 10.40.0.0/24, SVI 10.40.0.1.",
+    "cli_output": "CORE# show ip interface brief | include Vlan40\nVlan40   10.40.0.1   YES NVRAM  up    up\n\nCORE# show run interface Vlan40\ninterface Vlan40\n ip address 10.40.0.1 255.255.255.0\n\nCORE# ping 10.40.0.88\nType escape sequence to abort.\n.....\nSuccess rate is 0 percent (0/5)\n\nSW-ACC# show interfaces Gi1/0/18 status\nPort      Name     Status       Vlan  Duplex  Speed Type\nGi1/0/18  PC-USER  connected    40    a-full  a-1000 10/100/1000BaseTX\n\nSW-ACC# show mac address-table interface Gi1/0/18\n   40    aabb.ccdd.ee01    DYNAMIC     Gi1/0/18\n\nCORE# show arp | include 10.40.0.88\n! (vazio — host com mask /16 e gateway 10.41.0.1, fora do segmento 10.40.0.0/24)\n\n! Host estático: 10.40.0.88 255.255.0.0 gw 10.41.0.1 — Destination host unreachable no primeiro hop.",
     "alternativas": [
       "Corrigir no OS: mask 255.255.255.0 e gateway 10.40.0.1 (estático alinhado à VLAN)",
       "Manter mask /16 e gateway 10.41 — está correto para /24",
@@ -179,8 +179,8 @@
     "id": 12,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "HD-1602: notebook Windows não navega na VLAN com DHCP. O Wi-Fi está associado, mas o IP parece errado.",
-    "cli_output": "C:\\> ipconfig /all\nWireless LAN adapter Wi-Fi:\n   DHCP Enabled. . . . . . . . . . . : Yes\n   Autoconfiguration Enabled . . . . : Yes\n   IPv4 Address. . . . . . . . . . . : 169.254.44.19(Preferred)\n   Subnet Mask . . . . . . . . . . . : 255.255.0.0\n   Default Gateway . . . . . . . . . :\n   DNS Servers . . . . . . . . . . . :\n\nC:\\> ipconfig /renew\nAn error occurred while renewing interface Wi-Fi : unable to contact your DHCP server.\n\nC:\\> ping 10.40.0.1\nPinging 10.40.0.1 with 32 bytes of data:\nDestination host unreachable.\n\nMedia State: Wi-Fi Connected / SSID CORP-USER",
+    "sintoma": "HD-1602: clientes na VLAN 40 (SSID CORP-USER associado) ficam sem lease DHCP e caem em 169.254.x.x. O servidor DHCP vive na VLAN 10; o AP está Registered.",
+    "cli_output": "SW-ACC# show interfaces Gi1/0/22 status\nPort      Name        Status       Vlan  Duplex  Speed Type\nGi1/0/22  AP-USER     connected    40    a-full  a-1000 10/100/1000BaseTX\n\nSW-ACC# show ip dhcp snooping\nSwitch DHCP snooping is enabled\nDHCP snooping is configured on following VLANs: 40\nDHCP snooping is operational on following VLANs: 40\nInsertion of option 82 is enabled\n\nSW-ACC# show ip dhcp snooping | begin Interface\nInterface              Trusted     Rate limit (pps)\n---------------------  ----------  ----------------\nGigabitEthernet1/0/1   no          unlimited\nGigabitEthernet1/0/22  no          unlimited\n\nSW-ACC# show run interface Gi1/0/1\ninterface GigabitEthernet1/0/1\n description UPLINK-DIST\n switchport mode trunk\n! sem ip dhcp snooping trust\n\nCORE# show run interface Vlan40\ninterface Vlan40\n ip address 10.40.0.1 255.255.255.0\n! sem ip helper-address\n\nCORE# show ip dhcp snooping binding\nMacAddress          IpAddress        Lease(sec)  Type           VLAN  Interface\n------------------  ---------------  ----------  -------------  ----  ---------\n! (vazio)\n\nCORE# debug ip dhcp server packet\nDHCPD: DHCPDISCOVER received on Vlan40 from aabb.ccdd.ee01\nDHCPD: no helper-address on Vlan40 — dropping Discover (server 10.10.10.53 is on Vlan10)\n\n! Host na VLAN 40: 169.254.44.19/16, gateway vazio (APIPA, sem DORA)",
     "alternativas": [
       "Tratar 169.254 como IP de produção e criar rota estática para a Internet",
       "Configurar gateway 169.254.0.1 manualmente",
@@ -188,15 +188,15 @@
       "O DNS 8.8.8.8 fixo resolve APIPA sozinho"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "169.254.x.x com falha no /renew é APIPA: o cliente não completou DORA. No ângulo de host, reconheça APIPA, tente renew/reconectar e escale L2/DHCP — não invente estático. Tratar 169.254 como produção e criar rota para a Internet não resolve lease; gateway 169.254.0.1 é inventado; DNS 8.8.8.8 fixo não atribui endereço IPv4.",
+    "explicacao_profunda": "No CLI, Gi1/0/22 connected na VLAN 40, snooping operacional, uplink sem trust e Vlan40 sem ip helper-address — Discover é dropado (server na VLAN 10). Binding vazio e host em 169.254.x.x = APIPA, DORA incompleto. Tratar 169.254 como produção ou inventar gateway 169.254.0.1 não cria lease; DNS 8.8.8.8 fixo não atribui IPv4. Confie o uplink, coloque helper na SVI e reteste o Discover.",
     "part_id": "v2-1.6"
   },
   {
     "id": 13,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "HD-1603: VM Linux fala com hosts da mesma subnet, mas não sai da LAN — parece residual de IP antigo sem rota default.",
-    "cli_output": "user@vm:~$ ip addr show eth0\n2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP>\n    inet 10.40.0.77/24 brd 10.40.0.255 scope global eth0\n    inet6 fe80::a00:27ff:fe12:3456/64 scope link\n\nuser@vm:~$ ip route show\n10.40.0.0/24 dev eth0 proto kernel scope link src 10.40.0.77\n(no default via ...)\n\nuser@vm:~$ ping -c 2 10.40.0.10\n64 bytes from 10.40.0.10: icmp_seq=1 ttl=64\n\nuser@vm:~$ ping -c 2 10.40.0.1\nconnect: Network is unreachable\n\nuser@vm:~$ ping -c 1 8.8.8.8\nconnect: Network is unreachable",
+    "sintoma": "HD-1603: VM na VLAN 40 pinga vizinhos da /24 mas não sai da LAN. Pool DHCP local não entrega default-router.",
+    "cli_output": "CORE# show run | section dhcp\nip dhcp pool USERS\n network 10.40.0.0 255.255.255.0\n dns-server 10.40.0.53\n! sem default-router\n\nCORE# show ip dhcp binding | include 10.40.0.77\n10.40.0.77    0100.aabb.0011.2233    Infinite    Automatic\n\nCORE# show ip interface brief | include Vlan40\nVlan40   10.40.0.1   YES NVRAM  up    up\n\nCORE# ping 10.40.0.77\n!!!!! Success rate is 100 percent\n\nCORE# show ip route 8.8.8.8\nS*  0.0.0.0/0 [1/0] via 203.0.113.1\n\n! Host 10.40.0.77/24 sem rota default (on-link only). Ping local ok; 8.8.8.8 unreachable no cliente.",
     "alternativas": [
       "Problema exclusivo de certificado TLS",
       "Mask /24 está errada (não há evidência)",
@@ -211,8 +211,8 @@
     "id": 14,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "HD-1604: no Mac/Linux do dev, git clone por IP do servidor funciona; por hostname falha. A rede 'parece ok', mas o DNS não resolve.",
-    "cli_output": "dev@mac:~$ ping -c 2 10.20.5.40\n64 bytes from 10.20.5.40: icmp_seq=0 ttl=62 time=2 ms\n\ndev@mac:~$ ping -c 1 git.empresa.local\nping: cannot resolve git.empresa.local: Unknown host\n\ndev@mac:~$ dig git.empresa.local\n;; connection timed out; no servers could be reached\n\ndev@mac:~$ scutil --dns | head -20\nresolver #1\n  nameserver[0] : 192.0.2.53\n  nameserver[1] : 192.0.2.53\n\ndev@mac:~$ ping -c 1 192.0.2.53\nRequest timeout for icmp_seq 0\n\nip addr/IP config: 10.40.0.66/24  gw 10.40.0.1 (ping gw OK)",
+    "sintoma": "HD-1604: clone por IP do git (10.20.5.40) funciona; por hostname git.empresa.local falha. Path L3 ok.",
+    "cli_output": "CORE# show run | include ip name-server|ip dhcp\nip name-server 10.50.0.53\nip dhcp pool USERS\n dns-server 192.0.2.53\n\nCORE# show run | section dhcp\nip dhcp pool USERS\n network 10.40.0.0 255.255.255.0\n default-router 10.40.0.1\n dns-server 192.0.2.53\n\nCORE# ping 10.20.5.40\n!!!!! Success rate is 100 percent\n\nCORE# ping git.empresa.local\nTranslating \"git.empresa.local\"...domain server (192.0.2.53)\n% Unrecognized host or address, or protocol not running.\n\nCORE# ping 192.0.2.53\n..... Success rate is 0 percent\n\nCORE# ping 10.50.0.53\n!!!!! Success rate is 100 percent",
     "alternativas": [
       "Trocar a mask para 255.0.0.0",
       "Problema de duplex no core (sem evidência L1)",
@@ -227,8 +227,8 @@
     "id": 15,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "HD-1605: o usuário jura que 'o PC está errado'. Use o tracert para ver se a falha é local ou mais adiante no path.",
-    "cli_output": "C:\\> ipconfig\n   IPv4 Address. . . . . . . . . . . : 10.40.0.91\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.40.0.1\n\nC:\\> ping 10.40.0.1\nReply from 10.40.0.1: bytes=32 time=1ms TTL=64\n\nC:\\> ping 203.0.113.50\nRequest timed out.\n\nC:\\> tracert -d 203.0.113.50\nTracing route to 203.0.113.50 over a maximum of 30 hops\n  1    <1 ms    <1 ms    <1 ms  10.40.0.1\n  2    <1 ms    <1 ms    <1 ms  10.0.0.2\n  3     *        *        *     Request timed out.\n  4     *        *        *     Request timed out.\n\nC:\\> nslookup intranet.empresa.local\nName:    intranet.empresa.local\nAddress:  10.20.5.10",
+    "sintoma": "HD-1605: usuário culpa o PC. Confira se a falha é local ou além do primeiro hop.",
+    "cli_output": "CORE# show ip interface brief | include Vlan40\nVlan40   10.40.0.1   YES NVRAM  up    up\n\nCORE# ping 10.40.0.91\n!!!!! Success rate is 100 percent\n\nCORE# traceroute 203.0.113.50 numeric\nTracing the route to 203.0.113.50\n  1 10.40.0.1 1 msec\n  2 10.0.0.2 1 msec\n  3 * * *\n  4 * * *\n\nEDGE# show ip route 203.0.113.50\n% Network not in table\n\nCORE# ping intranet.empresa.local\nTranslating \"intranet.empresa.local\"...domain server (10.40.0.53)\n!!!!! Success rate is 100 percent (10.20.5.10)\n\n! Host 10.40.0.91/24 gw 10.40.0.1 — L3 local ok; path quebra depois do hop 2.",
     "alternativas": [
       "Reconfigurar IP/mask/gateway do PC imediatamente (locais ok)",
       "Cliente e primeiro hops OK — falha além do path local; não culpar settings do OS sem evidência",
@@ -963,8 +963,8 @@
     "id": 61,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "NOC-4401: usuários abrem o portal pelo IP 10.20.5.40, mas o atalho https://portal.empresa.local falha. Ping por nome não resolve.",
-    "cli_output": "PC-USER> ping 10.20.5.40\nReply from 10.20.5.40: bytes=32 time=1ms TTL=64\n\nPC-USER> ping portal.empresa.local\nPing request could not find host portal.empresa.local.\nPlease check the name and try again.\n\nPC-USER> nslookup portal.empresa.local\nServer:  dns-int.empresa.local\nAddress:  10.10.10.53\n\n*** dns-int.empresa.local can't find portal.empresa.local: Non-existent domain\n\nPC-USER> ipconfig /all | findstr /i \"DNS Servers\"\n   DNS Servers . . . . . . . . . . . : 10.10.10.53\n\nDNS-INT (admin view) zone empresa.local has hosts web01, mail01 — no portal name.",
+    "sintoma": "NOC-4401: portal abre por IP 10.20.5.40; o atalho https://portal.empresa.local falha.",
+    "cli_output": "CORE# ping 10.20.5.40\n!!!!! Success rate is 100 percent\n\nCORE# ping portal.empresa.local\nTranslating \"portal.empresa.local\"...domain server (10.10.10.53)\n% Unrecognized host or address, or protocol not running.\n\nCORE# show hosts\nDefault domain is empresa.local\nName servers are 10.10.10.53\nHost                 Flags      Age Type   Address(es)\nweb01.empresa.local  (temp, OK)  2   IP    10.20.5.11\nmail01.empresa.local (temp, OK)  2   IP    10.20.5.12\n! sem portal.empresa.local\n\nCORE# show run | include ip name-server\nip name-server 10.10.10.53",
     "alternativas": [
       "Problema de duplex no uplink do core",
       "Rota default ausente no PC (IP do portal responde, logo L3 local ok)",
@@ -979,8 +979,8 @@
     "id": 62,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "NOC-4402: www.app.local não abre. A equipe garante que ‘o CNAME está criado’. Precisamos checar se a cadeia até o canônico fecha.",
-    "cli_output": "PC> nslookup www.app.local 10.10.10.53\nServer:  dns-int.empresa.local\nAddress:  10.10.10.53\n\nName:    www.app.local\nCanonical name = app-prod.app.local\n\nPC> nslookup app-prod.app.local 10.10.10.53\nServer:  dns-int.empresa.local\nAddress:  10.10.10.53\n\n*** dns-int.empresa.local can't find app-prod.app.local: Non-existent domain\n\nPC> nslookup -type=A www.app.local 10.10.10.53\n(follows CNAME then fails on target)\n\nPC> ping 10.20.8.12\nReply from 10.20.8.12: time<1ms\n(note: that IP is the intended app server, but no A name app-prod)",
+    "sintoma": "NOC-4402: www.app.local não abre. A equipe garante que o CNAME está criado.",
+    "cli_output": "CORE# show hosts\nDefault domain is app.local\nName servers are 10.10.10.53\nHost                 Flags      Age Type   Address(es)\nwww.app.local        (temp, OK)  0   IP    (CNAME app-prod.app.local)\n\nCORE# ping www.app.local\nTranslating \"www.app.local\"...domain server (10.10.10.53)\n% Unrecognized host or address, or protocol not running.\n\nCORE# ping app-prod.app.local\nTranslating \"app-prod.app.local\"...domain server (10.10.10.53)\n% Unrecognized host or address, or protocol not running.\n\nCORE# ping 10.20.8.12\n!!!!! Success rate is 100 percent\n\n! Alias aponta para app-prod.app.local, que não tem A/AAAA. IP do app responde.",
     "alternativas": [
       "Cadeia CNAME quebrada: alias ok, alvo app-prod.app.local sem A/AAAA — criar A do canônico ou corrigir o CNAME",
       "Falha exclusiva de PoE na câmera do corredor",
@@ -995,24 +995,24 @@
     "id": 63,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "NOC-4403: parceiros não conseguem entregar e-mail para @empresa.com; o MTA remoto reclama de host do MX. Site www por nome continua ok.",
-    "cli_output": "EXT> nslookup -type=MX empresa.com 8.8.8.8\nNon-authoritative answer:\nempresa.com     MX preference = 10, mail exchanger = mail.empresa.com\n\nEXT> nslookup mail.empresa.com 8.8.8.8\n*** Non-existent domain\n\nEXT> nslookup -type=A www.empresa.com 8.8.8.8\nName:    www.empresa.com\nAddress: 203.0.113.80\n\nEXT> nslookup -type=NS empresa.com 8.8.8.8\nempresa.com     nameserver = ns1.empresa.com\nns1.empresa.com  internet address = 203.0.113.53\n\nQueue log (partner MTA): 'Host not found for MX mail.empresa.com'",
+    "sintoma": "NOC-4403: PCs e o próprio roteador resolvem www.empresa.com, mas falham ao traduzir mail.empresa.com (option 150 / ip host / name-server). NS público responde; www continua ok.",
+    "cli_output": "EDGE# show run | include ip name-server|ip domain|ip host|ip dhcp\nip domain-lookup\nip name-server 203.0.113.53\nip host www.empresa.com 203.0.113.80\n! sem ip host mail.empresa.com\n\nEDGE# show run | section dhcp\nip dhcp pool USERS\n network 10.40.0.0 255.255.255.0\n default-router 10.40.0.1\n dns-server 203.0.113.53\n option 150 ip 203.0.113.25\n! option 150 aponta IP; hostname mail.empresa.com ainda é usado em scripts de provisionamento\n\nEDGE# show hosts\nDefault domain is empresa.com\nName/address lookup uses domain service\nName servers are 203.0.113.53\nHost                 Flags      Age Type   Address(es)\nwww.empresa.com      (perm, OK)  0   IP    203.0.113.80\n\nEDGE# ping www.empresa.com\nType escape sequence to abort.\nSending 5, 100-byte ICMP Echos to 203.0.113.80, timeout is 2 seconds:\n!!!!!\nSuccess rate is 100 percent (5/5)\n\nEDGE# ping mail.empresa.com\nTranslating \"mail.empresa.com\"...domain server (203.0.113.53)\n% Unrecognized host or address, or protocol not running.\n\nEDGE# show ip dhcp binding | include 10.40.0.\n10.40.0.88    0100.aabb.ccdd.ee01    Infinite    Automatic\n\n! Name-server 203.0.113.53 devolve NXDOMAIN para mail.empresa.com; www tem A. SMTP não entra neste ticket.",
     "alternativas": [
       "Problema de CRC na fibra do parceiro apenas",
       "Falta de registro A de www",
       "Desligar o NS público",
-      "MX aponta para mail.empresa.com sem A/AAAA — criar A do host MX (ou corrigir o MX)"
+      "Hostname mail.empresa.com sem A/AAAA (NXDOMAIN no name-server) — criar A do host ou ip host equivalente"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "O MX existe e aponta para mail.empresa.com, mas esse hostname não resolve (NXDOMAIN); o log do parceiro bate com isso. www.empresa.com tem A e os NS públicos respondem, então a zona básica está viva — o buraco é o A/AAAA (ou MX corrigido) do exchanger. CRC na fibra do parceiro não gera ‘Host not found for MX’. www já tem A. Desligar o NS público só piora a resolução externa. Crie o A de mail.empresa.com alinhado ao IP do MTA e revalide MX → A de fora.",
+    "explicacao_profunda": "No CLI, www.empresa.com faz ping e aparece em show hosts; mail.empresa.com falha na tradução (name-server 203.0.113.53) e não há ip host para esse nome. A zona básica está viva — falta o A/AAAA (ou ip host) de mail.empresa.com. CRC na fibra do parceiro não gera falha seletiva de nome. www já tem A. Desligar o NS público só piora a resolução. Crie o A (ou ip host) alinhado ao IP de provisionamento e revalide ping/show hosts.",
     "part_id": "v2-4.4"
   },
   {
     "id": 64,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "NOC-4404: o MTA sai com HELO mail.empresa.com (A=203.0.113.25). Vários destinos rejeitam com 550 por falta de reverse DNS nesse IP.",
-    "cli_output": "OPS> nslookup mail.empresa.com 8.8.8.8\nName:    mail.empresa.com\nAddress: 203.0.113.25\n\nOPS> nslookup 203.0.113.25 8.8.8.8\n*** server can't find 25.113.0.203.in-addr.arpa: Non-existent domain\n\nOPS> nslookup -type=PTR 25.113.0.203.in-addr.arpa 8.8.8.8\n*** Non-existent domain\n\nOPS> nslookup -type=MX empresa.com 8.8.8.8\nempresa.com     MX preference = 10, mail exchanger = mail.empresa.com\n\nRemote bounce sample:\n  550 5.7.1 Rejected: no reverse DNS for 203.0.113.25",
+    "sintoma": "NOC-4404: o hostname mail.empresa.com resolve A=203.0.113.25, mas o reverse desse IP não existe (PTR ausente). Destinos rejeitam a sessão de gestão.",
+    "cli_output": "EDGE# ping mail.empresa.com\nTranslating \"mail.empresa.com\"...domain server (8.8.8.8)\n!!!!! Success rate is 100 percent (203.0.113.25)\n\nEDGE# show hosts\nName servers are 8.8.8.8\nHost                 Flags      Age Type   Address(es)\nmail.empresa.com     (temp, OK)  0   IP    203.0.113.25\nwww.empresa.com      (temp, OK)  0   IP    203.0.113.80\n\nEDGE# ping 203.0.113.25\n!!!!! Success rate is 100 percent\n\nEDGE# show ip dns view default | include reverse|ptr\n! no reverse zone / no PTR for 25.113.0.203.in-addr.arpa\n\n! Bounce de gestão: reverse DNS ausente para 203.0.113.25. Forward A ok.",
     "alternativas": [
       "Apagar o registro A de mail para 'forçar' PTR",
       "Forward A e MX ok; PTR do IP de saída ausente — solicitar/criar reverse correto no bloco",
@@ -1027,8 +1027,8 @@
     "id": 65,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "NOC-4405: depois da mudança de DHCP, PCs da VLAN 40 não resolvem nomes internos. No jump host, a zona em 10.50.0.53 responde intranet.empresa.local sem erro.",
-    "cli_output": "PC-VLAN40> ipconfig /all\n   IPv4 Address. . . . . . . . . . . : 10.40.0.88\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\n   Default Gateway . . . . . . . . . : 10.40.0.1\n   DNS Servers . . . . . . . . . . . : 192.0.2.53\n\nPC-VLAN40> ping 192.0.2.53\nRequest timed out.\n\nPC-VLAN40> nslookup intranet.empresa.local\nDNS request timed out.\n    timeout was 2 seconds.\n*** Can't find server name\n\nJUMP> nslookup intranet.empresa.local 10.50.0.53\nName:    intranet.empresa.local\nAddress: 10.20.5.10\n\nSW-DHCP-scope note: option 006 still set to 192.0.2.53 (decommissioned)\nRouter IOS: ip name-server 10.50.0.53  (not used by PCs)",
+    "sintoma": "NOC-4405: após mudança de DHCP, PCs da VLAN 40 não resolvem nomes internos. Jump host com 10.50.0.53 resolve intranet.empresa.local.",
+    "cli_output": "CORE# show run | section dhcp\nip dhcp pool USERS\n network 10.40.0.0 255.255.255.0\n default-router 10.40.0.1\n dns-server 192.0.2.53\n! option 006 ainda no resolver descomissionado\n\nCORE# show run | include ip name-server\nip name-server 10.50.0.53\n\nCORE# ping 192.0.2.53\n..... Success rate is 0 percent\n\nCORE# ping intranet.empresa.local\nTranslating \"intranet.empresa.local\"...domain server (10.50.0.53)\n!!!!! Success rate is 100 percent (10.20.5.10)\n\nCORE# show ip dhcp binding | include 10.40.0.88\n10.40.0.88    0100.aabb.ccdd.ee01    Mar 12 2026    Automatic\n\n! PCs receberam dns-server 192.0.2.53 (morto). ip name-server no IOS não alimenta o cliente.",
     "alternativas": [
       "Registro A de intranet nunca existiu (jump host prova o contrário)",
       "Falha de SFP no core apenas",
@@ -1299,8 +1299,8 @@
     "id": 82,
     "question_type": "ticket",
     "isPremium": true,
-    "sintoma": "NOC-9602: engenheiro júnior montou um prompt com 'contexto completo' do roteador, incluindo secrets. Avalie se pode enviar à IA generativa corporativa (serviço externo multi-tenant).",
-    "cli_output": "Prompt usado (trecho):\n  Persona: engenheiro sênior\n  Instructions: explique a config de gestão\n  Data pasted:\n    enable secret 5 $1$mERr$9cTjWIMyG/FQqKz1x2AbC\n    snmp-server community NetMonRW RW\n    username netops secret 5 $1$xxxx$yyyyyyyy\n    ip route 0.0.0.0 0.0.0.0 203.0.113.1\n\nEDGE# show ip interface brief | include GigabitEthernet0/0/0\nGigabitEthernet0/0/0   203.0.113.10  YES NVRAM  up    up\n\nEDGE# show run | section line vty\nline vty 0 4\n transport input ssh\n login local\n\nPolicy note: generative AI system is external multi-tenant service.",
+    "sintoma": "NOC-9602: júnior quer colar o show running-config da borda (com secrets) numa IA generativa externa multi-tenant. Avalie se o dump pode sair da rede de gestão.",
+    "cli_output": "EDGE# show running-config | include secret|snmp-server community|username netops|ip route 0.0.0.0\nenable secret 5 $1$mERr$9cTjWIMyG/FQqKz1x2AbC\nsnmp-server community NetMonRW RW\nusername netops secret 5 $1$xxxx$yyyyyyyy\nip route 0.0.0.0 0.0.0.0 203.0.113.1\n\nEDGE# show ip interface brief | include GigabitEthernet0/0/0\nGigabitEthernet0/0/0   203.0.113.10  YES NVRAM  up    up\n\nEDGE# show run | section line vty\nline vty 0 4\n transport input ssh\n login local\n\nEDGE# show logging | include CONFIG_I\n%SYS-5-CONFIG_I: Configured from console by netops on vty0\n\n! Pedido do júnior: colar o show run acima em serviço de IA externo multi-tenant (sem DLP).",
     "alternativas": [
       "Enviar o prompt inteiro: secrets em hash são sempre públicos",
       "Rejeitar o envio por data classification; redigir secrets/community e reenviar só shows/seções sem senha",

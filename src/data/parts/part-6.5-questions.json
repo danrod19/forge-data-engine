@@ -18,7 +18,7 @@
     "id": 2,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Discovery/inventário no DNA serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.5): Discovery/inventário no DNA serve para?",
     "alternativas": [
       "Apagar todas as VLANs do campus",
       "Descobrir e catalogar devices gerenciados (plataforma, IP, software, reachability)",
@@ -63,7 +63,7 @@
     "id": 5,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "YANG, em uma frase de exame, é:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.5): YANG, em uma frase de exame, é?",
     "alternativas": [
       "O modelo de dados que estrutura config/estado operacional do device",
       "Um protocolo de Spanning Tree",
@@ -93,7 +93,7 @@
     "id": 7,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "RESTCONF relaciona-se a:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.5): RESTCONF relaciona-se a?",
     "alternativas": [
       "Apenas CDP neighbors",
       "Apenas PortFast",
@@ -393,7 +393,7 @@
     "id": 27,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Qual par está correto?",
+    "enunciado": "No contexto do exame (6.5), Qual par está correto?",
     "alternativas": [
       "NETCONF = só HTTP JSON; RESTCONF = só SSH obrigatório sem HTTP",
       "YANG = protocolo de transporte; NETCONF = linguagem de modelo",

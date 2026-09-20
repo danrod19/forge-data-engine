@@ -78,7 +78,7 @@
     "id": 6,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "ip ssh version 2 é recomendado porque:",
+    "enunciado": "Qual alternativa completa corretamente este item (4.4): ip ssh version 2 é recomendado porque?",
     "alternativas": [
       "Desliga todas as VTY",
       "SSHv2 é a versão preferida; v1 é legado e considerado inseguro",
@@ -243,7 +243,7 @@
     "id": 17,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "enable secret protege principalmente:",
+    "enunciado": "Qual alternativa completa corretamente este item (4.4): enable secret protege principalmente?",
     "alternativas": [
       "A geração automática de domain-name",
       "O modo privilegiado (enable) após o acesso à linha — camada distinta do login VTY",

@@ -108,7 +108,7 @@
     "id": 8,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Aging time da tabela MAC serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.1): Aging time da tabela MAC serve para?",
     "alternativas": [
       "Congelar MACs estáticos para sempre",
       "Apagar portas administratively down",
@@ -288,7 +288,7 @@
     "id": 20,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Um frame known unicast NÃO deve ser:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.1): Um frame known unicast NÃO deve ser?",
     "alternativas": [
       "Forwarded pela porta do destino aprendido",
       "Filtrado se destino está na porta de entrada",

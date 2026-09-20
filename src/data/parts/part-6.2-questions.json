@@ -63,7 +63,7 @@
     "id": 5,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "POST em REST costuma corresponder a:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.2): POST em REST costuma corresponder a?",
     "alternativas": [
       "Create (criar recurso) ou disparar uma operação no servidor",
       "Somente leitura idempotente de inventário",
@@ -78,7 +78,7 @@
     "id": 6,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "DELETE no mapeamento CRUD significa:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.2): DELETE no mapeamento CRUD significa?",
     "alternativas": [
       "Sempre criar um recurso duplicado",
       "Remover o recurso identificado na URI",
@@ -108,7 +108,7 @@
     "id": 8,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Código HTTP 401 indica tipicamente:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.2): Código HTTP 401 indica tipicamente?",
     "alternativas": [
       "Recurso criado com sucesso",
       "Pedido bem-formado e autorizado",
@@ -228,7 +228,7 @@
     "id": 16,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "JSON no payload REST do módulo 6 é:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.2): JSON no payload REST do módulo 6 é?",
     "alternativas": [
       "Formato textual comum de representação (chaves/valores, listas) nas respostas e bodies",
       "Um protocolo de roteamento interno",
@@ -258,7 +258,7 @@
     "id": 18,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "HTTP 500 no controller API indica:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.2): HTTP 500 no controller API indica?",
     "alternativas": [
       "Erro no lado do servidor da API (falha interna)",
       "Sempre URI perfeita e cliente culpado apenas",
@@ -393,7 +393,7 @@
     "id": 27,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Qual par CRUD ↔ verbo está correto?",
+    "enunciado": "No contexto do exame (6.2), Qual par CRUD ↔ verbo está correto?",
     "alternativas": [
       "Read → DELETE; Create → GET",
       "Create → GET; Delete → POST",
@@ -408,7 +408,7 @@
     "id": 28,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "URI identifica o recurso; o body JSON:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.2): URI identifica o recurso; o body JSON?",
     "alternativas": [
       "Substitui sempre o método HTTP",
       "Carrega a representação/dados enviados ou retornados do recurso",

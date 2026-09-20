@@ -20,7 +20,7 @@
     "question_type": "ticket",
     "isPremium": true,
     "sintoma": "Chamado #7602 — campus de 3 prédios discute se precisa de core separado ou collapsed core. O diagrama textual do NOC foi colado no ticket.",
-    "cli_output": "CAMPUS-MEDIO (rascunho atual)\n  Predio-A/B/C: ~180 access ports total\n  Access switches: 12x (um por andar)\n  Agregacao atual: 2x 9300 em stack  (AGG1)\n  Links AGG1 <-> WAN edge: 2x 10G\n  NAO existe par de core separado hoje\n  Crescimento previsto: +1 predio em 18 meses, politica L3 na agregacao\n\nshow cdp neighbors (AGG1) — trecho\n  Access-A1 ... Access-C4  (todos uplinks no AGG1)\n  Edge-FW1\n\nOPCAO-1: manter AGG1 como collapsed core (two-tier)\nOPCAO-2: inserir par Core dedicado e rebaixar AGG a distribution only",
+    "cli_output": "SW1# show logging\nCAMPUS-MEDIO (rascunho atual)\n  Predio-A/B/C: ~180 access ports total\n  Access switches: 12x (um por andar)\n  Agregacao atual: 2x 9300 em stack  (AGG1)\n  Links AGG1 <-> WAN edge: 2x 10G\n  NAO existe par de core separado hoje\n  Crescimento previsto: +1 predio em 18 meses, politica L3 na agregacao\n\nshow cdp neighbors (AGG1) — trecho\n  Access-A1 ... Access-C4  (todos uplinks no AGG1)\n  Edge-FW1\n\nOPCAO-1: manter AGG1 como collapsed core (two-tier)\nOPCAO-2: inserir par Core dedicado e rebaixar AGG a distribution only",
     "alternativas": [
       "Com ~180 portas, um único tier de agregação/backbone e crescimento moderado, two-tier (collapsed core) costuma bastar; three-tier só se houver necessidade clara de core dedicado separado",
       "Todo campus com 12 access switches obriga spine-leaf de DC",
@@ -36,7 +36,7 @@
     "question_type": "ticket",
     "isPremium": true,
     "sintoma": "Chamado #7603 — o negócio pediu “servidor na nuvem”; compras abriu SaaS ilimitado. O time de app precisa instalar Windows e o ERP próprio com RDP e patch interno.",
-    "cli_output": "TICKET-COMPRAS #C-9921\n  Item solicitado: \"Cloud Server SaaS Enterprise Unlimited\"\n  Justificativa usuario: \"subir Windows Server, SQL e ERP legados\"\n  Restricoes:\n    - precisamos de RDP/admin no SO\n    - patch mensal do Windows pela equipe interna\n    - backup de VM sob nosso controle\n\nEMAIL-ARQUITETO (trecho)\n  \"SaaS = app pronta (ex.: e-mail). IaaS = VM/infra. PaaS = plataforma.\"\n\nCATALOGO-PROVEDOR (mock)\n  SKU-SAAS-MAIL   ... aplicacao de e-mail\n  SKU-IAAS-VM     ... vCPU/RAM/disk + hypervisor gerenciado, SO guest do cliente\n  SKU-PAAS-DB     ... banco gerenciado sem SO guest",
+    "cli_output": "SW1# show logging\nTICKET-COMPRAS #C-9921\n  Item solicitado: \"Cloud Server SaaS Enterprise Unlimited\"\n  Justificativa usuario: \"subir Windows Server, SQL e ERP legados\"\n  Restricoes:\n    - precisamos de RDP/admin no SO\n    - patch mensal do Windows pela equipe interna\n    - backup de VM sob nosso controle\n\nEMAIL-ARQUITETO (trecho)\n  \"SaaS = app pronta (ex.: e-mail). IaaS = VM/infra. PaaS = plataforma.\"\n\nCATALOGO-PROVEDOR (mock)\n  SKU-SAAS-MAIL   ... aplicacao de e-mail\n  SKU-IAAS-VM     ... vCPU/RAM/disk + hypervisor gerenciado, SO guest do cliente\n  SKU-PAAS-DB     ... banco gerenciado sem SO guest",
     "alternativas": [
       "SKU-SAAS-MAIL atende RDP e patch de Windows do ERP",
       "SKU-PAAS-DB entrega SO Windows completo para o ERP monólito",
@@ -52,7 +52,7 @@
     "question_type": "ticket",
     "isPremium": true,
     "sintoma": "Chamado #7604 — o time debate como empacotar o novo microserviço. Requisitos de isolamento e runtime foram colados no ticket de plataforma.",
-    "cli_output": "REQ-PLATAFORMA v1.3\n  - App: API Node.js + deps npm\n  - Deploy: 20x/dia em CI\n  - Isolamento: processo/namespace suficiente; NAO precisa kernel Windows dedicado\n  - Startup alvo: < 3 segundos por instancia\n  - Imagem deve caber em pipeline de registry\n\nLAB-HYPERVISOR (opcao A)\n  VM full: Windows Server 2022 + app  | boot ~90s | vCPU 4 / RAM 8GB\n\nLAB-CONTAINER (opcao B)\n  image: node:20-alpine + app         | start ~2s  | CPU 0.5 / RAM 256MB\n\nCOMENTARIO-DEV\n  \"Nao temos driver de kernel custom. So runtime de app.\"",
+    "cli_output": "SW1# show logging\nREQ-PLATAFORMA v1.3\n  - App: API Node.js + deps npm\n  - Deploy: 20x/dia em CI\n  - Isolamento: processo/namespace suficiente; NAO precisa kernel Windows dedicado\n  - Startup alvo: < 3 segundos por instancia\n  - Imagem deve caber em pipeline de registry\n\nLAB-HYPERVISOR (opcao A)\n  VM full: Windows Server 2022 + app  | boot ~90s | vCPU 4 / RAM 8GB\n\nLAB-CONTAINER (opcao B)\n  image: node:20-alpine + app         | start ~2s  | CPU 0.5 / RAM 256MB\n\nCOMENTARIO-DEV\n  \"Nao temos driver de kernel custom. So runtime de app.\"",
     "alternativas": [
       "Com app stateless leve, deploys frequentes e sem kernel guest dedicado, container (opção B) atende melhor que VM full Windows",
       "VM de 90s é obrigatória para qualquer API Node",
@@ -68,7 +68,7 @@
     "question_type": "ticket",
     "isPremium": true,
     "sintoma": "Chamado #7605 — DC novo com tráfego server↔server forte; a mesma planilha de BoM foi colada por engano na filial de 5 PCs.",
-    "cli_output": "DC-PROJETO (válido)\n  48 racks app/db | east-west alto\n  Leaf por rack | dual-home a 4 spines | 100G fabric\n  Justificativa: paths curtos server-server\n\nFILIAL-05 (BoM colado por engano)\n  Endpoints: 5\n  Mesmo BoM: 4 spines + 48 leafs + 100G\n\nshow inventory FILIAL-05 (hoje)\n  NAME: \"Chassis\"  DESCR: \"C1111-8P\" \n  NAME: \"Switch\"   DESCR: \"CBS110-8T\"\n\nANALISE-CUSTO\n  BoM DC na filial = 40x o CAPEX do site atual",
+    "cli_output": "SW1# show logging\nDC-PROJETO (válido)\n  48 racks app/db | east-west alto\n  Leaf por rack | dual-home a 4 spines | 100G fabric\n  Justificativa: paths curtos server-server\n\nFILIAL-05 (BoM colado por engano)\n  Endpoints: 5\n  Mesmo BoM: 4 spines + 48 leafs + 100G\n\nshow inventory FILIAL-05 (hoje)\n  NAME: \"Chassis\"  DESCR: \"C1111-8P\" \n  NAME: \"Switch\"   DESCR: \"CBS110-8T\"\n\nANALISE-CUSTO\n  BoM DC na filial = 40x o CAPEX do site atual",
     "alternativas": [
       "Filial de 5 PCs deve herdar 48 leafs porque east-west de DC é universal",
       "C1111+CBS110 já é spine-leaf de produção",

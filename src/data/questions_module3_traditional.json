@@ -108,7 +108,7 @@
     "id": 8,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Código C em show ip route significa:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.1): Código C em show ip route significa?",
     "alternativas": [
       "Rota connected (rede diretamente ligada)",
       "Candidate default apenas",
@@ -183,7 +183,7 @@
     "id": 13,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "AD típica eBGP vs static default:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.1): AD típica eBGP vs static default?",
     "alternativas": [
       "eBGP 110, static 120",
       "eBGP 1, static 20",
@@ -273,7 +273,7 @@
     "id": 19,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "show ip route static serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.1): show ip route static serve para?",
     "alternativas": [
       "Listar apenas rotas estáticas da tabela",
       "Apagar todas as estáticas",
@@ -288,7 +288,7 @@
     "id": 20,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "AD do RIP na memorização CCNA:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.1): AD do RIP na memorização CCNA?",
     "alternativas": [
       "90",
       "110",
@@ -318,7 +318,7 @@
     "id": 22,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Default IPv6 em visão leve do content:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.1): Default IPv6 em visão leve do content?",
     "alternativas": [
       "0.0.0.0/0 apenas",
       "FF00::/8",
@@ -498,7 +498,7 @@
     "id": 34,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "SVI no L3 switch é criada com:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.2): SVI no L3 switch é criada com?",
     "alternativas": [
       "channel-group 1 mode on",
       "spanning-tree portfast apenas",
@@ -558,7 +558,7 @@
     "id": 38,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Causa clássica de SVI Vlan20 up/down:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.2): Causa clássica de SVI Vlan20 up/down?",
     "alternativas": [
       "ip routing habilitado demais",
       "Excesso de rotas estáticas",
@@ -798,7 +798,7 @@
     "id": 54,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Diferença chave SVI vs routed port:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.2): Diferença chave SVI vs routed port?",
     "alternativas": [
       "SVI não pode ter IP",
       "Routed port exige encapsulation dot1Q no PC",
@@ -918,7 +918,7 @@
     "id": 62,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "O process-id em router ospf 10:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.3): O process-id em router ospf 10?",
     "alternativas": [
       "Deve ser idêntico em todos os roteadores do domínio",
       "É local ao roteador e não precisa coincidir com os vizinhos",
@@ -1128,7 +1128,7 @@
     "id": 76,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "ip ospf cost 50 na interface:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.3): ip ospf cost 50 na interface?",
     "alternativas": [
       "Define o Dead timer como 50",
       "Define a priority como 50",
@@ -1323,7 +1323,7 @@
     "id": 89,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Checklist “não forma vizinho OSPF”:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.3): Checklist “não forma vizinho OSPF”?",
     "alternativas": [
       "Só trocar o SFP por monomodo",
       "Interface no processo, same subnet/area/timers, not passive, RID único, MTU/auth se aplicável",
@@ -1383,7 +1383,7 @@
     "id": 93,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "FF02::1 no escopo link-local é:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): FF02::1 no escopo link-local é?",
     "alternativas": [
       "Unique local fd00::/8",
       "Loopback ::1",
@@ -1413,7 +1413,7 @@
     "id": 95,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "EUI-64 clássico a partir do MAC:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): EUI-64 clássico a partir do MAC?",
     "alternativas": [
       "Insere FFFE no meio do MAC e inverte o bit U/L para formar o Interface ID de 64 bits",
       "Usa apenas os 32 bits baixos do MAC",
@@ -1428,7 +1428,7 @@
     "id": 96,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "SLAAC depende principalmente de:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): SLAAC depende principalmente de?",
     "alternativas": [
       "Somente DHCPv4",
       "Router Advertisement com prefixo (tipicamente /64) para o host montar a GUA",
@@ -1443,7 +1443,7 @@
     "id": 97,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Default route IPv6 é:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): Default route IPv6 é?",
     "alternativas": [
       "0.0.0.0/0 apenas",
       "::/0",
@@ -1473,7 +1473,7 @@
     "id": 99,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Flag M no RA indica tipicamente:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): Flag M no RA indica tipicamente?",
     "alternativas": [
       "DHCPv6 stateful para obter endereço (managed)",
       "Somente compressão “::”",
@@ -1488,7 +1488,7 @@
     "id": 100,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "show ipv6 interface brief serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): show ipv6 interface brief serve para?",
     "alternativas": [
       "Só listar rotas OSPFv2",
       "Ver endereços IPv6 e estado das interfaces de forma resumida",
@@ -1548,7 +1548,7 @@
     "id": 104,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Flag O no RA (com A=1, M=0) sugere:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): Flag O no RA (com A=1, M=0) sugere?",
     "alternativas": [
       "Somente IPv4 DHCP",
       "Proibir SLAAC",
@@ -1563,7 +1563,7 @@
     "id": 105,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Dual-stack significa:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): Dual-stack significa?",
     "alternativas": [
       "Apenas IPv6 com NAT64 obrigatório",
       "Desligar IPv4 em todos os hosts",
@@ -1578,7 +1578,7 @@
     "id": 106,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "OSPFv3 na interface (visão leve):",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): OSPFv3 na interface (visão leve)?",
     "alternativas": [
       "ipv6 ospf <pid> area <area> na interface (com IPv6 ativo/link-local)",
       "Apenas network 0.0.0.0 sob router ospf IPv4",
@@ -1593,7 +1593,7 @@
     "id": 107,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "FF02::2 representa:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): FF02::2 representa?",
     "alternativas": [
       "All-nodes",
       "GUA de documentação",
@@ -1638,7 +1638,7 @@
     "id": 110,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "ipv6 unicast-routing no roteador:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): ipv6 unicast-routing no roteador?",
     "alternativas": [
       "Só cria link-local em hosts Windows",
       "Desabilita RA para sempre",
@@ -1698,7 +1698,7 @@
     "id": 114,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "DHCPv6 stateful vs SLAAC (conceito):",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): DHCPv6 stateful vs SLAAC (conceito)?",
     "alternativas": [
       "Stateful entrega endereço via DHCP; SLAAC monta GUA a partir do RA",
       "SLAAC só funciona com NAT IPv4",
@@ -1728,7 +1728,7 @@
     "id": 116,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "OSPFv3 Hellos usam, no essencial:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): OSPFv3 Hellos usam, no essencial?",
     "alternativas": [
       "Apenas broadcast 255.255.255.255",
       "Link-local IPv6 na interface (IPv6 precisa estar ativo)",
@@ -1743,7 +1743,7 @@
     "id": 117,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "show ipv6 route static ajuda a ver:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): show ipv6 route static ajuda a ver?",
     "alternativas": [
       "Apenas rotas OSPFv2 IPv4",
       "VLANs access",

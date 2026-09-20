@@ -41,7 +41,7 @@
       "Rota local /32 da interface"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "S* marca estática default. O é OSPF, C connected, L local.",
+    "explicacao_profunda": "S* marca estática default. O é OSPF, C connected, L local. Isso casa com «Default route estática (candidate default)». «Rota OSPF inter-area» não descreve o mesmo recorte. «Rede connected» mistura causa que o enunciado não mostra. «Rota local /32 da interface» também fica fora da evidência.",
     "part_id": "3.1"
   },
   {
@@ -56,7 +56,7 @@
       "1"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "Static AD default = 1. 110 OSPF, 120 RIP, 20 eBGP.",
+    "explicacao_profunda": "Static AD default = 1. 110 OSPF, 120 RIP, 20 eBGP. Isso casa com «1». «110» não descreve o mesmo recorte. «120» mistura causa que o enunciado não mostra. «20» também fica fora da evidência.",
     "part_id": "3.1"
   },
   {
@@ -71,7 +71,7 @@
       "Máscara /0 obrigatória"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Backup com AD maior. Não é AD 0 nem /0 obrigatório (pode ser qualquer prefixo).",
+    "explicacao_profunda": "Backup com AD maior. Não é AD 0 nem /0 obrigatório (pode ser qualquer prefixo). Isso casa com «AD maior (pior) para só instalar se a primária sair». «AD 0 igual a connected» não descreve o mesmo recorte. «Sempre AD menor que 1» mistura causa que o enunciado não mostra. «Máscara /0 obrigatória» também fica fora da evidência.",
     "part_id": "3.1"
   },
   {
@@ -101,14 +101,14 @@
       "255"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "OSPF 110. Static 1, eBGP 20, 255 não usável típico.",
+    "explicacao_profunda": "OSPF 110. Static 1, eBGP 20, 255 não usável típico. Isso casa com «110». «1» não descreve o mesmo recorte. «20» mistura causa que o enunciado não mostra. «255» também fica fora da evidência.",
     "part_id": "3.1"
   },
   {
     "id": 8,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Código C em show ip route significa:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.1): Código C em show ip route significa?",
     "alternativas": [
       "Rota connected (rede diretamente ligada)",
       "Candidate default apenas",
@@ -116,7 +116,7 @@
       "Rota RIP"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "C = connected. S static, R RIP, S* default estática.",
+    "explicacao_profunda": "C = connected. S static, R RIP, S* default estática. Isso casa com «Rota connected (rede diretamente ligada)». «Candidate default apenas» não descreve o mesmo recorte. «Rota estática» mistura causa que o enunciado não mostra. «Rota RIP» também fica fora da evidência.",
     "part_id": "3.1"
   },
   {
@@ -131,7 +131,7 @@
       "Default route estática via next-hop 203.0.113.1"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "0/0 com next-hop é default estática. Não é ACL nem host route isolada.",
+    "explicacao_profunda": "0/0 com next-hop é default estática. Não é ACL nem host route isolada. Isso casa com «Default route estática via next-hop 203.0.113.1». «Rota host para 203.0.113.1/32 apenas» não descreve o mesmo recorte. «ACL deny any» mistura causa que o enunciado não mostra. «Null route de descarte» também fica fora da evidência.",
     "part_id": "3.1"
   },
   {
@@ -183,7 +183,7 @@
     "id": 13,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "AD típica eBGP vs static default:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.1): AD típica eBGP vs static default?",
     "alternativas": [
       "eBGP 110, static 120",
       "eBGP 1, static 20",
@@ -191,7 +191,7 @@
       "Ambos 255"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Static 1, eBGP 20. No mesmo prefixo a estática default vence o eBGP.",
+    "explicacao_profunda": "Static 1, eBGP 20. No mesmo prefixo a estática default vence o eBGP. Isso casa com «eBGP 20, static 1 — static default costuma preferir-se a eBGP no mesmo prefixo». «eBGP 110, static 120» não descreve o mesmo recorte. «eBGP 1, static 20» mistura causa que o enunciado não mostra. «Ambos 255» também fica fora da evidência.",
     "part_id": "3.1"
   },
   {
@@ -206,7 +206,7 @@
       "ECMP obrigatório entre as duas"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Prefixo mais longo vence. Ordem de config e ECMP forçado não se aplicam assim.",
+    "explicacao_profunda": "Prefixo mais longo vence. Ordem de config e ECMP forçado não se aplicam assim. Isso casa com «172.16.5.0/24 por longest match». «Sempre /16 por ter sido configurada primeiro» não descreve o mesmo recorte. «Nenhuma se AD for igual» mistura causa que o enunciado não mostra. «ECMP obrigatório entre as duas» também fica fora da evidência.",
     "part_id": "3.1"
   },
   {
@@ -236,7 +236,7 @@
       "Default route"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "L = local host route da interface. Não é floating nem default.",
+    "explicacao_profunda": "L = local host route da interface. Não é floating nem default. Isso casa com «Rota local (/32 do IP da interface)». «Rota LISP apenas» não descreve o mesmo recorte. «Floating static» mistura causa que o enunciado não mostra. «Default route» também fica fora da evidência.",
     "part_id": "3.1"
   },
   {
@@ -273,7 +273,7 @@
     "id": 19,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "show ip route static serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.1): show ip route static serve para?",
     "alternativas": [
       "Listar apenas rotas estáticas da tabela",
       "Apagar todas as estáticas",
@@ -281,14 +281,14 @@
       "Mostrar só interfaces down"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Filtro de estáticas no show. Não configura nem apaga rotas.",
+    "explicacao_profunda": "Filtro de estáticas no show. Não configura nem apaga rotas. Isso casa com «Listar apenas rotas estáticas da tabela». «Apagar todas as estáticas» não descreve o mesmo recorte. «Configurar floating AD 200» mistura causa que o enunciado não mostra. «Mostrar só interfaces down» também fica fora da evidência.",
     "part_id": "3.1"
   },
   {
     "id": 20,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "AD do RIP na memorização CCNA:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.1): AD do RIP na memorização CCNA?",
     "alternativas": [
       "90",
       "110",
@@ -296,7 +296,7 @@
       "120"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "RIP 120. EIGRP 90, OSPF 110, static 1.",
+    "explicacao_profunda": "RIP 120. EIGRP 90, OSPF 110, static 1. Isso casa com «120». «90» não descreve o mesmo recorte. «110» mistura causa que o enunciado não mostra. «1» também fica fora da evidência.",
     "part_id": "3.1"
   },
   {
@@ -318,7 +318,7 @@
     "id": 22,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Default IPv6 em visão leve do content:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.1): Default IPv6 em visão leve do content?",
     "alternativas": [
       "0.0.0.0/0 apenas",
       "FF00::/8",
@@ -326,7 +326,7 @@
       "::/0"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "::/0 é default IPv6. FE80 link-local, FF00 multicast, 0/0 é IPv4.",
+    "explicacao_profunda": "::/0 é default IPv6. FE80 link-local, FF00 multicast, 0/0 é IPv4. Isso casa com «::/0». «0.0.0.0/0 apenas» não descreve o mesmo recorte. «FF00::/8» mistura causa que o enunciado não mostra. «FE80::/10» também fica fora da evidência.",
     "part_id": "3.1"
   },
   {
@@ -386,7 +386,7 @@
       "OSPF desabilitado"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "A linha de last resort sinaliza default. Não prova OSPF off nem só rota L.",
+    "explicacao_profunda": "A linha de last resort sinaliza default. Não prova OSPF off nem só rota L. Isso casa com «Há default route apontando (direta ou indiretamente) para esse caminho de last resort». «Não há default» não descreve o mesmo recorte. «Apenas rota L para 203.0.113.1» mistura causa que o enunciado não mostra. «OSPF desabilitado» também fica fora da evidência.",
     "part_id": "3.1"
   },
   {

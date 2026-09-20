@@ -48,7 +48,7 @@
     "id": 4,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Marking no modelo PHB serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (4.5): Marking no modelo PHB serve para?",
     "alternativas": [
       "Apagar rotas OSPF automaticamente",
       "Substituir o cabeçalho Ethernet por PPP sempre",

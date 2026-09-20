@@ -18,7 +18,7 @@
     "id": 2,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Em JSON, um objeto é delimitado por:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.3): Em JSON, um objeto é delimitado por?",
     "alternativas": [
       "Apenas colchetes [ ]",
       "Chaves { } com pares chave–valor",
@@ -33,7 +33,7 @@
     "id": 3,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Um array JSON é tipicamente usado para:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.3): Um array JSON é tipicamente usado para?",
     "alternativas": [
       "Substituir o status HTTP",
       "Eliminar a necessidade de aspas em strings",
@@ -78,7 +78,7 @@
     "id": 6,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "\"managementIp\": \"10.1.1.1\" — o valor é:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.3): \"managementIp\": \"10.1.1.1\" — o valor é?",
     "alternativas": [
       "number decimal",
       "string (IP entre aspas)",
@@ -243,7 +243,7 @@
     "id": 17,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "\"interfaces\": [] significa:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.3): \"interfaces\": [] significa?",
     "alternativas": [
       "null",
       "Array vazio válido — lista sem elementos",
@@ -258,7 +258,7 @@
     "id": 18,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Contraste leve JSON vs XML no CCNA:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.3): Contraste leve JSON vs XML no CCNA?",
     "alternativas": [
       "JSON é o formato de payload mais citado em REST de controllers; XML é legado/contraste, sem lab profundo",
       "XML substituiu JSON em todas as APIs DNA",

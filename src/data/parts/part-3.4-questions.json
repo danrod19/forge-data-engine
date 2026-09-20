@@ -11,7 +11,7 @@
       "Default route ::/0"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "FE80::/10 é link-local. GUA é outra faixa; all-nodes é FF02::1; ::/0 é default.",
+    "explicacao_profunda": "FE80::/10 é link-local. GUA é outra faixa; all-nodes é FF02::1; ::/0 é default. Isso casa com «Link-local IPv6». «GUA pública obrigatória» não descreve o mesmo recorte. «Multicast all-nodes apenas» mistura causa que o enunciado não mostra. «Default route ::/0» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {
@@ -33,7 +33,7 @@
     "id": 3,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "FF02::1 no escopo link-local é:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): FF02::1 no escopo link-local é?",
     "alternativas": [
       "Unique local fd00::/8",
       "Loopback ::1",
@@ -41,7 +41,7 @@
       "Default ::/0"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "FF02::1 = all-nodes. ULA, loopback e default são outros tipos.",
+    "explicacao_profunda": "FF02::1 = all-nodes. ULA, loopback e default são outros tipos. Isso casa com «Multicast all-nodes no enlace». «Unique local fd00::/8» não descreve o mesmo recorte. «Loopback ::1» mistura causa que o enunciado não mostra. «Default ::/0» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {
@@ -63,7 +63,7 @@
     "id": 5,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "EUI-64 clássico a partir do MAC:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): EUI-64 clássico a partir do MAC?",
     "alternativas": [
       "Insere FFFE no meio do MAC e inverte o bit U/L para formar o Interface ID de 64 bits",
       "Usa apenas os 32 bits baixos do MAC",
@@ -71,14 +71,14 @@
       "Gera obrigatoriamente FE80::1"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "EUI-64 = FFFE + flip U/L. Não é cópia crua de 128 bits nem FE80::1 fixo.",
+    "explicacao_profunda": "EUI-64 = FFFE + flip U/L. Não é cópia crua de 128 bits nem FE80::1 fixo. Isso casa com «Insere FFFE no meio do MAC e inverte o bit U/L para formar o Interface ID de 64 bits». «Usa apenas os 32 bits baixos do MAC» não descreve o mesmo recorte. «Copia o MAC sem alteração para os 128 bits» mistura causa que o enunciado não mostra. «Gera obrigatoriamente FE80::1» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {
     "id": 6,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "SLAAC depende principalmente de:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): SLAAC depende principalmente de?",
     "alternativas": [
       "Somente DHCPv4",
       "Router Advertisement com prefixo (tipicamente /64) para o host montar a GUA",
@@ -86,14 +86,14 @@
       "EtherChannel LACP"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "SLAAC usa RA/prefixo. Não depende de DHCPv4/NAT/LACP.",
+    "explicacao_profunda": "SLAAC usa RA/prefixo. Não depende de DHCPv4/NAT/LACP. Isso casa com «Router Advertisement com prefixo (tipicamente /64) para o host montar a GUA». «Somente DHCPv4» não descreve o mesmo recorte. «NAT overload IPv4» mistura causa que o enunciado não mostra. «EtherChannel LACP» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {
     "id": 7,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Default route IPv6 é:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): Default route IPv6 é?",
     "alternativas": [
       "0.0.0.0/0 apenas",
       "::/0",
@@ -101,7 +101,7 @@
       "FF02::2"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "::/0 é a default IPv6. 0/0 é IPv4; FE80 link-local; FF02::2 all-routers.",
+    "explicacao_profunda": "::/0 é a default IPv6. 0/0 é IPv4; FE80 link-local; FF02::2 all-routers. Isso casa com «::/0». «0.0.0.0/0 apenas» não descreve o mesmo recorte. «FE80::/10» mistura causa que o enunciado não mostra. «FF02::2» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {
@@ -123,7 +123,7 @@
     "id": 9,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Flag M no RA indica tipicamente:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): Flag M no RA indica tipicamente?",
     "alternativas": [
       "DHCPv6 stateful para obter endereço (managed)",
       "Somente compressão “::”",
@@ -138,7 +138,7 @@
     "id": 10,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "show ipv6 interface brief serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): show ipv6 interface brief serve para?",
     "alternativas": [
       "Só listar rotas OSPFv2",
       "Ver endereços IPv6 e estado das interfaces de forma resumida",
@@ -191,14 +191,14 @@
       "Default route IPv6 via next-hop 2001:db8:0:1::1"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "::/0 com next-hop é default IPv6. Não é ACL nem null IPv4.",
+    "explicacao_profunda": "::/0 com next-hop é default IPv6. Não é ACL nem null IPv4. Isso casa com «Default route IPv6 via next-hop 2001:db8:0:1::1». «Rota host /128 para todos os destinos» não descreve o mesmo recorte. «Null route de descarte IPv4» mistura causa que o enunciado não mostra. «ACL deny ipv6 any» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {
     "id": 14,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Flag O no RA (com A=1, M=0) sugere:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): Flag O no RA (com A=1, M=0) sugere?",
     "alternativas": [
       "Somente IPv4 DHCP",
       "Proibir SLAAC",
@@ -213,7 +213,7 @@
     "id": 15,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Dual-stack significa:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): Dual-stack significa?",
     "alternativas": [
       "Apenas IPv6 com NAT64 obrigatório",
       "Desligar IPv4 em todos os hosts",
@@ -221,14 +221,14 @@
       "Usar só FE80 em ambas as pilhas"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Dual-stack = duas pilhas ativas. Não exige desligar IPv4 nem só link-local.",
+    "explicacao_profunda": "Dual-stack = duas pilhas ativas. Não exige desligar IPv4 nem só link-local. Isso casa com «Operar IPv4 e IPv6 simultaneamente, cada um com endereços/rotas próprios». «Apenas IPv6 com NAT64 obrigatório» não descreve o mesmo recorte. «Desligar IPv4 em todos os hosts» mistura causa que o enunciado não mostra. «Usar só FE80 em ambas as pilhas» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {
     "id": 16,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "OSPFv3 na interface (visão leve):",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): OSPFv3 na interface (visão leve)?",
     "alternativas": [
       "ipv6 ospf <pid> area <area> na interface (com IPv6 ativo/link-local)",
       "Apenas network 0.0.0.0 sob router ospf IPv4",
@@ -243,7 +243,7 @@
     "id": 17,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "FF02::2 representa:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): FF02::2 representa?",
     "alternativas": [
       "All-nodes",
       "GUA de documentação",
@@ -251,7 +251,7 @@
       "Default ::/0"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "FF02::2 = all-routers. All-nodes é FF02::1. GUA e default são outros.",
+    "explicacao_profunda": "FF02::2 = all-routers. All-nodes é FF02::1. GUA e default são outros. Isso casa com «All-routers multicast no link-local scope». «All-nodes» não descreve o mesmo recorte. «GUA de documentação» mistura causa que o enunciado não mostra. «Default ::/0» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {
@@ -266,7 +266,7 @@
       "show arp / resolução de vizinhos no enlace (ND)"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "ND cache ≈ ARP do IPv4. Não é VLAN/STP/LSDB isolado.",
+    "explicacao_profunda": "ND cache ≈ ARP do IPv4. Não é VLAN/STP/LSDB isolado. Isso casa com «show arp / resolução de vizinhos no enlace (ND)». «show vlan brief» não descreve o mesmo recorte. «show ip ospf database apenas» mistura causa que o enunciado não mostra. «show spanning-tree root» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {
@@ -281,14 +281,14 @@
       "/8 privado IPv4"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "/64 é o padrão de sub-rede para SLAAC. /128 é host; /24 é IPv4.",
+    "explicacao_profunda": "/64 é o padrão de sub-rede para SLAAC. /128 é host; /24 é IPv4. Isso casa com «/64». «/128 apenas» não descreve o mesmo recorte. «/24 classful» mistura causa que o enunciado não mostra. «/8 privado IPv4» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {
     "id": 20,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "ipv6 unicast-routing no roteador:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): ipv6 unicast-routing no roteador?",
     "alternativas": [
       "Só cria link-local em hosts Windows",
       "Desabilita RA para sempre",
@@ -326,7 +326,7 @@
       "db8:2001::1::0"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Um único “::” comprime o bloco de zeros → 2001:db8::1. Dois “::” são inválidos.",
+    "explicacao_profunda": "Um único “::” comprime o bloco de zeros → 2001:db8::1. Dois “::” são inválidos. Isso casa com «2001:db8::1». «2001::db8::1» não descreve o mesmo recorte. «2001:db8:0:0::1::» mistura causa que o enunciado não mostra. «db8:2001::1::0» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {
@@ -348,7 +348,7 @@
     "id": 24,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "DHCPv6 stateful vs SLAAC (conceito):",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): DHCPv6 stateful vs SLAAC (conceito)?",
     "alternativas": [
       "Stateful entrega endereço via DHCP; SLAAC monta GUA a partir do RA",
       "SLAAC só funciona com NAT IPv4",
@@ -371,14 +371,14 @@
       "Link-local FE80 sem GUA"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "enable → FE80; sem address/SLAAC → sem GUA. Não cria default na if.",
+    "explicacao_profunda": "enable → FE80; sem address/SLAAC → sem GUA. Não cria default na if. Isso casa com «Link-local FE80 sem GUA». «Várias GUAs 2001:db8» não descreve o mesmo recorte. «Apenas IPv4» mistura causa que o enunciado não mostra. «Default ::/0 na interface» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {
     "id": 26,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "OSPFv3 Hellos usam, no essencial:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): OSPFv3 Hellos usam, no essencial?",
     "alternativas": [
       "Apenas broadcast 255.255.255.255",
       "Link-local IPv6 na interface (IPv6 precisa estar ativo)",
@@ -386,14 +386,14 @@
       "TCP 179"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "OSPFv3 opera com IPv6/link-local no link. Não é broadcast IPv4 nem BGP TCP 179.",
+    "explicacao_profunda": "OSPFv3 opera com IPv6/link-local no link. Não é broadcast IPv4 nem BGP TCP 179. Isso casa com «Link-local IPv6 na interface (IPv6 precisa estar ativo)». «Apenas broadcast 255.255.255.255» não descreve o mesmo recorte. «Somente GUA 2001:db8::1 fixa» mistura causa que o enunciado não mostra. «TCP 179» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {
     "id": 27,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "show ipv6 route static ajuda a ver:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.4): show ipv6 route static ajuda a ver?",
     "alternativas": [
       "Apenas rotas OSPFv2 IPv4",
       "VLANs access",
@@ -401,7 +401,7 @@
       "Tabela MAC L2"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Filtro de estáticas IPv6. Não é OSPFv2, VLAN nem MAC.",
+    "explicacao_profunda": "Filtro de estáticas IPv6. Não é OSPFv2, VLAN nem MAC. Isso casa com «Estáticas IPv6 configuradas/instaladas (incl. candidatos default)». «Apenas rotas OSPFv2 IPv4» não descreve o mesmo recorte. «VLANs access» mistura causa que o enunciado não mostra. «Tabela MAC L2» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {
@@ -416,7 +416,7 @@
       "ULA fd00::/8"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "2001:db8::/32 é documentação. FE80/FF02/ULA são outros tipos.",
+    "explicacao_profunda": "2001:db8::/32 é documentação. FE80/FF02/ULA são outros tipos. Isso casa com «Prefixo de documentação GUA (não roteável na Internet real como produção genérica)». «Link-local FE80» não descreve o mesmo recorte. «Multicast all-routers» mistura causa que o enunciado não mostra. «ULA fd00::/8» também fica fora da evidência.",
     "part_id": "3.4"
   },
   {

@@ -101,7 +101,7 @@
       "Configurar PortFast default"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "summary é o panorama do EtherChannel. Não é OSPF, secret nem PortFast.",
+    "explicacao_profunda": "summary é o panorama do EtherChannel. Não é OSPF, secret nem PortFast. Isso casa com «Visão rápida do Po, protocolo e estado dos membros no bundle». «Ver o hash de OSPF» não descreve o mesmo recorte. «Listar senhas enable» mistura causa que o enunciado não mostra. «Configurar PortFast default» também fica fora da evidência.",
     "part_id": "2.4"
   },
   {
@@ -123,7 +123,7 @@
     "id": 9,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "passive + passive em LACP resulta em:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.4): passive + passive em LACP resulta em?",
     "alternativas": [
       "Sem formação do bundle, pois ninguém inicia a negociação",
       "Canal LACP up com todos os membros",
@@ -131,14 +131,14 @@
       "Modo on automático"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Passive só responde; sem active não sobe. Não vira PAgP nem on sozinho.",
+    "explicacao_profunda": "Passive só responde; sem active não sobe. Não vira PAgP nem on sozinho. Isso casa com «Sem formação do bundle, pois ninguém inicia a negociação». «Canal LACP up com todos os membros» não descreve o mesmo recorte. «Canal PAgP desirable» mistura causa que o enunciado não mostra. «Modo on automático» também fica fora da evidência.",
     "part_id": "2.4"
   },
   {
     "id": 10,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "interface Port-channel 2 representa:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.4): interface Port-channel 2 representa?",
     "alternativas": [
       "A interface lógica do bundle (channel-group 2)",
       "Apenas o primeiro membro físico Gi1/0/1",
@@ -228,7 +228,7 @@
     "id": 16,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "auto + auto em PAgP:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.4): auto + auto em PAgP?",
     "alternativas": [
       "Forma canal imediatamente",
       "Equivalente a active + active LACP",
@@ -236,7 +236,7 @@
       "Força mode on"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "auto espera; auto+auto não sobe. Não é LACP active nem on.",
+    "explicacao_profunda": "auto espera; auto+auto não sobe. Não é LACP active nem on. Isso casa com «Não inicia negociação; ninguém é “desirable”». «Forma canal imediatamente» não descreve o mesmo recorte. «Equivalente a active + active LACP» mistura causa que o enunciado não mostra. «Força mode on» também fica fora da evidência.",
     "part_id": "2.4"
   },
   {
@@ -266,7 +266,7 @@
       "PAgP converte ambos para 10G"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Speed alinhada é requisito. Protocolos não “igualam” 100M a 1G magicamente.",
+    "explicacao_profunda": "Speed alinhada é requisito. Protocolos não “igualam” 100M a 1G magicamente. Isso casa com «Provável rejeição/inconsistência — speed deve ser igual nos membros». «Bundle perfeito com load ideal» não descreve o mesmo recorte. «LACP ignora speed sempre» mistura causa que o enunciado não mostra. «PAgP converte ambos para 10G» também fica fora da evidência.",
     "part_id": "2.4"
   },
   {
@@ -288,7 +288,7 @@
     "id": 20,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Cisco a Cisco, desirable + auto:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.4): Cisco a Cisco, desirable + auto?",
     "alternativas": [
       "Não forma nunca",
       "É par LACP",
@@ -326,7 +326,7 @@
       "Native VLAN mismatch obrigatório"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "P ≈ participante do Po. Não é OSPF nem definição de native mismatch/Guard.",
+    "explicacao_profunda": "P ≈ participante do Po. Não é OSPF nem definição de native mismatch/Guard. Isso casa com «Membro bundled no Port-Channel (in port-channel)». «Porta em err-disable por BPDU Guard apenas» não descreve o mesmo recorte. «Protocolo OSPF adjacente» mistura causa que o enunciado não mostra. «Native VLAN mismatch obrigatório» também fica fora da evidência.",
     "part_id": "2.4"
   },
   {
@@ -378,7 +378,7 @@
     "id": 26,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "active + passive (LACP):",
+    "enunciado": "Qual alternativa completa corretamente este item (2.4): active + passive (LACP)?",
     "alternativas": [
       "Não forma porque passive é inválido",
       "Forma o canal: active inicia e passive responde",
@@ -386,7 +386,7 @@
       "Equivalente a auto + auto"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Par LACP válido. Não é PAgP nem auto+auto. Passive é válido com active.",
+    "explicacao_profunda": "Par LACP válido. Não é PAgP nem auto+auto. Passive é válido com active. Isso casa com «Forma o canal: active inicia e passive responde». «Não forma porque passive é inválido» não descreve o mesmo recorte. «É par exclusivo PAgP» mistura causa que o enunciado não mostra. «Equivalente a auto + auto» também fica fora da evidência.",
     "part_id": "2.4"
   },
   {

@@ -3,7 +3,7 @@
     "id": 1,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Quantos bits possui um endereço IPv6?",
+    "enunciado": "No contexto do exame (1.5), Quantos bits possui um endereço IPv6?",
     "alternativas": [
       "128 bits",
       "32 bits",
@@ -48,7 +48,7 @@
     "id": 4,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "O endereço ::1/128 representa:",
+    "enunciado": "Qual alternativa completa corretamente este item (1.5): O endereço ::1/128 representa?",
     "alternativas": [
       "Default route IPv6",
       "Multicast all-nodes",
@@ -378,7 +378,7 @@
     "id": 26,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "FF02::2 no link-local scope representa:",
+    "enunciado": "Qual alternativa completa corretamente este item (1.5): FF02::2 no link-local scope representa?",
     "alternativas": [
       "Loopback ::1",
       "GUA 2000::/3",
@@ -423,7 +423,7 @@
     "id": 29,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "PAT (NAT overload) permite que:",
+    "enunciado": "Qual alternativa completa corretamente este item (1.5): PAT (NAT overload) permite que?",
     "alternativas": [
       "Cada FE80:: se torne GUA automaticamente",
       "Muitos hosts internos compartilhem um ou poucos IPs públicos usando portas distintas na tradução",

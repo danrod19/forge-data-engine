@@ -49,6 +49,7 @@
 - [x] E-mail transacional mínimo (Resend): pagamento no webhook `checkout.session.completed` + trial-reminder diário (SQL colunas; sem deploy/cron neste repo)
 - [x] Bugs AWS (auditoria 18/09): stems incompletos + ID visível `AWS-x.y · #n` + Estudo só mostra item com enunciado+explicação (sem Stripe/PWA/e-mail/CCNA)
 - [x] Bugs CCNA (auditoria 19/09): Estudo renderiza `Explicacao` após responder; header `#id` (não N/M); tickets 143/144 CLI IOS
+- [x] QA geral CCNA+AWS (19/09): scanner `qa-scan-questions.mjs`; 4683 vistos; 407 high + 96 med corrigidos; quarentena 0; V2 tickets 12/63/82 CLI IOS
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção

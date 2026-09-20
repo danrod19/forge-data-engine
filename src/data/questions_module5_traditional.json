@@ -33,7 +33,7 @@
     "id": 3,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Exploit é melhor definido como:",
+    "enunciado": "Qual alternativa completa corretamente este item (5.1): Exploit é melhor definido como?",
     "alternativas": [
       "Um treinamento de awareness obrigatório",
       "Um controle físico de rack",
@@ -48,7 +48,7 @@
     "id": 4,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Mitigation, em termos de prova, é:",
+    "enunciado": "Qual alternativa completa corretamente este item (5.1): Mitigation, em termos de prova, é?",
     "alternativas": [
       "Ignorar logs para economizar disco",
       "Compartilhar a senha de enable com toda a equipe",
@@ -123,7 +123,7 @@
     "id": 9,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "service password-encryption no IOS:",
+    "enunciado": "Qual alternativa completa corretamente este item (5.1): service password-encryption no IOS?",
     "alternativas": [
       "Aplica ofuscação tipo 7 a senhas em claro — fraca/reversível; não substitui enable secret",
       "É equivalente criptográfico ao tipo 9 scrypt em todos os casos",
@@ -1833,7 +1833,7 @@
     "id": 123,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Remote-access VPN é o caso em que:",
+    "enunciado": "Qual alternativa completa corretamente este item (5.5): Remote-access VPN é o caso em que?",
     "alternativas": [
       "Dois data centers trocam apenas rotas BGP sem túnel",
       "Switches access formam EtherChannel entre si",
@@ -1893,7 +1893,7 @@
     "id": 127,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Authorization em AAA define:",
+    "enunciado": "Qual alternativa completa corretamente este item (5.5): Authorization em AAA define?",
     "alternativas": [
       "Apenas o hostname do RADIUS",
       "Apenas o algoritmo de hash do enable secret",

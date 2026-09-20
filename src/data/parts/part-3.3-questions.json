@@ -18,7 +18,7 @@
     "id": 2,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "O process-id em router ospf 10:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.3): O process-id em router ospf 10?",
     "alternativas": [
       "Deve ser idêntico em todos os roteadores do domínio",
       "É local ao roteador e não precisa coincidir com os vizinhos",
@@ -71,7 +71,7 @@
       "Mudam o process-id automaticamente"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Timers devem combinar. Não definem cost/DR dual/process-id sozinhos.",
+    "explicacao_profunda": "Timers devem combinar. Não definem cost/DR dual/process-id sozinhos. Isso casa com «Impedem a formação correta de adjacency». «Aumentam só o cost para 65535» não descreve o mesmo recorte. «Elegem dois DRs obrigatoriamente» mistura causa que o enunciado não mostra. «Mudam o process-id automaticamente» também fica fora da evidência.",
     "part_id": "3.3"
   },
   {
@@ -101,7 +101,7 @@
       "D e AD 90"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "OSPF = O, AD 110. S/1 static, C/0 connected, D/90 EIGRP.",
+    "explicacao_profunda": "OSPF = O, AD 110. S/1 static, C/0 connected, D/90 EIGRP. Isso casa com «O e AD 110». «S e AD 1» não descreve o mesmo recorte. «C e AD 0» mistura causa que o enunciado não mostra. «D e AD 90» também fica fora da evidência.",
     "part_id": "3.3"
   },
   {
@@ -116,7 +116,7 @@
       "Impede Hellos (sem neighbor) na interface; a rede ainda pode ser anunciada"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "Passive = sem Hellos/neighbor local. Não define DR/area/priority.",
+    "explicacao_profunda": "Passive = sem Hellos/neighbor local. Não define DR/area/priority. Isso casa com «Impede Hellos (sem neighbor) na interface; a rede ainda pode ser anunciada». «Aumenta a priority para 255» não descreve o mesmo recorte. «Força DR na interface» mistura causa que o enunciado não mostra. «Muda a área para 1» também fica fora da evidência.",
     "part_id": "3.3"
   },
   {
@@ -131,7 +131,7 @@
       "RID duplicado resolvido"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Full = adjacência completa. Down/timers/RID são outros problemas.",
+    "explicacao_profunda": "Full = adjacência completa. Down/timers/RID são outros problemas. Isso casa com «Adjacência completa / LSDB sincronizada com esse peer (no papel esperado)». «Apenas cabo down» não descreve o mesmo recorte. «Timers nunca combinaram» mistura causa que o enunciado não mostra. «RID duplicado resolvido» também fica fora da evidência.",
     "part_id": "3.3"
   },
   {
@@ -146,7 +146,7 @@
       "Quem configurou passive primeiro"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Desempate DR: maior RID. Cost/process/passive não desempatam assim.",
+    "explicacao_profunda": "Desempate DR: maior RID. Cost/process/passive não desempatam assim. Isso casa com «O maior Router-ID». «O menor cost» não descreve o mesmo recorte. «O process-id maior» mistura causa que o enunciado não mostra. «Quem configurou passive primeiro» também fica fora da evidência.",
     "part_id": "3.3"
   },
   {
@@ -161,7 +161,7 @@
       "Sem adjacency estável por mismatch de timers"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "Hello/Dead devem coincidir. Não forma Full estável; não converte em RIP.",
+    "explicacao_profunda": "Hello/Dead devem coincidir. Não forma Full estável; não converte em RIP. Isso casa com «Sem adjacency estável por mismatch de timers». «Adjacency Full estável sem ajustes» não descreve o mesmo recorte. «DR eleito duas vezes com Full dual» mistura causa que o enunciado não mostra. «OSPF vira RIP automaticamente» também fica fora da evidência.",
     "part_id": "3.3"
   },
   {
@@ -221,14 +221,14 @@
       "Significa area mismatch"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Em broadcast, não há Full com todos os vizinhos. 2-Way com DROTHER é esperado.",
+    "explicacao_profunda": "Em broadcast, não há Full com todos os vizinhos. 2-Way com DROTHER é esperado. Isso casa com «É normal em multi-access: Full tipicamente com DR/BDR, 2-Way com outros DROTHERs». «Sempre indica falha de MTU» não descreve o mesmo recorte. «Prova timers mismatch com todos» mistura causa que o enunciado não mostra. «Significa area mismatch» também fica fora da evidência.",
     "part_id": "3.3"
   },
   {
     "id": 16,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "ip ospf cost 50 na interface:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.3): ip ospf cost 50 na interface?",
     "alternativas": [
       "Define o Dead timer como 50",
       "Define a priority como 50",
@@ -236,7 +236,7 @@
       "Sobrescreve o cost calculado por bandwidth para aquela interface"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "Cost manual na interface. Não é timer, priority nem process-id.",
+    "explicacao_profunda": "Cost manual na interface. Não é timer, priority nem process-id. Isso casa com «Sobrescreve o cost calculado por bandwidth para aquela interface». «Define o Dead timer como 50» não descreve o mesmo recorte. «Define a priority como 50» mistura causa que o enunciado não mostra. «Muda o process-id para 50» também fica fora da evidência.",
     "part_id": "3.3"
   },
   {
@@ -266,7 +266,7 @@
       "P2P usa apenas RIP"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "P2P: Full direto, sem DR/BDR. Multi-access usa DR/BDR e Hellos.",
+    "explicacao_profunda": "P2P: Full direto, sem DR/BDR. Multi-access usa DR/BDR e Hellos. Isso casa com «P2P forma Full sem eleição DR/BDR da mesma forma que Ethernet multi-access». «P2P também elege sempre DR e BDR obrigatórios» não descreve o mesmo recorte. «Multi-access nunca usa Hello» mistura causa que o enunciado não mostra. «P2P usa apenas RIP» também fica fora da evidência.",
     "part_id": "3.3"
   },
   {
@@ -281,7 +281,7 @@
       "Diagnosticar timers, área, papel DR/BDR/P2P e parâmetros do link OSPF"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "Comando-chave de interface OSPF. Não é BGP/EtherChannel/clear RID.",
+    "explicacao_profunda": "Comando-chave de interface OSPF. Não é BGP/EtherChannel/clear RID. Isso casa com «Diagnosticar timers, área, papel DR/BDR/P2P e parâmetros do link OSPF». «Só listar rotas BGP» não descreve o mesmo recorte. «Configurar channel-group» mistura causa que o enunciado não mostra. «Apagar o RID» também fica fora da evidência.",
     "part_id": "3.3"
   },
   {
@@ -296,7 +296,7 @@
       "Converte ambos em BDR"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Area deve ser igual no segmento. Mismatch = sem adjacency.",
+    "explicacao_profunda": "Area deve ser igual no segmento. Mismatch = sem adjacency. Isso casa com «Impede neighbor/adjacency OSPF naquele link». «Formam adjacency normalmente» não descreve o mesmo recorte. «Só afeta o cost» mistura causa que o enunciado não mostra. «Converte ambos em BDR» também fica fora da evidência.",
     "part_id": "3.3"
   },
   {
@@ -326,7 +326,7 @@
       "Desliga passive-interface"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "RID manual estável. Não remove area 0 nem seta priority/passive global.",
+    "explicacao_profunda": "RID manual estável. Não remove area 0 nem seta priority/passive global. Isso casa com «Torna o RID previsível e estável (não muda com interfaces)». «Elimina a necessidade de area 0» não descreve o mesmo recorte. «Define priority 2 em todas as interfaces» mistura causa que o enunciado não mostra. «Desliga passive-interface» também fica fora da evidência.",
     "part_id": "3.3"
   },
   {
@@ -386,7 +386,7 @@
       "O de maior RID apenas"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Menor cost vence. ECMP exige costs iguais. RID não escolhe path cost assim.",
+    "explicacao_profunda": "Menor cost vence. ECMP exige costs iguais. RID não escolhe path cost assim. Isso casa com «Cost 10 (menor métrica)». «Cost 30» não descreve o mesmo recorte. «Sempre ECMP com 10 e 30 iguais» mistura causa que o enunciado não mostra. «O de maior RID apenas» também fica fora da evidência.",
     "part_id": "3.3"
   },
   {
@@ -416,14 +416,14 @@
       "Não formam neighbor — precisam estar na mesma subnet"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "Mesma subnet é requisito. Area/timers não compensam IPs em redes diferentes.",
+    "explicacao_profunda": "Mesma subnet é requisito. Area/timers não compensam IPs em redes diferentes. Isso casa com «Não formam neighbor — precisam estar na mesma subnet». «Formam Full se a area for 0» não descreve o mesmo recorte. «Timers iguais bastam para adjacency» mistura causa que o enunciado não mostra. «OSPF ignora endereços IP» também fica fora da evidência.",
     "part_id": "3.3"
   },
   {
     "id": 29,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Checklist “não forma vizinho OSPF”:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.3): Checklist “não forma vizinho OSPF”?",
     "alternativas": [
       "Só trocar o SFP por monomodo",
       "Interface no processo, same subnet/area/timers, not passive, RID único, MTU/auth se aplicável",
@@ -446,7 +446,7 @@
       "Single-area com RID 3.3.3.3 na área 0 — coerente com single-area de estudo"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "1 área (0) e RID 3.3.3.3. Não são 3 áreas nem RID zero.",
+    "explicacao_profunda": "1 área (0) e RID 3.3.3.3. Não são 3 áreas nem RID zero. Isso casa com «Single-area com RID 3.3.3.3 na área 0 — coerente com single-area de estudo». «Há 3 áreas no processo» não descreve o mesmo recorte. «RID é 0.0.0.0» mistura causa que o enunciado não mostra. «Processo multi-area obrigatório» também fica fora da evidência.",
     "part_id": "3.3"
   }
 ]

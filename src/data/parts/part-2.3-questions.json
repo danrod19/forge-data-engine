@@ -33,7 +33,7 @@
     "id": 3,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "A Root Port em um switch não-root é:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.3): A Root Port em um switch não-root é?",
     "alternativas": [
       "Qualquer porta em err-disable",
       "Todas as portas Designated ao mesmo tempo",
@@ -281,7 +281,7 @@
       "O inventário de SFPs monomodo"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "show spanning-tree root foca o root. Não é allowed, SFP nem EtherType.",
+    "explicacao_profunda": "show spanning-tree root foca o root. Não é allowed, SFP nem EtherType. Isso casa com «Quem é o Root e informações associadas de root path». «Qual o EtherType do frame 802.1Q» não descreve o mesmo recorte. «A lista allowed de todos os trunks» mistura causa que o enunciado não mostra. «O inventário de SFPs monomodo» também fica fora da evidência.",
     "part_id": "2.3"
   },
   {
@@ -356,7 +356,7 @@
       "Medir CRC de fibra monomodo"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Priority entra no BID. Não é LACP, wildcard ACL nem CRC óptico.",
+    "explicacao_profunda": "Priority entra no BID. Não é LACP, wildcard ACL nem CRC óptico. Isso casa com «Influenciar o BID na eleição do Root (menor priority numérica favorece o root)». «Definir o EtherChannel mode on» não descreve o mesmo recorte. «Calcular wildcards de ACL» mistura causa que o enunciado não mostra. «Medir CRC de fibra monomodo» também fica fora da evidência.",
     "part_id": "2.3"
   },
   {

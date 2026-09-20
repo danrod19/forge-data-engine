@@ -18,7 +18,7 @@
     "id": 2,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "CAPWAP, no essencial do CCNA, é:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.5): CAPWAP, no essencial do CCNA, é?",
     "alternativas": [
       "Protocolo de roteamento entre VLANs de usuário",
       "O túnel/controle entre AP lightweight e a WLC",
@@ -56,14 +56,14 @@
       "1, 6 e 11"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "1/6/11 são o trio clássico. 3/4/5 se sobrepõem fortemente.",
+    "explicacao_profunda": "1/6/11 são o trio clássico. 3/4/5 se sobrepõem fortemente. Isso casa com «1, 6 e 11». «2, 7 e 12 apenas» não descreve o mesmo recorte. «3, 4 e 5» mistura causa que o enunciado não mostra. «8, 9 e 10» também fica fora da evidência.",
     "part_id": "2.5"
   },
   {
     "id": 5,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "SSID é melhor descrito como:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.5): SSID é melhor descrito como?",
     "alternativas": [
       "O nome da rede wireless anunciada aos clientes",
       "O endereço IP da WLC",
@@ -71,7 +71,7 @@
       "O modo LACP do LAG"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "SSID = nome da WLAN no ar. Não é IP da WLC, custo STP nem LACP.",
+    "explicacao_profunda": "SSID = nome da WLAN no ar. Não é IP da WLC, custo STP nem LACP. Isso casa com «O nome da rede wireless anunciada aos clientes». «O endereço IP da WLC» não descreve o mesmo recorte. «O custo STP do uplink» mistura causa que o enunciado não mostra. «O modo LACP do LAG» também fica fora da evidência.",
     "part_id": "2.5"
   },
   {
@@ -108,7 +108,7 @@
     "id": 8,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "LAG no WLC agrega principalmente:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.5): LAG no WLC agrega principalmente?",
     "alternativas": [
       "Rádios 2,4 e 5 em um único SSID mágico",
       "APs em mesh sem CAPWAP",
@@ -116,7 +116,7 @@
       "Portas de distribuição da WLC em direção ao switch (uplink da controller)"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "LAG = uplink cabeado da WLC. Não é mesh CAPWAP nem Bluetooth.",
+    "explicacao_profunda": "LAG = uplink cabeado da WLC. Não é mesh CAPWAP nem Bluetooth. Isso casa com «Portas de distribuição da WLC em direção ao switch (uplink da controller)». «Rádios 2,4 e 5 em um único SSID mágico» não descreve o mesmo recorte. «APs em mesh sem CAPWAP» mistura causa que o enunciado não mostra. «Clientes Bluetooth» também fica fora da evidência.",
     "part_id": "2.5"
   },
   {
@@ -251,7 +251,7 @@
       "Canais 1/6/11 são apagados do espectro"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "PSK errado = security mismatch. Não derruba CAPWAP campus nem apaga canais.",
+    "explicacao_profunda": "PSK errado = security mismatch. Não derruba CAPWAP campus nem apaga canais. Isso casa com «Falha de autenticação/associação segura; não completa o acesso à WLAN». «Recebe sempre VLAN de management da WLC» não descreve o mesmo recorte. «CAPWAP do AP cai em todos os andares» mistura causa que o enunciado não mostra. «Canais 1/6/11 são apagados do espectro» também fica fora da evidência.",
     "part_id": "2.5"
   },
   {
@@ -273,7 +273,7 @@
     "id": 19,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "show ap summary na WLC ajuda a ver:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.5): show ap summary na WLC ajuda a ver?",
     "alternativas": [
       "Se os APs estão joined e dados básicos de inventário/estado",
       "Apenas rotas OSPF do core",
@@ -281,7 +281,7 @@
       "Senhas dos usuários RADIUS em claro"
     ],
     "resposta_correta": 0,
-    "explicacao_profunda": "Inventário/join de APs. Não é tabela OSPF, LACP hash nem dump de senhas.",
+    "explicacao_profunda": "Inventário/join de APs. Não é tabela OSPF, LACP hash nem dump de senhas. Isso casa com «Se os APs estão joined e dados básicos de inventário/estado». «Apenas rotas OSPF do core» não descreve o mesmo recorte. «Somente o hash LACP» mistura causa que o enunciado não mostra. «Senhas dos usuários RADIUS em claro» também fica fora da evidência.",
     "part_id": "2.5"
   },
   {
@@ -363,7 +363,7 @@
     "id": 25,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "show wlan summary na WLC serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.5): show wlan summary na WLC serve para?",
     "alternativas": [
       "Só listar SFPs monomodo do core",
       "Configurar channel-group mode on",
@@ -371,7 +371,7 @@
       "Ver WLANs, SSID e se estão enabled/disabled"
     ],
     "resposta_correta": 3,
-    "explicacao_profunda": "Resumo de WLANs. Não é inventário óptico, EtherChannel nem clear mac.",
+    "explicacao_profunda": "Resumo de WLANs. Não é inventário óptico, EtherChannel nem clear mac. Isso casa com «Ver WLANs, SSID e se estão enabled/disabled». «Só listar SFPs monomodo do core» não descreve o mesmo recorte. «Configurar channel-group mode on» mistura causa que o enunciado não mostra. «Apagar a tabela MAC do switch de acesso» também fica fora da evidência.",
     "part_id": "2.5"
   },
   {
@@ -386,7 +386,7 @@
       "Canal 11 vira monomodo"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Sem PoE adequado o AP não sobe direito. Não altera WPA/LAG/canal óptico.",
+    "explicacao_profunda": "Sem PoE adequado o AP não sobe direito. Não altera WPA/LAG/canal óptico. Isso casa com «AP não energiza/estável o suficiente para operar e join — link de dados sem potência adequada». «SSID guest vira WPA3 sozinho» não descreve o mesmo recorte. «LAG da WLC muda para half-duplex» mistura causa que o enunciado não mostra. «Canal 11 vira monomodo» também fica fora da evidência.",
     "part_id": "2.5"
   },
   {
@@ -401,7 +401,7 @@
       "Desligar a WLC para forçar autônomo em massa"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Join → WLAN → client → dados. Canal 6 em massa e desligar WLC são anti-padrões.",
+    "explicacao_profunda": "Join → WLAN → client → dados. Canal 6 em massa e desligar WLC são anti-padrões. Isso casa com «AP join (CAPWAP) → WLAN no ar → associação/security → IP/VLAN de dados». «Só aumentar todos os APs para canal 6» não descreve o mesmo recorte. «Cliente → SSID → pular join do AP» mistura causa que o enunciado não mostra. «Desligar a WLC para forçar autônomo em massa» também fica fora da evidência.",
     "part_id": "2.5"
   },
   {

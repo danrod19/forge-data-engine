@@ -4,6 +4,16 @@
 
 ## Entradas Recentes
 
+- **2026-09-19** — QA geral CCNA+AWS (scanner + correção; auditoria 12/63/82)
+  - Scanner: `scripts/qa-scan-questions.mjs` → `scripts/qa-report.json` (pós-fix: flagged=0)
+  - 1ª passagem: **vistos 4683** · **high 407** · **med 96** (stem_lt40 339, expl_lt80 140, cli_not_ios 56, cli_json_http 26, ocr 2, template 1)
+  - Checkpoints 1ª passagem (vistos/high/med): 100/7/0 · 200/17/0 · 300/23/3 · 400/38/21 · 500/56/46 · 600–800 ~61–68/46 · 900/89/46 · 1000/97/46 · 1500/143/46 · 2000/209/46 · 2500/267/46 · 3000/271/46 · 3500/306/47 · 4000/358/93 · 4500/393/93 · 4683/407/96
+  - Corrigidas: **339 stems**, **141 explicações**, **66 CLI** (JSON/curl/Windows/nslookup → `hostname#` show/debug). **Quarentena: 0** (`scripts/qa-quarantine.json` vazio)
+  - Re-scan: 4683 / high 0 / med 0. Sem mudança de `resposta_correta`
+  - Fase A (Trilha **V2**, ids da auditoria Windows/MX/AI): `#12` DHCP snooping/helper; `#63` name-server/ip host (sem SMTP); `#82` show run com secrets (sem prompt cru)
+  - V1 curated `#12`/`#63`/`#82` já eram IOS (PoE / ip routing / NAT ACL) — intocados
+  - Sem Stripe / PWA / Auth / e-mail / CORS / deploy
+
 - **2026-09-19** — Bugs CCNA Estudo + tickets 143/144 (auditoria PRO)
   - Estudo: após responder, mesmo bloco do Simulado (`Explicacao` + “Resposta correta” se errar + paywall se `isPremium && !isPro`). Wrapper sem AnimatePresence/`opacity: 0` (explicação não some). `Explicacao` deixa de iniciar invisível.
   - Header Estudo: `#id` do JSON (`5.1 · #12`); N/M só na linha “Progresso”. 5.1/6.1 nunca `#` vazio.

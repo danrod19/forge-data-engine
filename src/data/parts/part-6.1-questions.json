@@ -33,7 +33,7 @@
     "id": 3,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "O data plane é responsável por:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.1): O data plane é responsável por?",
     "alternativas": [
       "Somente autenticação RADIUS de admin",
       "Somente gerar chaves SSH",
@@ -48,7 +48,7 @@
     "id": 4,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "O management plane inclui tipicamente:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.1): O management plane inclui tipicamente?",
     "alternativas": [
       "Apenas o hash do OSPF LSA",
       "Apenas a fila de prioridade de voz sem gestão",
@@ -78,7 +78,7 @@
     "id": 6,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Northbound refere-se a:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.1): Northbound refere-se a?",
     "alternativas": [
       "Somente cabos de console RJ-45",
       "Aplicações/orquestração consumindo a API do controller",
@@ -123,7 +123,7 @@
     "id": 9,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Control plane, em uma frase de prova:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.1): Control plane, em uma frase de prova?",
     "alternativas": [
       "É o plano que toma decisões de encaminhamento e roda protocolos (rotas, topologia, tabelas lógicas)",
       "É apenas o cabo de fibra do core",
@@ -333,7 +333,7 @@
     "id": 23,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Qual par está correto?",
+    "enunciado": "No contexto do exame (6.1), Qual par está correto?",
     "alternativas": [
       "Northbound = controller → switch; southbound = app → controller",
       "Northbound = app → controller; southbound = controller → device",

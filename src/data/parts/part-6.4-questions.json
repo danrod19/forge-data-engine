@@ -33,7 +33,7 @@
     "id": 3,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Inventory no Ansible serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.4): Inventory no Ansible serve para?",
     "alternativas": [
       "Cifrar o data plane com IPsec automaticamente",
       "Substituir o enable secret",
@@ -63,7 +63,7 @@
     "id": 5,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Module no Ansible é:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.4): Module no Ansible é?",
     "alternativas": [
       "A unidade de ação usada nas tasks (ex.: ios_config, ping)",
       "Somente o nome do switch no CDP",
@@ -93,7 +93,7 @@
     "id": 7,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Push model do Ansible indica que:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.4): Push model do Ansible indica que?",
     "alternativas": [
       "O device puxa o playbook sozinho a cada segundo sem control node",
       "Só existe pull de Chef no Ansible",
@@ -123,7 +123,7 @@
     "id": 9,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Drift de configuração ocorre quando:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.4): Drift de configuração ocorre quando?",
     "alternativas": [
       "O estado real do device diverge do estado desejado (ex.: mudança manual após o playbook)",
       "O inventory lista o host correto e o playbook aplica sem erro",
@@ -213,7 +213,7 @@
     "id": 15,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Caso típico de playbook no nível CCNA:",
+    "enunciado": "Qual alternativa completa corretamente este item (6.4): Caso típico de playbook no nível CCNA?",
     "alternativas": [
       "Compilar kernel Linux em todos os APs",
       "Aplicar banner, usuários locais ou VLAN de access padrão em muitos switches",

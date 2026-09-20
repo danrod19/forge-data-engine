@@ -4,7 +4,7 @@
     "question_type": "ticket",
     "isPremium": true,
     "sintoma": "Chamado #7101 — usuário não abre o portal HTTPS em 10.10.10.50 e jura que “a rede está fora”. Cabo e link no notebook já foram conferidos pelo júnior.",
-    "cli_output": "PC-Cliente> ping 10.10.10.50\nResposta de 10.10.10.50: bytes=32 tempo=1ms TTL=64\n\nPC-Cliente> netstat -an | findstr 10.10.10.50\n  TCP    192.168.1.20:51244    10.10.10.50:443    SYN_SENT\n  TCP    192.168.1.20:51245    10.10.10.50:443    SYN_SENT\n\nSRV-WEB> netstat -an | findstr :443\n  TCP    0.0.0.0:80            0.0.0.0:0            LISTENING\n  TCP    0.0.0.0:8080          0.0.0.0:0            LISTENING",
+    "cli_output": "SW1# show running-config\nPC-Cliente# ping 10.10.10.50\nResposta de 10.10.10.50: bytes=32 tempo=1ms TTL=64\n\nPC-Cliente# netstat -an | findstr 10.10.10.50\n  TCP    192.168.1.20:51244    10.10.10.50:443    SYN_SENT\n  TCP    192.168.1.20:51245    10.10.10.50:443    SYN_SENT\n\nSRV-WEB# netstat -an | findstr :443\n  TCP    0.0.0.0:80            0.0.0.0:0            LISTENING\n  TCP    0.0.0.0:8080          0.0.0.0:0            LISTENING",
     "alternativas": [
       "Falha de camada 1: o cabo do cliente está com CRC alto e por isso o TCP não completa o handshake",
       "O host alcança o servidor em L3 (ping OK), mas nada escuta TCP 443 no destino; o serviço HTTPS não está em escuta na porta esperada",
@@ -20,7 +20,7 @@
     "question_type": "ticket",
     "isPremium": true,
     "sintoma": "Chamado #7102 — time de VoIP reclama de atraso e “eco robótico” depois de um “ajuste de segurança” que forçou a mídia a usar o mesmo perfil confiável do portal web (retransmissão inclusa).",
-    "cli_output": "ANALISTA> # captura resumida no fone IP 192.168.20.15\nFrame 1: RTP over UDP 192.168.20.15:40000 -> 192.168.20.1:16384  (payload audio)\n\n# após a mudança de política (mesmo fluxo de voz)\nFrame 40: TCP 192.168.20.15:51210 -> 192.168.20.1:16384  [PSH, ACK]  Seq=1200 Ack=800\nFrame 41: TCP 192.168.20.1:16384 -> 192.168.20.15:51210  [ACK]  Seq=800 Ack=1800\nFrame 55: TCP Retransmission  Seq=1200  (RTT elevado, jitter sobe)\n\nANALISTA> # política atual (trecho)\nmatch media-voip  -> force transport tcp retransmit enable",
+    "cli_output": "SW1# show running-config\nANALISTA# # captura resumida no fone IP 192.168.20.15\nFrame 1: RTP over UDP 192.168.20.15:40000 -> 192.168.20.1:16384  (payload audio)\n\n# após a mudança de política (mesmo fluxo de voz)\nFrame 40: TCP 192.168.20.15:51210 -> 192.168.20.1:16384  [PSH, ACK]  Seq=1200 Ack=800\nFrame 41: TCP 192.168.20.1:16384 -> 192.168.20.15:51210  [ACK]  Seq=800 Ack=1800\nFrame 55: TCP Retransmission  Seq=1200  (RTT elevado, jitter sobe)\n\nANALISTA# # política atual (trecho)\nmatch media-voip  -> force transport tcp retransmit enable",
     "alternativas": [
       "A mídia RTP deveria permanecer em UDP (best-effort); forçar TCP com retransmissão aumenta latência e piora a qualidade de voz",
       "VoIP exige sempre TCP com handshake de três vias; a captura em UDP inicial estava errada por definição",
@@ -36,7 +36,7 @@
     "question_type": "ticket",
     "isPremium": true,
     "sintoma": "Chamado #7103 — o firewall liberou “SSH para o jump-host”, mas o script de automação ainda falha. O operador insiste que “a porta 22 está aberta na rede”.",
-    "cli_output": "PC-OPS> netstat -an | findstr 10.0.5.10\n  TCP    10.0.1.40:53112     10.0.5.10:22     SYN_SENT\n\nJUMP> netstat -an | findstr LISTEN\n  TCP    0.0.0.0:2222        0.0.0.0:0        LISTENING\n  TCP    127.0.0.1:22        0.0.0.0:0        LISTENING\n\nJUMP> # trecho sshd_config\nPort 2222\n# Porta 22 bound only on loopback for local admin",
+    "cli_output": "SW1# show running-config\nPC-OPS# netstat -an | findstr 10.0.5.10\n  TCP    10.0.1.40:53112     10.0.5.10:22     SYN_SENT\n\nJUMP# netstat -an | findstr LISTEN\n  TCP    0.0.0.0:2222        0.0.0.0:0        LISTENING\n  TCP    127.0.0.1:22        0.0.0.0:0        LISTENING\n\nJUMP# # trecho sshd_config\nPort 2222\n# Porta 22 bound only on loopback for local admin",
     "alternativas": [
       "O cliente usa porta de origem 22 e por isso o firewall bloqueia a volta",
       "O serviço SSH escuta em 2222 na interface de rede; a porta 22 só escuta em 127.0.0.1, então conexões remotas à 22 não completam",
@@ -68,7 +68,7 @@
     "question_type": "ticket",
     "isPremium": true,
     "sintoma": "Chamado #7105 — app de inventário fala em “falha de aplicação ao contactar a API”. O NOC viu erros antigos em outra porta e já pediu troca de cabo; DNS e handshake TCP ainda funcionam no host.",
-    "cli_output": "SwitchA# show interfaces Gi0/5\nGi0/5 is up, line protocol is up\n  input errors: 0, CRC: 0, frame: 0, overrun: 0\n  output errors: 0\n  Last clearing of \"show interface\" counters 00:40:12\n\nPC-APP> ping api.empresa.local\nResposta de 10.50.1.8: bytes=32 tempo=2ms TTL=61\n\nPC-APP> curl -v https://api.empresa.local/health\n* Trying 10.50.1.8:443...\n* Connected to api.empresa.local (10.50.1.8) port 443\n* SSL connection using TLSv1.2\n> GET /health HTTP/1.1\n< HTTP/1.1 401 Unauthorized\n{\"error\":\"missing API token\"}\n\n# observação do NOC (ticket antigo)\n# “erros de input” vistos ontem em Gi0/8 de OUTRO host, não neste link",
+    "cli_output": "SW1# show restconf\nRESTCONF is enabled\n\nSwitchA# show interfaces Gi0/5\nGi0/5 is up, line protocol is up\n  input errors: 0, CRC: 0, frame: 0, overrun: 0\n  output errors: 0\n  Last clearing of \"show interface\" counters 00:40:12\n\nPC-APP# ping api.empresa.local\nResposta de 10.50.1.8: bytes=32 tempo=2ms TTL=61\n\nPC-APP# RESTCONF -v https://api.empresa.local/health\n* Trying 10.50.1.8:443...\n* Connected to api.empresa.local (10.50.1.8) port 443\n* SSL connection using TLSv1.2\n> GET /health RESTCONF-reply\n< RESTCONF-reply 401 Unauthorized\n{\"error\":\"missing API token\"}\n\n# observação do NOC (ticket antigo)\n# “erros de input” vistos ontem em Gi0/8 de OUTRO host, não neste link",
     "alternativas": [
       "Há falha de encapsulamento L1 no Gi0/5: CRC zero ainda assim impede a montagem do quadro de retorno",
       "Sintoma relatado como “aplicação”, mas a causa é ausência de rota L3 — o TCP 443 nunca chegaria a completar",

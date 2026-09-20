@@ -108,7 +108,7 @@
     "id": 8,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Aging time da tabela MAC serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.1): Aging time da tabela MAC serve para?",
     "alternativas": [
       "Congelar MACs estáticos para sempre",
       "Apagar portas administratively down",
@@ -288,7 +288,7 @@
     "id": 20,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Um frame known unicast NÃO deve ser:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.1): Um frame known unicast NÃO deve ser?",
     "alternativas": [
       "Forwarded pela porta do destino aprendido",
       "Filtrado se destino está na porta de entrada",
@@ -588,7 +588,7 @@
     "id": 40,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "DTP, em visão leve do CCNA, serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.2): DTP, em visão leve do CCNA, serve para?",
     "alternativas": [
       "Negociar dinamicamente se a porta opera como trunk ou não",
       "Calcular máscaras VLSM",
@@ -933,7 +933,7 @@
     "id": 63,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "A Root Port em um switch não-root é:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.3): A Root Port em um switch não-root é?",
     "alternativas": [
       "Qualquer porta em err-disable",
       "Todas as portas Designated ao mesmo tempo",
@@ -1473,7 +1473,7 @@
     "id": 99,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "passive + passive em LACP resulta em:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.4): passive + passive em LACP resulta em?",
     "alternativas": [
       "Sem formação do bundle, pois ninguém inicia a negociação",
       "Canal LACP up com todos os membros",
@@ -1488,7 +1488,7 @@
     "id": 100,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "interface Port-channel 2 representa:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.4): interface Port-channel 2 representa?",
     "alternativas": [
       "A interface lógica do bundle (channel-group 2)",
       "Apenas o primeiro membro físico Gi1/0/1",
@@ -1578,7 +1578,7 @@
     "id": 106,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "auto + auto em PAgP:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.4): auto + auto em PAgP?",
     "alternativas": [
       "Forma canal imediatamente",
       "Equivalente a active + active LACP",
@@ -1638,7 +1638,7 @@
     "id": 110,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Cisco a Cisco, desirable + auto:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.4): Cisco a Cisco, desirable + auto?",
     "alternativas": [
       "Não forma nunca",
       "É par LACP",
@@ -1728,7 +1728,7 @@
     "id": 116,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "active + passive (LACP):",
+    "enunciado": "Qual alternativa completa corretamente este item (2.4): active + passive (LACP)?",
     "alternativas": [
       "Não forma porque passive é inválido",
       "Forma o canal: active inicia e passive responde",
@@ -1818,7 +1818,7 @@
     "id": 122,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "CAPWAP, no essencial do CCNA, é:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.5): CAPWAP, no essencial do CCNA, é?",
     "alternativas": [
       "Protocolo de roteamento entre VLANs de usuário",
       "O túnel/controle entre AP lightweight e a WLC",
@@ -1863,7 +1863,7 @@
     "id": 125,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "SSID é melhor descrito como:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.5): SSID é melhor descrito como?",
     "alternativas": [
       "O nome da rede wireless anunciada aos clientes",
       "O endereço IP da WLC",
@@ -1908,7 +1908,7 @@
     "id": 128,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "LAG no WLC agrega principalmente:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.5): LAG no WLC agrega principalmente?",
     "alternativas": [
       "Rádios 2,4 e 5 em um único SSID mágico",
       "APs em mesh sem CAPWAP",
@@ -2073,7 +2073,7 @@
     "id": 139,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "show ap summary na WLC ajuda a ver:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.5): show ap summary na WLC ajuda a ver?",
     "alternativas": [
       "Se os APs estão joined e dados básicos de inventário/estado",
       "Apenas rotas OSPF do core",
@@ -2163,7 +2163,7 @@
     "id": 145,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "show wlan summary na WLC serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (2.5): show wlan summary na WLC serve para?",
     "alternativas": [
       "Só listar SFPs monomodo do core",
       "Configurar channel-group mode on",

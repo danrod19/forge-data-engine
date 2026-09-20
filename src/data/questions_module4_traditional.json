@@ -918,7 +918,7 @@
     "id": 62,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Stratum no NTP indica principalmente:",
+    "enunciado": "Qual alternativa completa corretamente este item (4.3): Stratum no NTP indica principalmente?",
     "alternativas": [
       "A largura de banda da WAN em Mbps",
       "A distância hierárquica/qualidade relativa à fonte de tempo de referência",
@@ -1023,7 +1023,7 @@
     "id": 69,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "No modelo SNMP do CCNA, o agent é:",
+    "enunciado": "Qual alternativa completa corretamente este item (4.3): No modelo SNMP do CCNA, o agent é?",
     "alternativas": [
       "O software no device gerenciado que responde a polls e pode enviar traps",
       "Sempre o servidor NTP da Internet",
@@ -1098,7 +1098,7 @@
     "id": 74,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "SNMPv2c vs ideia de SNMPv3 no CCNA:",
+    "enunciado": "Qual alternativa completa corretamente este item (4.3): SNMPv2c vs ideia de SNMPv3 no CCNA?",
     "alternativas": [
       "v3 elimina o agent no device",
       "v2c usa community em claro; v3 introduz autenticação/criptografia (mais seguro)",
@@ -1188,7 +1188,7 @@
     "id": 80,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Manager SNMP é, no modelo da parte 4.3:",
+    "enunciado": "Qual alternativa completa corretamente este item (4.3): Manager SNMP é, no modelo da parte 4.3?",
     "alternativas": [
       "O processo DORA do DHCP",
       "A interface com ip nat outside",
@@ -1428,7 +1428,7 @@
     "id": 96,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "ip ssh version 2 é recomendado porque:",
+    "enunciado": "Qual alternativa completa corretamente este item (4.4): ip ssh version 2 é recomendado porque?",
     "alternativas": [
       "Desliga todas as VTY",
       "SSHv2 é a versão preferida; v1 é legado e considerado inseguro",
@@ -1593,7 +1593,7 @@
     "id": 107,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "enable secret protege principalmente:",
+    "enunciado": "Qual alternativa completa corretamente este item (4.4): enable secret protege principalmente?",
     "alternativas": [
       "A geração automática de domain-name",
       "O modo privilegiado (enable) após o acesso à linha — camada distinta do login VTY",
@@ -1848,7 +1848,7 @@
     "id": 124,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Marking no modelo PHB serve para:",
+    "enunciado": "Qual alternativa completa corretamente este item (4.5): Marking no modelo PHB serve para?",
     "alternativas": [
       "Apagar rotas OSPF automaticamente",
       "Substituir o cabeçalho Ethernet por PPP sempre",

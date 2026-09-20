@@ -33,7 +33,7 @@
     "id": 3,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Remote-access VPN é o caso em que:",
+    "enunciado": "Qual alternativa completa corretamente este item (5.5): Remote-access VPN é o caso em que?",
     "alternativas": [
       "Dois data centers trocam apenas rotas BGP sem túnel",
       "Switches access formam EtherChannel entre si",
@@ -93,7 +93,7 @@
     "id": 7,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Authorization em AAA define:",
+    "enunciado": "Qual alternativa completa corretamente este item (5.5): Authorization em AAA define?",
     "alternativas": [
       "Apenas o hostname do RADIUS",
       "Apenas o algoritmo de hash do enable secret",

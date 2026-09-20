@@ -36,7 +36,7 @@
     "question_type": "ticket",
     "isPremium": true,
     "sintoma": "Chamado #6103 — Portal de automação não aplica change. Usuários navegando normalmente. Time de rede jura que o switch de acesso está offline.",
-    "cli_output": "ORCH# curl -k -u orchestrator https://dnac.lab.local/dna/intent/api/v1/network-device\nHTTP/1.1 503 Service Unavailable\n{ \"error\": \"controller API gateway timeout\" }\n\nCTRL# show cluster\nNode-1: NOT_READY\nNode-2: NOT_READY\nVIP northbound: UNREACHABLE from orchestrator subnet\n\nACCESS-SW# show ip interface brief | include Vlan10|up\nVlan10   10.10.10.2   YES manual up  up\n\nPC-USER# ping 8.8.8.8\nReply from 8.8.8.8: time=12ms\n\nACCESS-SW# show cdp neighbors\nCore1  Gig 1/0/1  148  S I  WS-C\n\n! Inventario: device access ainda responde ICMP na gestao; cluster controller indisponivel para apps",
+    "cli_output": "SW1# show restconf\nRESTCONF is enabled\n\nORCH# RESTCONF -k -u orchestrator https://dnac.lab.local/dna/intent/api/v1/network-device\nRESTCONF-reply 503 Service Unavailable\n{ \"error\": \"controller API gateway timeout\" }\n\nCTRL# show cluster\nNode-1: NOT_READY\nNode-2: NOT_READY\nVIP northbound: UNREACHABLE from orchestrator subnet\n\nACCESS-SW# show ip interface brief | include Vlan10|up\nVlan10   10.10.10.2   YES manual up  up\n\nPC-USER# ping 8.8.8.8\nReply from 8.8.8.8: time=12ms\n\nACCESS-SW# show cdp neighbors\nCore1  Gig 1/0/1  148  S I  WS-C\n\n! Inventario: device access ainda responde ICMP na gestao; cluster controller indisponivel para apps",
     "alternativas": [
       "Data plane de Internet do usuário está down (ping 8.8.8.8 falha)",
       "CDP neighbors vazio prova cabo do access cortado",

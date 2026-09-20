@@ -48,7 +48,7 @@
     "id": 4,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "SVI no L3 switch é criada com:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.2): SVI no L3 switch é criada com?",
     "alternativas": [
       "channel-group 1 mode on",
       "spanning-tree portfast apenas",
@@ -86,7 +86,7 @@
       "Subinterface ROAS automática"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "no switchport = routed port. Não é access/trunk ROAS automático.",
+    "explicacao_profunda": "no switchport = routed port. Não é access/trunk ROAS automático. Isso casa com «Routed port L3 (IP na física, sem switchport L2)». «Porta access VLAN 1 forçada» não descreve o mesmo recorte. «Porta trunk nativa 99» mistura causa que o enunciado não mostra. «Subinterface ROAS automática» também fica fora da evidência.",
     "part_id": "3.2"
   },
   {
@@ -108,7 +108,7 @@
     "id": 8,
     "question_type": "traditional",
     "isPremium": false,
-    "enunciado": "Causa clássica de SVI Vlan20 up/down:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.2): Causa clássica de SVI Vlan20 up/down?",
     "alternativas": [
       "ip routing habilitado demais",
       "Excesso de rotas estáticas",
@@ -221,7 +221,7 @@
       "Somente S* obrigatória"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "SVIs up geram connected. Não exige BGP/S* como único conteúdo.",
+    "explicacao_profunda": "SVIs up geram connected. Não exige BGP/S* como único conteúdo. Isso casa com «Redes C (connected) das SVIs up com ip routing ativo». «Apenas rotas BGP» não descreve o mesmo recorte. «Nenhuma connected» mistura causa que o enunciado não mostra. «Somente S* obrigatória» também fica fora da evidência.",
     "part_id": "3.2"
   },
   {
@@ -251,7 +251,7 @@
       "Para substituir encapsulation dot1Q no ROAS do PC"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Routed port é L3 na física. PCs usam access+SVI. ROAS do PC não existe.",
+    "explicacao_profunda": "Routed port é L3 na física. PCs usam access+SVI. ROAS do PC não existe. Isso casa com «Em enlace L3 ponto a ponto entre devices, sem precisar de VLAN de acesso naquela porta». «Sempre para PCs de usuário final» não descreve o mesmo recorte. «Nunca em L3 switch» mistura causa que o enunciado não mostra. «Para substituir encapsulation dot1Q no ROAS do PC» também fica fora da evidência.",
     "part_id": "3.2"
   },
   {
@@ -296,7 +296,7 @@
       "Senhas VTY"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "show vlan brief = VLAN e membros access. Não é OSPF/LACP/VTY.",
+    "explicacao_profunda": "show vlan brief = VLAN e membros access. Não é OSPF/LACP/VTY. Isso casa com «Se a VLAN existe e quais portas access estão nela (base L2 da SVI)». «Apenas o next-hop OSPF» não descreve o mesmo recorte. «Só o hash LACP» mistura causa que o enunciado não mostra. «Senhas VTY» também fica fora da evidência.",
     "part_id": "3.2"
   },
   {
@@ -326,7 +326,7 @@
       "Desligar todas as SVIs"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "Fluxo do content: L2 então L3. Clear mac/Wi-Fi/desligar SVI não são o método.",
+    "explicacao_profunda": "Fluxo do content: L2 então L3. Clear mac/Wi-Fi/desligar SVI não são o método. Isso casa com «L2 VLAN/trunk → interface L3 up → ip routing → connected no route → ping gateway → outra VLAN». «Só clear mac em loop» não descreve o mesmo recorte. «Só aumentar potência Wi-Fi» mistura causa que o enunciado não mostra. «Desligar todas as SVIs» também fica fora da evidência.",
     "part_id": "3.2"
   },
   {
@@ -348,7 +348,7 @@
     "id": 24,
     "question_type": "traditional",
     "isPremium": true,
-    "enunciado": "Diferença chave SVI vs routed port:",
+    "enunciado": "Qual alternativa completa corretamente este item (3.2): Diferença chave SVI vs routed port?",
     "alternativas": [
       "SVI não pode ter IP",
       "Routed port exige encapsulation dot1Q no PC",
@@ -386,7 +386,7 @@
       "Allowed ignora a ausência da VLAN"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Sem VLAN no banco L2, a SVI não fica saudável. Não garante up/up.",
+    "explicacao_profunda": "Sem VLAN no banco L2, a SVI não fica saudável. Não garante up/up. Isso casa com «SVI/line protocol problemático — L2 da VLAN 30 inexistente/incompleto». «SVI up/up garantido» não descreve o mesmo recorte. «ROAS desnecessário em qualquer design» mistura causa que o enunciado não mostra. «Allowed ignora a ausência da VLAN» também fica fora da evidência.",
     "part_id": "3.2"
   },
   {
@@ -401,7 +401,7 @@
       "Somente rotas estáticas sem interfaces por VLAN"
     ],
     "resposta_correta": 2,
-    "explicacao_profunda": "SVI no multilayer é o padrão de escala. ROAS por PC e hub estão errados.",
+    "explicacao_profunda": "SVI no multilayer é o padrão de escala. ROAS por PC e hub estão errados. Isso casa com «SVIs no L3 switch de distribuição + ip routing (e trunks dos access)». «ROAS em cada PC» não descreve o mesmo recorte. «Um hub entre VLANs» mistura causa que o enunciado não mostra. «Somente rotas estáticas sem interfaces por VLAN» também fica fora da evidência.",
     "part_id": "3.2"
   },
   {
@@ -431,7 +431,7 @@
       "Canal Wi-Fi 6 GHz do switch"
     ],
     "resposta_correta": 1,
-    "explicacao_profunda": "Sem gateway local, inter-VLAN nem começa. Ver VLAN e SVI/subinterface primeiro.",
+    "explicacao_profunda": "Sem gateway local, inter-VLAN nem começa. Ver VLAN e SVI/subinterface primeiro. Isso casa com «L2/VLAN do host e status da SVI/subinterface gateway antes de culpar rotas remotas». «OSPF area 0 no core apenas» não descreve o mesmo recorte. «EtherChannel entre impressoras» mistura causa que o enunciado não mostra. «Canal Wi-Fi 6 GHz do switch» também fica fora da evidência.",
     "part_id": "3.2"
   },
   {

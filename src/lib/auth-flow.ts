@@ -1,7 +1,8 @@
 import type { AuthError, Session, User } from "@supabase/supabase-js";
+import { SITE_ORIGIN } from "@/types/question";
 
-/** Produção — Redirect URL já cadastrada no Supabase. */
-export const AUTH_PROD_ORIGIN = "https://forge-data-engine.vercel.app";
+/** Fallback SSR / e-mail — canônico. No browser, getAuthRedirectTo usa o origin atual (domínio ou alias). */
+export const AUTH_PROD_ORIGIN = SITE_ORIGIN;
 
 export const RESET_PASSWORD_SENT_COPY =
   "Se este e-mail estiver cadastrado, você receberá um link para redefinir a senha.";
@@ -17,9 +18,6 @@ export type PasswordRecoveryStatus = "none" | "ready" | "invalid";
 
 export function getAuthRedirectTo(): string {
   if (typeof window === "undefined") return AUTH_PROD_ORIGIN;
-  if (window.location.hostname === "forge-data-engine.vercel.app") {
-    return AUTH_PROD_ORIGIN;
-  }
   return window.location.origin;
 }
 

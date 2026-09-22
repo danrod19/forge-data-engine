@@ -4,6 +4,12 @@
 
 ## Entradas Recentes
 
+- **2026-09-22** — Domínio próprio + LGPD mínimo
+  - Canônico: `https://ccnaforge.com.br` (metadata, OG/Twitter, PWA `id`; `start_url`/`scope` = `/`). Alias `forge-data-engine.vercel.app` segue no ar (sem 301 no static export)
+  - Auth/checkout return: `getAuthRedirectTo()` = `window.location.origin` (domínio e alias)
+  - Rotas `/privacidade` e `/termos` (PT-BR, tema hacker). Rodapé: Privacidade · Termos · `ccnaforge19@gmail.com` + © 2026; `pb` acima do BottomNav
+  - Sem mudança de banco, preços, tracks, PRO/vidas, Stripe Dashboard
+
 - **2026-09-20** — Smoke Trilha V2 `#63`: **já IOS** (não reescrito)
   - Arquivo: `src/data/tickets_v2.json` id 63 · `resposta_correta`: **3**
   - Sintoma: `NOC-4403: PCs e o próprio roteador resolvem www.empresa.com, mas falham ao traduzir mail.empresa.com (option 150 / ip host / name-server). NS público responde; www continua ok.`

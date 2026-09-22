@@ -1,6 +1,6 @@
 /** Templates de e-mail transacional (Resend). Sem envio no client. */
 
-export const APP_URL = "https://forge-data-engine.vercel.app";
+export const APP_URL = "https://ccnaforge.com.br";
 export const SUPPORT_EMAIL = "ccnaforge19@gmail.com";
 export const DEFAULT_FROM = "onboarding@resend.dev";
 

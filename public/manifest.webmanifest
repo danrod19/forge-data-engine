@@ -1,8 +1,8 @@
 {
-  "id": "/",
+  "id": "https://ccnaforge.com.br/",
   "name": "CCNA Forge",
   "short_name": "Forge",
-  "description": "Estudo gamificado multi-track: CCNA 200-301 e AWS SAA.",
+  "description": "Estudo gamificado multi-track: CCNA 200-301 e AWS SAA. https://ccnaforge.com.br",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

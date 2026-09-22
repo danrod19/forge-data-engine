@@ -51,6 +51,7 @@
 - [x] Bugs CCNA (auditoria 19/09): Estudo renderiza `Explicacao` após responder; header `#id` (não N/M); tickets 143/144 CLI IOS
 - [x] QA geral CCNA+AWS (19/09): scanner `qa-scan-questions.mjs`; 4683 vistos; 407 high + 96 med corrigidos; quarentena 0; V2 tickets 12/63/82 CLI IOS
 - [x] Smoke V2 `#63` (20/09): já IOS (`EDGE#` / `show run` / `show hosts`); JSON não reescrito; `resposta_correta` 3
+- [x] Domínio ccnaforge.com.br + LGPD mínimo: metadata/PWA, /privacidade, /termos, rodapé, origin dinâmico no auth
 - [ ] Deploy na Vercel Hobby + rodar checklist QA pós-deploy
 - [ ] Validar na Vercel os env `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D` e `_120D` (sem Sensitive) + redeploy
 - [ ] Confirmar que os planos abrem `buy.stripe.com` a partir de Conta/Home/Paywall em produção

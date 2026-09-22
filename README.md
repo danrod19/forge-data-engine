@@ -47,7 +47,7 @@ App é **static export** — sem env obrigatória para o MVP free (quiz offline 
    - Checkout: `NEXT_PUBLIC_STRIPE_LINK_7D`, `_30D`, `_120D` (Payment Links).
    - Webhook **não** roda na Vercel static: fica na **Supabase Edge Function** `stripe-webhook` (secrets `STRIPE_*` + `SUPABASE_SERVICE_ROLE_KEY`).
 
-Deploy → abrir a URL `*.vercel.app` e rodar o checklist abaixo.
+Produção: **https://ccnaforge.com.br**. Alias antigo (continua válido): `https://forge-data-engine.vercel.app`. Abrir uma das duas URLs e rodar o checklist abaixo.
 
 ### Headers
 

@@ -47,6 +47,10 @@ export type NavTab =
 export const CONTACT_EMAIL = "ccnaforge19@gmail.com";
 export const CONTACT_MAILTO = `mailto:${CONTACT_EMAIL}`;
 
+/** Origem canônica (metadata / PWA / copy). Runtime de auth/checkout usa window.location.origin. */
+export const SITE_ORIGIN = "https://ccnaforge.com.br";
+export const SITE_HOST = "ccnaforge.com.br";
+
 /** Prompt principal da questão (enunciado ou sintoma) */
 export function getQuestionPrompt(q: Question): string {
   if (
